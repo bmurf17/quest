@@ -1,13 +1,11 @@
 import React from "react";
 import { useState } from "react";
+import { GameState, useGameStore } from "../state/GameState";
+import { Character } from "../types/Character";
 
-const GameLayout = () => {
-  const [activityLog] = useState(["1 Red Mushrhum draws near!"]);
-  const [party] = useState([
-    { name: "Character 1", hp: 80, maxHp: 100, mp: 60, maxMp: 100 },
-    { name: "Character 2", hp: 90, maxHp: 100, mp: 75, maxMp: 100 },
-    { name: "Character 3", hp: 70, maxHp: 100, mp: 85, maxMp: 100 },
-  ]);
+export default function GameLayout() {
+  const activityLog = useGameStore((state: GameState) => state.activityLog);
+  const party = useGameStore((state: GameState) => state.party);
 
   return (
     <div className="flex flex-col h-screen bg-gray-900 text-white">
@@ -51,30 +49,52 @@ const GameLayout = () => {
 
         {/* Party Status */}
         <div className="col-span-4 flex flex-col gap-2">
-          {party.map((character, i) => (
-            <div key={i} className="bg-gray-900 rounded p-2 flex gap-2">
-              <div className="w-12 h-12 bg-gray-700 rounded"></div>
-              <div className="flex-1">
-                <div className="text-sm">{character.name}</div>
-                <div className="h-2 bg-gray-700 rounded mt-1">
-                  <div
-                    className="h-full bg-green-500 rounded"
-                    style={{
-                      width: `${(character.hp / character.maxHp) * 100}%`,
-                    }}
-                  ></div>
-                </div>
-                <div className="h-2 bg-gray-700 rounded mt-1">
-                  <div
-                    className="h-full bg-blue-500 rounded"
-                    style={{
-                      width: `${(character.mp / character.maxMp) * 100}%`,
-                    }}
-                  ></div>
+          {party.map(
+            (
+              character: {
+                name:
+                  | string
+                  | number
+                  | boolean
+                  | React.ReactElement<
+                      any,
+                      string | React.JSXElementConstructor<any>
+                    >
+                  | Iterable<React.ReactNode>
+                  | React.ReactPortal
+                  | null
+                  | undefined;
+                hp: number;
+                maxHp: number;
+                mp: number;
+                maxMp: number;
+              },
+              i: React.Key | null | undefined
+            ) => (
+              <div key={i} className="bg-gray-900 rounded p-2 flex gap-2">
+                <div className="w-12 h-12 bg-gray-700 rounded"></div>
+                <div className="flex-1">
+                  <div className="text-sm">{character.name}</div>
+                  <div className="h-2 bg-gray-700 rounded mt-1">
+                    <div
+                      className="h-full bg-green-500 rounded"
+                      style={{
+                        width: `${(character.hp / character.maxHp) * 100}%`,
+                      }}
+                    ></div>
+                  </div>
+                  <div className="h-2 bg-gray-700 rounded mt-1">
+                    <div
+                      className="h-full bg-blue-500 rounded"
+                      style={{
+                        width: `${(character.mp / character.maxMp) * 100}%`,
+                      }}
+                    ></div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          )}
         </div>
 
         {/* Inventory/Actions */}
@@ -87,6 +107,4 @@ const GameLayout = () => {
       </div>
     </div>
   );
-};
-
-export default GameLayout;
+}
