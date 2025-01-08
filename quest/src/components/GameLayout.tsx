@@ -1,6 +1,6 @@
 import React from "react";
-import { useState } from "react";
 import { GameState, useGameStore } from "../state/GameState";
+import battleBackground from "../assets/portrait.png";
 import { Character } from "../types/Character";
 
 export default function GameLayout() {
@@ -28,7 +28,7 @@ export default function GameLayout() {
       </div>
 
       {/* Main Game Area */}
-      <div className="flex-1 relative bg-green-800 overflow-hidden">
+      <div className="flex-1 relative bg-cover bg-center bg-battle-background overflow-hidden">
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center">
             <div className="bg-gray-900/75 p-2 rounded">Red Mushrhum</div>
@@ -50,29 +50,11 @@ export default function GameLayout() {
         {/* Party Status */}
         <div className="col-span-4 flex flex-col gap-2">
           {party.map(
-            (
-              character: {
-                name:
-                  | string
-                  | number
-                  | boolean
-                  | React.ReactElement<
-                      any,
-                      string | React.JSXElementConstructor<any>
-                    >
-                  | Iterable<React.ReactNode>
-                  | React.ReactPortal
-                  | null
-                  | undefined;
-                hp: number;
-                maxHp: number;
-                mp: number;
-                maxMp: number;
-              },
-              i: React.Key | null | undefined
-            ) => (
+            (character: Character, i: React.Key | null | undefined) => (
               <div key={i} className="bg-gray-900 rounded p-2 flex gap-2">
-                <div className="w-12 h-12 bg-gray-700 rounded"></div>
+                <div className="w-12 h-12 bg-gray-700 rounded">
+                  <img src={battleBackground} />
+                </div>
                 <div className="flex-1">
                   <div className="text-sm">{character.name}</div>
                   <div className="h-2 bg-gray-700 rounded mt-1">
