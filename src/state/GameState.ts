@@ -1,9 +1,9 @@
+import { tempChar, CharacterData } from "@/types/Character";
 import { create } from "zustand";
-import { Character } from "../types/Character";
 
 export interface GameState {
   bears: number;
-  party: Character[];
+  party: CharacterData[];
   activityLog: string[];
   increasePopulation: () => void;
   removeAllBears: () => void;
@@ -12,11 +12,7 @@ export interface GameState {
 
 export const useGameStore = create<GameState>((set) => ({
   bears: 0,
-  party: [
-    { name: "Brendan", hp: 80, maxHp: 100, mp: 60, maxMp: 100 },
-    { name: "Character 2", hp: 90, maxHp: 100, mp: 75, maxMp: 100 },
-    { name: "Character 3", hp: 70, maxHp: 100, mp: 85, maxMp: 100 },
-  ],
+  party: [tempChar, tempChar, tempChar],
 
   activityLog: ["1 Red Mushrhum draws near for a fight!"],
 
