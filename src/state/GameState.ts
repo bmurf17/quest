@@ -8,6 +8,7 @@ export interface GameState {
   increasePopulation: () => void;
   removeAllBears: () => void;
   updateBears: (newBears: number) => void;
+  addToLog: (log: string) => void;
 }
 
 export const useGameStore = create<GameState>((set) => ({
@@ -16,7 +17,17 @@ export const useGameStore = create<GameState>((set) => ({
 
   activityLog: ["1 Red Mushrhum draws near for a fight!"],
 
+  addToLog: (message: string) =>
+    set((state) => ({
+      activityLog: [...state.activityLog, message],
+    })),
+
   increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
   removeAllBears: () => set({ bears: 0 }),
   updateBears: (newBears) => set({ bears: newBears }),
+
+  attack: () =>
+    set((state) => ({
+      activityLog: [...state.activityLog, "You attacked"],
+    })),
 }));
