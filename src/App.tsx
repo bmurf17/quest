@@ -1,7 +1,20 @@
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import GameLayout from "./components/GameLayout";
+import NavBar from "./components/NavBar";
+import Home from "./components/Home/Home";
 
 function App() {
-  return <GameLayout />;
+  return (
+    <Router>
+      <div className="flex flex-col h-screen bg-gray-900 text-white">
+        <NavBar />
+        <Routes>
+          <Route path={"/"} element={<Home />} />
+          <Route path={"/game"} element={<GameLayout />} />
+        </Routes>
+      </div>
+    </Router>
+  );
 }
 
 export default App;

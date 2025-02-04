@@ -7,6 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import warrior from "../assets/Warrior.png";
+import bow from "../assets/BowV1.png";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CharacterData } from "@/types/Character";
@@ -125,7 +126,14 @@ export default function CharacterSheet({
                     key={action.name}
                     className="flex justify-between items-center p-2 bg-gray-700/50 rounded"
                   >
-                    <span className="font-medium">{action.name}</span>
+                    <div className="flex flex-col">
+                      <span className="font-medium">{action.name}</span>
+                      <img
+                        src={bow}
+                        alt={"name"}
+                        className="w-16 h-16 rounded bg-gray-700"
+                      />
+                    </div>
                     <div className="flex gap-4 text-sm">
                       <span>Hit: {action.hitDC}</span>
                       <span>Damage: {action.damage}</span>
