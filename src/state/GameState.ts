@@ -1,10 +1,12 @@
 import { tempChar, CharacterData } from "@/types/Character";
+import { room, Room } from "@/types/Room";
 import { create } from "zustand";
 
 export interface GameState {
   bears: number;
   party: CharacterData[];
   activityLog: string[];
+  room: Room;
   increasePopulation: () => void;
   removeAllBears: () => void;
   updateBears: (newBears: number) => void;
@@ -14,9 +16,8 @@ export interface GameState {
 export const useGameStore = create<GameState>((set) => ({
   bears: 0,
   party: [tempChar, tempChar, tempChar],
-
   activityLog: ["1 Red Mushrhum draws near for a fight!"],
-
+  room: room,
   addToLog: (message: string) =>
     set((state) => ({
       activityLog: [...state.activityLog, message],
