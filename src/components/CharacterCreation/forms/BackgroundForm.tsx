@@ -33,15 +33,27 @@ export default function BackgroundForm() {
           <Label htmlFor="bg-charlatan">Charlatan</Label>
         </div>
         <div className="flex items-center space-x-2">
-          <RadioGroupItem value="criminal" id="bg-criminal" />
+          <RadioGroupItem
+            value="criminal"
+            id="bg-criminal"
+            className="border-yellow-500 text-yellow-500 focus:ring-yellow-500 data-[state=checked]:bg-yellow-500"
+          />
           <Label htmlFor="bg-criminal">Criminal</Label>
         </div>
         <div className="flex items-center space-x-2">
-          <RadioGroupItem value="entertainer" id="bg-entertainer" />
+          <RadioGroupItem
+            value="entertainer"
+            id="bg-entertainer"
+            className="border-yellow-500 text-yellow-500 focus:ring-yellow-500 data-[state=checked]:bg-yellow-500"
+          />
           <Label htmlFor="bg-entertainer">Entertainer</Label>
         </div>
         <div className="flex items-center space-x-2">
-          <RadioGroupItem value="folk-hero" id="bg-folk-hero" />
+          <RadioGroupItem
+            value="folk-hero"
+            id="bg-folk-hero"
+            className="border-yellow-500 text-yellow-500 focus:ring-yellow-500 data-[state=checked]:bg-yellow-500"
+          />
           <Label htmlFor="bg-folk-hero">Folk Hero</Label>
         </div>
       </RadioGroup>

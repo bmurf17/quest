@@ -41,6 +41,7 @@ export default function SubraceForm() {
               <RadioGroupItem
                 value={subrace.toLowerCase().replace(" ", "-")}
                 id={subrace.toLowerCase().replace(" ", "-")}
+                className="border-yellow-500 text-yellow-500 focus:ring-yellow-500 data-[state=checked]:bg-yellow-500"
               />
               <Label htmlFor={subrace.toLowerCase().replace(" ", "-")}>
                 {subrace}
