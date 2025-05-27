@@ -4,7 +4,7 @@ interface Props {
 
 export default function ActivityLog({ activityLog }: Props) {
   return (
-    <div className="col-span-4 bg-gray-900 rounded p-2">
+    <div className="col-span-4 bg-gray-900 rounded p-2 overflow-y-auto">
       {activityLog.map((log, i) => (
         <div key={i} className="text-sm">
           {log}
