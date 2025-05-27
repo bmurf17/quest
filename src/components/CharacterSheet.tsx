@@ -1,12 +1,9 @@
-"use client";
-
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import warrior from "../assets/Warrior.png";
 import bow from "../assets/BowV1.png";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -61,7 +58,6 @@ export default function CharacterSheet({
                   <Progress
                     value={(characterData.hp / characterData.maxHp) * 100}
                     className="h-2 bg-gray-700"
-                    //indicatorClassName="bg-green-500"
                   />
                   <div className="text-sm mt-1">
                     {characterData.hp} / {characterData.maxHp}
@@ -72,7 +68,6 @@ export default function CharacterSheet({
                   <Progress
                     value={(characterData.mp / characterData.maxMp) * 100}
                     className="h-2 bg-gray-700"
-                    //indicatorClassName="bg-blue-500"
                   />
                   <div className="text-sm mt-1">
                     {characterData.mp} / {characterData.maxMp}

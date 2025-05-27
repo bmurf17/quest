@@ -11,13 +11,16 @@ import {
 export default function MainGameArea() {
   const state = useGameStore((state: GameState) => state);
 
+  const roomInstance = state.roomInstances.get(state.room);
+  console.log(roomInstance);
+
   return (
     <div className="flex-1 relative bg-cover bg-center bg-battle-background overflow-hidden">
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="text-center">
-          {state.room.enemies.length > 0 ? (
+          {roomInstance && roomInstance?.enemies.length > 0 ? (
             <div className="bg-gray-900/75 p-2 rounded">
-              {state.room.enemies[0].name}
+              {roomInstance.enemies[0].name}
             </div>
           ) : (
             <>Enemy defeated</>

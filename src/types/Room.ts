@@ -6,11 +6,12 @@ export type Room = {
   neighboringRooms: [Directions, Room][];
 };
 
-const mushroom: Enemy = {
+// Factory function to create fresh enemy instances
+const createMushroom = (): Enemy => ({
   name: "mushroom",
   health: 10,
   id: 0,
-};
+});
 
 const northRoom: Room = {
   enemies: [],
@@ -18,7 +19,7 @@ const northRoom: Room = {
 };
 
 export const startRoom: Room = {
-  enemies: [mushroom],
+  enemies: [createMushroom()], // Creates a fresh instance
   neighboringRooms: [],
 };
 
