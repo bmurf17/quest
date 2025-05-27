@@ -51,7 +51,7 @@ export default function CharacterSheet({
             {/* Character Stats */}
             <div className="flex items-center gap-4">
               <img
-                src={warrior}
+                src={characterData.img}
                 alt={"name"}
                 className="w-24 h-24 rounded bg-gray-700"
               />

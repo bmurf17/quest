@@ -1,6 +1,6 @@
 import React from "react";
-import warrior from "../assets/Warrior.png";
-import { CharacterData, tempChar } from "../types/Character";
+
+import { CharacterData, tempRanger } from "../types/Character";
 import CharacterSheet from "./CharacterSheet";
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
 
 export default function Party({ party }: Props) {
   const [selectedCharacter, setSelectedCharacter] =
-    React.useState<CharacterData>(tempChar);
+    React.useState<CharacterData>(tempRanger);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
   const handleCharacterClick = (character: CharacterData) => {
@@ -27,7 +27,11 @@ export default function Party({ party }: Props) {
             onClick={() => handleCharacterClick(character)}
           >
             <div className="w-12 h-12 bg-gray-700 rounded">
-              <img className="w-12 h-12" src={warrior} alt={character.name} />
+              <img
+                className="w-12 h-12"
+                src={character.img}
+                alt={character.name}
+              />
             </div>
             <div className="flex-1">
               <div className="text-sm">{character.name}</div>
