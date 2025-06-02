@@ -31,7 +31,7 @@ export default function MainGameArea() {
                 }}
               />
               <div className="mt-4 text-white text-lg font-bold bg-black bg-opacity-50 rounded-lg px-4 py-2 inline-block">
-                Wild Mushroom Appears!
+                Wild Mushrhum Appears!
               </div>
             </div>
           ) : (
