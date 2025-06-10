@@ -1,7 +1,7 @@
 import { GameState, useGameStore } from "../state/GameState";
 import Party from "./Party";
 import Inventory from "./Inevntory";
-import MainGameArea from "./MainGameArea";
+import MainGameArea from "./MainGameArea/MainGameArea";
 import ActivityLog from "./ActivityLog";
 
 export default function GameLayout() {
@@ -12,7 +12,6 @@ export default function GameLayout() {
     <>
       <MainGameArea />
 
-      {/* Bottom Control Panel */}
       <div className="h-64 bg-gray-800 border-t border-gray-700 grid grid-cols-12 gap-2 p-2">
         <ActivityLog activityLog={activityLog} />
 

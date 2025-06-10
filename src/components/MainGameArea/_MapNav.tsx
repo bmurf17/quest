@@ -7,41 +7,11 @@ import {
   ChevronRight,
   ChevronUp,
 } from "lucide-react";
-import mushroom from "../assets/Mushroom.png";
 
-export default function MainGameArea() {
+export default function MapNav() {
   const state = useGameStore((state: GameState) => state);
-  const currentRoom = state.room;
-
   return (
-    <div className="flex-1 relative bg-cover bg-center bg-battle-background overflow-hidden">
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="text-center">
-          {currentRoom && currentRoom.enemies.length > 0 ? (
-            <div>
-              <img
-                src={mushroom}
-                alt="Enemy Mushroom"
-                className="mx-auto"
-                style={{
-                  width: "128px",
-                  height: "128px",
-                  imageRendering: "pixelated",
-                  filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.5))",
-                }}
-              />
-              <div className="mt-4 text-white text-lg font-bold bg-black bg-opacity-50 rounded-lg px-4 py-2 inline-block">
-                Wild Mushrhum Appears!
-              </div>
-            </div>
-          ) : (
-            <div className="text-white text-xl font-bold bg-black bg-opacity-80 rounded-lg px-6 py-3 inline-block">
-              Enemy defeated!
-            </div>
-          )}
-        </div>
-      </div>
-
+    <>
       {state.gameStatus === GameStatus.Exploring ? (
         <div className="absolute bottom-4 left-4 text-white">
           <div className="flex flex-col items-center space-y-2">
@@ -103,6 +73,6 @@ export default function MainGameArea() {
       ) : (
         <></>
       )}
-    </div>
+    </>
   );
 }
