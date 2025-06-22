@@ -3,8 +3,8 @@ import { Directions } from "@/types/Directions";
 import { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
 import { startRoom, Room } from "@/types/Room";
+import { getDiscoveryMessage } from "@/types/RoomInteractions";
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 
 export interface GameState {
   party: CharacterData[];
@@ -42,23 +42,19 @@ export const useGameStore = create<GameState>((set) => ({
       let logMessage2;
       let status = GameStatus.Combat;
 
-      // Get the current room instance
       const currentRoomInstance =
         state.roomInstances.get(state.room) || state.room;
 
       if (newHealth <= 0) {
-        // Remove the defeated enemy
         updatedEnemies = currentRoomInstance.enemies.filter(
           (e) => e.id !== enemy.id
         );
         logMessage = `${enemy.name} was defeated!`;
-        // Only change to exploring if no enemies left
         status =
           updatedEnemies.length === 0
             ? GameStatus.Exploring
             : GameStatus.Combat;
       } else {
-        // Update the enemy's health
         updatedEnemies = currentRoomInstance.enemies.map((e) => {
           if (e.id === enemy.id) {
             return {
@@ -70,7 +66,6 @@ export const useGameStore = create<GameState>((set) => ({
         });
         logMessage = `You attacked ${enemy.name} for 2 damage! Enemy health: ${newHealth}`;
 
-        // Enemy counter-attack
         const livingMembers = state.party.filter((member) => member.hp > 0);
         if (livingMembers.length > 0) {
           const target =
@@ -80,25 +75,21 @@ export const useGameStore = create<GameState>((set) => ({
         }
       }
 
-      // Create the updated room
       const updatedRoom = {
         ...currentRoomInstance,
         enemies: updatedEnemies,
       };
 
-      // Find the original room template
       const originalTemplate = [...state.roomInstances.entries()].find(
         ([template, instance]) =>
           instance === currentRoomInstance || template === state.room
       )?.[0];
 
-      // Update the room instances map
       const newRoomInstances = new Map(state.roomInstances);
       if (originalTemplate) {
         newRoomInstances.set(originalTemplate, updatedRoom);
       }
 
-      // Add messages to log
       const newActivityLog = [...state.activityLog, logMessage];
       if (logMessage2) {
         newActivityLog.push(logMessage2);
@@ -119,33 +110,66 @@ export const useGameStore = create<GameState>((set) => ({
       )?.[1];
 
       if (!targetRoomTemplate) {
-        return state; // No room in that direction
+        return state;
       }
 
-      // Get or create the room instance
       let roomInstance = state.roomInstances.get(targetRoomTemplate);
       if (!roomInstance) {
-        // First time visiting this room - create a copy
         roomInstance = {
           ...targetRoomTemplate,
           enemies: targetRoomTemplate.enemies.map((enemy) => ({ ...enemy })),
         };
       }
 
-      const logMessage = `Your party has moved ${Directions[direction]}`;
       const status =
         roomInstance.enemies.length > 0
           ? GameStatus.Combat
           : GameStatus.Exploring;
 
+      // Build activity log messages
+      const logBuilder = new ActivityLogBuilder()
+        .add(`Your party has moved ${Directions[direction]}`)
+        .addIf(
+          status === GameStatus.Exploring && !!roomInstance.interaction,
+          roomInstance.interaction
+            ? getDiscoveryMessage(roomInstance.interaction)
+            : ""
+        )
+        .addIf(
+          roomInstance.enemies.length > 0,
+          `You encounter ${roomInstance.enemies.length} ${
+            roomInstance.enemies.length === 1 ? "enemy" : "enemies"
+          }!`
+        );
+
       const newRoomInstances = new Map(state.roomInstances);
       newRoomInstances.set(targetRoomTemplate, roomInstance);
 
       return {
-        activityLog: [...state.activityLog, logMessage],
+        activityLog: [...state.activityLog, ...logBuilder.build()],
         room: roomInstance,
         roomInstances: newRoomInstances,
         gameStatus: status,
       };
     }),
 }));
+
+class ActivityLogBuilder {
+  private messages: string[] = [];
+
+  add(message: string): this {
+    this.messages.push(message);
+    return this;
+  }
+
+  addIf(condition: boolean, message: string): this {
+    if (condition) {
+      this.messages.push(message);
+    }
+    return this;
+  }
+
+  build(): string[] {
+    return [...this.messages];
+  }
+}

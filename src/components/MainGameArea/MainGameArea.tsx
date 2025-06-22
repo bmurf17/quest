@@ -7,6 +7,7 @@ export default function MainGameArea() {
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="text-center">
           <BattleEnemies />
+          
           <MapNav />
         </div>
       </div>

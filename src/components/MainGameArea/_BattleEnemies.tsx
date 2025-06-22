@@ -24,9 +24,7 @@ export default function BattleEnemies() {
           </div>
         </div>
       ) : (
-        <div className="text-white text-xl font-bold bg-black bg-opacity-80 rounded-lg px-6 py-3 inline-block">
-          Enemy defeated!
-        </div>
+        <> </>
       )}
     </>
   );
