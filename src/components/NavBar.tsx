@@ -12,6 +12,7 @@ import {
   Share2,
   MessageCircle,
   BarChart,
+  Shield,
 } from "lucide-react";
 
 export default function NavBar() {
@@ -28,6 +29,7 @@ export default function NavBar() {
     { icon: <Share2 size={20} />, path: "/share" },
     { icon: <MessageCircle size={20} />, path: "/comments" },
     { icon: <BarChart size={20} />, path: "/analytics" },
+    { icon: <Shield size={20} />, path: "/admin" },
   ];
 
   return (
