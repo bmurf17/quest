@@ -1,34 +1,14 @@
-import { Link } from "react-router-dom";
 import {
   Home,
-  Search,
-  Bell,
-  Mail,
-  Bookmark,
-  User,
-  Settings,
   Plus,
-  Heart,
-  Share2,
-  MessageCircle,
-  BarChart,
-  Shield,
+  Shield
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function NavBar() {
   const navItems = [
     { icon: <Home size={20} />, path: "/" },
-    { icon: <Search size={20} />, path: "/search" },
-    { icon: <Bell size={20} />, path: "/notifications" },
-    { icon: <Mail size={20} />, path: "/messages" },
-    { icon: <Bookmark size={20} />, path: "/bookmarks" },
-    { icon: <User size={20} />, path: "/profile" },
-    { icon: <Settings size={20} />, path: "/settings" },
     { icon: <Plus size={20} />, path: "/create" },
-    { icon: <Heart size={20} />, path: "/likes" },
-    { icon: <Share2 size={20} />, path: "/share" },
-    { icon: <MessageCircle size={20} />, path: "/comments" },
-    { icon: <BarChart size={20} />, path: "/analytics" },
     { icon: <Shield size={20} />, path: "/admin" },
   ];
 
