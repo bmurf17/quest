@@ -1,4 +1,4 @@
-interface NPC {
+export interface NPC {
   name: string;
   dialogue: string[];
   questId?: string;
@@ -20,13 +20,13 @@ interface Camp {
 }
 
 export type RoomInteraction =
-  | { type: "npc"; npc: NPC }
+  | { type: "NPC"; npc: NPC }
   | { type: "chest"; chest: Chest }
   | { type: "camp"; camp: Camp };
 
 export function getDiscoveryMessage(interaction: RoomInteraction): string {
   switch (interaction.type) {
-    case "npc":
+    case "NPC":
       return (
         interaction.npc.discoveryMessage ||
         `You notice ${interaction.npc.name} in this room.`

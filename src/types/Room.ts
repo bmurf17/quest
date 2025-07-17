@@ -3,6 +3,7 @@ import { Enemy } from "./Enemy";
 import { RoomInteraction } from "./RoomInteractions";
 
 export type Room = {
+  name: string;
   enemies: Enemy[];
   neighboringRooms: [Directions, Room][];
   interaction: RoomInteraction | null;
@@ -15,10 +16,11 @@ const createMushroom = (): Enemy => ({
 });
 
 const northRoom: Room = {
+  name: "north room",
   enemies: [],
   neighboringRooms: [],
   interaction: {
-    type: "npc",
+    type: "NPC",
     npc: {
       name: "Merchant",
       dialogue: ["What can I do for you?"],
@@ -28,6 +30,7 @@ const northRoom: Room = {
 };
 
 export const startRoom: Room = {
+  name: "start room",
   enemies: [createMushroom()],
   neighboringRooms: [],
   interaction: null,
@@ -35,3 +38,5 @@ export const startRoom: Room = {
 
 startRoom.neighboringRooms.push([Directions.North, northRoom]);
 northRoom.neighboringRooms.push([Directions.South, startRoom]);
+
+export const rooms = [startRoom, northRoom];

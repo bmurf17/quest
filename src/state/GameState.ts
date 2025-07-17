@@ -2,7 +2,7 @@ import { tempRanger, CharacterData, tempWarrior } from "@/types/Character";
 import { Directions } from "@/types/Directions";
 import { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
-import { startRoom, Room } from "@/types/Room";
+import { startRoom, Room, rooms } from "@/types/Room";
 import { getDiscoveryMessage } from "@/types/RoomInteractions";
 import { create } from "zustand";
 
@@ -12,9 +12,12 @@ export interface GameState {
   room: Room;
   roomInstances: Map<Room, Room>;
   gameStatus: GameStatus;
+  rooms: Room[];
   addToLog: (log: string) => void;
   attack: (enemy: Enemy) => void;
   move: (direction: Directions) => void;
+  addRoom: (room: Room) => void;
+  updateRoom: (room: Room) => void;
 }
 
 export const useGameStore = create<GameState>((set) => ({
@@ -28,6 +31,7 @@ export const useGameStore = create<GameState>((set) => ({
       { ...startRoom, enemies: startRoom.enemies.map((e) => ({ ...e })) },
     ],
   ]),
+  rooms: rooms,
 
   addToLog: (message: string) =>
     set((state) => ({
@@ -150,6 +154,21 @@ export const useGameStore = create<GameState>((set) => ({
         room: roomInstance,
         roomInstances: newRoomInstances,
         gameStatus: status,
+      };
+    }),
+
+  addRoom: (room: Room) =>
+    set((state) => {
+      state.rooms.push(room);
+      return {
+        rooms: rooms,
+      };
+    }),
+
+  updateRoom: (room: Room) =>
+    set((state) => {
+      return {
+        rooms: state.rooms.map((x) => (x.name !== room.name ? x : room)),
       };
     }),
 }));
