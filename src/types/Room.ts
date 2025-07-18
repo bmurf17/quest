@@ -30,7 +30,7 @@ const northRoom: Room = {
 };
 
 export const startRoom: Room = {
-  name: "start room",
+  name: "Start Room",
   enemies: [createMushroom()],
   neighboringRooms: [],
   interaction: null,

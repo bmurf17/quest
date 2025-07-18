@@ -158,12 +158,9 @@ export const useGameStore = create<GameState>((set) => ({
     }),
 
   addRoom: (room: Room) =>
-    set((state) => {
-      state.rooms.push(room);
-      return {
-        rooms: rooms,
-      };
-    }),
+    set((state) => ({
+      rooms: [...state.rooms, room],
+    })),
 
   updateRoom: (room: Room) =>
     set((state) => {

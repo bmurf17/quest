@@ -42,6 +42,7 @@ export default function ManageRooms() {
     var direction = formData.get("direction");
     if (direction) {
       neighboringRoom.neighboringRooms.push([+direction, room]);
+
       if (+direction === Directions.East) {
         room.neighboringRooms.push([Directions.West, neighboringRoom]);
       }
@@ -62,7 +63,13 @@ export default function ManageRooms() {
     addRoom(room);
     updateRoom(neighboringRoom);
 
+    event.currentTarget.reset();
+    setInteraction("NPC");
     console.log(rooms);
+    console.log(
+      "Current rooms in dropdown:",
+      rooms.map((r) => r.name)
+    );
   };
 
   return (
@@ -103,7 +110,7 @@ export default function ManageRooms() {
               >
                 {rooms.map((room, i) => {
                   return (
-                    <option key={room.name + i} value={room.name}>
+                    <option key={`${room.name}-${i}`} value={room.name}>
                       {room.name}
                     </option>
                   );
