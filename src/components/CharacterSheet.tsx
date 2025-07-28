@@ -5,6 +5,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import bow from "../assets/BowV1.png";
+import sword from "../assets/Sword.png";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CharacterData } from "@/types/Character";
@@ -124,9 +125,12 @@ export default function CharacterSheet({
                     <div className="flex flex-col">
                       <span className="font-medium">{action.name}</span>
                       <img
-                        src={bow}
+                        src={sword}
                         alt={"name"}
                         className="w-16 h-16 rounded bg-gray-700"
+                        style={{
+                          imageRendering: "pixelated",
+                        }}
                       />
                     </div>
                     <div className="flex gap-4 text-sm">
