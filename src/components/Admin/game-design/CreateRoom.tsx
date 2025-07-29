@@ -65,17 +65,12 @@ export default function ManageRooms() {
 
     event.currentTarget.reset();
     setInteraction("NPC");
-    console.log(rooms);
-    console.log(
-      "Current rooms in dropdown:",
-      rooms.map((r) => r.name)
-    );
   };
 
   return (
     <main className="container mx-auto p-4 pb-0 h-full">
       <h2 className="text-3xl font-bold m-4 mb-6">Manage Rooms</h2>
-      <div className="bg-white m-4 p-4 h-max text-black">
+      <div className="bg-gray-200 m-4 p-4 h-max text-black rounded-sm">
         <form onSubmit={handleSubmit} className="flex flex-col gap-2">
           <h2 className="text-3xl font-bold mb-6">Room Creation</h2>
 
@@ -96,8 +91,8 @@ export default function ManageRooms() {
                 Neighboring Rooms
               </label>
               <select
-                id="neightboringRooms"
-                name="neightboringRooms"
+                id="neighboringRooms"
+                name="neighboringRooms"
                 onChange={(e) => {
                   const selectedRoom = rooms.find(
                     (room) => room.name === e.target.value
