@@ -1,12 +1,12 @@
 import { GameState, useGameStore } from "@/state/GameState";
 import mushroom from "../../assets/Mushroom.png";
 
-export default function BattleEnemies() {
+export default function RoomNPC() {
   const state = useGameStore((state: GameState) => state);
   const currentRoom = state.room;
   return (
     <>
-      {currentRoom && currentRoom.enemies.length > 0 ? (
+      {currentRoom && currentRoom.interaction?.type === "NPC" ? (
         <div>
           <img
             src={mushroom}
@@ -20,7 +20,7 @@ export default function BattleEnemies() {
             }}
           />
           <div className="mt-4 text-white text-lg font-bold bg-black bg-opacity-50 rounded-lg px-4 py-2 inline-block">
-            {currentRoom.enemies[0].name} Appears!
+            You are greeted by {currentRoom.interaction.npc.name}
           </div>
         </div>
       ) : (

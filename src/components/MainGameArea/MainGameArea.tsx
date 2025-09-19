@@ -1,5 +1,6 @@
 import BattleEnemies from "./_BattleEnemies";
 import MapNav from "./_MapNav";
+import RoomNPC from "./_RoomNPc";
 
 export default function MainGameArea() {
   return (
@@ -7,7 +8,7 @@ export default function MainGameArea() {
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="text-center">
           <BattleEnemies />
-          
+          <RoomNPC />
           <MapNav />
         </div>
       </div>
