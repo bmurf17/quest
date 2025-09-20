@@ -3,7 +3,7 @@ import { Directions } from "@/types/Directions";
 import { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
 import { startRoom, Room, rooms } from "@/types/Room";
-import { getDiscoveryMessage } from "@/types/RoomInteractions";
+import { getDiscoveryMessage, NPC } from "@/types/RoomInteractions";
 import { create } from "zustand";
 
 export interface GameState {
@@ -16,6 +16,7 @@ export interface GameState {
   addToLog: (log: string) => void;
   attack: (enemy: Enemy) => void;
   move: (direction: Directions) => void;
+  speak: (npc: NPC) => void;
   addRoom: (room: Room) => void;
   updateRoom: (room: Room) => void;
 }
@@ -104,6 +105,17 @@ export const useGameStore = create<GameState>((set) => ({
         roomInstances: newRoomInstances,
         gameStatus: status,
         activityLog: newActivityLog,
+      };
+    }),
+    
+  speak: (npc: NPC) =>
+    set((state) => {
+      const logBuilder = new ActivityLogBuilder().add(
+        `${npc.name} says: ${npc.dialogue}`
+      );
+
+      return {
+        activityLog: [...state.activityLog, ...logBuilder.build()],
       };
     }),
 
