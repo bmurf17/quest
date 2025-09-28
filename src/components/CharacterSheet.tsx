@@ -4,8 +4,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import bow from "../assets/BowV1.png";
-import sword from "../assets/Sword.png";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CharacterData } from "@/types/Character";
@@ -46,7 +44,6 @@ export default function CharacterSheet({
               </div>
             </div>
 
-            {/* Character Stats */}
             <div className="flex items-center gap-4">
               <img
                 src={characterData.img}
@@ -77,7 +74,6 @@ export default function CharacterSheet({
               </div>
             </div>
 
-            {/* Abilities */}
             <div className="grid grid-cols-6 gap-4">
               {Object.entries(characterData.abilities).map(([key, value]) => (
                 <div
@@ -95,7 +91,6 @@ export default function CharacterSheet({
               ))}
             </div>
 
-            {/* Skills */}
             <div className="space-y-2">
               <h3 className="text-lg font-semibold">Skills</h3>
               <div className="grid grid-cols-2 gap-2">
@@ -113,20 +108,19 @@ export default function CharacterSheet({
               </div>
             </div>
 
-            {/* Actions */}
             <div className="space-y-2">
               <h3 className="text-lg font-semibold">Actions</h3>
               <div className="space-y-2">
-                {characterData.actions.map((action) => (
+                {characterData.items.map((item) => (
                   <div
-                    key={action.name}
+                    key={item.action.name}
                     className="flex justify-between items-center p-2 bg-gray-700/50 rounded"
                   >
                     <div className="flex flex-col">
-                      <span className="font-medium">{action.name}</span>
+                      <span className="font-medium">{item.action.name}</span>
                       <img
-                        src={sword}
-                        alt={"name"}
+                        src={item.img}
+                        alt={item.action.name}
                         className="w-16 h-16 rounded bg-gray-700"
                         style={{
                           imageRendering: "pixelated",
@@ -134,9 +128,9 @@ export default function CharacterSheet({
                       />
                     </div>
                     <div className="flex gap-4 text-sm">
-                      <span>Hit: {action.hitDC}</span>
-                      <span>Damage: {action.damage}</span>
-                      <span className="text-gray-400">{action.type}</span>
+                      <span>Hit: {item.action.hitDC}</span>
+                      <span>Damage: {item.action.damage}</span>
+                      <span className="text-gray-400">{item.action.type}</span>
                     </div>
                   </div>
                 ))}

@@ -1,5 +1,7 @@
 import warrior from "../assets/Warrior.png";
 import rogue from "../assets/Rogue.png";
+import longbow from "../assets/BowV1.png";
+import sword from "../assets/Sword.png";
 
 type Ability = {
   score: number;
@@ -37,6 +39,11 @@ type SavingThrows = {
   cha: string;
 };
 
+type Item = {
+  img: string;
+  action: Action;
+};
+
 export type CharacterData = {
   name: string;
   race: string;
@@ -49,7 +56,7 @@ export type CharacterData = {
   maxMp: number;
   abilities: AbilityScores;
   skills: Skill[];
-  actions: Action[];
+  items: Item[];
   savingThrows: SavingThrows;
 };
 
@@ -78,9 +85,25 @@ export const tempRanger: CharacterData = {
     { name: "Athletics", ability: "STR", modifier: "+2" },
     { name: "Deception", ability: "CHA", modifier: "-1" },
   ],
-  actions: [
-    { name: "Longbow", hitDC: "+6", damage: "1d8+2", type: "Ranged Weapon" },
-    { name: "Shortsword", hitDC: "+4", damage: "1d6+2", type: "Melee Weapon" },
+  items: [
+    {
+      img: longbow,
+      action: {
+        name: "Longbow",
+        hitDC: "+6",
+        damage: "1d8+2",
+        type: "Ranged Weapon",
+      },
+    },
+    {
+      img: sword,
+      action: {
+        name: "Shortsword",
+        hitDC: "+4",
+        damage: "1d6+2",
+        type: "Melee Weapon",
+      },
+    },
   ],
   savingThrows: {
     str: "+2",
@@ -117,9 +140,25 @@ export const tempWarrior: CharacterData = {
     { name: "Athletics", ability: "STR", modifier: "+2" },
     { name: "Deception", ability: "CHA", modifier: "-1" },
   ],
-  actions: [
-    { name: "Longbow", hitDC: "+6", damage: "1d8+2", type: "Ranged Weapon" },
-    { name: "Shortsword", hitDC: "+4", damage: "1d6+2", type: "Melee Weapon" },
+  items: [
+    {
+      img: longbow,
+      action: {
+        name: "Longbow",
+        hitDC: "+6",
+        damage: "1d8+2",
+        type: "Ranged Weapon",
+      },
+    },
+    {
+      img: sword,
+      action: {
+        name: "Shortsword",
+        hitDC: "+4",
+        damage: "1d6+2",
+        type: "Melee Weapon",
+      },
+    },
   ],
   savingThrows: {
     str: "+2",
