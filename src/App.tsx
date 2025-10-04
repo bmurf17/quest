@@ -6,6 +6,8 @@ import CharacterCreation from "./components/CharacterCreation/CharacterCreation"
 import ManageRooms from "./components/Admin/game-design/CreateRoom";
 import Admin from "./components/Admin/GameDesign";
 import RoomMap from "./components/Admin/game-design/RoomMap";
+import { PartySelection } from "./components/Party/PartySelection";
+import { tempCleric, tempRanger, tempWarrior } from "./types/Character";
 
 function App() {
   return (
@@ -15,6 +17,7 @@ function App() {
         <Routes>
           <Route path={"/"} element={<Home />} />
           <Route path={"/game"} element={<GameLayout />} />
+          <Route path={"/party"} element={<PartySelection availableCharacters={[tempRanger, tempWarrior, tempCleric]} />} />
           <Route path={"/create"} element={<CharacterCreation />} />
           <Route path={"/admin/game-design/rooms"} element={<ManageRooms />} />
           <Route path={"/admin/game-design/roomMap"} element={<RoomMap />} />

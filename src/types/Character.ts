@@ -1,7 +1,9 @@
 import warrior from "../assets/Warrior.png";
 import rogue from "../assets/Rogue.png";
 import longbow from "../assets/BowV1.png";
+import staff from "../assets/Staff.png";
 import sword from "../assets/Sword.png";
+import cleric from "../assets/Cleric.png";
 
 type Ability = {
   score: number;
@@ -147,6 +149,61 @@ export const tempWarrior: CharacterData = {
         name: "Longbow",
         hitDC: "+6",
         damage: "1d8+2",
+        type: "Ranged Weapon",
+      },
+    },
+    {
+      img: sword,
+      action: {
+        name: "Shortsword",
+        hitDC: "+4",
+        damage: "1d6+2",
+        type: "Melee Weapon",
+      },
+    },
+  ],
+  savingThrows: {
+    str: "+2",
+    dex: "+4",
+    con: "0",
+    int: "+1",
+    wis: "+1",
+    cha: "-1",
+  },
+};
+
+export const tempCleric: CharacterData = {
+  name: "Cleric Example",
+  race: "Human",
+  img: cleric,
+  class: "Cleric",
+  level: 2,
+  hp: 20,
+  maxHp: 20,
+  mp: 10,
+  maxMp: 10,
+  abilities: {
+    str: { score: 11, modifier: 0 },
+    dex: { score: 15, modifier: 2 },
+    con: { score: 10, modifier: 0 },
+    int: { score: 12, modifier: 1 },
+    wis: { score: 12, modifier: 1 },
+    cha: { score: 12, modifier: 1 },
+  },
+  skills: [
+    { name: "Acrobatics", ability: "DEX", modifier: "+2" },
+    { name: "Animal Handling", ability: "WIS", modifier: "+1" },
+    { name: "Arcana", ability: "INT", modifier: "+1" },
+    { name: "Athletics", ability: "STR", modifier: "+2" },
+    { name: "Deception", ability: "CHA", modifier: "-1" },
+  ],
+  items: [
+    {
+      img: staff,
+      action: {
+        name: "staff",
+        hitDC: "+1",
+        damage: "1d4+2",
         type: "Ranged Weapon",
       },
     },

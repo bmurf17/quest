@@ -1,4 +1,4 @@
-import { tempRanger, CharacterData, tempWarrior } from "@/types/Character";
+import { tempRanger, CharacterData, tempWarrior, tempCleric } from "@/types/Character";
 import { Directions } from "@/types/Directions";
 import { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
@@ -22,7 +22,7 @@ export interface GameState {
 }
 
 export const useGameStore = create<GameState>((set) => ({
-  party: [tempRanger, tempWarrior],
+  party: [tempRanger, tempWarrior, tempCleric],
   activityLog: ["1 Red Mushrhum draws near for a fight!"],
   room: startRoom,
   gameStatus: GameStatus.Combat,
