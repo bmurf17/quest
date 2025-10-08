@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CharacterData } from "../../types/Character";
+import { useGameStore, GameState } from "@/state/GameState";
 
 interface PartyPickerProps {
   availableCharacters: CharacterData[];
@@ -10,7 +11,8 @@ interface PartyPickerProps {
 export function PartySelection({ availableCharacters }: PartyPickerProps) {
   const [selectedCharacter, setSelectedCharacter] =
     useState<CharacterData | null>(availableCharacters[0] || null);
-  const [party, setParty] = useState<CharacterData[]>([]);
+  const [party, setParty] = useState<CharacterData[]>(useGameStore((state: GameState) => state.party));
+  const updateParty = useGameStore((state: GameState) => state.setParty);
 
   const MAX_PARTY_SIZE = 3;
 
@@ -27,11 +29,13 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
       if (!isDuplicate) {
         setParty([...party, selectedCharacter]);
       }
+      updateParty([...party, selectedCharacter])
     }
   };
 
   const handleRemoveFromParty = (index: number) => {
     setParty(party.filter((_, i) => i !== index));
+    updateParty(party)
   };
 
   return (
@@ -128,7 +132,7 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                 </div>
 
                 <div>
-                  <h4 className="font-semibold text-gray-800 mb-3">
+                  <h4 className="font-semibold text-gray-50 mb-3">
                     Ability Scores
                   </h4>
                   <div className="grid grid-cols-3 gap-3">
@@ -155,7 +159,7 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                 </div>
 
                 <div>
-                  <h4 className="font-semibold text-gray-800 mb-3">
+                  <h4 className="font-semibold text-gray-50 mb-3">
                     Equipment
                   </h4>
                   <div className="grid grid-cols-2 gap-3">

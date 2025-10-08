@@ -1,4 +1,4 @@
-import { tempRanger, CharacterData, tempWarrior, tempCleric } from "@/types/Character";
+import { CharacterData } from "@/types/Character";
 import { Directions } from "@/types/Directions";
 import { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
@@ -19,10 +19,11 @@ export interface GameState {
   speak: (npc: NPC) => void;
   addRoom: (room: Room) => void;
   updateRoom: (room: Room) => void;
+  setParty: (characters: CharacterData[]) => void;
 }
 
 export const useGameStore = create<GameState>((set) => ({
-  party: [tempRanger, tempWarrior, tempCleric],
+  party: [],
   activityLog: ["1 Red Mushrhum draws near for a fight!"],
   room: startRoom,
   gameStatus: GameStatus.Combat,
@@ -107,7 +108,7 @@ export const useGameStore = create<GameState>((set) => ({
         activityLog: newActivityLog,
       };
     }),
-    
+
   speak: (npc: NPC) =>
     set((state) => {
       const logBuilder = new ActivityLogBuilder().add(
@@ -178,6 +179,13 @@ export const useGameStore = create<GameState>((set) => ({
     set((state) => {
       return {
         rooms: state.rooms.map((x) => (x.name !== room.name ? x : room)),
+      };
+    }),
+
+  setParty: (chars: CharacterData[]) =>
+    set(() => {
+      return {
+        party: chars,
       };
     }),
 }));

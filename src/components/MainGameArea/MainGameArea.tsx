@@ -1,6 +1,7 @@
 import BattleEnemies from "./_BattleEnemies";
 import MapNav from "./_MapNav";
-import RoomNPC from "./_RoomNPc";
+import RoomNPC from "./_RoomNPC";
+
 
 export default function MainGameArea() {
   return (

@@ -1,7 +1,8 @@
 import {
   Home,
   Plus,
-  Shield
+  Shield,
+  Users
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -9,6 +10,7 @@ export default function NavBar() {
   const navItems = [
     { icon: <Home size={20} />, path: "/" },
     { icon: <Plus size={20} />, path: "/create" },
+    { icon: <Users size={20} />, path: "/party" },
     { icon: <Shield size={20} />, path: "/admin" },
   ];
 
