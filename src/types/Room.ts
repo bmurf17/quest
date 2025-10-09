@@ -29,6 +29,20 @@ const northRoom: Room = {
   },
 };
 
+const eastRoom: Room = {
+  name: "east room",
+  enemies: [],
+  neighboringRooms: [],
+  interaction: {
+    type: "chest",
+    chest: {
+      itemId: "",
+      quantity: 0,
+      isLocked: false
+    }
+  },
+};
+
 export const startRoom: Room = {
   name: "Start Room",
   enemies: [createMushroom()],
@@ -38,5 +52,7 @@ export const startRoom: Room = {
 
 startRoom.neighboringRooms.push([Directions.North, northRoom]);
 northRoom.neighboringRooms.push([Directions.South, startRoom]);
+northRoom.neighboringRooms.push([Directions.East, eastRoom]);
+eastRoom.neighboringRooms.push([Directions.West, northRoom])
 
-export const rooms = [startRoom, northRoom];
+export const rooms = [startRoom, northRoom, eastRoom];

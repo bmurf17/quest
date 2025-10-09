@@ -30,6 +30,18 @@ export default function Inventory() {
       ) : (
         <> </>
       )}
+      {room && room.interaction?.type === "chest" ? (
+        <div className="bg-gray-900 rounded hover:bg-gray-600 cursor-pointer flex justify-center items-center"
+          // onClick={() =>
+          //   {if(room && room.interaction?.type === "NPC") {
+          //     speak(room?.interaction?.npc as NPC)}
+          //   }}
+          >
+          Open
+        </div>
+      ) : (
+        <> </>
+      )}
       <div className="bg-gray-900 rounded"></div>
       <div className="bg-gray-900 rounded"></div>
       <div className="bg-gray-900 rounded"></div>

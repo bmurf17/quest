@@ -1,5 +1,6 @@
 import BattleEnemies from "./_BattleEnemies";
 import MapNav from "./_MapNav";
+import RoomChest from "./_RoomChest";
 import RoomNPC from "./_RoomNPC";
 
 
@@ -10,6 +11,7 @@ export default function MainGameArea() {
         <div className="text-center">
           <BattleEnemies />
           <RoomNPC />
+          <RoomChest />
           <MapNav />
         </div>
       </div>

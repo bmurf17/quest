@@ -1,6 +1,6 @@
 import { GameState, useGameStore } from "../state/GameState";
 import Party from "./Party";
-import Inventory from "./Inevntory";
+import Inventory from "./Inventory";
 import MainGameArea from "./MainGameArea/MainGameArea";
 import ActivityLog from "./ActivityLog";
 
