@@ -20,7 +20,7 @@ export interface GameState {
   addRoom: (room: Room) => void;
   updateRoom: (room: Room) => void;
   setParty: (characters: CharacterData[]) => void;
-  openChest: (chest: Chest) => void;
+  updateChest: (chest: Chest) => void;
 }
 
 export const useGameStore = create<GameState>((set) => ({
@@ -190,17 +190,16 @@ export const useGameStore = create<GameState>((set) => ({
       };
     }),
 
-  openChest: (chest: Chest) =>
+  updateChest: (chest: Chest) =>
     set((state) => {
       const currentRoomInstance =
         state.roomInstances.get(state.room) || state.room;
       const logBuilder = new ActivityLogBuilder().add(
         `You have opened the chest!`
       );
-      const updatedChest: Chest = { ...chest, isOpen: true };
       const updatedRoom: Room = {
         ...currentRoomInstance,
-        interaction: { type: "chest", chest: updatedChest },
+        interaction: { type: "chest", chest: chest },
       };
 
       const originalTemplate = [...state.roomInstances.entries()].find(

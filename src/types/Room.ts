@@ -36,8 +36,9 @@ const eastRoom: Room = {
   interaction: {
     type: "chest",
     chest: {
+      id: 1,
       itemId: "",
-      quantity: 0,
+      quantity: 3,
       isLocked: false,
       isOpen: false
     }

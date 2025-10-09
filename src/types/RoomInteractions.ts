@@ -6,6 +6,7 @@ export interface NPC {
 }
 
 export interface Chest {
+  id: number;
   itemId: string;
   quantity: number;
   isLocked: boolean;
