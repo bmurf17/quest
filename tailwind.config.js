@@ -5,7 +5,7 @@ export default {
   theme: {
     extend: {
       backgroundImage: {
-        "battle-background": "url(../src/assets/battle%20background.jpg)",
+        "battle-background": "url(../src/assets/area1-background.png)",
       },
       borderRadius: {
         lg: "var(--radius)",

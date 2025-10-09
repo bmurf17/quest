@@ -5,11 +5,12 @@ export interface NPC {
   discoveryMessage?: string;
 }
 
-interface Chest {
+export interface Chest {
   itemId: string;
   quantity: number;
   isLocked: boolean;
   discoveryMessage?: string;
+  isOpen: boolean;
 }
 
 interface Camp {

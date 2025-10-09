@@ -1,9 +1,10 @@
 import { useGameStore } from "@/state/GameState";
-import { NPC } from "@/types/RoomInteractions";
+import { Chest, NPC } from "@/types/RoomInteractions";
 
 export default function Inventory() {
   const attack = useGameStore((state) => state.attack);
   const speak = useGameStore((state) => state.speak);
+  const openChest = useGameStore((state) => state.openChest);
   const room = useGameStore((state) => state.room);
 
   return (
@@ -32,10 +33,10 @@ export default function Inventory() {
       )}
       {room && room.interaction?.type === "chest" ? (
         <div className="bg-gray-900 rounded hover:bg-gray-600 cursor-pointer flex justify-center items-center"
-          // onClick={() =>
-          //   {if(room && room.interaction?.type === "NPC") {
-          //     speak(room?.interaction?.npc as NPC)}
-          //   }}
+          onClick={() =>
+            {if(room && room.interaction?.type === "chest") {
+              openChest(room?.interaction?.chest as Chest)
+            }}}
           >
           Open
         </div>

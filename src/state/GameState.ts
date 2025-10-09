@@ -3,7 +3,7 @@ import { Directions } from "@/types/Directions";
 import { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
 import { startRoom, Room, rooms } from "@/types/Room";
-import { getDiscoveryMessage, NPC } from "@/types/RoomInteractions";
+import { Chest, getDiscoveryMessage, NPC } from "@/types/RoomInteractions";
 import { create } from "zustand";
 
 export interface GameState {
@@ -20,6 +20,7 @@ export interface GameState {
   addRoom: (room: Room) => void;
   updateRoom: (room: Room) => void;
   setParty: (characters: CharacterData[]) => void;
+  openChest: (chest: Chest) => void;
 }
 
 export const useGameStore = create<GameState>((set) => ({
@@ -186,6 +187,36 @@ export const useGameStore = create<GameState>((set) => ({
     set(() => {
       return {
         party: chars,
+      };
+    }),
+
+  openChest: (chest: Chest) =>
+    set((state) => {
+      const currentRoomInstance =
+        state.roomInstances.get(state.room) || state.room;
+      const logBuilder = new ActivityLogBuilder().add(
+        `You have opened the chest!`
+      );
+      const updatedChest: Chest = { ...chest, isOpen: true };
+      const updatedRoom: Room = {
+        ...currentRoomInstance,
+        interaction: { type: "chest", chest: updatedChest },
+      };
+
+      const originalTemplate = [...state.roomInstances.entries()].find(
+        ([template, instance]) =>
+          instance === currentRoomInstance || template === state.room
+      )?.[0];
+
+      const newRoomInstances = new Map(state.roomInstances);
+      if (originalTemplate) {
+        newRoomInstances.set(originalTemplate, updatedRoom);
+      }
+
+      return {
+        activityLog: [...state.activityLog, ...logBuilder.build()],
+        room: updatedRoom,
+        roomInstances: newRoomInstances,
       };
     }),
 }));

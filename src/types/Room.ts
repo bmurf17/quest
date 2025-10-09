@@ -38,7 +38,8 @@ const eastRoom: Room = {
     chest: {
       itemId: "",
       quantity: 0,
-      isLocked: false
+      isLocked: false,
+      isOpen: false
     }
   },
 };

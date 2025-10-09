@@ -17,8 +17,6 @@ export default function NavBar() {
   return (
     <div className="flex justify-between items-center p-2 bg-gray-800 border-b border-gray-700">
       <div className="flex items-center gap-2">
-        <span className="text-blue-400">250</span>
-        <span className="text-yellow-400">0</span>
       </div>
       <div className="flex gap-2">
         {navItems.map((item, i) => (
