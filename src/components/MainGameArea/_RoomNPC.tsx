@@ -1,5 +1,5 @@
 import { GameState, useGameStore } from "@/state/GameState";
-import mushroom from "../../assets/Mushroom.png";
+import merchant from "../../assets/Merchant.png"
 
 export default function RoomNPC() {
   const state = useGameStore((state: GameState) => state);
@@ -9,8 +9,8 @@ export default function RoomNPC() {
       {currentRoom && currentRoom.interaction?.type === "NPC" ? (
         <div>
           <img
-            src={mushroom}
-            alt="Enemy Mushroom"
+            src={merchant}
+            alt="Merchant"
             className="mx-auto"
             style={{
               width: "128px",
