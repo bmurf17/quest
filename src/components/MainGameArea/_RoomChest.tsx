@@ -6,7 +6,6 @@ import emptyChest from "../../assets/Empty-Chest.png"
 export default function RoomChest() {
   const state = useGameStore((state: GameState) => state);
   const currentRoom = state.room;
-  console.log(currentRoom.interaction);
   return (
     <>
       {currentRoom && currentRoom.interaction?.type === "chest" ? (

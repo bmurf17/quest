@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { CharacterData } from "../../types/Character";
 import { useGameStore, GameState } from "@/state/GameState";
+import { Link } from "react-router-dom";
 
 interface PartyPickerProps {
   availableCharacters: CharacterData[];
@@ -11,7 +12,9 @@ interface PartyPickerProps {
 export function PartySelection({ availableCharacters }: PartyPickerProps) {
   const [selectedCharacter, setSelectedCharacter] =
     useState<CharacterData | null>(availableCharacters[0] || null);
-  const [party, setParty] = useState<CharacterData[]>(useGameStore((state: GameState) => state.party));
+  const [party, setParty] = useState<CharacterData[]>(
+    useGameStore((state: GameState) => state.party)
+  );
   const updateParty = useGameStore((state: GameState) => state.setParty);
 
   const MAX_PARTY_SIZE = 3;
@@ -29,19 +32,21 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
       if (!isDuplicate) {
         setParty([...party, selectedCharacter]);
       }
-      updateParty([...party, selectedCharacter])
+      updateParty([...party, selectedCharacter]);
     }
   };
 
   const handleRemoveFromParty = (index: number) => {
     setParty(party.filter((_, i) => i !== index));
-    updateParty(party)
+    updateParty(party);
   };
 
   return (
     <div className="flex gap-4 h-screen p-4 bg-gray-100">
       <div className="w-64 flex flex-col gap-2 overflow-y-auto">
-        <h2 className="text-xl font-bold    text-gray-800 mb-2">Choose Class</h2>
+        <h2 className="text-xl font-bold    text-gray-800 mb-2">
+          Choose Class
+        </h2>
         {availableCharacters.map(
           (character: CharacterData, i: React.Key | null | undefined) => (
             <div
@@ -159,9 +164,7 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                 </div>
 
                 <div>
-                  <h4 className="font-semibold text-gray-50 mb-3">
-                    Equipment
-                  </h4>
+                  <h4 className="font-semibold text-gray-50 mb-3">Equipment</h4>
                   <div className="grid grid-cols-2 gap-3">
                     {selectedCharacter.items.map((item, idx) => (
                       <div
@@ -244,44 +247,56 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
             </p>
           </div>
         ) : (
-          party.map((member, index) => (
-            <div key={index} className="relative bg-slate-300 rounded">
-              <div className="bg-gray-900 p-2 flex gap-2" >
-                <div className="text-white text-lg">{member.name}</div>
-                <div className="text-purple-100 text-xs flex items-center">
-                  {member.class} • Lvl {member.level}
+          <div>
+            {party.map((member, index) => (
+              <div key={index} className="relative bg-slate-300 rounded">
+                <div className="bg-gray-900 p-2 flex gap-2">
+                  <div className="text-white text-lg">{member.name}</div>
+                  <div className="text-purple-100 text-xs flex items-center">
+                    {member.class} • Lvl {member.level}
+                  </div>
                 </div>
-              </div>
-              <div className="pt-4">
-                <div className="flex gap-3">
-                  <img
-                    src={member.img || "/placeholder.svg"}
-                    alt={member.name}
-                    style={{
-                      width: "80px",
-                      height: "480x",
-                      imageRendering: "pixelated",
-                      filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.5))",
-                    }}
-                  />
-                  <div className="flex-1">
-                    <div className="text-sm text-gray-600 mb-1">
-                      HP: {member.hp}/{member.maxHp}
+                <div className="pt-4">
+                  <div className="flex gap-3">
+                    <img
+                      src={member.img || "/placeholder.svg"}
+                      alt={member.name}
+                      style={{
+                        width: "80px",
+                        height: "480x",
+                        imageRendering: "pixelated",
+                        filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.5))",
+                      }}
+                    />
+                    <div className="flex-1">
+                      <div className="text-sm text-gray-600 mb-1">
+                        HP: {member.hp}/{member.maxHp}
+                      </div>
+                      <div className="text-sm text-gray-600 mb-2">
+                        MP: {member.mp}/{member.maxMp}
+                      </div>
+                      <button
+                        onClick={() => handleRemoveFromParty(index)}
+                        className="text-xs bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-colors"
+                      >
+                        Remove
+                      </button>
                     </div>
-                    <div className="text-sm text-gray-600 mb-2">
-                      MP: {member.mp}/{member.maxMp}
-                    </div>
-                    <button
-                      onClick={() => handleRemoveFromParty(index)}
-                      className="text-xs bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-colors"
-                    >
-                      Remove
-                    </button>
                   </div>
                 </div>
               </div>
-            </div>
-          ))
+            ))}
+            <Link to="/game">
+              <button
+                className={`w-full py-3 rounded-lg font-semibold transition-all ${
+                  party.length >= MAX_PARTY_SIZE ||
+                  "bg-green-600 text-white hover:bg-green-700 shadow-md mt-4"
+                }`}
+              >
+                {"Start your adventure"}
+              </button>
+            </Link>
+          </div>
         )}
       </div>
     </div>
