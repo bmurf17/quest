@@ -8,8 +8,25 @@ import Admin from "./components/Admin/GameDesign";
 import RoomMap from "./components/Admin/game-design/RoomMap";
 import { PartySelection } from "./components/Party/PartySelection";
 import { tempCleric, tempRanger, tempWarrior } from "./types/Character";
+import { useEffect } from "react";
+import { getAllRooms } from "./queries/RoomQueries";
+import { useGameStore } from "./state/GameState";
 
 function App() {
+  const setRooms = useGameStore(state => state.setRooms);
+
+  useEffect(() => {
+    const loadRooms = async () => {
+      try {
+        const rooms = await getAllRooms();
+        setRooms(rooms);
+      } catch (error) {
+        console.error('Failed to load rooms:', error);
+      }
+    };
+
+    loadRooms();
+  }, [setRooms]);
   return (
     <Router>
       <div className="flex flex-col h-screen bg-gray-900 text-white">

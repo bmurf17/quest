@@ -30,6 +30,7 @@ export default function ManageRooms() {
       enemies: [],
       neighboringRooms: [],
       interaction: null,
+      id: 0
     };
 
     if (interaction === "NPC") {

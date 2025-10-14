@@ -3,6 +3,7 @@ import { Enemy } from "./Enemy";
 import { RoomInteraction } from "./RoomInteractions";
 
 export type Room = {
+  id: number;
   name: string;
   enemies: Enemy[];
   neighboringRooms: [Directions, Room][];
@@ -27,34 +28,19 @@ const northRoom: Room = {
       discoveryMessage: "Well met travelers!",
     },
   },
+  id: 0
 };
 
-const eastRoom: Room = {
-  name: "east room",
-  enemies: [],
-  neighboringRooms: [],
-  interaction: {
-    type: "chest",
-    chest: {
-      id: 1,
-      itemId: "",
-      quantity: 3,
-      isLocked: false,
-      isOpen: false
-    }
-  },
-};
+
 
 export const startRoom: Room = {
   name: "Start Room",
   enemies: [createMushroom()],
   neighboringRooms: [],
   interaction: null,
+  id: 0
 };
 
 startRoom.neighboringRooms.push([Directions.North, northRoom]);
 northRoom.neighboringRooms.push([Directions.South, startRoom]);
-northRoom.neighboringRooms.push([Directions.East, eastRoom]);
-eastRoom.neighboringRooms.push([Directions.West, northRoom])
 
-export const rooms = [startRoom, northRoom, eastRoom];

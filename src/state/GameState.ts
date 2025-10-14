@@ -2,7 +2,7 @@ import { CharacterData } from "@/types/Character";
 import { Directions } from "@/types/Directions";
 import { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
-import { startRoom, Room, rooms } from "@/types/Room";
+import { startRoom, Room } from "@/types/Room";
 import { Chest, getDiscoveryMessage, NPC } from "@/types/RoomInteractions";
 import { create } from "zustand";
 
@@ -17,7 +17,7 @@ export interface GameState {
   attack: (enemy: Enemy) => void;
   move: (direction: Directions) => void;
   speak: (npc: NPC) => void;
-  getRooms: () => void;
+  setRooms: (rooms: Room[]) => void;
   addRoom: (room: Room) => void;
   updateRoom: (room: Room) => void;
   setParty: (characters: CharacterData[]) => void;
@@ -172,7 +172,8 @@ export const useGameStore = create<GameState>((set) => ({
       };
     }),
 
-  getRooms: () => set(() => ({
+  setRooms: (rooms: Room[]) => set(() => ( {
+    room: rooms[0],
     rooms: rooms
   })),
 
