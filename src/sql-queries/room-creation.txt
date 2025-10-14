@@ -1,0 +1,96 @@
+-- Enum for directions
+CREATE TYPE direction_enum AS ENUM ('North', 'South', 'East', 'West');
+
+-- Enum for interaction types
+CREATE TYPE interaction_type_enum AS ENUM ('NPC', 'chest', 'camp');
+
+-- Rooms table
+CREATE TABLE rooms (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Enemies table (assuming you have an Enemy type)
+CREATE TABLE enemies (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    -- Add other enemy properties as needed
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Room enemies junction table
+CREATE TABLE room_enemies (
+    id SERIAL PRIMARY KEY,
+    room_id INTEGER NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,
+    enemy_id INTEGER NOT NULL REFERENCES enemies(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(room_id, enemy_id)
+);
+
+-- Neighboring rooms junction table
+CREATE TABLE neighboring_rooms (
+    id SERIAL PRIMARY KEY,
+    room_id INTEGER NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,
+    neighbor_room_id INTEGER NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,
+    direction direction_enum NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(room_id, direction)
+);
+
+-- NPCs table
+CREATE TABLE npcs (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    dialogue TEXT[] NOT NULL, -- Array of dialogue strings
+    quest_id VARCHAR(255),
+    discovery_message TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Chests table
+CREATE TABLE chests (
+    id SERIAL PRIMARY KEY,
+    item_id VARCHAR(255) NOT NULL,
+    quantity INTEGER NOT NULL DEFAULT 1,
+    is_locked BOOLEAN NOT NULL DEFAULT false,
+    discovery_message TEXT,
+    is_open BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Camps table
+CREATE TABLE camps (
+    id SERIAL PRIMARY KEY,
+    heal_amount INTEGER NOT NULL,
+    restores_mana BOOLEAN NOT NULL DEFAULT false,
+    cost INTEGER,
+    discovery_message TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Room interactions table (polymorphic relationship)
+CREATE TABLE room_interactions (
+    id SERIAL PRIMARY KEY,
+    room_id INTEGER NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,
+    interaction_type interaction_type_enum NOT NULL,
+    npc_id INTEGER REFERENCES npcs(id) ON DELETE CASCADE,
+    chest_id INTEGER REFERENCES chests(id) ON DELETE CASCADE,
+    camp_id INTEGER REFERENCES camps(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(room_id),
+    -- Ensure only one interaction type is set
+    CONSTRAINT check_single_interaction CHECK (
+        (interaction_type = 'NPC' AND npc_id IS NOT NULL AND chest_id IS NULL AND camp_id IS NULL) OR
+        (interaction_type = 'chest' AND chest_id IS NOT NULL AND npc_id IS NULL AND camp_id IS NULL) OR
+        (interaction_type = 'camp' AND camp_id IS NOT NULL AND npc_id IS NULL AND chest_id IS NULL)
+    )
+);
+
+-- Indexes for better query performance
+CREATE INDEX idx_room_enemies_room_id ON room_enemies(room_id);
+CREATE INDEX idx_room_enemies_enemy_id ON room_enemies(enemy_id);
+CREATE INDEX idx_neighboring_rooms_room_id ON neighboring_rooms(room_id);
+CREATE INDEX idx_neighboring_rooms_neighbor_id ON neighboring_rooms(neighbor_room_id);
+CREATE INDEX idx_room_interactions_room_id ON room_interactions(room_id);
+CREATE INDEX idx_room_interactions_type ON room_interactions(interaction_type);

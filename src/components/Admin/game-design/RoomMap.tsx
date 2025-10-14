@@ -46,9 +46,8 @@ const RoomNode = React.memo(
         <div
           className="absolute bg-blue-100 border-2 border-blue-300 px-3 py-2 rounded text-sm font-medium"
           style={{
-            left: `calc(50% + ${x}px)`,
-            top: `calc(50% + ${y}px)`,
-            transform: "translate(-50%, -50%)",
+            left: `${x}px`,
+            top: `${y}px`,
           }}
         >
           {room.name}
@@ -161,7 +160,7 @@ export default function RoomMap() {
               width: `${containerWidth}px`,
               height: `${containerHeight}px`,
               transform: `translate(${-bounds.minX + padding}px, ${
-                -bounds.minY - verticalPadding * 3
+                -bounds.minY + verticalPadding
               }px)`,
             }}
           >

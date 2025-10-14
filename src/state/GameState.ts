@@ -17,6 +17,7 @@ export interface GameState {
   attack: (enemy: Enemy) => void;
   move: (direction: Directions) => void;
   speak: (npc: NPC) => void;
+  getRooms: () => void;
   addRoom: (room: Room) => void;
   updateRoom: (room: Room) => void;
   setParty: (characters: CharacterData[]) => void;
@@ -34,7 +35,7 @@ export const useGameStore = create<GameState>((set) => ({
       { ...startRoom, enemies: startRoom.enemies.map((e) => ({ ...e })) },
     ],
   ]),
-  rooms: rooms,
+  rooms: [],
 
   addToLog: (message: string) =>
     set((state) => ({
@@ -170,6 +171,10 @@ export const useGameStore = create<GameState>((set) => ({
         gameStatus: status,
       };
     }),
+
+  getRooms: () => set(() => ({
+    rooms: rooms
+  })),
 
   addRoom: (room: Room) =>
     set((state) => ({
