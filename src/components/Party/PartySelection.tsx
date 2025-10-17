@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { CharacterData } from "../../types/Character";
 import { useGameStore, GameState } from "@/state/GameState";

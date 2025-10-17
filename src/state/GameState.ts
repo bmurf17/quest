@@ -25,9 +25,11 @@ export interface GameState {
   setParty: (characters: CharacterData[]) => void;
   updateChest: (chest: Chest) => void;
   enterCombat: () => void;
+  isCurrentFighterEnemy: () => boolean;
+  performEnemyTurn: () => void;
 }
 
-export const useGameStore = create<GameState>((set) => ({
+export const useGameStore = create<GameState>((set, get) => ({
   party: [],
   activityLog: ["1 Red Mushrhum draws near for a fight!"],
   room: startRoom,
@@ -47,76 +49,133 @@ export const useGameStore = create<GameState>((set) => ({
       activityLog: [...state.activityLog, message],
     })),
 
-attack: (enemy: Enemy) =>
-  set((state) => {
-    const newHealth = enemy.health - 2;
-    let updatedEnemies;
-    let logMessage;
-    let logMessage2;
-    let status = GameStatus.Combat;
-    const currentRoomInstance =
-      state.roomInstances.get(state.room) || state.room;
-    
-    if (newHealth <= 0) {
-      updatedEnemies = currentRoomInstance.enemies.filter(
-        (e) => e.id !== enemy.id
-      );
-      logMessage = `${enemy.name} was defeated!`;
-      status =
-        updatedEnemies.length === 0
-          ? GameStatus.Exploring
-          : GameStatus.Combat;
-    } else {
-      updatedEnemies = currentRoomInstance.enemies.map((e) => {
-        if (e.id === enemy.id) {
-          return {
-            ...e,
-            health: newHealth,
-          };
+  isCurrentFighterEnemy: () => {
+    const state = get();
+    const currentFighter = state.combatOrder[state.activeFighterIndex];
+    return (
+      currentFighter && "health" in currentFighter && "id" in currentFighter
+    );
+  },
+
+  // Separate method for enemy AI turn
+  performEnemyTurn: () => {
+    const state = get();
+    const currentEnemy = state.combatOrder[state.activeFighterIndex] as Enemy;
+
+    if (!currentEnemy) return;
+
+    // Pick a random living party member to attack
+    const livingMembers = state.party.filter((member) => member.hp > 0);
+    if (livingMembers.length === 0) return;
+
+    const target =
+      livingMembers[Math.floor(Math.random() * livingMembers.length)];
+
+    set((state) => {
+      const updatedParty = state.party.map((member) => {
+        if (member.name === target.name) {
+          return { ...member, hp: Math.max(0, member.hp - 2) };
         }
-        return e;
+        return member;
       });
-      logMessage = `You attacked ${enemy.name} for 2 damage! Enemy health: ${newHealth}`;
-      const livingMembers = state.party.filter((member) => member.hp > 0);
-      if (livingMembers.length > 0) {
-        const target =
-          livingMembers[Math.floor(Math.random() * livingMembers.length)];
-        target.hp -= 2;
-        logMessage2 = `${enemy.name} attacked you back! and hit ${target.name}`;
+
+      const logMessage = `${currentEnemy.name} attacked ${
+        target.name
+      } for 2 damage! ${target.name}'s HP: ${Math.max(0, target.hp - 2)}`;
+
+      // Advance to next fighter
+      const nextIndex =
+        (state.activeFighterIndex + 1) % state.combatOrder.length;
+
+      return {
+        party: updatedParty,
+        activityLog: [...state.activityLog, logMessage],
+        activeFighterIndex: nextIndex,
+      };
+    });
+
+    // Check if next fighter is also an enemy, continue the chain
+    setTimeout(() => {
+      const { isCurrentFighterEnemy, performEnemyTurn } = get();
+      if (isCurrentFighterEnemy()) {
+        performEnemyTurn();
       }
-    }
-    
-    const updatedRoom = {
-      ...currentRoomInstance,
-      enemies: updatedEnemies,
-    };
-    
-    const originalTemplate = [...state.roomInstances.entries()].find(
-      ([template, instance]) =>
-        instance === currentRoomInstance || template === state.room
-    )?.[0];
-    
-    const newRoomInstances = new Map(state.roomInstances);
-    if (originalTemplate) {
-      newRoomInstances.set(originalTemplate, updatedRoom);
-    }
-    
-    const newActivityLog = [...state.activityLog, logMessage];
-    if (logMessage2) {
-      newActivityLog.push(logMessage2);
-    }
-    
-    // Advance to next fighter in combat order with wrapping
-    const nextIndex = (state.activeFighterIndex + 1) % state.combatOrder.length;
-    
-    return {
-      room: updatedRoom,
-      roomInstances: newRoomInstances,
-      gameStatus: status,
-      activityLog: newActivityLog,
-      activeFighterIndex: nextIndex,
-    };
-  }),
+    }, 500);
+  },
+
+  attack: (enemy: Enemy) => {
+    set((state) => {
+      // Get the current attacker from combat order
+      const currentAttacker = state.combatOrder[state.activeFighterIndex];
+      const attackerName = currentAttacker?.name || "Unknown";
+
+      const newHealth = enemy.health - 2;
+      let updatedEnemies;
+      let logMessage;
+      let status = GameStatus.Combat;
+      const currentRoomInstance =
+        state.roomInstances.get(state.room) || state.room;
+
+      if (newHealth <= 0) {
+        updatedEnemies = currentRoomInstance.enemies.filter(
+          (e) => e.id !== enemy.id
+        );
+        logMessage = `${attackerName} defeated ${enemy.name}!`;
+        status =
+          updatedEnemies.length === 0
+            ? GameStatus.Exploring
+            : GameStatus.Combat;
+      } else {
+        updatedEnemies = currentRoomInstance.enemies.map((e) => {
+          if (e.id === enemy.id) {
+            return {
+              ...e,
+              health: newHealth,
+            };
+          }
+          return e;
+        });
+        logMessage = `${attackerName} attacked ${enemy.name} for 2 damage! Enemy health: ${newHealth}`;
+      }
+
+      const updatedRoom = {
+        ...currentRoomInstance,
+        enemies: updatedEnemies,
+      };
+
+      const originalTemplate = [...state.roomInstances.entries()].find(
+        ([template, instance]) =>
+          instance === currentRoomInstance || template === state.room
+      )?.[0];
+
+      const newRoomInstances = new Map(state.roomInstances);
+      if (originalTemplate) {
+        newRoomInstances.set(originalTemplate, updatedRoom);
+      }
+
+      const newActivityLog = [...state.activityLog, logMessage];
+
+      // Advance to next fighter in combat order with wrapping
+      const nextIndex =
+        (state.activeFighterIndex + 1) % state.combatOrder.length;
+
+      return {
+        room: updatedRoom,
+        roomInstances: newRoomInstances,
+        gameStatus: status,
+        activityLog: newActivityLog,
+        activeFighterIndex: nextIndex,
+      };
+    });
+
+    // Trigger enemy turn if next fighter is an enemy
+    setTimeout(() => {
+      const { gameStatus, isCurrentFighterEnemy, performEnemyTurn } = get();
+      if (gameStatus === GameStatus.Combat && isCurrentFighterEnemy()) {
+        performEnemyTurn();
+      }
+    }, 500);
+  },
 
   speak: (npc: NPC) =>
     set((state) => {
@@ -236,8 +295,11 @@ attack: (enemy: Enemy) =>
   enterCombat: () =>
     set((state) => {
       const theParty = state.party;
-      const room = state.room !== null && state.room !== undefined ? state.room : startRoom;
-      
+      const room =
+        state.room !== null && state.room !== undefined
+          ? state.room
+          : startRoom;
+
       const theEnemies = room.enemies;
 
       const combatOrder = [...theParty, ...theEnemies];
