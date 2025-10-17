@@ -2,7 +2,7 @@ import { CharacterData } from "@/types/Character";
 import { Directions } from "@/types/Directions";
 import { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
-import { startRoom, Room } from "@/types/Room";
+import { Room, startRoom } from "@/types/Room";
 import { Chest, getDiscoveryMessage, NPC } from "@/types/RoomInteractions";
 import { create } from "zustand";
 
@@ -13,6 +13,7 @@ export interface GameState {
   roomInstances: Map<Room, Room>;
   gameStatus: GameStatus;
   rooms: Room[];
+  combatOrder: (CharacterData | Enemy)[];
   addToLog: (log: string) => void;
   attack: (enemy: Enemy) => void;
   move: (direction: Directions) => void;
@@ -22,6 +23,7 @@ export interface GameState {
   updateRoom: (room: Room) => void;
   setParty: (characters: CharacterData[]) => void;
   updateChest: (chest: Chest) => void;
+  enterCombat: () => void;
 }
 
 export const useGameStore = create<GameState>((set) => ({
@@ -36,6 +38,7 @@ export const useGameStore = create<GameState>((set) => ({
     ],
   ]),
   rooms: [],
+  combatOrder: [],
 
   addToLog: (message: string) =>
     set((state) => ({
@@ -172,10 +175,11 @@ export const useGameStore = create<GameState>((set) => ({
       };
     }),
 
-  setRooms: (rooms: Room[]) => set(() => ( {
-    room: rooms[0],
-    rooms: rooms
-  })),
+  setRooms: (rooms: Room[]) =>
+    set(() => ({
+      room: rooms[0],
+      rooms: rooms,
+    })),
 
   addRoom: (room: Room) =>
     set((state) => ({
@@ -222,6 +226,22 @@ export const useGameStore = create<GameState>((set) => ({
         activityLog: [...state.activityLog, ...logBuilder.build()],
         room: updatedRoom,
         roomInstances: newRoomInstances,
+      };
+    }),
+
+  enterCombat: () =>
+    set((state) => {
+      const theParty = state.party;
+      console.log(state.room)
+      const room = state.room !== null && state.room !== undefined ? state.room : startRoom;
+      
+      console.log(room)
+      const theEnemies = room.enemies;
+
+      const combatOrder = [...theParty, ...theEnemies];
+
+      return {
+        combatOrder: combatOrder,
       };
     }),
 }));

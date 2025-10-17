@@ -16,6 +16,7 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
     useGameStore((state: GameState) => state.party)
   );
   const updateParty = useGameStore((state: GameState) => state.setParty);
+  const enterCombat = useGameStore((state: GameState) => state.enterCombat);
 
   const MAX_PARTY_SIZE = 3;
 
@@ -248,6 +249,7 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
           </div>
         ) : (
           <div>
+            <div className="flex flex-col gap-4">
             {party.map((member, index) => (
               <div key={index} className="relative bg-slate-300 rounded">
                 <div className="bg-gray-900 p-2 flex gap-2">
@@ -286,12 +288,13 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                 </div>
               </div>
             ))}
+            </div>
             <Link to="/game">
               <button
                 className={`w-full py-3 rounded-lg font-semibold transition-all ${
-                  party.length >= MAX_PARTY_SIZE ||
                   "bg-green-600 text-white hover:bg-green-700 shadow-md mt-4"
                 }`}
+                onClick={enterCombat}
               >
                 {"Start your adventure"}
               </button>
