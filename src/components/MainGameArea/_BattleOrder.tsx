@@ -4,9 +4,6 @@ import mushroom from "../../assets/Mushroom.png";
 
 export default function BattleOrder() {
   const state = useGameStore((state: GameState) => state);
-
-  console.log(state.combatOrder);
-
   return (
     <>
       {state.gameStatus === GameStatus.Combat ? (
@@ -14,7 +11,7 @@ export default function BattleOrder() {
           <div className="flex flex-col items-center space-y-2">
             {state.combatOrder.map((characterOrEnemy, i) => {
               return (
-                <div className="border-yellow-400 border-4 p-2" key={i}>
+                <div className={` ${state.activeFighterIndex === i ? "border-yellow-400 border-4" : ""} p-2`} key={i}>
                   {'img' in characterOrEnemy ? (
                     <img
                       src={characterOrEnemy.img}

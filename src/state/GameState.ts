@@ -14,6 +14,7 @@ export interface GameState {
   gameStatus: GameStatus;
   rooms: Room[];
   combatOrder: (CharacterData | Enemy)[];
+  activeFighterIndex: number;
   addToLog: (log: string) => void;
   attack: (enemy: Enemy) => void;
   move: (direction: Directions) => void;
@@ -39,80 +40,83 @@ export const useGameStore = create<GameState>((set) => ({
   ]),
   rooms: [],
   combatOrder: [],
+  activeFighterIndex: 0,
 
   addToLog: (message: string) =>
     set((state) => ({
       activityLog: [...state.activityLog, message],
     })),
 
-  attack: (enemy: Enemy) =>
-    set((state) => {
-      const newHealth = enemy.health - 2;
-      let updatedEnemies;
-      let logMessage;
-      let logMessage2;
-      let status = GameStatus.Combat;
-
-      const currentRoomInstance =
-        state.roomInstances.get(state.room) || state.room;
-
-      if (newHealth <= 0) {
-        updatedEnemies = currentRoomInstance.enemies.filter(
-          (e) => e.id !== enemy.id
-        );
-        logMessage = `${enemy.name} was defeated!`;
-        status =
-          updatedEnemies.length === 0
-            ? GameStatus.Exploring
-            : GameStatus.Combat;
-      } else {
-        updatedEnemies = currentRoomInstance.enemies.map((e) => {
-          if (e.id === enemy.id) {
-            return {
-              ...e,
-              health: newHealth,
-            };
-          }
-          return e;
-        });
-        logMessage = `You attacked ${enemy.name} for 2 damage! Enemy health: ${newHealth}`;
-
-        const livingMembers = state.party.filter((member) => member.hp > 0);
-        if (livingMembers.length > 0) {
-          const target =
-            livingMembers[Math.floor(Math.random() * livingMembers.length)];
-          target.hp -= 2;
-          logMessage2 = `${enemy.name} attacked you back! and hit ${target.name}`;
+attack: (enemy: Enemy) =>
+  set((state) => {
+    const newHealth = enemy.health - 2;
+    let updatedEnemies;
+    let logMessage;
+    let logMessage2;
+    let status = GameStatus.Combat;
+    const currentRoomInstance =
+      state.roomInstances.get(state.room) || state.room;
+    
+    if (newHealth <= 0) {
+      updatedEnemies = currentRoomInstance.enemies.filter(
+        (e) => e.id !== enemy.id
+      );
+      logMessage = `${enemy.name} was defeated!`;
+      status =
+        updatedEnemies.length === 0
+          ? GameStatus.Exploring
+          : GameStatus.Combat;
+    } else {
+      updatedEnemies = currentRoomInstance.enemies.map((e) => {
+        if (e.id === enemy.id) {
+          return {
+            ...e,
+            health: newHealth,
+          };
         }
+        return e;
+      });
+      logMessage = `You attacked ${enemy.name} for 2 damage! Enemy health: ${newHealth}`;
+      const livingMembers = state.party.filter((member) => member.hp > 0);
+      if (livingMembers.length > 0) {
+        const target =
+          livingMembers[Math.floor(Math.random() * livingMembers.length)];
+        target.hp -= 2;
+        logMessage2 = `${enemy.name} attacked you back! and hit ${target.name}`;
       }
-
-      const updatedRoom = {
-        ...currentRoomInstance,
-        enemies: updatedEnemies,
-      };
-
-      const originalTemplate = [...state.roomInstances.entries()].find(
-        ([template, instance]) =>
-          instance === currentRoomInstance || template === state.room
-      )?.[0];
-
-      const newRoomInstances = new Map(state.roomInstances);
-      if (originalTemplate) {
-        newRoomInstances.set(originalTemplate, updatedRoom);
-      }
-
-      const newActivityLog = [...state.activityLog, logMessage];
-      if (logMessage2) {
-        newActivityLog.push(logMessage2);
-      }
-
-      return {
-        room: updatedRoom,
-        roomInstances: newRoomInstances,
-        gameStatus: status,
-        activityLog: newActivityLog,
-      };
-    }),
+    }
+    
+    const updatedRoom = {
+      ...currentRoomInstance,
+      enemies: updatedEnemies,
+    };
+    
+    const originalTemplate = [...state.roomInstances.entries()].find(
+      ([template, instance]) =>
+        instance === currentRoomInstance || template === state.room
+    )?.[0];
+    
+    const newRoomInstances = new Map(state.roomInstances);
+    if (originalTemplate) {
+      newRoomInstances.set(originalTemplate, updatedRoom);
+    }
+    
+    const newActivityLog = [...state.activityLog, logMessage];
+    if (logMessage2) {
+      newActivityLog.push(logMessage2);
+    }
+    
+    // Advance to next fighter in combat order with wrapping
+    const nextIndex = (state.activeFighterIndex + 1) % state.combatOrder.length;
+    
+    return {
+      room: updatedRoom,
+      roomInstances: newRoomInstances,
+      gameStatus: status,
+      activityLog: newActivityLog,
+      activeFighterIndex: nextIndex,
+    };
+  }),
 
   speak: (npc: NPC) =>
     set((state) => {
@@ -232,10 +236,8 @@ export const useGameStore = create<GameState>((set) => ({
   enterCombat: () =>
     set((state) => {
       const theParty = state.party;
-      console.log(state.room)
       const room = state.room !== null && state.room !== undefined ? state.room : startRoom;
       
-      console.log(room)
       const theEnemies = room.enemies;
 
       const combatOrder = [...theParty, ...theEnemies];
