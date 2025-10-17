@@ -57,7 +57,6 @@ export const useGameStore = create<GameState>((set, get) => ({
     );
   },
 
-  // Separate method for enemy AI turn
   performEnemyTurn: () => {
     const state = get();
     const currentEnemy = state.combatOrder[state.activeFighterIndex] as Enemy;
@@ -83,7 +82,6 @@ export const useGameStore = create<GameState>((set, get) => ({
         target.name
       } for 2 damage! ${target.name}'s HP: ${Math.max(0, target.hp - 2)}`;
 
-      // Advance to next fighter
       const nextIndex =
         (state.activeFighterIndex + 1) % state.combatOrder.length;
 
@@ -94,7 +92,6 @@ export const useGameStore = create<GameState>((set, get) => ({
       };
     });
 
-    // Check if next fighter is also an enemy, continue the chain
     setTimeout(() => {
       const { isCurrentFighterEnemy, performEnemyTurn } = get();
       if (isCurrentFighterEnemy()) {
@@ -105,7 +102,6 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   attack: (enemy: Enemy) => {
     set((state) => {
-      // Get the current attacker from combat order
       const currentAttacker = state.combatOrder[state.activeFighterIndex];
       const attackerName = currentAttacker?.name || "Unknown";
 
@@ -155,7 +151,6 @@ export const useGameStore = create<GameState>((set, get) => ({
 
       const newActivityLog = [...state.activityLog, logMessage];
 
-      // Advance to next fighter in combat order with wrapping
       const nextIndex =
         (state.activeFighterIndex + 1) % state.combatOrder.length;
 
@@ -168,7 +163,6 @@ export const useGameStore = create<GameState>((set, get) => ({
       };
     });
 
-    // Trigger enemy turn if next fighter is an enemy
     setTimeout(() => {
       const { gameStatus, isCurrentFighterEnemy, performEnemyTurn } = get();
       if (gameStatus === GameStatus.Combat && isCurrentFighterEnemy()) {
