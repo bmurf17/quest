@@ -104,8 +104,10 @@ export const useGameStore = create<GameState>((set, get) => ({
     set((state) => {
       const currentAttacker = state.combatOrder[state.activeFighterIndex];
       const attackerName = currentAttacker?.name || "Unknown";
+      const damage = calcDamage(enemy.defense, 10, 10)
 
-      const newHealth = enemy.health - 2;
+
+      const newHealth = enemy.health - damage;
       let updatedEnemies;
       let logMessage;
       let status = GameStatus.Combat;
@@ -131,7 +133,7 @@ export const useGameStore = create<GameState>((set, get) => ({
           }
           return e;
         });
-        logMessage = `${attackerName} attacked ${enemy.name} for 2 damage! Enemy health: ${newHealth}`;
+        logMessage = `${attackerName} attacked ${enemy.name} for ${damage} damage! Enemy health: ${newHealth}`;
       }
 
       const updatedRoom = {
@@ -303,6 +305,17 @@ export const useGameStore = create<GameState>((set, get) => ({
       };
     }),
 }));
+
+function calcDamage(defense: number, strength: number, dex: number): number{
+  const hitChance = dex + Math.floor(Math.random() * 20) + 1;
+  console.log("Hit Chance")
+  console.log(hitChance);
+  if(hitChance >= defense){
+    const damage = strength + Math.floor(Math.random() * 6) + 1;
+    return Math.max(1, damage-defense)
+  }
+  return 0;
+}
 
 class ActivityLogBuilder {
   private messages: string[] = [];
