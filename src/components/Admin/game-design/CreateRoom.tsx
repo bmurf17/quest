@@ -1,12 +1,38 @@
+import { supabase } from "@/queries/RoomQueries";
 import { useGameStore } from "@/state/GameState";
 import { Directions } from "@/types/Directions";
 import { Room, startRoom } from "@/types/Room";
 import { NPC } from "@/types/RoomInteractions";
 import { useState } from "react";
 
+const directionToDbEnum = (direction: Directions): string => {
+  const map: { [key in Directions]: string } = {
+    [Directions.North]: 'North',
+    [Directions.South]: 'South',
+    [Directions.East]: 'East',
+    [Directions.West]: 'West',
+  };
+  return map[direction];
+};
+
+// Helper to get opposite direction
+const getOppositeDirection = (direction: Directions): Directions => {
+  const opposites: { [key in Directions]: Directions } = {
+    [Directions.North]: Directions.South,
+    [Directions.South]: Directions.North,
+    [Directions.East]: Directions.West,
+    [Directions.West]: Directions.East,
+  };
+  return opposites[direction];
+};
+
 export default function ManageRooms() {
-  const [interaction, setInteraction] = useState("NPC");
+const [interaction, setInteraction] = useState("NPC");
   const [neighboringRoom, setNeighboringRoom] = useState(startRoom);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  
   const rooms = useGameStore((state) => state.rooms);
   const addRoom = useGameStore((state) => state.addRoom);
   const updateRoom = useGameStore((state) => state.updateRoom);
@@ -15,57 +41,169 @@ export default function ManageRooms() {
     .filter(([, value]) => typeof value === "string")
     .map(([key, value]) => ({ label: value, value: key }));
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
+    setSuccess(null);
 
-    const formData = new FormData(event.currentTarget);
-    const name = formData.get("name");
-    const npc: NPC = {
-      name: formData.get("npcName")?.toString() || "",
-      dialogue: [formData.get("dialogue")?.toString() || ""],
-    };
+    try {
+      const formData = new FormData(event.currentTarget);
+      const roomName = formData.get("name")?.toString() || "";
+      const direction = formData.get("direction");
 
-    const room: Room = {
-      name: name?.toString() || "",
-      enemies: [],
-      neighboringRooms: [],
-      interaction: null,
-      id: 0
-    };
+      const { data: newRoomData, error: roomError } = await supabase
+        .from('rooms')
+        .insert({ name: roomName })
+        .select()
+        .single();
 
-    if (interaction === "NPC") {
-      room.interaction = {
-        type: "NPC",
-        npc: npc,
+      if (roomError) throw new Error(`Failed to create room: ${roomError.message}`);
+
+      const newRoomId = newRoomData.id;
+
+      if (interaction === "NPC") {
+        const npcName = formData.get("npcName")?.toString() || "";
+        const dialogue = formData.get("dialogue")?.toString() || "";
+        const discoveryMessage = formData.get("discoveryMessage")?.toString() || "";
+
+        const { data: npcData, error: npcError } = await supabase
+          .from('npcs')
+          .insert({
+            name: npcName,
+            dialogue: [dialogue],
+            discovery_message: discoveryMessage
+          })
+          .select()
+          .single();
+
+        if (npcError) throw new Error(`Failed to create NPC: ${npcError.message}`);
+
+        const { error: interactionError } = await supabase
+          .from('room_interactions')
+          .insert({
+            room_id: newRoomId,
+            interaction_type: 'NPC',
+            npc_id: npcData.id
+          });
+
+        if (interactionError) throw new Error(`Failed to link NPC: ${interactionError.message}`);
+      } else if (interaction === "Chest") {
+        const itemId = formData.get("itemId")?.toString() || "";
+        const quantity = parseInt(formData.get("quantity")?.toString() || "1");
+        const isLocked = formData.get("isLocked") === "true";
+
+        const { data: chestData, error: chestError } = await supabase
+          .from('chests')
+          .insert({
+            item_id: itemId,
+            quantity: quantity,
+            is_locked: isLocked
+          })
+          .select()
+          .single();
+
+        if (chestError) throw new Error(`Failed to create chest: ${chestError.message}`);
+
+        const { error: interactionError } = await supabase
+          .from('room_interactions')
+          .insert({
+            room_id: newRoomId,
+            interaction_type: 'chest',
+            chest_id: chestData.id
+          });
+
+        if (interactionError) throw new Error(`Failed to link chest: ${interactionError.message}`);
+      } else if (interaction === "Camp") {
+        const healAmount = parseInt(formData.get("healAmount")?.toString() || "50");
+        const restoresMana = formData.get("restoresMana") === "true";
+
+        const { data: campData, error: campError } = await supabase
+          .from('camps')
+          .insert({
+            heal_amount: healAmount,
+            restores_mana: restoresMana
+          })
+          .select()
+          .single();
+
+        if (campError) throw new Error(`Failed to create camp: ${campError.message}`);
+
+        const { error: interactionError } = await supabase
+          .from('room_interactions')
+          .insert({
+            room_id: newRoomId,
+            interaction_type: 'camp',
+            camp_id: campData.id
+          });
+
+        if (interactionError) throw new Error(`Failed to link camp: ${interactionError.message}`);
+      }
+
+
+      console.log(neighboringRoom)
+      if (direction && neighboringRoom.id) {
+        const directionEnum = +direction;
+        const oppositeDirectionEnum = getOppositeDirection(directionEnum);
+
+        const { error: neighborError1 } = await supabase
+          .from('neighboring_rooms')
+          .insert({
+            room_id: neighboringRoom.id,
+            neighbor_room_id: newRoomId,
+            direction: directionToDbEnum(directionEnum)
+          });
+
+        if (neighborError1) throw new Error(`Failed to link rooms: ${neighborError1.message}`);
+
+        const { error: neighborError2 } = await supabase
+          .from('neighboring_rooms')
+          .insert({
+            room_id: newRoomId,
+            neighbor_room_id: neighboringRoom.id,
+            direction: directionToDbEnum(oppositeDirectionEnum)
+          });
+
+        if (neighborError2) throw new Error(`Failed to create reverse link: ${neighborError2.message}`);
+      }
+
+      const room: Room = {
+        name: roomName,
+        enemies: [],
+        neighboringRooms: [],
+        interaction: interaction === "NPC" ? {
+          type: "NPC",
+          npc: {
+            name: formData.get("npcName")?.toString() || "",
+            dialogue: [formData.get("dialogue")?.toString() || ""],
+            discoveryMessage: formData.get("discoveryMessage")?.toString() || ""
+          },
+        } : null,
+        id: newRoomId
       };
+
+      if (direction) {
+        const directionEnum = +direction;
+        const oppositeDirectionEnum = getOppositeDirection(directionEnum);
+        
+        neighboringRoom.neighboringRooms.push([directionEnum, room]);
+        room.neighboringRooms.push([oppositeDirectionEnum, neighboringRoom]);
+        
+        updateRoom(neighboringRoom);
+      }
+
+      addRoom(room);
+      //updateRoom(neighboringRoom);
+
+      setSuccess(`Room "${roomName}" created successfully!`);
+      //event.currentTarget.reset();
+      //setInteraction("NPC");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      console.error('Error creating room:', err);
+    } finally {
+      setIsSubmitting(false);
     }
-
-    var direction = formData.get("direction");
-    if (direction) {
-      neighboringRoom.neighboringRooms.push([+direction, room]);
-
-      if (+direction === Directions.East) {
-        room.neighboringRooms.push([Directions.West, neighboringRoom]);
-      }
-
-      if (+direction === Directions.West) {
-        room.neighboringRooms.push([Directions.East, neighboringRoom]);
-      }
-
-      if (+direction === Directions.South) {
-        room.neighboringRooms.push([Directions.North, neighboringRoom]);
-      }
-
-      if (+direction === Directions.North) {
-        room.neighboringRooms.push([Directions.South, neighboringRoom]);
-      }
-    }
-
-    addRoom(room);
-    updateRoom(neighboringRoom);
-
-    event.currentTarget.reset();
-    setInteraction("NPC");
   };
 
   return (

@@ -6,7 +6,7 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = 'https://ojbcuhpmphtriewcccdm.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9qYmN1aHBtcGh0cmlld2NjY2RtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0MTYyMDgsImV4cCI6MjA3NTk5MjIwOH0.bLXsgDp0UDJ485qZMCQ8BqVjJbBj_qRz-GM8H2GtRqI';
-const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function getAllRooms(): Promise<Room[]> {
   const { data: rooms, error: roomsError } = await supabase

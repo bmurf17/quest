@@ -32,7 +32,7 @@ export const startRoom: Room = {
   enemies: [],
   neighboringRooms: [],
   interaction: null,
-  id: 0
+  id: 1
 };
 
 startRoom.neighboringRooms.push([Directions.North, northRoom]);
