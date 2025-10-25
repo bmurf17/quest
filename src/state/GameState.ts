@@ -104,8 +104,10 @@ export const useGameStore = create<GameState>((set, get) => ({
     set((state) => {
       const currentAttacker = state.combatOrder[state.activeFighterIndex];
       const attackerName = currentAttacker?.name || "Unknown";
-      const damage = calcDamage(enemy.defense, 10, 10)
+      const currentDex = 'abilities' in currentAttacker ? currentAttacker.abilities.dex.score : currentAttacker.dex
+      const currentStrength = 'abilities' in currentAttacker ? currentAttacker.abilities.str.score : currentAttacker.strength
 
+      const damage = calcDamage(enemy.defense, currentDex, currentStrength)
 
       const newHealth = enemy.health - damage;
       let updatedEnemies;
@@ -308,8 +310,6 @@ export const useGameStore = create<GameState>((set, get) => ({
 
 function calcDamage(defense: number, strength: number, dex: number): number{
   const hitChance = dex + Math.floor(Math.random() * 20) + 1;
-  console.log("Hit Chance")
-  console.log(hitChance);
   if(hitChance >= defense){
     const damage = strength + Math.floor(Math.random() * 6) + 1;
     return Math.max(1, damage-defense)

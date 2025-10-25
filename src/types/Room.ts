@@ -10,12 +10,6 @@ export type Room = {
   interaction: RoomInteraction | null;
 };
 
-const createMushroom = (): Enemy => ({
-  name: "mushroom",
-  health: 10,
-  id: 0,
-});
-
 const northRoom: Room = {
   name: "north room",
   enemies: [],
@@ -35,7 +29,7 @@ const northRoom: Room = {
 
 export const startRoom: Room = {
   name: "Start Room",
-  enemies: [createMushroom()],
+  enemies: [],
   neighboringRooms: [],
   interaction: null,
   id: 0

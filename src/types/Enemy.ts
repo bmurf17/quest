@@ -3,5 +3,6 @@ export type Enemy = {
   name: string;
   health: number;
   strength: number;
+  dex: number;
   defense: number;
 };
