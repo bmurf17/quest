@@ -123,6 +123,8 @@ export default function RoomMap() {
   const rooms = useGameStore((state) => state.rooms);
   const startRoom = rooms.find((x) => x.name === "Start Room");
   const containerRef = useRef(null);
+  const isDraggingRef = useRef(false);
+  const dragStartRef = useRef({ x: 0, y: 0 });
 
   if (startRoom) {
     const bounds = calculateBounds(startRoom);
@@ -146,13 +148,60 @@ export default function RoomMap() {
       }
     }, [containerWidth, containerHeight]);
 
+    const handleMouseDown = (e: React.MouseEvent) => {
+      isDraggingRef.current = true;
+      dragStartRef.current = {
+        x: e.clientX,
+        y: e.clientY,
+      };
+      if (containerRef.current) {
+        (containerRef.current as HTMLElement).style.cursor = "grabbing";
+      }
+    };
+
+    const handleMouseMove = (e: React.MouseEvent) => {
+      if (!isDraggingRef.current || !containerRef.current) return;
+
+      const container = containerRef.current as HTMLElement;
+      const dx = e.clientX - dragStartRef.current.x;
+      const dy = e.clientY - dragStartRef.current.y;
+
+      container.scrollLeft -= dx;
+      container.scrollTop -= dy;
+
+      dragStartRef.current = {
+        x: e.clientX,
+        y: e.clientY,
+      };
+    };
+
+    const handleMouseUp = () => {
+      isDraggingRef.current = false;
+      if (containerRef.current) {
+        (containerRef.current as HTMLElement).style.cursor = "grab";
+      }
+    };
+
+    const handleMouseLeave = () => {
+      if (isDraggingRef.current) {
+        isDraggingRef.current = false;
+        if (containerRef.current) {
+          (containerRef.current as HTMLElement).style.cursor = "grab";
+        }
+      }
+    };
+
     return (
       <main className="container mx-auto p-4 pb-0" style={{ maxHeight: "90%" }}>
         <h2 className="text-3xl font-bold m-4 mb-6">Room Map</h2>
         <div
           ref={containerRef}
           className="bg-white m-4 text-black overflow-auto relative"
-          style={{ maxHeight: "90%", minHeight: "78vh" }}
+          style={{ maxHeight: "90%", minHeight: "78vh", cursor: "grab" }}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseLeave}
         >
           <div
             className="relative"

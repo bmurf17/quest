@@ -2,7 +2,6 @@ import { supabase } from "@/queries/RoomQueries";
 import { useGameStore } from "@/state/GameState";
 import { Directions } from "@/types/Directions";
 import { Room, startRoom } from "@/types/Room";
-import { NPC } from "@/types/RoomInteractions";
 import { useState } from "react";
 
 const directionToDbEnum = (direction: Directions): string => {
@@ -15,7 +14,6 @@ const directionToDbEnum = (direction: Directions): string => {
   return map[direction];
 };
 
-// Helper to get opposite direction
 const getOppositeDirection = (direction: Directions): Directions => {
   const opposites: { [key in Directions]: Directions } = {
     [Directions.North]: Directions.South,
