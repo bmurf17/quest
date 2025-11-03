@@ -6,6 +6,7 @@ import RoomNPC from "./_RoomNPC";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import BattleOrder from "./_BattleOrder";
+import RoomCamp from "./_RoomCamp";
 
 export default function MainGameArea() {
   const party = useGameStore((state) => state.party);
@@ -24,6 +25,7 @@ export default function MainGameArea() {
           <RoomNPC />
           <RoomChest />
           <MapNav />
+          <RoomCamp />
           <BattleOrder />
         </div>
       </div>
