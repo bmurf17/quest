@@ -14,7 +14,7 @@ export interface Chest {
   isOpen: boolean;
 }
 
-interface Camp {
+export interface Camp {
   healAmount: number;
   restoresMana: boolean;
   cost?: number;

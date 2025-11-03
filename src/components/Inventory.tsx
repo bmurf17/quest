@@ -1,9 +1,10 @@
 import { useGameStore } from "@/state/GameState";
-import { Chest, NPC } from "@/types/RoomInteractions";
+import { Camp, Chest, NPC } from "@/types/RoomInteractions";
 
 export default function Inventory() {
   const attack = useGameStore((state) => state.attack);
   const speak = useGameStore((state) => state.speak);
+  const rest = useGameStore((state) => state.rest)
   const updateChest = useGameStore((state) => state.updateChest);
   const room = useGameStore((state) => state.room);
 
@@ -86,6 +87,20 @@ export default function Inventory() {
             </>
           )}
         </>
+      ) : (
+        <> </>
+      )}
+       {room && room.interaction?.type === "camp" ? (
+        <div
+          className="bg-gray-900 rounded hover:bg-gray-600 cursor-pointer flex justify-center items-center"
+          onClick={() => {
+            if (room && room.interaction?.type === "camp") {
+              rest(room?.interaction?.camp as Camp);
+            }
+          }}
+        >
+          Rest
+        </div>
       ) : (
         <> </>
       )}

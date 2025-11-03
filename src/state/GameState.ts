@@ -3,7 +3,7 @@ import { Directions } from "@/types/Directions";
 import { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
 import { Room, startRoom } from "@/types/Room";
-import { Chest, getDiscoveryMessage, NPC } from "@/types/RoomInteractions";
+import { Camp, Chest, getDiscoveryMessage, NPC } from "@/types/RoomInteractions";
 import { create } from "zustand";
 
 export interface GameState {
@@ -19,6 +19,7 @@ export interface GameState {
   attack: (enemy: Enemy) => void;
   move: (direction: Directions) => void;
   speak: (npc: NPC) => void;
+  rest: (camp: Camp) => void;
   setRooms: (rooms: Room[]) => void;
   addRoom: (room: Room) => void;
   updateRoom: (room: Room) => void;
@@ -182,6 +183,22 @@ export const useGameStore = create<GameState>((set, get) => ({
       );
 
       return {
+        activityLog: [...state.activityLog, ...logBuilder.build()],
+      };
+    }),
+
+    rest: (camp: Camp) =>
+    set((state) => {
+      const updatedParty = state.party.map((member) => {
+          return { ...member, hp: Math.min(member.maxHp, member.hp + camp.healAmount) };
+      });
+      
+      const logBuilder = new ActivityLogBuilder().add(
+        `$Your party rests and heals ${camp.healAmount} hp`
+      );
+
+      return {
+        party: updatedParty,
         activityLog: [...state.activityLog, ...logBuilder.build()],
       };
     }),
