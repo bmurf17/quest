@@ -3,6 +3,7 @@ import rogue from "../assets/Rogue.png";
 import longbow from "../assets/BowV1.png";
 import staff from "../assets/Staff.png";
 import sword from "../assets/Sword.png";
+import spear from "../assets/Spear.png"
 import cleric from "../assets/Cleric.png";
 import wizard from "../assets/Wizard.png";
 
@@ -69,13 +70,13 @@ export const tempRanger: CharacterData = {
   img: rogue,
   class: "Ranger",
   level: 2,
-  hp: 16,
-  maxHp: 16,
-  mp: 8,
+  hp: 15,
+  maxHp: 15,
+  mp: 10,
   maxMp: 10,
   abilities: {
     str: { score: 11, modifier: 0 },
-    dex: { score: 15, modifier: 2 },
+    dex: { score: 17, modifier: 2 },
     con: { score: 10, modifier: 0 },
     int: { score: 12, modifier: 1 },
     wis: { score: 12, modifier: 1 },
@@ -126,10 +127,10 @@ export const tempWarrior: CharacterData = {
   level: 2,
   hp: 20,
   maxHp: 20,
-  mp: 10,
-  maxMp: 10,
+  mp: 5,
+  maxMp: 5,
   abilities: {
-    str: { score: 11, modifier: 0 },
+    str: { score: 15, modifier: 0 },
     dex: { score: 15, modifier: 2 },
     con: { score: 10, modifier: 0 },
     int: { score: 12, modifier: 1 },
@@ -145,12 +146,12 @@ export const tempWarrior: CharacterData = {
   ],
   items: [
     {
-      img: longbow,
+      img: spear,
       action: {
-        name: "Longbow",
+        name: "Spear",
         hitDC: "+6",
         damage: "1d8+2",
-        type: "Ranged Weapon",
+        type: "Melee Weapon",
       },
     },
     {
@@ -179,12 +180,12 @@ export const tempCleric: CharacterData = {
   img: cleric,
   class: "Cleric",
   level: 2,
-  hp: 20,
-  maxHp: 20,
-  mp: 10,
-  maxMp: 10,
+  hp: 12,
+  maxHp: 12,
+  mp: 15,
+  maxMp: 15,
   abilities: {
-    str: { score: 11, modifier: 0 },
+    str: { score: 8, modifier: 0 },
     dex: { score: 15, modifier: 2 },
     con: { score: 10, modifier: 0 },
     int: { score: 12, modifier: 1 },
@@ -234,10 +235,10 @@ export const tempWizard: CharacterData = {
   img: wizard,
   class: "Wizard",
   level: 2,
-  hp: 16,
-  maxHp: 16,
-  mp: 8,
-  maxMp: 10,
+  hp: 10,
+  maxHp: 10,
+  mp: 20,
+  maxMp: 20,
   abilities: {
     str: { score: 11, modifier: 0 },
     dex: { score: 15, modifier: 2 },
@@ -255,9 +256,9 @@ export const tempWizard: CharacterData = {
   ],
   items: [
     {
-      img: longbow,
+      img: staff,
       action: {
-        name: "Longbow",
+        name: "Staff",
         hitDC: "+6",
         damage: "1d8+2",
         type: "Ranged Weapon",

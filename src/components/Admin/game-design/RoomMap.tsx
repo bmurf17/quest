@@ -5,7 +5,7 @@ import React from "react";
 import { useRef, useEffect } from "react";
 
 const MAX_DEPTH = 5;
-const ROOM_DISTANCE = 120;
+const ROOM_DISTANCE = 160;
 const CONTAINER_PADDING = 250;
 
 const getDirectionOffset = (
@@ -126,28 +126,31 @@ export default function RoomMap() {
   const isDraggingRef = useRef(false);
   const dragStartRef = useRef({ x: 0, y: 0 });
 
+  const bounds = startRoom ? calculateBounds(startRoom) : null;
+
+  const padding = CONTAINER_PADDING;
+  const verticalPadding = 100;
+
+  const containerWidth = bounds ? bounds.maxX - bounds.minX + padding * 2 : 0;
+  const containerHeight = bounds
+    ? bounds.maxY - bounds.minY + verticalPadding * 2
+    : 0;
+
+  useEffect(() => {
+    if (containerRef.current) {
+      const container: any = containerRef.current;
+      const scrollLeft = (container.scrollWidth - container.clientWidth) / 2;
+      const scrollTop = (container.scrollHeight - container.clientHeight) / 2;
+
+      container.scrollTo({
+        left: scrollLeft,
+        top: scrollTop,
+        behavior: "smooth",
+      });
+    }
+  }, [containerWidth, containerHeight]);
+
   if (startRoom) {
-    const bounds = calculateBounds(startRoom);
-    const padding = CONTAINER_PADDING;
-    const verticalPadding = 100;
-
-    const containerWidth = bounds.maxX - bounds.minX + padding * 2;
-    const containerHeight = bounds.maxY - bounds.minY + verticalPadding * 2;
-
-    useEffect(() => {
-      if (containerRef.current) {
-        const container: any = containerRef.current;
-        const scrollLeft = (container.scrollWidth - container.clientWidth) / 2;
-        const scrollTop = (container.scrollHeight - container.clientHeight) / 2;
-
-        container.scrollTo({
-          left: scrollLeft,
-          top: scrollTop,
-          behavior: "smooth",
-        });
-      }
-    }, [containerWidth, containerHeight]);
-
     const handleMouseDown = (e: React.MouseEvent) => {
       isDraggingRef.current = true;
       dragStartRef.current = {
@@ -191,6 +194,10 @@ export default function RoomMap() {
       }
     };
 
+    if (!startRoom) {
+      return <div>No start room found</div>;
+    }
+
     return (
       <main className="container mx-auto p-4 pb-0" style={{ maxHeight: "90%" }}>
         <h2 className="text-3xl font-bold m-4 mb-6">Room Map</h2>
@@ -208,8 +215,8 @@ export default function RoomMap() {
             style={{
               width: `${containerWidth}px`,
               height: `${containerHeight}px`,
-              transform: `translate(${-bounds.minX + padding}px, ${
-                -bounds.minY + verticalPadding
+              transform: `translate(${bounds ? -bounds.minX + padding : 0}px, ${
+                bounds ? -bounds.minY + verticalPadding : 0
               }px)`,
             }}
           >
