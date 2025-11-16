@@ -3,6 +3,8 @@ import { useGameStore } from "@/state/GameState";
 import { Directions } from "@/types/Directions";
 import { Room, startRoom } from "@/types/Room";
 import { useState } from "react";
+import mushroom from "../../../assets/Mushroom.png";
+import blord from "../../../assets/blord.png";
 
 const directionToDbEnum = (direction: Directions): string => {
   const map: { [key in Directions]: string } = {
@@ -35,6 +37,8 @@ export default function ManageRooms() {
   const addRoom = useGameStore((state) => state.addRoom);
   const updateRoom = useGameStore((state) => state.updateRoom);
 
+  const enemyImgs = [mushroom, blord];
+
   const directionOptions = Object.entries(Directions)
     .filter(([, value]) => typeof value === "string")
     .map(([key, value]) => ({ label: value, value: key }));
@@ -47,6 +51,8 @@ export default function ManageRooms() {
 
     try {
       const formData = new FormData(event.currentTarget);
+      console.log(formData);
+
       const roomName = formData.get("name")?.toString() || "";
       const direction = formData.get("direction");
 
@@ -61,7 +67,42 @@ export default function ManageRooms() {
 
       const newRoomId = newRoomData.id;
 
-      if (interaction === "NPC") {
+      if (interaction === "Combat") {
+        const enemyName = formData.get("enemyName")?.toString() || "";
+        const health = parseInt(formData.get("health")?.toString() || "100");
+        const strength = parseInt(formData.get("strength")?.toString() || "10");
+        const dex = parseInt(formData.get("dex")?.toString() || "10");
+        const defense = parseInt(formData.get("defense")?.toString() || "10");
+        const img = formData.get("enemyImg")?.toString() || "";
+
+        const { data: enemyData, error: enemyError } = await supabase
+          .from("enemies")
+          .insert({
+            name: enemyName,
+            health: health,
+            strength: strength,
+            dex: dex,
+            defense: defense,
+            img: img,
+          })
+          .select()
+          .single();
+
+        if (enemyError)
+          throw new Error(`Failed to create enemy: ${enemyError.message}`);
+
+        const { error: roomEnemyError } = await supabase
+          .from("room_enemies")
+          .insert({
+            room_id: newRoomId,
+            enemy_id: enemyData.id,
+          });
+
+        if (roomEnemyError)
+          throw new Error(
+            `Failed to link enemy to room: ${roomEnemyError.message}`
+          );
+      } else if (interaction === "NPC") {
         const npcName = formData.get("npcName")?.toString() || "";
         const dialogue = formData.get("dialogue")?.toString() || "";
         const discoveryMessage =
@@ -207,11 +248,8 @@ export default function ManageRooms() {
       }
 
       addRoom(room);
-      //updateRoom(neighboringRoom);
 
       setSuccess(`Room "${roomName}" created successfully!`);
-      //event.currentTarget.reset();
-      //setInteraction("NPC");
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "An unknown error occurred"
@@ -304,6 +342,7 @@ export default function ManageRooms() {
               <option value="NPC">NPC</option>
               <option value="Chest">Chest</option>
               <option value="Camp">Camp</option>
+              <option value="Combat">Combat</option>
               <option value="None">None</option>
             </select>
           </div>
@@ -350,6 +389,97 @@ export default function ManageRooms() {
               <></>
             )}
             {interaction === "Chest" ? <>Chest Form</> : <></>}
+            {interaction === "Combat" ? (
+              <>
+                <div className="text-xl font-bold mb-2">Combat Form</div>
+
+                <div className="flex flex-col gap-2 ">
+                  <label htmlFor="enemyName" className="font-bold">
+                    Enemy Name
+                  </label>
+                  <input
+                    id="enemyName"
+                    name="enemyName"
+                    className="border-slate-950 border rounded-md p-2"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2 ">
+                  <label htmlFor="health" className="font-bold">
+                    Health
+                  </label>
+                  <input
+                    id="health"
+                    name="health"
+                    type="number"
+                    defaultValue="100"
+                    className="border-slate-950 border rounded-md p-2"
+                  />
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="flex flex-col gap-2 flex-1">
+                    <label htmlFor="strength" className="font-bold">
+                      Strength
+                    </label>
+                    <input
+                      id="strength"
+                      name="strength"
+                      type="number"
+                      defaultValue="10"
+                      className="border-slate-950 border rounded-md p-2"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-2 flex-1">
+                    <label htmlFor="dex" className="font-bold">
+                      Dexterity
+                    </label>
+                    <input
+                      id="dex"
+                      name="dex"
+                      type="number"
+                      defaultValue="10"
+                      className="border-slate-950 border rounded-md p-2"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-2 flex-1">
+                    <label htmlFor="defense" className="font-bold">
+                      Defense
+                    </label>
+                    <input
+                      id="defense"
+                      name="defense"
+                      type="number"
+                      defaultValue="10"
+                      className="border-slate-950 border rounded-md p-2"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2 ">
+                  <label htmlFor="enemyImg" className="font-bold">
+                    Enemy Image
+                  </label>
+                  <select
+                    id="enemyImg"
+                    name="enemyImg"
+                    className="border-slate-950 border rounded-md p-2"
+                  >
+                    {enemyImgs.map((img, i) => {
+                      return (
+                        <option key={i} value={img}>
+                          {img}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+              </>
+            ) : (
+              <></>
+            )}
             {interaction === "Camp" ? (
               <>
                 <div className="text-xl font-bold mb-2">Camp Form</div>

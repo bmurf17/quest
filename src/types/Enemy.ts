@@ -5,4 +5,5 @@ export type Enemy = {
   strength: number;
   dex: number;
   defense: number;
+  img: string;
 };
