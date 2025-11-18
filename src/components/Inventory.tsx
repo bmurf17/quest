@@ -1,22 +1,49 @@
 import { useGameStore } from "@/state/GameState";
 import { Camp, Chest, NPC } from "@/types/RoomInteractions";
+import { CharacterData } from "@/types/Character";
 
 export default function Inventory() {
   const attack = useGameStore((state) => state.attack);
   const speak = useGameStore((state) => state.speak);
-  const rest = useGameStore((state) => state.rest)
+  const rest = useGameStore((state) => state.rest);
   const updateChest = useGameStore((state) => state.updateChest);
+  const index = useGameStore((state) => state.activeFighterIndex);
+  const combatOrder = useGameStore((state) => state.combatOrder);
+  const isFighterEnemy = useGameStore((state) => state.isCurrentFighterEnemy());
   const room = useGameStore((state) => state.room);
 
   return (
     <>
       {room && room.enemies.length > 0 ? (
-        <button
-          className="bg-gray-900 rounded hover:bg-gray-600 cursor-pointer flex justify-center items-center"
-          onClick={() => attack(room.enemies[0])}
-        >
-          Attack
-        </button>
+        <>
+          {isFighterEnemy ? (
+            <></>
+          ) : (
+            <div className="grid grid-cols-2 gap-2">
+              {(combatOrder[index] as CharacterData).items.map((item) => {
+                return (
+                  <div
+                    className="bg-gray-700 rounded h-18 hover:bg-gray-600 cursor-pointer w-full flex items-center justify-center"
+                    onClick={() => attack(room.enemies[0])}
+                  >
+                    <img
+                      src={item.img}
+                      alt={item.action.name}
+                      className="w-12x h-12"
+                      style={{
+                        imageRendering: "pixelated",
+                      }}
+                    />
+                  </div>
+                );
+              })}
+              <div className="bg-gray-900 rounded h-18 w-full"></div>
+              <div className="bg-gray-900 rounded h-18 w-full"></div>
+              <div className="bg-gray-900 rounded h-18 w-full"></div>
+              <div className="bg-gray-900 rounded h-18 w-full"></div>
+            </div>
+          )}
+        </>
       ) : (
         <> </>
       )}
@@ -90,7 +117,7 @@ export default function Inventory() {
       ) : (
         <> </>
       )}
-       {room && room.interaction?.type === "camp" ? (
+      {room && room.interaction?.type === "camp" ? (
         <div
           className="bg-gray-900 rounded hover:bg-gray-600 cursor-pointer flex justify-center items-center"
           onClick={() => {

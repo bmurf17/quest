@@ -108,6 +108,8 @@ export const useGameStore = create<GameState>((set, get) => ({
       const currentDex = 'abilities' in currentAttacker ? currentAttacker.abilities.dex.score : currentAttacker.dex
       const currentStrength = 'abilities' in currentAttacker ? currentAttacker.abilities.str.score : currentAttacker.strength
 
+      var nextIndex =
+        (state.activeFighterIndex + 1) % state.combatOrder.length;
       const damage = calcDamage(enemy.defense, currentDex, currentStrength)
 
       const newHealth = enemy.health - damage;
@@ -121,6 +123,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         updatedEnemies = currentRoomInstance.enemies.filter(
           (e) => e.id !== enemy.id
         );
+        nextIndex = 0
         logMessage = `${attackerName} defeated ${enemy.name}!`;
         status =
           updatedEnemies.length === 0
@@ -155,9 +158,6 @@ export const useGameStore = create<GameState>((set, get) => ({
       }
 
       const newActivityLog = [...state.activityLog, logMessage];
-
-      const nextIndex =
-        (state.activeFighterIndex + 1) % state.combatOrder.length;
 
       return {
         room: updatedRoom,
