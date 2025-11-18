@@ -1,6 +1,4 @@
 import { GameState, useGameStore } from "@/state/GameState";
-import mushroom from "../../assets/Mushroom.png";
-
 export default function BattleEnemies() {
   const state = useGameStore((state: GameState) => state);
   const currentRoom = state.room;
@@ -9,7 +7,7 @@ export default function BattleEnemies() {
       {currentRoom && currentRoom.enemies.length > 0 ? (
         <div>
           <img
-            src={mushroom}
+            src={currentRoom.enemies[0].img}
             alt="Enemy Mushroom"
             className="mx-auto"
             style={{

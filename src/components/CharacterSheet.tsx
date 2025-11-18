@@ -28,7 +28,6 @@ export default function CharacterSheet({
 
         <ScrollArea className="h-[80vh] pr-4">
           <div className="space-y-6">
-            {/* Basic Info */}
             <div className="grid grid-cols-3 gap-4 p-4 bg-gray-700/50 rounded-lg">
               <div>
                 <span className="text-sm text-gray-400">Race</span>
@@ -48,6 +47,9 @@ export default function CharacterSheet({
               <img
                 src={characterData.img}
                 alt={"name"}
+                style={{
+                  imageRendering: "pixelated",
+                }}
                 className="w-24 h-24 rounded bg-gray-700"
               />
               <div className="flex-1 space-y-2">
@@ -137,7 +139,6 @@ export default function CharacterSheet({
               </div>
             </div>
 
-            {/* Saving Throws */}
             <div className="space-y-2">
               <h3 className="text-lg font-semibold">Saving Throws</h3>
               <div className="grid grid-cols-6 gap-4">
