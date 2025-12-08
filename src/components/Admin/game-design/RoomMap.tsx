@@ -1,12 +1,17 @@
 import { useGameStore } from "@/state/GameState";
 import { Directions } from "@/types/Directions";
 import { Room } from "@/types/Room";
-import React from "react";
+import React, { useState } from "react";
 import { useRef, useEffect } from "react";
 
 const MAX_DEPTH = 5;
 const ROOM_DISTANCE = 160;
 const CONTAINER_PADDING = 250;
+
+interface RoomPopupProps {
+  room: Room;
+  onClose: () => void;
+}
 
 const getDirectionOffset = (
   direction: Directions,
@@ -32,14 +37,20 @@ interface RoomNodeProps {
   y: number;
   visitedRooms: Set<string>;
   depth?: number;
+  onRoomClick: (room: Room) => void;
 }
 
 const RoomNode = React.memo(
-  ({ room, x, y, visitedRooms, depth = 0 }: RoomNodeProps) => {
+  ({ room, x, y, visitedRooms, depth = 0, onRoomClick }: RoomNodeProps) => {
     //todo: explore this but saves me incase I have infinite loop of rooms
     const maxDepth = MAX_DEPTH;
 
     const newVisitedRooms = new Set([...visitedRooms, room.name]);
+
+    const handleClick = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onRoomClick(room);
+    };
 
     return (
       <>
@@ -49,6 +60,7 @@ const RoomNode = React.memo(
             left: `${x}px`,
             top: `${y}px`,
           }}
+          onClick={handleClick}
         >
           {room.name}
         </div>
@@ -72,6 +84,7 @@ const RoomNode = React.memo(
                   y={newY}
                   visitedRooms={newVisitedRooms}
                   depth={depth + 1}
+                  onRoomClick={onRoomClick}
                 />
               );
             }
@@ -119,14 +132,62 @@ const calculateBounds = (
   return bounds;
 };
 
+export function RoomPopup ({ room, onClose }: RoomPopupProps){
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full relative">
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-2xl"
+        >
+          &times;
+        </button>
+        <h3 className="text-xl font-bold mb-4 text-blue-800">{room.name} Info</h3>
+        <p className="mb-4">
+          <span className="font-semibold">ID:</span> {room.id}
+        </p>
+
+        <h4 className="font-semibold mb-2">Neighbors:</h4>
+        <ul className="list-disc list-inside">
+          {room.neighboringRooms?.length ? (
+            room.neighboringRooms.map(([direction, neighbor]) => (
+              <li key={direction} className="text-sm">
+                **{Directions[direction]}**: {neighbor.name}
+              </li>
+            ))
+          ) : (
+            <li className="text-sm">No visible neighbors.</li>
+          )}
+        </ul>
+
+        <button
+          onClick={onClose}
+          className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function RoomMap() {
   const rooms = useGameStore((state) => state.rooms);
   const startRoom = rooms.find((x) => x.name === "Start Room");
   const containerRef = useRef(null);
   const isDraggingRef = useRef(false);
   const dragStartRef = useRef({ x: 0, y: 0 });
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
 
   const bounds = startRoom ? calculateBounds(startRoom) : null;
+
+  const handleRoomClick = (room: Room) => {
+    setSelectedRoom(room);
+  };
+
+  const handleClosePopup = () => {
+    setSelectedRoom(null);
+  };
 
   const padding = CONTAINER_PADDING;
   const verticalPadding = 100;
@@ -226,9 +287,13 @@ export default function RoomMap() {
               y={0}
               visitedRooms={new Set()}
               depth={0}
+              onRoomClick={handleRoomClick}
             />
           </div>
         </div>
+        {selectedRoom && (
+          <RoomPopup room={selectedRoom} onClose={handleClosePopup} />
+        )}
       </main>
     );
   }
