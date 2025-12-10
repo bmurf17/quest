@@ -181,6 +181,26 @@ export function RoomPopup({ room, onClose }: RoomPopupProps) {
           <></>
         )}
 
+
+        {room.interaction?.type === "chest" ? (
+          <>
+            <p className="mb-4 text-gray-800">
+              <span className="font-semibold text-black">Item:</span>{" "}
+              <span className="text-black">
+                {room.interaction.chest.itemId}
+              </span>
+            </p>
+            <p className="mb-4 text-gray-800">
+              <span className="font-semibold text-black">Quantity:</span>{" "}
+              <span className="text-black">
+                {room.interaction.chest.quantity}
+              </span>
+            </p>
+          </>
+        ) : (
+          <></>
+        )}
+
         <button
           onClick={onClose}
           className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
