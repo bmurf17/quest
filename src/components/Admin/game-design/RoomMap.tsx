@@ -132,7 +132,7 @@ const calculateBounds = (
   return bounds;
 };
 
-export function RoomPopup({ room, onClose }: RoomPopupProps) {  
+export function RoomPopup({ room, onClose }: RoomPopupProps) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full flex flex-col">
@@ -146,11 +146,40 @@ export function RoomPopup({ room, onClose }: RoomPopupProps) {
           {room.name} Info
         </h3>
         <p className="mb-4 text-gray-800">
-          <span className="font-semibold text-black">Interaction:</span>{' '}
+          <span className="font-semibold text-black">Interaction:</span>{" "}
           <span className="text-black">
-            {room.interaction ? room.interaction.type : 'None'}
+            {room.interaction
+              ? room.interaction.type
+              : room.enemies
+              ? "Combat"
+              : "None"}
           </span>
         </p>
+
+        {room.interaction?.type === "NPC" ? (
+          <>
+            <p className="mb-4 text-gray-800">
+              <span className="font-semibold text-black">NPC:</span>{" "}
+              <span className="text-black">
+                {room.interaction.npc.name}
+              </span>
+            </p>
+            <p className="mb-4 text-gray-800">
+              <span className="font-semibold text-black">Discover Message:</span>{" "}
+              <span className="text-black">
+                {room.interaction.npc.discoveryMessage}
+              </span>
+            </p>
+            <p className="mb-4 text-gray-800">
+              <span className="font-semibold text-black">Dialogue:</span>{" "}
+              <span className="text-black">
+                {room.interaction.npc.dialogue}
+              </span>
+            </p>
+          </>
+        ) : (
+          <></>
+        )}
 
         <button
           onClick={onClose}
