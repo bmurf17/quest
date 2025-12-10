@@ -132,33 +132,25 @@ const calculateBounds = (
   return bounds;
 };
 
-export function RoomPopup ({ room, onClose }: RoomPopupProps){
+export function RoomPopup({ room, onClose }: RoomPopupProps) {  
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full relative">
+      <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full flex flex-col">
         <button
           onClick={onClose}
           className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-2xl"
         >
           &times;
         </button>
-        <h3 className="text-xl font-bold mb-4 text-blue-800">{room.name} Info</h3>
-        <p className="mb-4">
-          <span className="font-semibold">ID:</span> {room.id}
+        <h3 className="text-xl font-bold mb-4 text-blue-800">
+          {room.name} Info
+        </h3>
+        <p className="mb-4 text-gray-800">
+          <span className="font-semibold text-black">Interaction:</span>{' '}
+          <span className="text-black">
+            {room.interaction ? room.interaction.type : 'None'}
+          </span>
         </p>
-
-        <h4 className="font-semibold mb-2">Neighbors:</h4>
-        <ul className="list-disc list-inside">
-          {room.neighboringRooms?.length ? (
-            room.neighboringRooms.map(([direction, neighbor]) => (
-              <li key={direction} className="text-sm">
-                **{Directions[direction]}**: {neighbor.name}
-              </li>
-            ))
-          ) : (
-            <li className="text-sm">No visible neighbors.</li>
-          )}
-        </ul>
 
         <button
           onClick={onClose}
