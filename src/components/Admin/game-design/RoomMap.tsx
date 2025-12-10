@@ -160,12 +160,12 @@ export function RoomPopup({ room, onClose }: RoomPopupProps) {
           <>
             <p className="mb-4 text-gray-800">
               <span className="font-semibold text-black">NPC:</span>{" "}
-              <span className="text-black">
-                {room.interaction.npc.name}
-              </span>
+              <span className="text-black">{room.interaction.npc.name}</span>
             </p>
             <p className="mb-4 text-gray-800">
-              <span className="font-semibold text-black">Discover Message:</span>{" "}
+              <span className="font-semibold text-black">
+                Discover Message:
+              </span>{" "}
               <span className="text-black">
                 {room.interaction.npc.discoveryMessage}
               </span>
@@ -181,7 +181,6 @@ export function RoomPopup({ room, onClose }: RoomPopupProps) {
           <></>
         )}
 
-
         {room.interaction?.type === "chest" ? (
           <>
             <p className="mb-4 text-gray-800">
@@ -194,6 +193,25 @@ export function RoomPopup({ room, onClose }: RoomPopupProps) {
               <span className="font-semibold text-black">Quantity:</span>{" "}
               <span className="text-black">
                 {room.interaction.chest.quantity}
+              </span>
+            </p>
+          </>
+        ) : (
+          <></>
+        )}
+
+        {room.interaction?.type === "camp" ? (
+          <>
+            <p className="mb-4 text-gray-800">
+              <span className="font-semibold text-black">Heal Amount:</span>{" "}
+              <span className="text-black">
+                {room.interaction.camp.healAmount}
+              </span>
+            </p>
+            <p className="mb-4 text-gray-800">
+              <span className="font-semibold text-black">Mana Amount:</span>{" "}
+              <span className="text-black">
+                {room.interaction.camp.restoresMana}
               </span>
             </p>
           </>
