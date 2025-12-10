@@ -32,9 +32,9 @@ export interface GameState {
 
 export const useGameStore = create<GameState>((set, get) => ({
   party: [],
-  activityLog: ["1 Red Mushrhum draws near for a fight!"],
+  activityLog: ["You start your adventure."],
   room: startRoom,
-  gameStatus: GameStatus.Combat,
+  gameStatus: GameStatus.Exploring,
   roomInstances: new Map<Room, Room>([
     [
       startRoom,

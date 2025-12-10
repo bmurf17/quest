@@ -20,9 +20,10 @@ export default function Inventory() {
             <></>
           ) : (
             <div className="grid grid-cols-2 gap-2">
-              {(combatOrder[index] as CharacterData).items.map((item) => {
+              {(combatOrder[index] as CharacterData).items.map((item, index) => {
                 return (
                   <div
+                    key={item.action.name + index}
                     className="bg-gray-700 rounded h-18 hover:bg-gray-600 cursor-pointer w-full flex items-center justify-center"
                     onClick={() => attack(room.enemies[0])}
                   >
