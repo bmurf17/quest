@@ -219,6 +219,39 @@ export function RoomPopup({ room, onClose }: RoomPopupProps) {
           <></>
         )}
 
+        {room.enemies.length > 0 ? (
+          <>
+            {room.enemies.map((enemy, index) => {
+              return (
+                <div key={enemy.name + index}>
+                  <p className="mb-4 text-gray-800">
+                    <span className="font-semibold text-black">Enemy:</span>{" "}
+                    <span className="text-black">{enemy.name}</span>
+                  </p>
+                   <p className="mb-4 text-gray-800">
+                    <span className="font-semibold text-black">HP:</span>{" "}
+                    <span className="text-black">{enemy.health}</span>
+                  </p>
+                   <p className="mb-4 text-gray-800">
+                    <span className="font-semibold text-black">Str:</span>{" "}
+                    <span className="text-black">{enemy.strength}</span>
+                  </p>
+                   <p className="mb-4 text-gray-800">
+                    <span className="font-semibold text-black">Def:</span>{" "}
+                    <span className="text-black">{enemy.defense}</span>
+                  </p>
+                   <p className="mb-4 text-gray-800">
+                    <span className="font-semibold text-black">Dex:</span>{" "}
+                    <span className="text-black">{enemy.dex}</span>
+                  </p>
+                </div>
+              );
+            })}
+          </>
+        ) : (
+          <></>
+        )}
+
         <button
           onClick={onClose}
           className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
