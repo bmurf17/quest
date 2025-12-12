@@ -1,6 +1,6 @@
 import { GameState, useGameStore } from "../state/GameState";
 import Party from "./Party";
-import Inventory from "./Inventory";
+import ActionMenu from "./ActionMenu";
 import MainGameArea from "./MainGameArea/MainGameArea";
 import ActivityLog from "./ActivityLog";
 
@@ -20,7 +20,7 @@ export default function GameLayout() {
         </div>
 
         <div className="col-span-4 grid grid-cols-4 gap-2">
-          <Inventory />
+          <ActionMenu />
         </div>
       </div>
     </>

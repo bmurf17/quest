@@ -2,7 +2,7 @@ import { useGameStore } from "@/state/GameState";
 import { Camp, Chest, NPC } from "@/types/RoomInteractions";
 import { CharacterData } from "@/types/Character";
 
-export default function Inventory() {
+export default function ActionMenu() {
   const attack = useGameStore((state) => state.attack);
   const speak = useGameStore((state) => state.speak);
   const rest = useGameStore((state) => state.rest);
@@ -20,24 +20,26 @@ export default function Inventory() {
             <></>
           ) : (
             <div className="grid grid-cols-2 gap-2">
-              {(combatOrder[index] as CharacterData).items.map((item, index) => {
-                return (
-                  <div
-                    key={item.action.name + index}
-                    className="bg-gray-700 rounded h-18 hover:bg-gray-600 cursor-pointer w-full flex items-center justify-center"
-                    onClick={() => attack(room.enemies[0])}
-                  >
-                    <img
-                      src={item.img}
-                      alt={item.action.name}
-                      className="w-12x h-12"
-                      style={{
-                        imageRendering: "pixelated",
-                      }}
-                    />
-                  </div>
-                );
-              })}
+              {(combatOrder[index] as CharacterData).items.map(
+                (item, index) => {
+                  return (
+                    <div
+                      key={item.action.name + index}
+                      className="bg-gray-700 rounded h-18 hover:bg-gray-600 cursor-pointer w-full flex items-center justify-center"
+                      onClick={() => attack(room.enemies[0])}
+                    >
+                      <img
+                        src={item.img}
+                        alt={item.action.name}
+                        className="w-12x h-12"
+                        style={{
+                          imageRendering: "pixelated",
+                        }}
+                      />
+                    </div>
+                  );
+                }
+              )}
               <div className="bg-gray-900 rounded h-18 w-full"></div>
               <div className="bg-gray-900 rounded h-18 w-full"></div>
               <div className="bg-gray-900 rounded h-18 w-full"></div>
@@ -132,7 +134,9 @@ export default function Inventory() {
       ) : (
         <> </>
       )}
-      <div className="bg-gray-900 rounded"></div>
+      <div className="bg-gray-900 rounded hover:bg-gray-600 cursor-pointer flex justify-center items-center">
+         Inventory
+      </div>
       <div className="bg-gray-900 rounded"></div>
       <div className="bg-gray-900 rounded"></div>
     </>
