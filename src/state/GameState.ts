@@ -2,6 +2,7 @@ import { CharacterData } from "@/types/Character";
 import { Directions } from "@/types/Directions";
 import { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
+import { healthPotion, Item } from "@/types/Item";
 import { Room, startRoom } from "@/types/Room";
 import { Camp, Chest, getDiscoveryMessage, NPC } from "@/types/RoomInteractions";
 import { create } from "zustand";
@@ -15,6 +16,7 @@ export interface GameState {
   rooms: Room[];
   combatOrder: (CharacterData | Enemy)[];
   activeFighterIndex: number;
+  inventory: Item[];
   addToLog: (log: string) => void;
   attack: (enemy: Enemy) => void;
   move: (direction: Directions) => void;
@@ -44,6 +46,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   rooms: [],
   combatOrder: [],
   activeFighterIndex: 0,
+  inventory: [healthPotion],
 
   addToLog: (message: string) =>
     set((state) => ({

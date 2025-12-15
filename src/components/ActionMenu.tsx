@@ -1,6 +1,8 @@
 import { useGameStore } from "@/state/GameState";
 import { Camp, Chest, NPC } from "@/types/RoomInteractions";
 import { CharacterData } from "@/types/Character";
+import { useState } from "react";
+import Inventory from "./Inventory";
 
 export default function ActionMenu() {
   const attack = useGameStore((state) => state.attack);
@@ -11,6 +13,14 @@ export default function ActionMenu() {
   const combatOrder = useGameStore((state) => state.combatOrder);
   const isFighterEnemy = useGameStore((state) => state.isCurrentFighterEnemy());
   const room = useGameStore((state) => state.room);
+  const inventory = useGameStore((state) => state.inventory)
+
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+  
+    const openInventory = () => {
+      setIsModalOpen(true);
+    };
 
   return (
     <>
@@ -134,11 +144,13 @@ export default function ActionMenu() {
       ) : (
         <> </>
       )}
-      <div className="bg-gray-900 rounded hover:bg-gray-600 cursor-pointer flex justify-center items-center">
+      <div className="bg-gray-900 rounded hover:bg-gray-600 cursor-pointer flex justify-center items-center" onClick={openInventory}>
          Inventory
       </div>
       <div className="bg-gray-900 rounded"></div>
       <div className="bg-gray-900 rounded"></div>
+
+      <Inventory isOpen={isModalOpen} onOpenChange={setIsModalOpen} inventory={inventory} />
     </>
   );
 }
