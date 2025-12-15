@@ -59,6 +59,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   performEnemyTurn: () => {
+    console.log("TEST")
     const state = get();
     const currentEnemy = state.combatOrder[state.activeFighterIndex] as Enemy;
 
@@ -104,6 +105,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   attack: (enemy: Enemy) => {
     set((state) => {
       const currentAttacker = state.combatOrder[state.activeFighterIndex];
+      console.log(currentAttacker)
       const attackerName = currentAttacker?.name || "Unknown";
       const currentDex = 'abilities' in currentAttacker ? currentAttacker.abilities.dex.score : currentAttacker.dex
       const currentStrength = 'abilities' in currentAttacker ? currentAttacker.abilities.str.score : currentAttacker.strength
@@ -226,6 +228,11 @@ export const useGameStore = create<GameState>((set, get) => ({
           ? GameStatus.Combat
           : GameStatus.Exploring;
 
+      let combatOrder = state.combatOrder
+      if(status === GameStatus.Combat){
+        combatOrder = [...state.party, ...roomInstance.enemies]
+      }
+
       // Build activity log messages
       const logBuilder = new ActivityLogBuilder()
         .add(`Your party has moved ${Directions[direction]}`)
@@ -250,6 +257,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         room: roomInstance,
         roomInstances: newRoomInstances,
         gameStatus: status,
+        combatOrder: combatOrder
       };
     }),
 

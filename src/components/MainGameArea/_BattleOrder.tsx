@@ -26,7 +26,7 @@ export default function BattleOrder() {
                   ) : (
                     <img
                       src={mushroom}
-                      alt={characterOrEnemy.name}
+                      alt={characterOrEnemy + ""}
                       style={{
                         width: "64px",
                         height: "64x",
