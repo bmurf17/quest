@@ -5,7 +5,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Item } from "@/types/Item";
+import { useGameStore } from "@/state/GameState";
+import { Consumable, Item } from "@/types/Item";
 
 export default function Inventory({
   isOpen = false,
@@ -16,6 +17,7 @@ export default function Inventory({
   onOpenChange?: (open: boolean) => void;
   inventory: Item[];
 }) {
+  const useConsumable = useGameStore((state) => state.useConsumable);
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-xl bg-gray-800 text-white">
@@ -30,6 +32,7 @@ export default function Inventory({
                 <div
                   className="flex gap-4 items-center hover:cursor-pointer hover:bg-gray-600"
                   key={item.name}
+                  onClick={() => useConsumable(item as Consumable)}
                 >
                   <img
                     src={item.img}

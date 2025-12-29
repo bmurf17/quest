@@ -2,9 +2,14 @@ import { CharacterData } from "@/types/Character";
 import { Directions } from "@/types/Directions";
 import { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
-import { healthPotion, Item } from "@/types/Item";
+import { Consumable, healthPotion, Item } from "@/types/Item";
 import { Room, startRoom } from "@/types/Room";
-import { Camp, Chest, getDiscoveryMessage, NPC } from "@/types/RoomInteractions";
+import {
+  Camp,
+  Chest,
+  getDiscoveryMessage,
+  NPC,
+} from "@/types/RoomInteractions";
 import { create } from "zustand";
 
 export interface GameState {
@@ -30,6 +35,7 @@ export interface GameState {
   enterCombat: () => void;
   isCurrentFighterEnemy: () => boolean;
   performEnemyTurn: () => void;
+  useConsumable: (item: Consumable) => void;
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -62,7 +68,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   performEnemyTurn: () => {
-    console.log("TEST")
+    console.log("TEST");
     const state = get();
     const currentEnemy = state.combatOrder[state.activeFighterIndex] as Enemy;
 
@@ -108,14 +114,19 @@ export const useGameStore = create<GameState>((set, get) => ({
   attack: (enemy: Enemy) => {
     set((state) => {
       const currentAttacker = state.combatOrder[state.activeFighterIndex];
-      console.log(currentAttacker)
+      console.log(currentAttacker);
       const attackerName = currentAttacker?.name || "Unknown";
-      const currentDex = 'abilities' in currentAttacker ? currentAttacker.abilities.dex.score : currentAttacker.dex
-      const currentStrength = 'abilities' in currentAttacker ? currentAttacker.abilities.str.score : currentAttacker.strength
+      const currentDex =
+        "abilities" in currentAttacker
+          ? currentAttacker.abilities.dex.score
+          : currentAttacker.dex;
+      const currentStrength =
+        "abilities" in currentAttacker
+          ? currentAttacker.abilities.str.score
+          : currentAttacker.strength;
 
-      var nextIndex =
-        (state.activeFighterIndex + 1) % state.combatOrder.length;
-      const damage = calcDamage(enemy.defense, currentDex, currentStrength)
+      var nextIndex = (state.activeFighterIndex + 1) % state.combatOrder.length;
+      const damage = calcDamage(enemy.defense, currentDex, currentStrength);
 
       const newHealth = enemy.health - damage;
       let updatedEnemies;
@@ -128,7 +139,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         updatedEnemies = currentRoomInstance.enemies.filter(
           (e) => e.id !== enemy.id
         );
-        nextIndex = 0
+        nextIndex = 0;
         logMessage = `${attackerName} defeated ${enemy.name}!`;
         status =
           updatedEnemies.length === 0
@@ -192,12 +203,15 @@ export const useGameStore = create<GameState>((set, get) => ({
       };
     }),
 
-    rest: (camp: Camp) =>
+  rest: (camp: Camp) =>
     set((state) => {
       const updatedParty = state.party.map((member) => {
-          return { ...member, hp: Math.min(member.maxHp, member.hp + camp.healAmount) };
+        return {
+          ...member,
+          hp: Math.min(member.maxHp, member.hp + camp.healAmount),
+        };
       });
-      
+
       const logBuilder = new ActivityLogBuilder().add(
         `$Your party rests and heals ${camp.healAmount} hp`
       );
@@ -231,9 +245,9 @@ export const useGameStore = create<GameState>((set, get) => ({
           ? GameStatus.Combat
           : GameStatus.Exploring;
 
-      let combatOrder = state.combatOrder
-      if(status === GameStatus.Combat){
-        combatOrder = [...state.party, ...roomInstance.enemies]
+      let combatOrder = state.combatOrder;
+      if (status === GameStatus.Combat) {
+        combatOrder = [...state.party, ...roomInstance.enemies];
       }
 
       // Build activity log messages
@@ -260,7 +274,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         room: roomInstance,
         roomInstances: newRoomInstances,
         gameStatus: status,
-        combatOrder: combatOrder
+        combatOrder: combatOrder,
       };
     }),
 
@@ -334,13 +348,30 @@ export const useGameStore = create<GameState>((set, get) => ({
         combatOrder: combatOrder,
       };
     }),
+
+  useConsumable: (item: Consumable) =>
+    set((state) => {
+      const logBuilder = new ActivityLogBuilder().add(`${item.effect}`);
+
+      const updatedParty = state.party.map((member) => {
+        return {
+          ...member,
+          hp: Math.min(member.maxHp, member.hp + item.hpChange),
+        };
+      });
+
+      return {
+        party: updatedParty,
+        activityLog: [...state.activityLog, ...logBuilder.build()],
+      };
+    }),
 }));
 
-function calcDamage(defense: number, strength: number, dex: number): number{
+function calcDamage(defense: number, strength: number, dex: number): number {
   const hitChance = dex + Math.floor(Math.random() * 20) + 1;
-  if(hitChance >= defense){
+  if (hitChance >= defense) {
     const damage = strength + Math.floor(Math.random() * 6) + 1;
-    return Math.max(1, damage-defense)
+    return Math.max(1, damage - defense);
   }
   return 0;
 }
