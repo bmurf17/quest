@@ -6,4 +6,5 @@ export type Enemy = {
   dex: number;
   defense: number;
   img: string;
+  type: 'enemy'
 };

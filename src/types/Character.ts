@@ -62,6 +62,7 @@ export type CharacterData = {
   skills: Skill[];
   items: Item[];
   savingThrows: SavingThrows;
+  type: 'character'
 };
 
 export const tempRanger: CharacterData = {
@@ -117,6 +118,7 @@ export const tempRanger: CharacterData = {
     wis: "+1",
     cha: "-1",
   },
+  type: "character"
 };
 
 export const tempWarrior: CharacterData = {
@@ -172,6 +174,7 @@ export const tempWarrior: CharacterData = {
     wis: "+1",
     cha: "-1",
   },
+  type: "character"
 };
 
 export const tempCleric: CharacterData = {
@@ -227,6 +230,7 @@ export const tempCleric: CharacterData = {
     wis: "+1",
     cha: "-1",
   },
+  type: "character"
 };
 
 export const tempWizard: CharacterData = {
@@ -282,4 +286,5 @@ export const tempWizard: CharacterData = {
     wis: "+1",
     cha: "-1",
   },
+  type: "character"
 };

@@ -68,7 +68,6 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   performEnemyTurn: () => {
-    console.log("TEST");
     const state = get();
     const currentEnemy = state.combatOrder[state.activeFighterIndex] as Enemy;
 
@@ -132,6 +131,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       let updatedEnemies;
       let logMessage;
       let status = GameStatus.Combat;
+      let combatOrder = state.combatOrder;
       const currentRoomInstance =
         state.roomInstances.get(state.room) || state.room;
 
@@ -139,8 +139,48 @@ export const useGameStore = create<GameState>((set, get) => ({
         updatedEnemies = currentRoomInstance.enemies.filter(
           (e) => e.id !== enemy.id
         );
-        nextIndex = 0;
+
         logMessage = `${attackerName} defeated ${enemy.name}!`;
+
+        // Add debugging
+        console.log("Enemy to remove:", enemy.id, enemy);
+        console.log(
+          "Combat order before filter:",
+          combatOrder.map((x) => ({
+            type: x.type,
+            id: x.type === "enemy" ? x.id : "N/A",
+            name: x.name,
+          }))
+        );
+
+        combatOrder = combatOrder.filter((x) => {
+          if (x.type === "enemy") {
+            console.log(
+              "Comparing enemy:",
+              x.id,
+              "with target:",
+              enemy.id,
+              "match:",
+              x.id === enemy.id
+            );
+            return x.id !== enemy.id;
+          }
+          return true;
+        });
+
+        console.log(
+          "Combat order after filter:",
+          combatOrder.map((x) => ({
+            type: x.type,
+            id: x.type === "enemy" ? x.id : "N/A",
+            name: x.name,
+          }))
+        );
+        nextIndex = nextIndex >= combatOrder.length ? 0 : nextIndex;
+
+        if (updatedEnemies.length === 0) {
+          nextIndex = 0;
+        }
         status =
           updatedEnemies.length === 0
             ? GameStatus.Exploring
@@ -181,6 +221,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         gameStatus: status,
         activityLog: newActivityLog,
         activeFighterIndex: nextIndex,
+        combatOrder: combatOrder,
       };
     });
 
