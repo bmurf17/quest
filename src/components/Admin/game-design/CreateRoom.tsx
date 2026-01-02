@@ -51,7 +51,6 @@ export default function ManageRooms() {
 
     try {
       const formData = new FormData(event.currentTarget);
-      console.log(formData);
 
       const roomName = formData.get("name")?.toString() || "";
       const direction = formData.get("direction");

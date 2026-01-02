@@ -4,8 +4,6 @@ import mushroom from "../../assets/Mushroom.png";
 
 export default function BattleOrder() {
   const state = useGameStore((state: GameState) => state);
-  console.log("In component")
-  console.log(state.combatOrder)
   return (
     <>
       {state.gameStatus === GameStatus.Combat ? (

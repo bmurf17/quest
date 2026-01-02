@@ -113,7 +113,6 @@ export const useGameStore = create<GameState>((set, get) => ({
   attack: (enemy: Enemy) => {
     set((state) => {
       const currentAttacker = state.combatOrder[state.activeFighterIndex];
-      console.log(currentAttacker);
       const attackerName = currentAttacker?.name || "Unknown";
       const currentDex =
         "abilities" in currentAttacker
@@ -142,45 +141,17 @@ export const useGameStore = create<GameState>((set, get) => ({
 
         logMessage = `${attackerName} defeated ${enemy.name}!`;
 
-        // Add debugging
-        console.log("Enemy to remove:", enemy.id, enemy);
-        console.log(
-          "Combat order before filter:",
-          combatOrder.map((x) => ({
-            type: x.type,
-            id: x.type === "enemy" ? x.id : "N/A",
-            name: x.name,
-          }))
-        );
+        const defeatedEnemyName = enemy.name;
 
         combatOrder = combatOrder.filter((x) => {
-          if (x.type === "enemy") {
-            console.log(
-              "Comparing enemy:",
-              x.id,
-              "with target:",
-              enemy.id,
-              "match:",
-              x.id === enemy.id
-            );
-            return x.id !== enemy.id;
-          }
-          return true;
+          const shouldKeep = x.name !== defeatedEnemyName;
+          return shouldKeep;
         });
-
-        console.log(
-          "Combat order after filter:",
-          combatOrder.map((x) => ({
-            type: x.type,
-            id: x.type === "enemy" ? x.id : "N/A",
-            name: x.name,
-          }))
-        );
-        nextIndex = nextIndex >= combatOrder.length ? 0 : nextIndex;
 
         if (updatedEnemies.length === 0) {
           nextIndex = 0;
         }
+
         status =
           updatedEnemies.length === 0
             ? GameStatus.Exploring
