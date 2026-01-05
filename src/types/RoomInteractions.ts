@@ -1,3 +1,5 @@
+import { Item } from "./Item";
+
 export interface NPC {
   name: string;
   dialogue: string[];
@@ -5,14 +7,15 @@ export interface NPC {
   discoveryMessage?: string;
 }
 
-export interface Chest {
+export type Chest = {
   id: number;
   itemId: string;
   quantity: number;
   isLocked: boolean;
-  discoveryMessage?: string;
   isOpen: boolean;
-}
+  discoveryMessage: string | null;
+  item: Item | null;  // Add this line
+};
 
 export interface Camp {
   healAmount: number;

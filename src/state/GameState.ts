@@ -317,6 +317,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   updateChest: (chest: Chest) =>
     set((state) => {
+      console.log(chest)
       const currentRoomInstance =
         state.roomInstances.get(state.room) || state.room;
       const logBuilder = new ActivityLogBuilder().add(
