@@ -32,6 +32,7 @@ export interface GameState {
   updateRoom: (room: Room) => void;
   setParty: (characters: CharacterData[]) => void;
   updateChest: (chest: Chest) => void;
+  takeFromChest: (chest: Chest) => void;
   enterCombat: () => void;
   isCurrentFighterEnemy: () => boolean;
   performEnemyTurn: () => void;
@@ -317,7 +318,6 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   updateChest: (chest: Chest) =>
     set((state) => {
-      console.log(chest)
       const currentRoomInstance =
         state.roomInstances.get(state.room) || state.room;
       const logBuilder = new ActivityLogBuilder().add(
@@ -376,6 +376,43 @@ export const useGameStore = create<GameState>((set, get) => ({
       return {
         party: updatedParty,
         activityLog: [...state.activityLog, ...logBuilder.build()],
+      };
+    }),
+
+  takeFromChest: (chest: Chest) =>
+    set((state) => {
+      const currentRoomInstance =
+        state.roomInstances.get(state.room) || state.room;
+      const logBuilder = new ActivityLogBuilder().add(
+        `You take from the chest!`
+      );
+      const updatedRoom: Room = {
+        ...currentRoomInstance,
+        interaction: { type: "chest", chest: {...chest} },
+      };
+
+      const originalTemplate = [...state.roomInstances.entries()].find(
+        ([template, instance]) =>
+          instance === currentRoomInstance || template === state.room
+      )?.[0];
+
+      const newRoomInstances = new Map(state.roomInstances);
+      if (originalTemplate) {
+        newRoomInstances.set(originalTemplate, updatedRoom);
+      }
+
+      const inventory = state.inventory;
+
+      if(chest.item){
+        inventory.push(chest.item)
+      }
+
+      console.log(inventory)
+      return {
+        activityLog: [...state.activityLog, ...logBuilder.build()],
+        room: updatedRoom,
+        roomInstances: newRoomInstances,
+        inventory: inventory
       };
     }),
 }));

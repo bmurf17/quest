@@ -9,6 +9,7 @@ export default function ActionMenu() {
   const speak = useGameStore((state) => state.speak);
   const rest = useGameStore((state) => state.rest);
   const updateChest = useGameStore((state) => state.updateChest);
+  const takeFromChest = useGameStore((state) => state.takeFromChest);
   const index = useGameStore((state) => state.activeFighterIndex);
   const combatOrder = useGameStore((state) => state.combatOrder);
   const isFighterEnemy = useGameStore((state) => state.isCurrentFighterEnemy());
@@ -118,7 +119,7 @@ export default function ActionMenu() {
                 onClick={() => {
                   if (room && room.interaction?.type === "chest") {
                     const chest = room?.interaction?.chest as Chest;
-                    updateChest({ ...chest, quantity: 0 });
+                    takeFromChest({ ...chest, quantity: 0 });
                   }
                 }}
               >

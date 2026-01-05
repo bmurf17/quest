@@ -14,7 +14,7 @@ export type Chest = {
   isLocked: boolean;
   isOpen: boolean;
   discoveryMessage: string | null;
-  item: Item | null;  // Add this line
+  item: Item | null; 
 };
 
 export interface Camp {
