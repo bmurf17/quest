@@ -1,6 +1,6 @@
 import { Directions } from "./Directions";
 import { Enemy } from "./Enemy";
-import { RoomInteraction } from "./RoomInteractions";
+import { NPCType, RoomInteraction } from "./RoomInteractions";
 
 export type Room = {
   id: number;
@@ -20,6 +20,7 @@ const northRoom: Room = {
       name: "Merchant",
       dialogue: ["What can I do for you?"],
       discoveryMessage: "Well met travelers!",
+      NPCType: NPCType.MERCHANT
     },
   },
   id: 0

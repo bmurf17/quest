@@ -5,6 +5,7 @@ import { Room, startRoom } from "@/types/Room";
 import { useState } from "react";
 import mushroom from "../../../assets/Mushroom.png";
 import blord from "../../../assets/blord.png";
+import { NPCType } from "@/types/RoomInteractions";
 
 const directionToDbEnum = (direction: Directions): string => {
   const map: { [key in Directions]: string } = {
@@ -29,9 +30,9 @@ const getOppositeDirection = (direction: Directions): Directions => {
 export default function ManageRooms() {
   const [interaction, setInteraction] = useState("NPC");
   const [neighboringRoom, setNeighboringRoom] = useState(startRoom);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [, setIsSubmitting] = useState(false);
+  const [, setError] = useState<string | null>(null);
+  const [, setSuccess] = useState<string | null>(null);
 
   const rooms = useGameStore((state) => state.rooms);
   const addRoom = useGameStore((state) => state.addRoom);
@@ -230,6 +231,7 @@ export default function ManageRooms() {
                   dialogue: [formData.get("dialogue")?.toString() || ""],
                   discoveryMessage:
                     formData.get("discoveryMessage")?.toString() || "",
+                  NPCType: NPCType.GENERIC
                 },
               }
             : null,

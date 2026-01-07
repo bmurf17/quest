@@ -95,6 +95,7 @@ export async function getAllRooms(): Promise<Room[]> {
               dialogue: interactionData.npcs.dialogue,
               questId: interactionData.npcs.quest_id,
               discoveryMessage: interactionData.npcs.discovery_message,
+              NPCType: interactionData.npcs.npc_type
             },
           };
           break;

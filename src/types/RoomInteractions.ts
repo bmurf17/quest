@@ -1,10 +1,17 @@
 import { Item } from "./Item";
 
+export enum NPCType {
+  MERCHANT = "merchant",
+  QUEST_GIVER = "quest_giver",
+  GENERIC = "generic"
+}
+
 export interface NPC {
   name: string;
   dialogue: string[];
   questId?: string;
   discoveryMessage?: string;
+  NPCType: NPCType
 }
 
 export type Chest = {

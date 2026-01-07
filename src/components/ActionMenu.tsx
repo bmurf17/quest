@@ -1,5 +1,5 @@
 import { useGameStore } from "@/state/GameState";
-import { Camp, Chest, NPC } from "@/types/RoomInteractions";
+import { Camp, Chest, NPC, NPCType } from "@/types/RoomInteractions";
 import { CharacterData } from "@/types/Character";
 import { useState } from "react";
 import Inventory from "./Inventory";
@@ -14,14 +14,13 @@ export default function ActionMenu() {
   const combatOrder = useGameStore((state) => state.combatOrder);
   const isFighterEnemy = useGameStore((state) => state.isCurrentFighterEnemy());
   const room = useGameStore((state) => state.room);
-  const inventory = useGameStore((state) => state.inventory)
+  const inventory = useGameStore((state) => state.inventory);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-  
-    const openInventory = () => {
-      setIsModalOpen(true);
-    };
+  const openInventory = () => {
+    setIsModalOpen(true);
+  };
 
   return (
     <>
@@ -62,16 +61,29 @@ export default function ActionMenu() {
         <> </>
       )}
       {room && room.interaction?.type === "NPC" ? (
-        <div
-          className="bg-gray-900 rounded hover:bg-gray-600 cursor-pointer flex justify-center items-center"
-          onClick={() => {
-            if (room && room.interaction?.type === "NPC") {
-              speak(room?.interaction?.npc as NPC);
-            }
-          }}
-        >
-          Speak
-        </div>
+        <>
+          <div
+            className="bg-gray-900 rounded hover:bg-gray-600 cursor-pointer flex justify-center items-center"
+            onClick={() => {
+              if (room && room.interaction?.type === "NPC") {
+                speak(room?.interaction?.npc as NPC);
+              }
+            }}
+          >
+            Speak
+          </div>
+          
+          {room.interaction.npc.NPCType === NPCType.MERCHANT}<div
+            className="bg-gray-900 rounded hover:bg-gray-600 cursor-pointer flex justify-center items-center"
+            onClick={() => {
+              if (room && room.interaction?.type === "NPC") {
+                speak(room?.interaction?.npc as NPC);
+              }
+            }}
+          >
+            Shop
+          </div>
+        </>
       ) : (
         <> </>
       )}
@@ -145,13 +157,26 @@ export default function ActionMenu() {
       ) : (
         <> </>
       )}
-      <div className="bg-gray-900 rounded hover:bg-gray-600 cursor-pointer flex justify-center items-center" onClick={openInventory}>
-         Inventory
+      <div
+        className="bg-gray-900 rounded hover:bg-gray-600 cursor-pointer flex justify-center items-center"
+        onClick={openInventory}
+      >
+        Inventory
       </div>
       <div className="bg-gray-900 rounded"></div>
       <div className="bg-gray-900 rounded"></div>
 
-      <Inventory isOpen={isModalOpen} onOpenChange={setIsModalOpen} inventory={inventory} />
+      <Inventory
+        isOpen={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        inventory={inventory}
+      />
+
+      <Inventory
+        isOpen={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        inventory={inventory}
+      />
     </>
   );
 }
