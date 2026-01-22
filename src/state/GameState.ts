@@ -84,6 +84,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     set((state) => {
       var damage = calcDamage(target.abilities.def.score, currentEnemy.dex, currentEnemy.strength);
       var newHealth = Math.max(0, target.hp - damage);
+      var combatOrder = state.combatOrder;
 
       const updatedParty = state.party.map((member) => {
         if (member.name === target.name) {
@@ -98,6 +99,11 @@ export const useGameStore = create<GameState>((set, get) => ({
 
       if(newHealth <= 0){
         logMessage += ` \n ${target.name} has been defeated!`;
+
+        combatOrder = combatOrder.filter((x) => {
+          const shouldKeep = x.name !== target.name;
+          return shouldKeep;
+        });
       }
 
       const nextIndex =
@@ -107,6 +113,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         party: updatedParty,
         activityLog: [...state.activityLog, logMessage],
         activeFighterIndex: nextIndex,
+        combatOrder: combatOrder,
       };
     });
 
