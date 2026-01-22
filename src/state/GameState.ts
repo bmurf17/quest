@@ -82,16 +82,23 @@ export const useGameStore = create<GameState>((set, get) => ({
       livingMembers[Math.floor(Math.random() * livingMembers.length)];
 
     set((state) => {
+      var damage = calcDamage(target.abilities.def.score, currentEnemy.dex, currentEnemy.strength);
+      var newHealth = Math.max(0, target.hp - damage);
+
       const updatedParty = state.party.map((member) => {
         if (member.name === target.name) {
-          return { ...member, hp: Math.max(0, member.hp - 2) };
+          return { ...member, hp: newHealth, alive: newHealth > 0 };
         }
         return member;
       });
 
-      const logMessage = `${currentEnemy.name} attacked ${
+      var logMessage = `${currentEnemy.name} attacked ${
         target.name
-      } for 2 damage! ${target.name}'s HP: ${Math.max(0, target.hp - 2)}`;
+      } for ${damage} damage! ${target.name}'s HP: ${newHealth}`;
+
+      if(newHealth <= 0){
+        logMessage += ` \n ${target.name} has been defeated!`;
+      }
 
       const nextIndex =
         (state.activeFighterIndex + 1) % state.combatOrder.length;
@@ -125,7 +132,7 @@ export const useGameStore = create<GameState>((set, get) => ({
           : currentAttacker.strength;
 
       var nextIndex = (state.activeFighterIndex + 1) % state.combatOrder.length;
-      const damage = calcDamage(enemy.defense, currentDex, currentStrength);
+      const damage = calcDamage(enemy.defense, currentStrength, currentDex);
 
       const newHealth = enemy.health - damage;
       let updatedEnemies;

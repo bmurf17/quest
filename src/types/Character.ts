@@ -3,7 +3,7 @@ import rogue from "../assets/Rogue.png";
 import longbow from "../assets/BowV1.png";
 import staff from "../assets/Staff.png";
 import sword from "../assets/Sword.png";
-import spear from "../assets/Spear.png"
+import spear from "../assets/Spear.png";
 import cleric from "../assets/Cleric.png";
 import wizard from "../assets/Wizard.png";
 import assasin from "../assets/Assassin.png";
@@ -20,6 +20,7 @@ type AbilityScores = {
   int: Ability;
   wis: Ability;
   cha: Ability;
+  def: Ability;
 };
 
 type Skill = {
@@ -63,7 +64,8 @@ export type CharacterData = {
   skills: Skill[];
   items: Item[];
   savingThrows: SavingThrows;
-  type: 'character'
+  type: "character";
+  alive: boolean;
 };
 
 export const tempRanger: CharacterData = {
@@ -83,6 +85,7 @@ export const tempRanger: CharacterData = {
     int: { score: 12, modifier: 1 },
     wis: { score: 12, modifier: 1 },
     cha: { score: 12, modifier: 1 },
+    def: { score: 12, modifier: 1 },
   },
   skills: [
     { name: "Acrobatics", ability: "DEX", modifier: "+2" },
@@ -119,7 +122,8 @@ export const tempRanger: CharacterData = {
     wis: "+1",
     cha: "-1",
   },
-  type: "character"
+  type: "character",
+  alive: true,
 };
 
 export const tempWarrior: CharacterData = {
@@ -139,6 +143,7 @@ export const tempWarrior: CharacterData = {
     int: { score: 12, modifier: 1 },
     wis: { score: 12, modifier: 1 },
     cha: { score: 12, modifier: 1 },
+    def: { score: 12, modifier: 1 },
   },
   skills: [
     { name: "Acrobatics", ability: "DEX", modifier: "+2" },
@@ -175,7 +180,8 @@ export const tempWarrior: CharacterData = {
     wis: "+1",
     cha: "-1",
   },
-  type: "character"
+  type: "character",
+  alive: true,
 };
 
 export const tempCleric: CharacterData = {
@@ -195,6 +201,7 @@ export const tempCleric: CharacterData = {
     int: { score: 12, modifier: 1 },
     wis: { score: 12, modifier: 1 },
     cha: { score: 12, modifier: 1 },
+    def: { score: 12, modifier: 1 },
   },
   skills: [
     { name: "Acrobatics", ability: "DEX", modifier: "+2" },
@@ -231,7 +238,8 @@ export const tempCleric: CharacterData = {
     wis: "+1",
     cha: "-1",
   },
-  type: "character"
+  type: "character",
+  alive: true,
 };
 
 export const tempWizard: CharacterData = {
@@ -251,6 +259,7 @@ export const tempWizard: CharacterData = {
     int: { score: 12, modifier: 1 },
     wis: { score: 12, modifier: 1 },
     cha: { score: 12, modifier: 1 },
+    def: { score: 12, modifier: 1 },
   },
   skills: [
     { name: "Acrobatics", ability: "DEX", modifier: "+2" },
@@ -287,7 +296,8 @@ export const tempWizard: CharacterData = {
     wis: "+1",
     cha: "-1",
   },
-  type: "character"
+  type: "character",
+  alive: true,
 };
 
 export const tempAssassin: CharacterData = {
@@ -307,6 +317,7 @@ export const tempAssassin: CharacterData = {
     int: { score: 12, modifier: 1 },
     wis: { score: 12, modifier: 1 },
     cha: { score: 12, modifier: 1 },
+    def: { score: 12, modifier: 1 },
   },
   skills: [
     { name: "Acrobatics", ability: "DEX", modifier: "+2" },
@@ -343,5 +354,6 @@ export const tempAssassin: CharacterData = {
     wis: "+1",
     cha: "-1",
   },
-  type: "character"
+  type: "character",
+  alive: true,
 };
