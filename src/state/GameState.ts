@@ -37,6 +37,7 @@ export interface GameState {
   isCurrentFighterEnemy: () => boolean;
   performEnemyTurn: () => void;
   useConsumable: (item: Consumable) => void;
+  buyItem: (item: Item) => void;
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -82,7 +83,11 @@ export const useGameStore = create<GameState>((set, get) => ({
       livingMembers[Math.floor(Math.random() * livingMembers.length)];
 
     set((state) => {
-      var damage = calcDamage(target.abilities.def.score, currentEnemy.dex, currentEnemy.strength);
+      var damage = calcDamage(
+        target.abilities.def.score,
+        currentEnemy.dex,
+        currentEnemy.strength,
+      );
       var newHealth = Math.max(0, target.hp - damage);
       var combatOrder = state.combatOrder;
 
@@ -97,7 +102,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         target.name
       } for ${damage} damage! ${target.name}'s HP: ${newHealth}`;
 
-      if(newHealth <= 0){
+      if (newHealth <= 0) {
         logMessage += ` \n ${target.name} has been defeated!`;
 
         combatOrder = combatOrder.filter((x) => {
@@ -151,7 +156,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
       if (newHealth <= 0) {
         updatedEnemies = currentRoomInstance.enemies.filter(
-          (e) => e.id !== enemy.id
+          (e) => e.id !== enemy.id,
         );
 
         logMessage = `${attackerName} defeated ${enemy.name}!`;
@@ -191,7 +196,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
       const originalTemplate = [...state.roomInstances.entries()].find(
         ([template, instance]) =>
-          instance === currentRoomInstance || template === state.room
+          instance === currentRoomInstance || template === state.room,
       )?.[0];
 
       const newRoomInstances = new Map(state.roomInstances);
@@ -222,7 +227,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   speak: (npc: NPC) =>
     set((state) => {
       const logBuilder = new ActivityLogBuilder().add(
-        `${npc.name} says: ${npc.dialogue}`
+        `${npc.name} says: ${npc.dialogue}`,
       );
 
       return {
@@ -240,7 +245,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       });
 
       const logBuilder = new ActivityLogBuilder().add(
-        `$Your party rests and heals ${camp.healAmount} hp`
+        `$Your party rests and heals ${camp.healAmount} hp`,
       );
 
       return {
@@ -252,7 +257,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   move: (direction: Directions) =>
     set((state) => {
       const targetRoomTemplate = state.room.neighboringRooms.find(
-        ([mapDirection]) => mapDirection === direction
+        ([mapDirection]) => mapDirection === direction,
       )?.[1];
 
       if (!targetRoomTemplate) {
@@ -284,13 +289,13 @@ export const useGameStore = create<GameState>((set, get) => ({
           status === GameStatus.Exploring && !!roomInstance.interaction,
           roomInstance.interaction
             ? getDiscoveryMessage(roomInstance.interaction)
-            : ""
+            : "",
         )
         .addIf(
           roomInstance.enemies.length > 0,
           `You encounter ${roomInstance.enemies.length} ${
             roomInstance.enemies.length === 1 ? "enemy" : "enemies"
-          }!`
+          }!`,
         );
 
       const newRoomInstances = new Map(state.roomInstances);
@@ -335,7 +340,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       const currentRoomInstance =
         state.roomInstances.get(state.room) || state.room;
       const logBuilder = new ActivityLogBuilder().add(
-        `You have opened the chest!`
+        `You have opened the chest!`,
       );
       const updatedRoom: Room = {
         ...currentRoomInstance,
@@ -344,7 +349,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
       const originalTemplate = [...state.roomInstances.entries()].find(
         ([template, instance]) =>
-          instance === currentRoomInstance || template === state.room
+          instance === currentRoomInstance || template === state.room,
       )?.[0];
 
       const newRoomInstances = new Map(state.roomInstances);
@@ -398,16 +403,16 @@ export const useGameStore = create<GameState>((set, get) => ({
       const currentRoomInstance =
         state.roomInstances.get(state.room) || state.room;
       const logBuilder = new ActivityLogBuilder().add(
-        `You take from the chest!`
+        `You take from the chest!`,
       );
       const updatedRoom: Room = {
         ...currentRoomInstance,
-        interaction: { type: "chest", chest: {...chest} },
+        interaction: { type: "chest", chest: { ...chest } },
       };
 
       const originalTemplate = [...state.roomInstances.entries()].find(
         ([template, instance]) =>
-          instance === currentRoomInstance || template === state.room
+          instance === currentRoomInstance || template === state.room,
       )?.[0];
 
       const newRoomInstances = new Map(state.roomInstances);
@@ -417,18 +422,28 @@ export const useGameStore = create<GameState>((set, get) => ({
 
       const inventory = state.inventory;
 
-      if(chest.item){
-        inventory.push(chest.item)
+      if (chest.item) {
+        inventory.push(chest.item);
       }
 
-      console.log(inventory)
+      console.log(inventory);
       return {
         activityLog: [...state.activityLog, ...logBuilder.build()],
         room: updatedRoom,
         roomInstances: newRoomInstances,
-        inventory: inventory
+        inventory: inventory,
       };
     }),
+  buyItem(item) {
+    set((state) => {
+      const inventory = state.inventory;
+
+      inventory.push(item);
+      return {
+        inventory: inventory,
+      };
+    });
+  },
 }));
 
 function calcDamage(defense: number, strength: number, dex: number): number {

@@ -3,6 +3,8 @@ import { Camp, Chest, NPC, NPCType } from "@/types/RoomInteractions";
 import { CharacterData } from "@/types/Character";
 import { useState } from "react";
 import Inventory from "./Inventory";
+import Shop from "./Shop";
+import { manaPotion } from "@/types/Item";
 
 export default function ActionMenu() {
   const attack = useGameStore((state) => state.attack);
@@ -16,10 +18,17 @@ export default function ActionMenu() {
   const room = useGameStore((state) => state.room);
   const inventory = useGameStore((state) => state.inventory);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isInventoryModalOpen, setIsInventoryModalOpen] = useState(false);
 
   const openInventory = () => {
-    setIsModalOpen(true);
+    setIsInventoryModalOpen(true);
+  };
+
+
+  const [isShopModalOpen, setIsShopModalOpen] = useState(false);
+
+  const openShop = () => {
+    setIsShopModalOpen(true);
   };
 
   return (
@@ -77,7 +86,7 @@ export default function ActionMenu() {
             className="bg-gray-900 rounded hover:bg-gray-600 cursor-pointer flex justify-center items-center"
             onClick={() => {
               if (room && room.interaction?.type === "NPC") {
-                speak(room?.interaction?.npc as NPC);
+                openShop();
               }
             }}
           >
@@ -167,15 +176,16 @@ export default function ActionMenu() {
       <div className="bg-gray-900 rounded"></div>
 
       <Inventory
-        isOpen={isModalOpen}
-        onOpenChange={setIsModalOpen}
+        isOpen={isInventoryModalOpen}
+        onOpenChange={setIsInventoryModalOpen}
         inventory={inventory}
       />
 
-      <Inventory
-        isOpen={isModalOpen}
-        onOpenChange={setIsModalOpen}
-        inventory={inventory}
+      <Shop
+        isOpen={isShopModalOpen}
+        onOpenChange={setIsShopModalOpen}
+        inventory={[manaPotion]}
+        ownersName={room && room.interaction?.type === "NPC" ? room.interaction.npc.name : "Shopkeeper"}
       />
     </>
   );

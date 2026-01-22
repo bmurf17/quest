@@ -1,4 +1,5 @@
 import hpImg from "../assets/health-potion.png"
+import manaImg from "../assets/mana-potion.png"
 
 export type BaseItem = {
   name: string;
@@ -33,4 +34,14 @@ export const healthPotion: Consumable = {
     type: "consumable",
     hpChange: 3,
     manaChange: 0
+}
+
+export const manaPotion: Consumable = {
+    name: 'Mana Potion',
+    value: 2,
+    img: manaImg,
+    effect: "You are healed 3 mana",
+    type: "consumable",
+    hpChange: 0,
+    manaChange: 3
 }
