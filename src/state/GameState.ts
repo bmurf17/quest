@@ -42,6 +42,59 @@ export interface GameState {
   advanceDialogue: () => void; // Add this
 }
 
+const handleCombatCompletion = (enemies: Enemy[], currentNextIndex: number) => {
+  const isVictory = enemies.length === 0;
+  
+  if (isVictory) {
+    console.log("Combat complete! Returning to exploration.");
+    return {
+      nextIndex: 0,
+      status: GameStatus.Exploring,
+      logSuffix: " All enemies defeated!"
+    };
+  }
+
+  return {
+    nextIndex: currentNextIndex,
+    status: GameStatus.Combat,
+    logSuffix: ""
+  };
+};
+const finalizeAttackState = (
+  state: GameState, 
+  updatedEnemies: Enemy[], 
+  newStatus: GameStatus, 
+  nextIndex: number, 
+  combatOrder: any[], 
+  logMessage: string
+) => {
+  const currentRoomInstance = state.roomInstances.get(state.room) || state.room;
+
+  const updatedRoom = {
+    ...currentRoomInstance,
+    enemies: updatedEnemies,
+  };
+
+  const originalTemplate = [...state.roomInstances.entries()].find(
+    ([template, instance]) =>
+      instance === currentRoomInstance || template === state.room,
+  )?.[0];
+
+  const newRoomInstances = new Map(state.roomInstances);
+  if (originalTemplate) {
+    newRoomInstances.set(originalTemplate, updatedRoom);
+  }
+
+  return {
+    room: updatedRoom,
+    roomInstances: newRoomInstances,
+    gameStatus: newStatus,
+    activityLog: [...state.activityLog, logMessage],
+    activeFighterIndex: nextIndex,
+    combatOrder: combatOrder,
+  };
+};
+
 export const useGameStore = create<GameState>((set, get) => ({
   party: [],
   activityLog: ["You start your adventure."],
@@ -58,7 +111,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   activeFighterIndex: 0,
   dialogueIndex: 0,
   inventory: [healthPotion],
-
+  
   addToLog: (message: string) =>
     set((state) => ({
       activityLog: [...state.activityLog, message],
@@ -133,112 +186,68 @@ export const useGameStore = create<GameState>((set, get) => ({
     }, 500);
   },
 
-  attack: (enemy: Enemy) => {
-    set((state) => {
-      const currentAttacker = state.combatOrder[state.activeFighterIndex];
-      const attackerName = currentAttacker?.name || "Unknown";
-      const currentDex =
-        "abilities" in currentAttacker
-          ? currentAttacker.abilities.dex.score
-          : currentAttacker.dex;
-      const currentStrength =
-        "abilities" in currentAttacker
-          ? currentAttacker.abilities.str.score
-          : currentAttacker.strength;
-
-      var nextIndex = (state.activeFighterIndex + 1) % state.combatOrder.length;
-      const damage = calcDamage(enemy.defense, currentStrength, currentDex);
-
-      const newHealth = enemy.health - damage;
-      let updatedEnemies;
-      let logMessage;
-      let status = GameStatus.Combat;
-      let combatOrder = state.combatOrder;
-      const currentRoomInstance =
-        state.roomInstances.get(state.room) || state.room;
-
-      if (newHealth <= 0) {
-        updatedEnemies = currentRoomInstance.enemies.filter(
-          (e) => e.id !== enemy.id,
-        );
-
-        logMessage = `${attackerName} defeated ${enemy.name}!`;
-
-        const defeatedEnemyName = enemy.name;
-
-        combatOrder = combatOrder.filter((x) => {
-          const shouldKeep = x.name !== defeatedEnemyName;
-          return shouldKeep;
-        });
-
-        if (updatedEnemies.length === 0) {
-          nextIndex = 0;
-        }
-
-        status =
-          updatedEnemies.length === 0
-            ? GameStatus.Exploring
-            : GameStatus.Combat;
-      } else {
-        updatedEnemies = currentRoomInstance.enemies.map((e) => {
-          if (e.id === enemy.id) {
-            return {
-              ...e,
-              health: newHealth,
-            };
-          }
-          return e;
-        });
-        logMessage = `${attackerName} attacked ${enemy.name} for ${damage} damage! Enemy health: ${newHealth}`;
-      }
-
-      const updatedRoom = {
-        ...currentRoomInstance,
-        enemies: updatedEnemies,
-      };
-
-      const originalTemplate = [...state.roomInstances.entries()].find(
-        ([template, instance]) =>
-          instance === currentRoomInstance || template === state.room,
-      )?.[0];
-
-      const newRoomInstances = new Map(state.roomInstances);
-      if (originalTemplate) {
-        newRoomInstances.set(originalTemplate, updatedRoom);
-      }
-
-      const newActivityLog = [...state.activityLog, logMessage];
-
-      return {
-        room: updatedRoom,
-        roomInstances: newRoomInstances,
-        gameStatus: status,
-        activityLog: newActivityLog,
-        activeFighterIndex: nextIndex,
-        combatOrder: combatOrder,
-      };
-    });
-
-    setTimeout(() => {
-      const { gameStatus, isCurrentFighterEnemy, performEnemyTurn } = get();
-      if (gameStatus === GameStatus.Combat && isCurrentFighterEnemy()) {
-        performEnemyTurn();
-      }
-    }, 500);
-  },
-
-speak: (npc: NPC) => set((state) => {
-    const nextIndex = state.dialogueIndex + 1;
-    const currentLine = npc.dialogue[state.dialogueIndex];
+attack: (enemy: Enemy) => {
+  set((state) => {
+    const currentAttacker = state.combatOrder[state.activeFighterIndex];
+    const attackerName = currentAttacker?.name || "Unknown";
     
-    if (currentLine) {
-      return {
-        dialogueIndex: Math.min(nextIndex, npc.dialogue.length - 1),
-        activityLog: [...state.activityLog, `${npc.name}: ${currentLine}`],
-      };
+    const currentDex = "abilities" in currentAttacker ? currentAttacker.abilities.dex.score : currentAttacker.dex;
+    const currentStr = "abilities" in currentAttacker ? currentAttacker.abilities.str.score : currentAttacker.strength;
+
+    const damage = calcDamage(enemy.defense, currentStr, currentDex);
+    const newHealth = enemy.health - damage;
+    
+    let nextIndex = (state.activeFighterIndex + 1) % state.combatOrder.length;
+    let combatOrder = state.combatOrder;
+    let updatedEnemies: Enemy[];
+    let logMessage: string;
+
+    const currentRoomInstance = state.roomInstances.get(state.room) || state.room;
+
+    if (newHealth <= 0) {
+      updatedEnemies = currentRoomInstance.enemies.filter((e) => e.id !== enemy.id);
+      combatOrder = combatOrder.filter((x) => x.name !== enemy.name);
+      
+      const completion = handleCombatCompletion(updatedEnemies, nextIndex);
+      nextIndex = completion.nextIndex;
+      const status = completion.status; 
+      
+      logMessage = `${attackerName} defeated ${enemy.name}!${completion.logSuffix}`;
+      
+      // We need to return the state here or store status to use later
+      return finalizeAttackState(state, updatedEnemies, status, nextIndex, combatOrder, logMessage);
+    } else {
+      // Logic for damaging enemy
+      updatedEnemies = currentRoomInstance.enemies.map((e) => 
+        e.id === enemy.id ? { ...e, health: newHealth } : e
+      );
+      logMessage = `${attackerName} attacked ${enemy.name} for ${damage} damage!`;
+      
+      return finalizeAttackState(state, updatedEnemies, GameStatus.Combat, nextIndex, combatOrder, logMessage);
     }
-    return state;
-  }),
+  });
+
+  // Keep your timeout for enemy turns
+  setTimeout(() => {
+    const { gameStatus, isCurrentFighterEnemy, performEnemyTurn } = get();
+    if (gameStatus === GameStatus.Combat && isCurrentFighterEnemy()) {
+      performEnemyTurn();
+    }
+  }, 500);
+},
+  speak: (npc: NPC) =>
+    set((state) => {
+      const nextIndex = state.dialogueIndex + 1;
+      const currentLine = npc.dialogue[state.dialogueIndex];
+
+      if (currentLine) {
+        return {
+          dialogueIndex: Math.min(nextIndex, npc.dialogue.length - 1),
+          activityLog: [...state.activityLog, `${npc.name}: ${currentLine}`],
+        };
+      }
+      return state;
+    }),
 
   rest: (camp: Camp) =>
     set((state) => {
@@ -440,6 +449,7 @@ speak: (npc: NPC) => set((state) => {
         inventory: inventory,
       };
     }),
+
   buyItem(item) {
     set((state) => {
       const inventory = state.inventory;
@@ -450,9 +460,11 @@ speak: (npc: NPC) => set((state) => {
       };
     });
   },
-  advanceDialogue: () => set((state) => ({
-    dialogueIndex: state.dialogueIndex + 1
-  })),
+
+  advanceDialogue: () =>
+    set((state) => ({
+      dialogueIndex: state.dialogueIndex + 1,
+    })),
 }));
 
 function calcDamage(defense: number, strength: number, dex: number): number {
