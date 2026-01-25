@@ -38,6 +38,8 @@ export interface GameState {
   performEnemyTurn: () => void;
   useConsumable: (item: Consumable) => void;
   buyItem: (item: Item) => void;
+  dialogueIndex: number; // Add this
+  advanceDialogue: () => void; // Add this
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -54,6 +56,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   rooms: [],
   combatOrder: [],
   activeFighterIndex: 0,
+  dialogueIndex: 0,
   inventory: [healthPotion],
 
   addToLog: (message: string) =>
@@ -224,16 +227,18 @@ export const useGameStore = create<GameState>((set, get) => ({
     }, 500);
   },
 
-  speak: (npc: NPC) =>
-    set((state) => {
-      const logBuilder = new ActivityLogBuilder().add(
-        `${npc.name} says: ${npc.dialogue}`,
-      );
-
+speak: (npc: NPC) => set((state) => {
+    const nextIndex = state.dialogueIndex + 1;
+    const currentLine = npc.dialogue[state.dialogueIndex];
+    
+    if (currentLine) {
       return {
-        activityLog: [...state.activityLog, ...logBuilder.build()],
+        dialogueIndex: Math.min(nextIndex, npc.dialogue.length - 1),
+        activityLog: [...state.activityLog, `${npc.name}: ${currentLine}`],
       };
-    }),
+    }
+    return state;
+  }),
 
   rest: (camp: Camp) =>
     set((state) => {
@@ -307,6 +312,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         roomInstances: newRoomInstances,
         gameStatus: status,
         combatOrder: combatOrder,
+        dialogueIndex: 0,
       };
     }),
 
@@ -444,6 +450,9 @@ export const useGameStore = create<GameState>((set, get) => ({
       };
     });
   },
+  advanceDialogue: () => set((state) => ({
+    dialogueIndex: state.dialogueIndex + 1
+  })),
 }));
 
 function calcDamage(defense: number, strength: number, dex: number): number {

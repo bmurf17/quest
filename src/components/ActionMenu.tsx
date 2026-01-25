@@ -24,7 +24,6 @@ export default function ActionMenu() {
     setIsInventoryModalOpen(true);
   };
 
-
   const [isShopModalOpen, setIsShopModalOpen] = useState(false);
 
   const openShop = () => {
@@ -57,7 +56,7 @@ export default function ActionMenu() {
                       />
                     </div>
                   );
-                }
+                },
               )}
               <div className="bg-gray-900 rounded h-18 w-full"></div>
               <div className="bg-gray-900 rounded h-18 w-full"></div>
@@ -72,30 +71,29 @@ export default function ActionMenu() {
       {room && room.interaction?.type === "NPC" ? (
         <>
           <div
-            className="bg-gray-900 rounded hover:bg-gray-600 cursor-pointer flex justify-center items-center"
+            className="bg-gray-900 rounded hover:bg-gray-600 cursor-pointer flex justify-center items-center p-2 text-white"
             onClick={() => {
               if (room && room.interaction?.type === "NPC") {
-                speak(room?.interaction?.npc as NPC);
+                speak(room.interaction.npc as NPC);
               }
             }}
           >
-            Speak
+            {useGameStore.getState().dialogueIndex <
+            room.interaction.npc.dialogue.length - 1
+              ? "Continue Dialogue"
+              : "Speak"}
           </div>
-          
-          {room.interaction.npc.NPCType === NPCType.MERCHANT}<div
-            className="bg-gray-900 rounded hover:bg-gray-600 cursor-pointer flex justify-center items-center"
-            onClick={() => {
-              if (room && room.interaction?.type === "NPC") {
-                openShop();
-              }
-            }}
-          >
-            Shop
-          </div>
+
+          {room.interaction.npc.NPCType === NPCType.MERCHANT && (
+            <div
+              className="bg-gray-900 rounded hover:bg-gray-600 cursor-pointer flex justify-center items-center p-2 text-white"
+              onClick={() => openShop()}
+            >
+              Shop
+            </div>
+          )}
         </>
-      ) : (
-        <> </>
-      )}
+      ) : null}
       {room && room.interaction?.type === "chest" ? (
         <>
           {!room.interaction.chest.isOpen ? (
@@ -185,7 +183,11 @@ export default function ActionMenu() {
         isOpen={isShopModalOpen}
         onOpenChange={setIsShopModalOpen}
         inventory={[manaPotion]}
-        ownersName={room && room.interaction?.type === "NPC" ? room.interaction.npc.name : "Shopkeeper"}
+        ownersName={
+          room && room.interaction?.type === "NPC"
+            ? room.interaction.npc.name
+            : "Shopkeeper"
+        }
       />
     </>
   );
