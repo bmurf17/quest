@@ -71,7 +71,7 @@ export default function ActionMenu() {
       {room && room.interaction?.type === "NPC" ? (
         <>
           <div
-            className="bg-gray-900 rounded hover:bg-gray-600 cursor-pointer flex justify-center items-center p-2 text-white"
+            className="bg-gray-900 rounded hover:bg-gray-600 cursor-pointer flex justify-center items-center p-2 text-white text-center"
             onClick={() => {
               if (room && room.interaction?.type === "NPC") {
                 speak(room.interaction.npc as NPC);

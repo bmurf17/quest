@@ -16,7 +16,7 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
   const updateParty = useGameStore((state: GameState) => state.setParty);
   const enterCombat = useGameStore((state: GameState) => state.enterCombat);
 
-  const MAX_PARTY_SIZE = 3;
+  const MAX_PARTY_SIZE = 6;
 
   const handleClassSelect = (character: CharacterData) => {
     setSelectedCharacter(character);
