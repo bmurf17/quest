@@ -1,6 +1,6 @@
 import { GameState, useGameStore } from "@/state/GameState";
 import { GameStatus } from "@/types/GameStatus";
-import mushroom from "../../assets/Mushroom.png";
+import mushroom from "/images/Mushroom.png";
 
 export default function BattleOrder() {
   const state = useGameStore((state: GameState) => state);

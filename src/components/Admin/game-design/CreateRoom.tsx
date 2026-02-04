@@ -3,8 +3,8 @@ import { useGameStore } from "@/state/GameState";
 import { Directions } from "@/types/Directions";
 import { Room, startRoom } from "@/types/Room";
 import { useState } from "react";
-import mushroom from "../../../assets/Mushroom.png";
-import blord from "../../../assets/blord.png";
+import mushroom from "/images/Mushroom.png";
+import blord from "/images/Blord.png";
 import { NPCType } from "@/types/RoomInteractions";
 
 const directionToDbEnum = (direction: Directions): string => {

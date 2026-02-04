@@ -1,18 +1,36 @@
 import { GameState, useGameStore } from "@/state/GameState";
+import { useEffect, useState } from "react";
+
 export default function BattleEnemies() {
   const state = useGameStore((state: GameState) => state);
   const currentRoom = state.room;
+  const lastHitEnemyId = useGameStore((state) => state.lastHitEnemyId);
+  const lastHitCounter = useGameStore((state) => state.lastHitCounter);
+  const [flashingEnemyId, setFlashingEnemyId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (lastHitEnemyId) {
+      setFlashingEnemyId(lastHitEnemyId);
+      const timer = setTimeout(() => {
+        setFlashingEnemyId(null);
+      }, 600);
+
+      return () => clearTimeout(timer);
+    }
+  }, [lastHitEnemyId, lastHitCounter]);
+
   return (
     <>
       {currentRoom ? (
         <div className="flex gap-4">
           {currentRoom.enemies.map((enemy) => {
+            const isFlashing = flashingEnemyId === enemy.id.toString();
             return (
-              <div>
+              <div key={enemy.id}>
                 <img
                   src={enemy.img}
-                  alt="Enemy Mushroom"
-                  className="mx-auto"
+                  alt={`Enemy ${enemy.name}`}
+                  className={`mx-auto ${isFlashing ? "animate-flash" : ""}`}
                   style={{
                     width: "128px",
                     height: "128px",

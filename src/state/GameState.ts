@@ -38,8 +38,10 @@ export interface GameState {
   performEnemyTurn: () => void;
   useConsumable: (item: Consumable) => void;
   buyItem: (item: Item) => void;
-  dialogueIndex: number; // Add this
-  advanceDialogue: () => void; // Add this
+  dialogueIndex: number;
+  advanceDialogue: () => void;
+  lastHitEnemyId: string | null;
+  lastHitCounter: number;
 }
 
 const handleCombatCompletion = (enemies: Enemy[], currentNextIndex: number) => {
@@ -66,7 +68,9 @@ const finalizeAttackState = (
   newStatus: GameStatus, 
   nextIndex: number, 
   combatOrder: any[], 
-  logMessage: string
+  logMessage: string,
+  hitEnemyId: string,
+  lastHitCounter: number
 ) => {
   const currentRoomInstance = state.roomInstances.get(state.room) || state.room;
 
@@ -92,6 +96,8 @@ const finalizeAttackState = (
     activityLog: [...state.activityLog, logMessage],
     activeFighterIndex: nextIndex,
     combatOrder: combatOrder,
+    lastHitEnemyId: hitEnemyId,
+    lastHitCounter: lastHitCounter
   };
 };
 
@@ -111,7 +117,9 @@ export const useGameStore = create<GameState>((set, get) => ({
   activeFighterIndex: 0,
   dialogueIndex: 0,
   inventory: [healthPotion],
-  
+  lastHitEnemyId: null,
+  lastHitCounter: 0,
+
   addToLog: (message: string) =>
     set((state) => ({
       activityLog: [...state.activityLog, message],
@@ -196,6 +204,8 @@ attack: (enemy: Enemy) => {
 
     const damage = calcDamage(enemy.defense, currentStr, currentDex);
     const newHealth = enemy.health - damage;
+    const hitEnemyId = enemy.id;
+    const hitCount = state.lastHitCounter + 1;
     
     let nextIndex = (state.activeFighterIndex + 1) % state.combatOrder.length;
     let combatOrder = state.combatOrder;
@@ -213,17 +223,15 @@ attack: (enemy: Enemy) => {
       const status = completion.status; 
       
       logMessage = `${attackerName} defeated ${enemy.name}!${completion.logSuffix}`;
-      
-      // We need to return the state here or store status to use later
-      return finalizeAttackState(state, updatedEnemies, status, nextIndex, combatOrder, logMessage);
+
+      return finalizeAttackState(state, updatedEnemies, status, nextIndex, combatOrder, logMessage, hitEnemyId.toString(), hitCount);
     } else {
-      // Logic for damaging enemy
       updatedEnemies = currentRoomInstance.enemies.map((e) => 
         e.id === enemy.id ? { ...e, health: newHealth } : e
       );
       logMessage = `${attackerName} attacked ${enemy.name} for ${damage} damage!`;
-      
-      return finalizeAttackState(state, updatedEnemies, GameStatus.Combat, nextIndex, combatOrder, logMessage);
+
+      return finalizeAttackState(state, updatedEnemies, GameStatus.Combat, nextIndex, combatOrder, logMessage, hitEnemyId.toString(), hitCount);
     }
   });
 
