@@ -1,5 +1,6 @@
 import { GameState, useGameStore } from "@/state/GameState";
 import { useEffect, useState } from "react";
+import { useSound } from "@/hooks/useSound";
 
 export default function BattleEnemies() {
   const state = useGameStore((state: GameState) => state);
@@ -7,9 +8,13 @@ export default function BattleEnemies() {
   const lastHitEnemyId = useGameStore((state) => state.lastHitEnemyId);
   const lastHitCounter = useGameStore((state) => state.lastHitCounter);
   const [flashingEnemyId, setFlashingEnemyId] = useState<string | null>(null);
+  
+  const playHitSound = useSound('/sounds/hit.mp3', 0.5);
 
   useEffect(() => {
     if (lastHitEnemyId) {
+      playHitSound();
+      
       setFlashingEnemyId(lastHitEnemyId);
       const timer = setTimeout(() => {
         setFlashingEnemyId(null);
@@ -17,7 +22,7 @@ export default function BattleEnemies() {
 
       return () => clearTimeout(timer);
     }
-  }, [lastHitEnemyId, lastHitCounter]);
+  }, [lastHitEnemyId, lastHitCounter]); 
 
   return (
     <>
