@@ -6,7 +6,9 @@ import sword from "../assets/Sword.png";
 import spear from "../assets/Spear.png";
 import cleric from "../assets/Cleric.png";
 import wizard from "../assets/Wizard.png";
-import assasin from "../assets/Assassin.png";
+import assassin from "../assets/Assassin.png";
+import fireball from "/images/spells/fireball.png";
+import heal from "/images/spells/heal.png";
 
 type Ability = {
   score: number;
@@ -50,6 +52,12 @@ type Item = {
   action: Action;
 };
 
+type Spell = {
+  name: string;
+  manaCost: number;
+  image: string;
+};
+
 export type CharacterData = {
   name: string;
   race: string;
@@ -64,6 +72,7 @@ export type CharacterData = {
   skills: Skill[];
   items: Item[];
   savingThrows: SavingThrows;
+  spells: Spell[];
   type: "character";
   alive: boolean;
 };
@@ -122,6 +131,18 @@ export const tempRanger: CharacterData = {
     wis: "+1",
     cha: "-1",
   },
+  spells: [
+    {
+      name: "Fireball",
+      manaCost: 5,
+      image: fireball,
+    },
+    {
+      name: "Heal",
+      manaCost: 3,
+      image: heal,
+    },
+  ],
   type: "character",
   alive: true,
 };
@@ -182,6 +203,18 @@ export const tempWarrior: CharacterData = {
   },
   type: "character",
   alive: true,
+  spells: [
+    {
+      name: "Fireball",
+      manaCost: 5,
+      image: fireball,
+    },
+    {
+      name: "Heal",
+      manaCost: 3,
+      image: heal,
+    },
+  ],
 };
 
 export const tempCleric: CharacterData = {
@@ -240,6 +273,18 @@ export const tempCleric: CharacterData = {
   },
   type: "character",
   alive: true,
+  spells: [
+    {
+      name: "Fireball",
+      manaCost: 5,
+      image: fireball,
+    },
+    {
+      name: "Heal",
+      manaCost: 3,
+      image: heal,
+    },
+  ],
 };
 
 export const tempWizard: CharacterData = {
@@ -298,12 +343,24 @@ export const tempWizard: CharacterData = {
   },
   type: "character",
   alive: true,
+  spells: [
+    {
+      name: "Fireball",
+      manaCost: 5,
+      image: fireball,
+    },
+    {
+      name: "Heal",
+      manaCost: 3,
+      image: heal,
+    },
+  ],
 };
 
 export const tempAssassin: CharacterData = {
   name: "Assassin Example",
   race: "Human",
-  img: assasin,
+  img: assassin,
   class: "Assassin",
   level: 2,
   hp: 15,
@@ -356,4 +413,16 @@ export const tempAssassin: CharacterData = {
   },
   type: "character",
   alive: true,
+  spells: [
+    {
+      name: "Fireball",
+      manaCost: 5,
+      image: fireball,
+    },
+    {
+      name: "Heal",
+      manaCost: 3,
+      image: heal,
+    },
+  ],
 };

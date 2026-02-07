@@ -196,6 +196,40 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                   </div>
                 </div>
 
+                <div>
+                  <h4 className="font-semibold text-gray-50 mb-3">Skills</h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    {selectedCharacter.spells.map((spell, idx) => (
+                      <div
+                        key={idx}
+                        className="bg-gray-50 p-3 rounded-lg flex items-center gap-3"
+                      >
+                        <img
+                          src={spell.image || "/placeholder.svg"}
+                          alt={spell.name}
+                          style={{
+                            width: "48px",
+                            height: "48px",
+                            imageRendering: "pixelated",
+                            filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.5))",
+                          }}
+                        />
+                        <div className="flex-1">
+                          <div className="font-semibold text-sm text-gray-800">
+                            {spell.name}
+                          </div>
+                          <div className="text-xs text-gray-600">
+                            {spell.manaCost} MP
+                          </div>
+                          <div className="text-xs text-gray-600">
+                            Hit: {6} • Dmg: {8}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
                 <button
                   onClick={handleAddToParty}
                   disabled={

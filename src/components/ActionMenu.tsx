@@ -58,10 +58,26 @@ export default function ActionMenu() {
                   );
                 },
               )}
-              <div className="bg-gray-900 rounded h-18 w-full"></div>
-              <div className="bg-gray-900 rounded h-18 w-full"></div>
-              <div className="bg-gray-900 rounded h-18 w-full"></div>
-              <div className="bg-gray-900 rounded h-18 w-full"></div>
+              {(combatOrder[index] as CharacterData).spells.map(
+                (spell, index) => {
+                  return (
+                    <div
+                      key={spell.name + index}
+                      className="bg-gray-700 rounded h-18 hover:bg-gray-600 cursor-pointer w-full flex items-center justify-center"
+                      onClick={() => attack(room.enemies[0])}
+                    >
+                      <img
+                        src={spell.image}
+                        alt={spell.name}
+                        className="w-12x h-12"
+                        style={{
+                          imageRendering: "pixelated",
+                        }}
+                      />
+                    </div>
+                  );
+                },
+              )}
             </div>
           )}
         </>
