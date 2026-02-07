@@ -75,6 +75,8 @@ export type CharacterData = {
   spells: Spell[];
   type: "character";
   alive: boolean;
+  exp: number;
+  nextLevelExp: number;
 };
 
 export const tempRanger: CharacterData = {
@@ -145,6 +147,8 @@ export const tempRanger: CharacterData = {
   ],
   type: "character",
   alive: true,
+  exp: 0,
+  nextLevelExp: 50
 };
 
 export const tempWarrior: CharacterData = {
@@ -215,6 +219,8 @@ export const tempWarrior: CharacterData = {
       image: heal,
     },
   ],
+  exp: 0,
+  nextLevelExp: 50
 };
 
 export const tempCleric: CharacterData = {
@@ -285,6 +291,8 @@ export const tempCleric: CharacterData = {
       image: heal,
     },
   ],
+  exp: 0,
+  nextLevelExp: 50
 };
 
 export const tempWizard: CharacterData = {
@@ -355,6 +363,8 @@ export const tempWizard: CharacterData = {
       image: heal,
     },
   ],
+  exp: 0,
+  nextLevelExp: 50
 };
 
 export const tempAssassin: CharacterData = {
@@ -425,4 +435,6 @@ export const tempAssassin: CharacterData = {
       image: heal,
     },
   ],
+  exp: 0,
+  nextLevelExp: 50
 };

@@ -44,33 +44,77 @@ export interface GameState {
   lastHitCounter: number;
 }
 
-const handleCombatCompletion = (enemies: Enemy[], currentNextIndex: number) => {
+export interface GameState {
+  party: CharacterData[];
+  activityLog: string[];
+  room: Room;
+  roomInstances: Map<Room, Room>;
+  gameStatus: GameStatus;
+  rooms: Room[];
+  combatOrder: (CharacterData | Enemy)[];
+  activeFighterIndex: number;
+  inventory: Item[];
+  addToLog: (log: string) => void;
+  attack: (enemy: Enemy) => void;
+  move: (direction: Directions) => void;
+  speak: (npc: NPC) => void;
+  rest: (camp: Camp) => void;
+  setRooms: (rooms: Room[]) => void;
+  addRoom: (room: Room) => void;
+  updateRoom: (room: Room) => void;
+  setParty: (characters: CharacterData[]) => void;
+  updateChest: (chest: Chest) => void;
+  takeFromChest: (chest: Chest) => void;
+  enterCombat: () => void;
+  isCurrentFighterEnemy: () => boolean;
+  performEnemyTurn: () => void;
+  useConsumable: (item: Consumable) => void;
+  buyItem: (item: Item) => void;
+  dialogueIndex: number;
+  advanceDialogue: () => void;
+  lastHitEnemyId: string | null;
+  lastHitCounter: number;
+}
+
+const handleCombatCompletion = (enemies: Enemy[], currentNextIndex: number, party: CharacterData[]) => {
   const isVictory = enemies.length === 0;
   
   if (isVictory) {
-    console.log("Combat complete! Returning to exploration.");
+    const updatedParty = party.map(char => {
+      if (char.alive) {
+        return {
+          ...char,
+          exp: char.exp + 10
+        };
+      }
+      return char;
+    });
+
     return {
       nextIndex: 0,
       status: GameStatus.Exploring,
-      logSuffix: " All enemies defeated!"
+      logSuffix: " All enemies defeated! Party gained 10 exp!",
+      updatedParty
     };
   }
 
   return {
     nextIndex: currentNextIndex,
     status: GameStatus.Combat,
-    logSuffix: ""
+    logSuffix: "",
+    updatedParty: party
   };
 };
+
 const finalizeAttackState = (
-  state: GameState, 
-  updatedEnemies: Enemy[], 
-  newStatus: GameStatus, 
-  nextIndex: number, 
-  combatOrder: any[], 
+  state: GameState,
+  updatedEnemies: Enemy[],
+  newStatus: GameStatus,
+  nextIndex: number,
+  combatOrder: any[],
   logMessage: string,
   hitEnemyId: string,
-  lastHitCounter: number
+  lastHitCounter: number,
 ) => {
   const currentRoomInstance = state.roomInstances.get(state.room) || state.room;
 
@@ -97,7 +141,7 @@ const finalizeAttackState = (
     activeFighterIndex: nextIndex,
     combatOrder: combatOrder,
     lastHitEnemyId: hitEnemyId,
-    lastHitCounter: lastHitCounter
+    lastHitCounter: lastHitCounter,
   };
 };
 
@@ -218,13 +262,16 @@ attack: (enemy: Enemy) => {
       updatedEnemies = currentRoomInstance.enemies.filter((e) => e.id !== enemy.id);
       combatOrder = combatOrder.filter((x) => x.name !== enemy.name);
       
-      const completion = handleCombatCompletion(updatedEnemies, nextIndex);
+      const completion = handleCombatCompletion(updatedEnemies, nextIndex, state.party);
       nextIndex = completion.nextIndex;
       const status = completion.status; 
       
       logMessage = `${attackerName} defeated ${enemy.name}!${completion.logSuffix}`;
 
-      return finalizeAttackState(state, updatedEnemies, status, nextIndex, combatOrder, logMessage, hitEnemyId.toString(), hitCount);
+      return {
+        ...finalizeAttackState(state, updatedEnemies, status, nextIndex, combatOrder, logMessage, hitEnemyId.toString(), hitCount),
+        party: completion.updatedParty
+      };
     } else {
       updatedEnemies = currentRoomInstance.enemies.map((e) => 
         e.id === enemy.id ? { ...e, health: newHealth } : e
@@ -235,7 +282,6 @@ attack: (enemy: Enemy) => {
     }
   });
 
-  // Keep your timeout for enemy turns
   setTimeout(() => {
     const { gameStatus, isCurrentFighterEnemy, performEnemyTurn } = get();
     if (gameStatus === GameStatus.Combat && isCurrentFighterEnemy()) {
@@ -243,6 +289,7 @@ attack: (enemy: Enemy) => {
     }
   }, 500);
 },
+
   speak: (npc: NPC) =>
     set((state) => {
       const nextIndex = state.dialogueIndex + 1;

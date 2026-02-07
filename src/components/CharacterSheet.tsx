@@ -73,6 +73,16 @@ export default function CharacterSheet({
                     {characterData.mp} / {characterData.maxMp}
                   </div>
                 </div>
+                <div>
+                  <div className="text-sm text-gray-400">EXP</div>
+                  <Progress
+                    value={(characterData.exp / characterData.nextLevelExp) * 100}
+                    className="h-2 bg-gray-700"
+                  />
+                  <div className="text-sm mt-1">
+                    {characterData.exp} / {characterData.nextLevelExp}
+                  </div>
+                </div>
               </div>
             </div>
 
