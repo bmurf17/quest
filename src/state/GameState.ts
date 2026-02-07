@@ -1,4 +1,4 @@
-import { CharacterData } from "@/types/Character";
+import { CharacterData, Spell } from "@/types/Character";
 import { Directions } from "@/types/Directions";
 import { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
@@ -11,6 +11,7 @@ import {
   NPC,
 } from "@/types/RoomInteractions";
 import { create } from "zustand";
+import { handleCombatCompletion, finalizeAttackState } from "./utils/CombatUtils";
 
 export interface GameState {
   party: CharacterData[];
@@ -74,76 +75,9 @@ export interface GameState {
   advanceDialogue: () => void;
   lastHitEnemyId: string | null;
   lastHitCounter: number;
+  castSpell: (spell: Spell) => void;
 }
 
-const handleCombatCompletion = (enemies: Enemy[], currentNextIndex: number, party: CharacterData[]) => {
-  const isVictory = enemies.length === 0;
-  
-  if (isVictory) {
-    const updatedParty = party.map(char => {
-      if (char.alive) {
-        return {
-          ...char,
-          exp: char.exp + 10
-        };
-      }
-      return char;
-    });
-
-    return {
-      nextIndex: 0,
-      status: GameStatus.Exploring,
-      logSuffix: " All enemies defeated! Party gained 10 exp!",
-      updatedParty
-    };
-  }
-
-  return {
-    nextIndex: currentNextIndex,
-    status: GameStatus.Combat,
-    logSuffix: "",
-    updatedParty: party
-  };
-};
-
-const finalizeAttackState = (
-  state: GameState,
-  updatedEnemies: Enemy[],
-  newStatus: GameStatus,
-  nextIndex: number,
-  combatOrder: any[],
-  logMessage: string,
-  hitEnemyId: string,
-  lastHitCounter: number,
-) => {
-  const currentRoomInstance = state.roomInstances.get(state.room) || state.room;
-
-  const updatedRoom = {
-    ...currentRoomInstance,
-    enemies: updatedEnemies,
-  };
-
-  const originalTemplate = [...state.roomInstances.entries()].find(
-    ([template, instance]) =>
-      instance === currentRoomInstance || template === state.room,
-  )?.[0];
-
-  const newRoomInstances = new Map(state.roomInstances);
-  if (originalTemplate) {
-    newRoomInstances.set(originalTemplate, updatedRoom);
-  }
-
-  return {
-    room: updatedRoom,
-    roomInstances: newRoomInstances,
-    gameStatus: newStatus,
-    activityLog: [...state.activityLog, logMessage],
-    activeFighterIndex: nextIndex,
-    combatOrder: combatOrder,
-    lastHitEnemyId: hitEnemyId,
-    lastHitCounter: lastHitCounter,
-  };
-};
 
 export const useGameStore = create<GameState>((set, get) => ({
   party: [],
@@ -520,6 +454,26 @@ attack: (enemy: Enemy) => {
     set((state) => ({
       dialogueIndex: state.dialogueIndex + 1,
     })),
+
+    castSpell: (spell: Spell) =>
+      set((state) => {
+        const logBuilder = new ActivityLogBuilder().add(`You cast ${spell.name}!`);
+
+        const updatedParty = state.party.map((member) => {
+          if (member.mp >= spell.manaCost) {
+            return {
+              ...member,
+              mp: member.mp - spell.manaCost,
+            };
+          }
+          return member;
+        });
+
+        return {
+          party: updatedParty,
+          activityLog: [...state.activityLog, ...logBuilder.build()],
+        };
+      }),
 }));
 
 function calcDamage(defense: number, strength: number, dex: number): number {

@@ -52,7 +52,7 @@ type Item = {
   action: Action;
 };
 
-type Spell = {
+export type Spell = {
   name: string;
   manaCost: number;
   image: string;

@@ -12,6 +12,7 @@ export default function ActionMenu() {
   const rest = useGameStore((state) => state.rest);
   const updateChest = useGameStore((state) => state.updateChest);
   const takeFromChest = useGameStore((state) => state.takeFromChest);
+  const castSpell = useGameStore((state) => state.castSpell);
   const index = useGameStore((state) => state.activeFighterIndex);
   const combatOrder = useGameStore((state) => state.combatOrder);
   const isFighterEnemy = useGameStore((state) => state.isCurrentFighterEnemy());
@@ -64,7 +65,7 @@ export default function ActionMenu() {
                     <div
                       key={spell.name + index}
                       className="bg-gray-700 rounded h-18 hover:bg-gray-600 cursor-pointer w-full flex items-center justify-center"
-                      onClick={() => attack(room.enemies[0])}
+                      onClick={() => castSpell(spell)}
                     >
                       <img
                         src={spell.image}
