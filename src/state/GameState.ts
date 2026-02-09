@@ -46,40 +46,10 @@ export interface GameState {
   advanceDialogue: () => void;
   lastHitEnemyId: string | null;
   lastHitCounter: number;
-}
-
-export interface GameState {
-  party: CharacterData[];
-  activityLog: string[];
-  room: Room;
-  roomInstances: Map<Room, Room>;
-  gameStatus: GameStatus;
-  rooms: Room[];
-  combatOrder: (CharacterData | Enemy)[];
-  activeFighterIndex: number;
-  inventory: Item[];
-  addToLog: (log: string) => void;
-  attack: (enemy: Enemy) => void;
-  move: (direction: Directions) => void;
-  speak: (npc: NPC) => void;
-  rest: (camp: Camp) => void;
-  setRooms: (rooms: Room[]) => void;
-  addRoom: (room: Room) => void;
-  updateRoom: (room: Room) => void;
-  setParty: (characters: CharacterData[]) => void;
-  updateChest: (chest: Chest) => void;
-  takeFromChest: (chest: Chest) => void;
-  enterCombat: () => void;
-  isCurrentFighterEnemy: () => boolean;
-  performEnemyTurn: () => void;
-  useConsumable: (item: Consumable) => void;
-  buyItem: (item: Item) => void;
-  dialogueIndex: number;
-  advanceDialogue: () => void;
-  lastHitEnemyId: string | null;
-  lastHitCounter: number;
   castSpell: (spell: Spell) => void;
   accumulatedExp: number;
+  isTargeting: boolean;
+  setTargeting: (targeting: boolean) => void;
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -101,6 +71,12 @@ export const useGameStore = create<GameState>((set, get) => ({
   lastHitEnemyId: null,
   lastHitCounter: 0,
   accumulatedExp: 0,
+  isTargeting: false,
+
+  setTargeting: (targeting: boolean) =>
+    set(() => ({
+      isTargeting: targeting,
+    })),
 
   addToLog: (message: string) =>
     set((state) => ({
@@ -238,6 +214,7 @@ export const useGameStore = create<GameState>((set, get) => ({
           party: completion.updatedParty,
           accumulatedExp:
             status === GameStatus.Exploring ? 0 : newAccumulatedExp,
+          isTargeting: false, // Reset targeting after attack
         };
       } else {
         updatedEnemies = currentRoomInstance.enemies.map((e) =>
@@ -245,16 +222,19 @@ export const useGameStore = create<GameState>((set, get) => ({
         );
         logMessage = `${attackerName} attacked ${enemy.name} for ${damage} damage!`;
 
-        return finalizeAttackState(
-          state,
-          updatedEnemies,
-          GameStatus.Combat,
-          nextIndex,
-          combatOrder,
-          logMessage,
-          hitEnemyId.toString(),
-          hitCount,
-        );
+        return {
+          ...finalizeAttackState(
+            state,
+            updatedEnemies,
+            GameStatus.Combat,
+            nextIndex,
+            combatOrder,
+            logMessage,
+            hitEnemyId.toString(),
+            hitCount,
+          ),
+          isTargeting: false,
+        };
       }
     });
 

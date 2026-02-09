@@ -13,6 +13,7 @@ export default function ActionMenu() {
   const updateChest = useGameStore((state) => state.updateChest);
   const takeFromChest = useGameStore((state) => state.takeFromChest);
   const castSpell = useGameStore((state) => state.castSpell);
+  const setTargeting = useGameStore((state) => state.setTargeting);
   const index = useGameStore((state) => state.activeFighterIndex);
   const combatOrder = useGameStore((state) => state.combatOrder);
   const isFighterEnemy = useGameStore((state) => state.isCurrentFighterEnemy());
@@ -31,6 +32,14 @@ export default function ActionMenu() {
     setIsShopModalOpen(true);
   };
 
+  const handleAttackClick = () => {
+    if (room.enemies.length === 1) {
+      attack(room.enemies[0]);
+    } else {
+      setTargeting(true);
+    }
+  };
+
   return (
     <>
       {room && room.enemies.length > 0 ? (
@@ -39,13 +48,13 @@ export default function ActionMenu() {
             <></>
           ) : (
             <div className="grid grid-cols-2 gap-2">
-              {(combatOrder[index] as CharacterData).items.map(
+              {(combatOrder[index] as CharacterData)?.items.map(
                 (item, index) => {
                   return (
                     <div
                       key={item.action.name + index}
                       className="bg-gray-700 rounded h-18 hover:bg-gray-600 cursor-pointer w-full flex items-center justify-center"
-                      onClick={() => attack(room.enemies[0])}
+                      onClick={handleAttackClick}
                     >
                       <img
                         src={item.img}
