@@ -6,6 +6,8 @@ import sword from "../assets/Sword.png";
 import spear from "../assets/Spear.png";
 import cleric from "../assets/Cleric.png";
 import wizard from "../assets/Wizard.png";
+import bard from "../assets/Bard.png";
+import barbarian from "../assets/Barbarian.png";
 import assassin from "../assets/Assassin.png";
 import fireball from "/images/spells/fireball.png";
 import heal from "/images/spells/heal.png";
@@ -398,6 +400,151 @@ export const tempAssassin: CharacterData = {
       img: longbow,
       action: {
         name: "Longbow",
+        hitDC: "+6",
+        damage: "1d8+2",
+        type: "Ranged Weapon",
+      },
+    },
+    {
+      img: sword,
+      action: {
+        name: "Shortsword",
+        hitDC: "+4",
+        damage: "1d6+2",
+        type: "Melee Weapon",
+      },
+    },
+  ],
+  savingThrows: {
+    str: "+2",
+    dex: "+4",
+    con: "0",
+    int: "+1",
+    wis: "+1",
+    cha: "-1",
+  },
+  type: "character",
+  alive: true,
+  spells: [
+    {
+      name: "Fireball",
+      manaCost: 5,
+      image: fireball,
+    },
+    {
+      name: "Heal",
+      manaCost: 3,
+      image: heal,
+    },
+  ],
+  exp: 0,
+  nextLevelExp: 50
+};
+
+
+export const tempBarbarian: CharacterData = {
+  name: "Barbarian Example",
+  race: "Ogre",
+  img: barbarian,
+  class: "Barbarian",
+  level: 2,
+  hp: 20,
+  maxHp: 20,
+  mp: 5,
+  maxMp: 5,
+  abilities: {
+    str: { score: 18, modifier: 0 },
+    dex: { score: 15, modifier: 2 },
+    con: { score: 10, modifier: 0 },
+    int: { score: 12, modifier: 1 },
+    wis: { score: 12, modifier: 1 },
+    cha: { score: 12, modifier: 1 },
+    def: { score: 14, modifier: 1 },
+  },
+  skills: [
+    { name: "Acrobatics", ability: "DEX", modifier: "+2" },
+    { name: "Animal Handling", ability: "WIS", modifier: "+1" },
+    { name: "Arcana", ability: "INT", modifier: "+1" },
+    { name: "Athletics", ability: "STR", modifier: "+2" },
+    { name: "Deception", ability: "CHA", modifier: "-1" },
+  ],
+  items: [
+    {
+      img: staff,
+      action: {
+        name: "Staff",
+        hitDC: "+6",
+        damage: "1d8+2",
+        type: "Ranged Weapon",
+      },
+    },
+    {
+      img: sword,
+      action: {
+        name: "Shortsword",
+        hitDC: "+4",
+        damage: "1d6+2",
+        type: "Melee Weapon",
+      },
+    },
+  ],
+  savingThrows: {
+    str: "+2",
+    dex: "+4",
+    con: "0",
+    int: "+1",
+    wis: "+1",
+    cha: "-1",
+  },
+  type: "character",
+  alive: true,
+  spells: [
+    {
+      name: "Fireball",
+      manaCost: 5,
+      image: fireball,
+    },
+    {
+      name: "Heal",
+      manaCost: 3,
+      image: heal,
+    },
+  ],
+  exp: 0,
+  nextLevelExp: 50
+};
+
+export const tempBard: CharacterData = {
+  name: "Bard Example",
+  race: "Tiefling",
+  img: bard,
+  class: "Bard",
+  level: 2,
+  hp: 10,
+  maxHp: 10,
+  mp: 20,
+  maxMp: 20,
+  abilities: {
+    str: { score: 11, modifier: 0 },
+    dex: { score: 15, modifier: 2 },
+    con: { score: 10, modifier: 0 },
+    int: { score: 12, modifier: 1 },
+    wis: { score: 12, modifier: 1 },
+    cha: { score: 12, modifier: 1 },
+    def: { score: 12, modifier: 1 },
+  },
+  skills: [
+    { name: "Acrobatics", ability: "DEX", modifier: "+2" },
+    { name: "Animal Handling", ability: "WIS", modifier: "+1" },
+    { name: "Arcana", ability: "INT", modifier: "+1" },
+    { name: "Athletics", ability: "STR", modifier: "+2" },
+    { name: "Deception", ability: "CHA", modifier: "-1" },
+  ],
+  items: [
+    {
+      img: staff,
+      action: {
+        name: "Staff",
         hitDC: "+6",
         damage: "1d8+2",
         type: "Ranged Weapon",

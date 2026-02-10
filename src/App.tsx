@@ -7,7 +7,7 @@ import ManageRooms from "./components/Admin/game-design/CreateRoom";
 import Admin from "./components/Admin/GameDesign";
 import RoomMap from "./components/Admin/game-design/RoomMap";
 import { PartySelection } from "./components/Party/PartySelection";
-import { tempCleric, tempRanger, tempWarrior, tempWizard, tempAssassin } from "./types/Character";
+import { tempCleric, tempRanger, tempWarrior, tempWizard, tempAssassin, tempBarbarian, tempBard } from "./types/Character";
 import { useEffect } from "react";
 import { getAllRooms } from "./queries/RoomQueries";
 import { useGameStore } from "./state/GameState";
@@ -34,7 +34,7 @@ function App() {
         <Routes>
           <Route path={"/"} element={<Home />} />
           <Route path={"/game"} element={<GameLayout />} />
-          <Route path={"/party"} element={<PartySelection availableCharacters={[tempRanger, tempWarrior, tempCleric, tempWizard, tempAssassin]} />} />
+          <Route path={"/party"} element={<PartySelection availableCharacters={[tempRanger, tempWarrior, tempCleric, tempWizard, tempAssassin, tempBarbarian, tempBard]} />} />
           <Route path={"/create"} element={<CharacterCreation />} />
           <Route path={"/admin/game-design/rooms"} element={<ManageRooms />} />
           <Route path={"/admin/game-design/roomMap"} element={<RoomMap />} />
