@@ -50,6 +50,8 @@ export interface GameState {
   accumulatedExp: number;
   isTargeting: boolean;
   setTargeting: (targeting: boolean) => void;
+  lastDefeatedEnemyId: string | null;
+  lastDefeatedCounter: number;  
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -72,6 +74,8 @@ export const useGameStore = create<GameState>((set, get) => ({
   lastHitCounter: 0,
   accumulatedExp: 0,
   isTargeting: false,
+  lastDefeatedEnemyId: null,
+  lastDefeatedCounter: 0,
 
   setTargeting: (targeting: boolean) =>
     set(() => ({
@@ -199,7 +203,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         const status = completion.status;
 
         logMessage = `${attackerName} defeated ${enemy.name}!${completion.logSuffix}`;
-
+              const defeatedCount = state.lastDefeatedCounter + 1;
         return {
           ...finalizeAttackState(
             state,
@@ -210,11 +214,13 @@ export const useGameStore = create<GameState>((set, get) => ({
             logMessage,
             hitEnemyId.toString(),
             hitCount,
+            true,
+            defeatedCount
           ),
           party: completion.updatedParty,
           accumulatedExp:
             status === GameStatus.Exploring ? 0 : newAccumulatedExp,
-          isTargeting: false, // Reset targeting after attack
+          isTargeting: false,
         };
       } else {
         updatedEnemies = currentRoomInstance.enemies.map((e) =>
@@ -232,6 +238,8 @@ export const useGameStore = create<GameState>((set, get) => ({
             logMessage,
             hitEnemyId.toString(),
             hitCount,
+            false,
+            0
           ),
           isTargeting: false,
         };

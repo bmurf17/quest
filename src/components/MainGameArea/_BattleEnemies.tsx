@@ -10,9 +10,12 @@ export default function BattleEnemies() {
   const isTargeting = useGameStore((state) => state.isTargeting);
   const attack = useGameStore((state) => state.attack);
   const setTargeting = useGameStore((state) => state.setTargeting);
+  const lastDefeatedEnemyId = useGameStore((state) => state.lastDefeatedEnemyId);
+  const lastDefeatedCounter = useGameStore((state) => state.lastDefeatedCounter);
   const [flashingEnemyId, setFlashingEnemyId] = useState<string | null>(null);
   
   const playHitSound = useSound('/sounds/hit.mp3', 0.5);
+  const playDefeatSound = useSound('/sounds/monster_defeat.mp3', 0.5);
 
   useEffect(() => {
     if (lastHitEnemyId) {
@@ -26,6 +29,12 @@ export default function BattleEnemies() {
       return () => clearTimeout(timer);
     }
   }, [lastHitEnemyId, lastHitCounter]); 
+
+    useEffect(() => {
+    if (lastDefeatedEnemyId) {
+      playDefeatSound();
+    }
+  }, [lastDefeatedEnemyId, lastDefeatedCounter]);
 
   const handleEnemyClick = (enemy: any) => {
     if (isTargeting) {

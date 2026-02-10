@@ -50,6 +50,8 @@ export const finalizeAttackState = (
   logMessage: string,
   hitEnemyId: string,
   lastHitCounter: number,
+  isDefeated: boolean = false,
+  defeatedCount: number = 0
 ) => {
   const currentRoomInstance = state.roomInstances.get(state.room) || state.room;
 
@@ -77,5 +79,7 @@ export const finalizeAttackState = (
     combatOrder: combatOrder,
     lastHitEnemyId: hitEnemyId,
     lastHitCounter: lastHitCounter,
+    lastDefeatedEnemyId: isDefeated ? hitEnemyId : null,
+    lastDefeatedCounter: isDefeated ? defeatedCount : state.lastDefeatedCounter
   };
 };
