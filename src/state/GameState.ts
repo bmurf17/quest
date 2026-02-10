@@ -1,4 +1,4 @@
-import { CharacterData, Spell } from "@/types/Character";
+import { CharacterData } from "@/types/Character";
 import { Directions } from "@/types/Directions";
 import { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
@@ -15,6 +15,7 @@ import {
   handleCombatCompletion,
   finalizeAttackState,
 } from "./utils/CombatUtils";
+import { Spell } from "@/types/Spell";
 
 export interface GameState {
   party: CharacterData[];
@@ -46,12 +47,14 @@ export interface GameState {
   advanceDialogue: () => void;
   lastHitEnemyId: string | null;
   lastHitCounter: number;
-  castSpell: (spell: Spell) => void;
+  castSpell: (spell: Spell, target?: Enemy | CharacterData) => void;
   accumulatedExp: number;
   isTargeting: boolean;
   setTargeting: (targeting: boolean) => void;
   lastDefeatedEnemyId: string | null;
-  lastDefeatedCounter: number;  
+  lastDefeatedCounter: number;
+  targetingSpell: Spell | null;
+  setTargetingSpell: (spell: Spell | null) => void;
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -76,10 +79,16 @@ export const useGameStore = create<GameState>((set, get) => ({
   isTargeting: false,
   lastDefeatedEnemyId: null,
   lastDefeatedCounter: 0,
+  targetingSpell: null,
 
   setTargeting: (targeting: boolean) =>
     set(() => ({
       isTargeting: targeting,
+    })),
+
+  setTargetingSpell: (spell: Spell | null) =>
+    set(() => ({
+      targetingSpell: spell,
     })),
 
   addToLog: (message: string) =>
@@ -189,8 +198,6 @@ export const useGameStore = create<GameState>((set, get) => ({
         );
         combatOrder = combatOrder.filter((x) => x.name !== enemy.name);
 
-        console.log(enemy)
-        console.log(`Gained ${enemy.expGain} exp from defeating ${enemy.name}`);
         const newAccumulatedExp = state.accumulatedExp + (enemy.expGain ?? 10);
 
         const completion = handleCombatCompletion(
@@ -203,7 +210,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         const status = completion.status;
 
         logMessage = `${attackerName} defeated ${enemy.name}!${completion.logSuffix}`;
-              const defeatedCount = state.lastDefeatedCounter + 1;
+        const defeatedCount = state.lastDefeatedCounter + 1;
         return {
           ...finalizeAttackState(
             state,
@@ -215,7 +222,7 @@ export const useGameStore = create<GameState>((set, get) => ({
             hitEnemyId.toString(),
             hitCount,
             true,
-            defeatedCount
+            defeatedCount,
           ),
           party: completion.updatedParty,
           accumulatedExp:
@@ -239,7 +246,7 @@ export const useGameStore = create<GameState>((set, get) => ({
             hitEnemyId.toString(),
             hitCount,
             false,
-            0
+            0,
           ),
           isTargeting: false,
         };
@@ -315,7 +322,6 @@ export const useGameStore = create<GameState>((set, get) => ({
         combatOrder = [...state.party, ...roomInstance.enemies];
       }
 
-      // Build activity log messages
       const logBuilder = new ActivityLogBuilder()
         .add(`Your party has moved ${Directions[direction]}`)
         .addIf(
@@ -485,25 +491,227 @@ export const useGameStore = create<GameState>((set, get) => ({
       dialogueIndex: state.dialogueIndex + 1,
     })),
 
-  castSpell: (spell: Spell) =>
+  castSpell: (spell: Spell, target?: Enemy | CharacterData) =>
     set((state) => {
+      const currentCaster = state.combatOrder[
+        state.activeFighterIndex
+      ] as CharacterData;
+
+      if (currentCaster.mp < spell.manaCost) {
+        return {
+          activityLog: [
+            ...state.activityLog,
+            `Not enough mana to cast ${spell.name}!`,
+          ],
+        };
+      }
+
       const logBuilder = new ActivityLogBuilder().add(
-        `You cast ${spell.name}!`,
+        `${currentCaster.name} casts ${spell.name}!`,
       );
 
-      const updatedParty = state.party.map((member) => {
-        if (member.mp >= spell.manaCost) {
-          return {
-            ...member,
-            mp: member.mp - spell.manaCost,
-          };
+      let updatedParty = state.party;
+      let updatedEnemies = (state.roomInstances.get(state.room) || state.room)
+        .enemies;
+      let combatOrder = state.combatOrder;
+      let nextIndex = (state.activeFighterIndex + 1) % state.combatOrder.length;
+      let newAccumulatedExp = state.accumulatedExp;
+      let gameStatus = state.gameStatus;
+
+      updatedParty = updatedParty.map((member) => {
+        if (member.name === currentCaster.name) {
+          return { ...member, mp: member.mp - spell.manaCost };
         }
         return member;
       });
 
+      switch (spell.effect.type) {
+        case "damage":
+          if (
+            spell.effect.target === "single" &&
+            target &&
+            "health" in target
+          ) {
+            const enemy = target as Enemy;
+            const newHealth = Math.max(0, enemy.health - spell.effect.amount);
+
+            if (newHealth <= 0) {
+              updatedEnemies = updatedEnemies.filter((e) => e.id !== enemy.id);
+              combatOrder = combatOrder.filter((x) => x.name !== enemy.name);
+              newAccumulatedExp += enemy.expGain ?? 10;
+
+              logBuilder.add(
+                `${enemy.name} takes ${spell.effect.amount} damage and is defeated!`,
+              );
+
+              const completion = handleCombatCompletion(
+                updatedEnemies,
+                nextIndex,
+                updatedParty,
+                newAccumulatedExp,
+              );
+
+              nextIndex = completion.nextIndex;
+              updatedParty = completion.updatedParty;
+              gameStatus = completion.status;
+
+              const currentRoomInstance =
+                state.roomInstances.get(state.room) || state.room;
+              const updatedRoom = {
+                ...currentRoomInstance,
+                enemies: updatedEnemies,
+              };
+              const newRoomInstances = new Map(state.roomInstances);
+              newRoomInstances.set(state.room, updatedRoom);
+
+              return {
+                party: updatedParty,
+                activityLog: [...state.activityLog, ...logBuilder.build()],
+                combatOrder,
+                activeFighterIndex: nextIndex,
+                gameStatus: gameStatus,
+                room: updatedRoom,
+                roomInstances: newRoomInstances,
+                accumulatedExp:
+                  gameStatus === GameStatus.Exploring ? 0 : newAccumulatedExp,
+                isTargeting: false,
+                targetingSpell: null,
+              };
+            } else {
+              updatedEnemies = updatedEnemies.map((e) =>
+                e.id === enemy.id ? { ...e, health: newHealth } : e,
+              );
+              logBuilder.add(
+                `${enemy.name} takes ${spell.effect.amount} damage!`,
+              );
+            }
+          } else if (spell.effect.target === "all") {
+            const defeatedEnemies: string[] = [];
+            updatedEnemies = updatedEnemies
+              .map((enemy) => {
+                const newHealth = Math.max(
+                  0,
+                  enemy.health - spell.effect.amount,
+                );
+                if (newHealth <= 0) {
+                  defeatedEnemies.push(enemy.name);
+                  newAccumulatedExp += enemy.expGain ?? 10;
+                }
+                return { ...enemy, health: newHealth };
+              })
+              .filter((e) => e.health > 0);
+
+            combatOrder = combatOrder.filter(
+              (x) => !defeatedEnemies.includes(x.name),
+            );
+
+            if (defeatedEnemies.length > 0) {
+              logBuilder.add(`${defeatedEnemies.join(", ")} defeated!`);
+            }
+            logBuilder.add(`All enemies take ${spell.effect.amount} damage!`);
+          }
+          break;
+
+        case "heal":
+          if (spell.effect.target === "single" && target && "hp" in target) {
+            const character = target as CharacterData;
+
+            if (!character.alive || character.hp <= 0) {
+              logBuilder.add(
+                `${character.name} cannot be healed - they are unconscious!`,
+              );
+              break;
+            }
+
+            updatedParty = updatedParty.map((member) => {
+              if (member.name === character.name) {
+                const healAmount = Math.min(
+                  spell.effect.amount,
+                  member.maxHp - member.hp,
+                );
+                const newHp = Math.min(
+                  member.maxHp,
+                  member.hp + spell.effect.amount,
+                );
+                if (healAmount > 0) {
+                  logBuilder.add(`${member.name} recovers ${healAmount} HP!`);
+                } else {
+                  logBuilder.add(`${member.name} is already at full health!`);
+                }
+                return { ...member, hp: newHp };
+              }
+              return member;
+            });
+          } else if (spell.effect.target === "party") {
+            let anyHealed = false;
+            updatedParty = updatedParty.map((member) => {
+              if (member.alive && member.hp > 0 && member.hp < member.maxHp) {
+                const newHp = Math.min(
+                  member.maxHp,
+                  member.hp + spell.effect.amount,
+                );
+                anyHealed = true;
+                return { ...member, hp: newHp };
+              }
+              return member;
+            });
+            if (anyHealed) {
+              logBuilder.add(`The party recovers ${spell.effect.amount} HP!`);
+            } else {
+              logBuilder.add(`Everyone is already at full health!`);
+            }
+          }
+          break;
+      }
+
+      const currentRoomInstance =
+        state.roomInstances.get(state.room) || state.room;
+      const updatedRoom = { ...currentRoomInstance, enemies: updatedEnemies };
+      const newRoomInstances = new Map(state.roomInstances);
+      newRoomInstances.set(state.room, updatedRoom);
+
+      if (
+        updatedEnemies.length === 0 &&
+        state.gameStatus === GameStatus.Combat
+      ) {
+        const completion = handleCombatCompletion(
+          updatedEnemies,
+          nextIndex,
+          updatedParty,
+          newAccumulatedExp,
+        );
+
+        return {
+          party: completion.updatedParty,
+          activityLog: [...state.activityLog, ...logBuilder.build()],
+          combatOrder,
+          activeFighterIndex: completion.nextIndex,
+          gameStatus: completion.status,
+          room: updatedRoom,
+          roomInstances: newRoomInstances,
+          accumulatedExp:
+            completion.status === GameStatus.Exploring ? 0 : newAccumulatedExp,
+          isTargeting: false,
+          targetingSpell: null,
+        };
+      }
+
+      setTimeout(() => {
+        const { gameStatus, isCurrentFighterEnemy, performEnemyTurn } = get();
+        if (gameStatus === GameStatus.Combat && isCurrentFighterEnemy()) {
+          performEnemyTurn();
+        }
+      }, 500);
       return {
         party: updatedParty,
         activityLog: [...state.activityLog, ...logBuilder.build()],
+        combatOrder,
+        activeFighterIndex: nextIndex,
+        room: updatedRoom,
+        roomInstances: newRoomInstances,
+        accumulatedExp: newAccumulatedExp,
+        isTargeting: false,
+        targetingSpell: null,
       };
     }),
 }));

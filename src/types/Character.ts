@@ -11,6 +11,7 @@ import barbarian from "../assets/Barbarian.png";
 import assassin from "../assets/Assassin.png";
 import fireball from "/images/spells/fireball.png";
 import heal from "/images/spells/heal.png";
+import { Spell } from "./Spell";
 
 type Ability = {
   score: number;
@@ -52,12 +53,6 @@ type SavingThrows = {
 type Item = {
   img: string;
   action: Action;
-};
-
-export type Spell = {
-  name: string;
-  manaCost: number;
-  image: string;
 };
 
 export type CharacterData = {
@@ -136,16 +131,20 @@ export const tempRanger: CharacterData = {
     cha: "-1",
   },
   spells: [
-    {
-      name: "Fireball",
-      manaCost: 5,
-      image: fireball,
-    },
-    {
-      name: "Heal",
-      manaCost: 3,
-      image: heal,
-    },
+  {
+    name: "Fireball",
+    manaCost: 5,
+    image: fireball,
+    effect: { type: 'damage', amount: 15, target: 'single' },
+    description: "Hurls a blazing fireball at an enemy"
+  },
+  {
+    name: "Heal",
+    manaCost: 3,
+    image: heal,
+    effect: { type: 'heal', amount: 20, target: 'single' },
+    description: "Restores health to a party member"
+  },
   ],
   type: "character",
   alive: true,
@@ -210,16 +209,20 @@ export const tempWarrior: CharacterData = {
   type: "character",
   alive: true,
   spells: [
-    {
-      name: "Fireball",
-      manaCost: 5,
-      image: fireball,
-    },
-    {
-      name: "Heal",
-      manaCost: 3,
-      image: heal,
-    },
+  {
+    name: "Fireball",
+    manaCost: 5,
+    image: fireball,
+    effect: { type: 'damage', amount: 15, target: 'single' },
+    description: "Hurls a blazing fireball at an enemy"
+  },
+  {
+    name: "Heal",
+    manaCost: 3,
+    image: heal,
+    effect: { type: 'heal', amount: 20, target: 'single' },
+    description: "Restores health to a party member"
+  },
   ],
   exp: 0,
   nextLevelExp: 50
@@ -282,16 +285,20 @@ export const tempCleric: CharacterData = {
   type: "character",
   alive: true,
   spells: [
-    {
-      name: "Fireball",
-      manaCost: 5,
-      image: fireball,
-    },
-    {
-      name: "Heal",
-      manaCost: 3,
-      image: heal,
-    },
+  {
+    name: "Fireball",
+    manaCost: 5,
+    image: fireball,
+    effect: { type: 'damage', amount: 15, target: 'single' },
+    description: "Hurls a blazing fireball at an enemy"
+  },
+  {
+    name: "Heal",
+    manaCost: 3,
+    image: heal,
+    effect: { type: 'heal', amount: 20, target: 'single' },
+    description: "Restores health to a party member"
+  },
   ],
   exp: 0,
   nextLevelExp: 50
@@ -354,16 +361,20 @@ export const tempWizard: CharacterData = {
   type: "character",
   alive: true,
   spells: [
-    {
-      name: "Fireball",
-      manaCost: 5,
-      image: fireball,
-    },
-    {
-      name: "Heal",
-      manaCost: 3,
-      image: heal,
-    },
+  {
+    name: "Fireball",
+    manaCost: 5,
+    image: fireball,
+    effect: { type: 'damage', amount: 15, target: 'single' },
+    description: "Hurls a blazing fireball at an enemy"
+  },
+  {
+    name: "Heal",
+    manaCost: 3,
+    image: heal,
+    effect: { type: 'heal', amount: 20, target: 'single' },
+    description: "Restores health to a party member"
+  },
   ],
   exp: 0,
   nextLevelExp: 50
@@ -426,16 +437,20 @@ export const tempAssassin: CharacterData = {
   type: "character",
   alive: true,
   spells: [
-    {
-      name: "Fireball",
-      manaCost: 5,
-      image: fireball,
-    },
-    {
-      name: "Heal",
-      manaCost: 3,
-      image: heal,
-    },
+  {
+    name: "Fireball",
+    manaCost: 5,
+    image: fireball,
+    effect: { type: 'damage', amount: 15, target: 'single' },
+    description: "Hurls a blazing fireball at an enemy"
+  },
+  {
+    name: "Heal",
+    manaCost: 3,
+    image: heal,
+    effect: { type: 'heal', amount: 20, target: 'single' },
+    description: "Restores health to a party member"
+  },
   ],
   exp: 0,
   nextLevelExp: 50
@@ -499,16 +514,20 @@ export const tempBarbarian: CharacterData = {
   type: "character",
   alive: true,
   spells: [
-    {
-      name: "Fireball",
-      manaCost: 5,
-      image: fireball,
-    },
-    {
-      name: "Heal",
-      manaCost: 3,
-      image: heal,
-    },
+  {
+    name: "Fireball",
+    manaCost: 5,
+    image: fireball,
+    effect: { type: 'damage', amount: 15, target: 'single' },
+    description: "Hurls a blazing fireball at an enemy"
+  },
+  {
+    name: "Heal",
+    manaCost: 3,
+    image: heal,
+    effect: { type: 'heal', amount: 20, target: 'single' },
+    description: "Restores health to a party member"
+  },
   ],
   exp: 0,
   nextLevelExp: 50
@@ -571,16 +590,20 @@ export const tempBard: CharacterData = {
   type: "character",
   alive: true,
   spells: [
-    {
-      name: "Fireball",
-      manaCost: 5,
-      image: fireball,
-    },
-    {
-      name: "Heal",
-      manaCost: 3,
-      image: heal,
-    },
+  {
+    name: "Fireball",
+    manaCost: 5,
+    image: fireball,
+    effect: { type: 'damage', amount: 15, target: 'single' },
+    description: "Hurls a blazing fireball at an enemy"
+  },
+  {
+    name: "Heal",
+    manaCost: 3,
+    image: heal,
+    effect: { type: 'heal', amount: 20, target: 'single' },
+    description: "Restores health to a party member"
+  },
   ],
   exp: 0,
   nextLevelExp: 50

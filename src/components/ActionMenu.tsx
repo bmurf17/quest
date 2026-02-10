@@ -5,6 +5,7 @@ import { useState } from "react";
 import Inventory from "./Inventory";
 import Shop from "./Shop";
 import { manaPotion } from "@/types/Item";
+import { Spell } from "@/types/Spell";
 
 export default function ActionMenu() {
   const attack = useGameStore((state) => state.attack);
@@ -14,6 +15,7 @@ export default function ActionMenu() {
   const takeFromChest = useGameStore((state) => state.takeFromChest);
   const castSpell = useGameStore((state) => state.castSpell);
   const setTargeting = useGameStore((state) => state.setTargeting);
+  const setTargetingSpell = useGameStore((state) => state.setTargetingSpell);
   const index = useGameStore((state) => state.activeFighterIndex);
   const combatOrder = useGameStore((state) => state.combatOrder);
   const isFighterEnemy = useGameStore((state) => state.isCurrentFighterEnemy());
@@ -21,12 +23,11 @@ export default function ActionMenu() {
   const inventory = useGameStore((state) => state.inventory);
 
   const [isInventoryModalOpen, setIsInventoryModalOpen] = useState(false);
+  const [isShopModalOpen, setIsShopModalOpen] = useState(false);
 
   const openInventory = () => {
     setIsInventoryModalOpen(true);
   };
-
-  const [isShopModalOpen, setIsShopModalOpen] = useState(false);
 
   const openShop = () => {
     setIsShopModalOpen(true);
@@ -37,6 +38,35 @@ export default function ActionMenu() {
       attack(room.enemies[0]);
     } else {
       setTargeting(true);
+      setTargetingSpell(null); 
+    }
+  };
+
+  const handleSpellClick = (spell: Spell) => {
+    const currentCaster = combatOrder[index] as CharacterData;
+    
+    if (currentCaster.mp < spell.manaCost) {
+      return;
+    }
+
+    if (spell.effect.type === 'damage') {
+      if (spell.effect.target === 'single') {
+        if (room.enemies.length === 1) {
+          castSpell(spell, room.enemies[0]);
+        } else {
+          setTargeting(true);
+          setTargetingSpell(spell);
+        }
+      } else if (spell.effect.target === 'all') {
+        castSpell(spell);
+      }
+    } else if (spell.effect.type === 'heal') {
+      if (spell.effect.target === 'single') {
+        setTargeting(true);
+        setTargetingSpell(spell);
+      } else if (spell.effect.target === 'party') {
+        castSpell(spell);
+      }
     }
   };
 
@@ -49,10 +79,10 @@ export default function ActionMenu() {
           ) : (
             <div className="grid grid-cols-2 gap-2">
               {(combatOrder[index] as CharacterData)?.items.map(
-                (item, index) => {
+                (item, itemIndex) => {
                   return (
                     <div
-                      key={item.action.name + index}
+                      key={item.action.name + itemIndex}
                       className="bg-gray-700 rounded h-18 hover:bg-gray-600 cursor-pointer w-full flex items-center justify-center"
                       onClick={handleAttackClick}
                     >
@@ -69,12 +99,20 @@ export default function ActionMenu() {
                 },
               )}
               {(combatOrder[index] as CharacterData).spells.map(
-                (spell, index) => {
+                (spell, spellIndex) => {
+                  const currentCaster = combatOrder[index] as CharacterData;
+                  const notEnoughMana = currentCaster.mp < spell.manaCost;
+                  
                   return (
                     <div
-                      key={spell.name + index}
-                      className="bg-gray-700 rounded h-18 hover:bg-gray-600 cursor-pointer w-full flex items-center justify-center"
-                      onClick={() => castSpell(spell)}
+                      key={spell.name + spellIndex}
+                      className={`rounded h-18 w-full flex items-center justify-center relative ${
+                        notEnoughMana 
+                          ? 'bg-gray-800 cursor-not-allowed opacity-50' 
+                          : 'bg-gray-700 hover:bg-gray-600 cursor-pointer'
+                      }`}
+                      onClick={() => !notEnoughMana && handleSpellClick(spell)}
+                      title={`${spell.name} (${spell.manaCost} MP) - ${spell.description}`}
                     >
                       <img
                         src={spell.image}
@@ -84,6 +122,9 @@ export default function ActionMenu() {
                           imageRendering: "pixelated",
                         }}
                       />
+                      <div className="absolute bottom-1 right-1 bg-blue-600 text-white text-xs px-1 rounded">
+                        {spell.manaCost}
+                      </div>
                     </div>
                   );
                 },

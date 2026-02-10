@@ -8,8 +8,11 @@ export default function BattleEnemies() {
   const lastHitEnemyId = useGameStore((state) => state.lastHitEnemyId);
   const lastHitCounter = useGameStore((state) => state.lastHitCounter);
   const isTargeting = useGameStore((state) => state.isTargeting);
+  const targetingSpell = useGameStore((state) => state.targetingSpell);
   const attack = useGameStore((state) => state.attack);
+  const castSpell = useGameStore((state) => state.castSpell);
   const setTargeting = useGameStore((state) => state.setTargeting);
+  const setTargetingSpell = useGameStore((state) => state.setTargetingSpell);
   const lastDefeatedEnemyId = useGameStore((state) => state.lastDefeatedEnemyId);
   const lastDefeatedCounter = useGameStore((state) => state.lastDefeatedCounter);
   const [flashingEnemyId, setFlashingEnemyId] = useState<string | null>(null);
@@ -30,7 +33,7 @@ export default function BattleEnemies() {
     }
   }, [lastHitEnemyId, lastHitCounter]); 
 
-    useEffect(() => {
+  useEffect(() => {
     if (lastDefeatedEnemyId) {
       playDefeatSound();
     }
@@ -38,9 +41,32 @@ export default function BattleEnemies() {
 
   const handleEnemyClick = (enemy: any) => {
     if (isTargeting) {
-      attack(enemy);
+      if (targetingSpell) {
+        // Casting a spell on this enemy
+        castSpell(targetingSpell, enemy);
+        setTargetingSpell(null);
+      } else {
+        // Regular attack
+        attack(enemy);
+      }
       setTargeting(false);
     }
+  };
+
+  const getTargetingMessage = () => {
+    if (targetingSpell) {
+      return `🔮 Select an enemy to cast ${targetingSpell.name}`;
+    }
+    return "⚔️ Select an enemy to attack";
+  };
+
+  const getGlowColor = () => {
+    if (targetingSpell) {
+      // Purple glow for spell targeting
+      return "drop-shadow(2px 2px 4px rgba(0,0,0,0.5)) drop-shadow(0 0 10px rgba(147,51,234,0.5))";
+    }
+    // Red glow for attack targeting
+    return "drop-shadow(2px 2px 4px rgba(0,0,0,0.5)) drop-shadow(0 0 10px rgba(255,0,0,0.5))";
   };
 
   return (
@@ -66,7 +92,7 @@ export default function BattleEnemies() {
                     height: "128px",
                     imageRendering: "pixelated",
                     filter: isTargeting 
-                      ? "drop-shadow(2px 2px 4px rgba(0,0,0,0.5)) drop-shadow(0 0 10px rgba(255,0,0,0.5))"
+                      ? getGlowColor()
                       : "drop-shadow(2px 2px 4px rgba(0,0,0,0.5))",
                   }}
                 />
@@ -81,8 +107,10 @@ export default function BattleEnemies() {
         <> </>
       )}
       {isTargeting && currentRoom && currentRoom.enemies.length > 1 && (
-        <div className="mt-4 text-yellow-400 text-sm font-bold bg-black bg-opacity-70 rounded-lg px-4 py-2">
-          ⚔️ Select an enemy to attack
+        <div className={`mt-4 text-sm font-bold bg-black bg-opacity-70 rounded-lg px-4 py-2 ${
+          targetingSpell ? 'text-purple-400' : 'text-yellow-400'
+        }`}>
+          {getTargetingMessage()}
         </div>
       )}
     </>
