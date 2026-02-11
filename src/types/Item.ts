@@ -5,6 +5,7 @@ export type BaseItem = {
   name: string;
   value: number;
   img: string
+  cost: number;
 };
 
 export type Consumable = BaseItem & {
@@ -33,7 +34,8 @@ export const healthPotion: Consumable = {
     effect: "You are healed 3 hp",
     type: "consumable",
     hpChange: 3,
-    manaChange: 0
+    manaChange: 0,
+    cost: 3
 }
 
 export const manaPotion: Consumable = {
@@ -43,5 +45,6 @@ export const manaPotion: Consumable = {
     effect: "You are healed 3 mana",
     type: "consumable",
     hpChange: 0,
-    manaChange: 3
+    manaChange: 3,
+    cost: 3
 }

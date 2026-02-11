@@ -12,7 +12,7 @@ export default function Shop({
   isOpen = false,
   onOpenChange,
   inventory,
-  ownersName
+  ownersName,
 }: {
   isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -20,11 +20,15 @@ export default function Shop({
   ownersName: string;
 }) {
   const buyItem = useGameStore((state) => state.buyItem);
+  const goldPieces = useGameStore((state) => state.goldPieces);
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-xl bg-gray-800 text-white">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold">{ownersName}'s Shop</DialogTitle>
+        <DialogHeader className="mt-4">
+          <DialogTitle className="text-xl font-bold flex items-center justify-between">
+            <span>{ownersName}'s Shop</span>
+            <span className="text-yellow-400 text-lg">💰 {goldPieces} GP</span>
+          </DialogTitle>
         </DialogHeader>
 
         <ScrollArea className="h-[80vh] pr-4">
@@ -32,9 +36,13 @@ export default function Shop({
             {inventory.map((item) => {
               return (
                 <div
-                  className="flex gap-4 items-center hover:cursor-pointer hover:bg-gray-600"
+                  className={`flex gap-4 items-center ${
+                    item.cost > goldPieces
+                      ? "opacity-50 cursor-not-allowed"
+                      : "hover:cursor-pointer hover:bg-gray-600"
+                  }`}
                   key={item.name}
-                  onClick={() => buyItem(item)}
+                  onClick={() => item.cost <= goldPieces && buyItem(item)}
                 >
                   <img
                     src={item.img}
@@ -42,10 +50,14 @@ export default function Shop({
                     className="w-32 h-32 rounded bg-gray-700"
                     style={{
                       imageRendering: "pixelated",
+                      opacity: item.cost > goldPieces ? 0.4 : 1,
+                      filter:
+                        item.cost > goldPieces ? "grayscale(100%)" : "none",
                     }}
                   />
                   <div className="flex flex-col">
                     <p className="text-xl">{item.name}</p>{" "}
+                    <p className="text-xl text-yellow-400">{item.cost} GP</p>
                   </div>
                 </div>
               );

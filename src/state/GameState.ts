@@ -55,6 +55,7 @@ export interface GameState {
   lastDefeatedCounter: number;
   targetingSpell: Spell | null;
   setTargetingSpell: (spell: Spell | null) => void;
+  goldPieces: number;
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -80,6 +81,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   lastDefeatedEnemyId: null,
   lastDefeatedCounter: 0,
   targetingSpell: null,
+  goldPieces: 5,
 
   setTargeting: (targeting: boolean) =>
     set(() => ({
@@ -479,9 +481,19 @@ export const useGameStore = create<GameState>((set, get) => ({
     set((state) => {
       const inventory = state.inventory;
 
+      if(item.cost > state.goldPieces) {
+        return {
+          activityLog: [
+            ...state.activityLog,
+            `Not enough gold to buy ${item.name}!`,
+          ],
+        };
+      }
+
       inventory.push(item);
       return {
         inventory: inventory,
+        goldPieces: state.goldPieces - item.cost,
       };
     });
   },
