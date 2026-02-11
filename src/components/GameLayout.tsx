@@ -12,7 +12,7 @@ export default function GameLayout() {
     <>
       <MainGameArea />
 
-      <div className="h-64 bg-gray-800 border-t border-gray-700 grid grid-cols-12 gap-2 p-2">
+      <div className="h-72 bg-gray-800 border-t border-gray-700 grid grid-cols-12 gap-2 p-2">
         <ActivityLog activityLog={activityLog} />
 
         <div className="col-span-4 flex flex-col gap-2">

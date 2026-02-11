@@ -38,7 +38,7 @@ export default function Party({ party }: Props) {
   return (
     <>
       {isTargetingHeal && (
-        <div className="text-center mb-2 text-green-400 text-sm font-bold bg-black bg-opacity-70 rounded-lg px-4 py-2">
+        <div className="text-center  text-green-400 text-sm font-bold bg-black bg-opacity-70 rounded-lg px-4 py-2">
           💚 Select a party member to heal
         </div>
       )}
@@ -84,7 +84,6 @@ export default function Party({ party }: Props) {
                 <div className="text-[9px] text-right text-gray-500 mt-0.5">{character.maxHp}</div>
               </div>
 
-              {/* MP */}
               <div className="flex flex-col">
                 <div className="flex justify-between text-[10px] font-mono leading-none mb-0.5">
                   <span className="text-gray-400">MP</span>

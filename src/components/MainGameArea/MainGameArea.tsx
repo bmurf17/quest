@@ -7,6 +7,7 @@
   import { useEffect } from "react";
   import BattleOrder from "./_BattleOrder";
   import RoomCamp from "./_RoomCamp";
+import LevelUpModal from "./_LevelUpModal";
 
 export default function MainGameArea() {
   const party = useGameStore((state) => state.party);
@@ -36,7 +37,8 @@ export default function MainGameArea() {
           <RoomNPC />
         </div>
       </div>
-
+      
+      <LevelUpModal />
     </div>
   );
 }

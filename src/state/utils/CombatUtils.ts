@@ -3,7 +3,6 @@ import { GameStatus } from "@/types/GameStatus";
 import { GameState } from "../GameState";
 import { CharacterData } from "@/types/Character";
 
-
 export const handleCombatCompletion = (
   enemies: Enemy[], 
   currentNextIndex: number, 
@@ -15,11 +14,19 @@ export const handleCombatCompletion = (
   if (isVictory) {
     const totalExpGained = accumulatedExp ?? 10;
     
+    const levelingUpChars: CharacterData[] = [];
+    
     const updatedParty = party.map(char => {
       if (char.alive) {
+        const newExp = char.exp + totalExpGained;
+        
+        if (newExp >= char.nextLevelExp) {
+          levelingUpChars.push({ ...char, exp: newExp });
+        }
+        
         return {
           ...char,
-          exp: char.exp + totalExpGained
+          exp: newExp
         };
       }
       return char;
@@ -29,7 +36,8 @@ export const handleCombatCompletion = (
       nextIndex: 0,
       status: GameStatus.Exploring,
       logSuffix: ` All enemies defeated! Party gained ${totalExpGained} exp!`,
-      updatedParty
+      updatedParty,
+      levelingUpChars
     };
   }
 
@@ -37,7 +45,8 @@ export const handleCombatCompletion = (
     nextIndex: currentNextIndex,
     status: GameStatus.Combat,
     logSuffix: "",
-    updatedParty: party
+    updatedParty: party,
+    levelingUpChars: []
   };
 };
 

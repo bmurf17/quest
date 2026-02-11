@@ -56,6 +56,12 @@ export interface GameState {
   targetingSpell: Spell | null;
   setTargetingSpell: (spell: Spell | null) => void;
   goldPieces: number;
+  isLevelingUp: boolean;
+  levelingUpChars: CharacterData[];
+  currentLevelingCharIndex: number;
+  setLevelingUpChars: (chars: CharacterData[]) => void;
+  applyLevelUp: (char: CharacterData) => void;
+  nextLevelingChar: () => void;
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -82,6 +88,9 @@ export const useGameStore = create<GameState>((set, get) => ({
   lastDefeatedCounter: 0,
   targetingSpell: null,
   goldPieces: 5,
+  isLevelingUp: false,
+  levelingUpChars: [],
+  currentLevelingCharIndex: -1,
 
   setTargeting: (targeting: boolean) =>
     set(() => ({
@@ -213,6 +222,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
         logMessage = `${attackerName} defeated ${enemy.name}!${completion.logSuffix}`;
         const defeatedCount = state.lastDefeatedCounter + 1;
+
         return {
           ...finalizeAttackState(
             state,
@@ -230,6 +240,11 @@ export const useGameStore = create<GameState>((set, get) => ({
           accumulatedExp:
             status === GameStatus.Exploring ? 0 : newAccumulatedExp,
           isTargeting: false,
+          // Add leveling state
+          levelingUpChars: completion.levelingUpChars || [],
+          isLevelingUp: (completion.levelingUpChars || []).length > 0,
+          currentLevelingCharIndex:
+            (completion.levelingUpChars || []).length > 0 ? 0 : -1,
         };
       } else {
         updatedEnemies = currentRoomInstance.enemies.map((e) =>
@@ -256,8 +271,17 @@ export const useGameStore = create<GameState>((set, get) => ({
     });
 
     setTimeout(() => {
-      const { gameStatus, isCurrentFighterEnemy, performEnemyTurn } = get();
-      if (gameStatus === GameStatus.Combat && isCurrentFighterEnemy()) {
+      const {
+        gameStatus,
+        isCurrentFighterEnemy,
+        performEnemyTurn,
+        isLevelingUp,
+      } = get();
+      if (
+        gameStatus === GameStatus.Combat &&
+        isCurrentFighterEnemy() &&
+        !isLevelingUp
+      ) {
         performEnemyTurn();
       }
     }, 500);
@@ -276,6 +300,55 @@ export const useGameStore = create<GameState>((set, get) => ({
       }
       return state;
     }),
+
+  setLevelingUpChars: (chars: CharacterData[]) => {
+    set({
+      levelingUpChars: chars,
+      isLevelingUp: chars.length > 0,
+      currentLevelingCharIndex: chars.length > 0 ? 0 : -1,
+    });
+  },
+
+  applyLevelUp: (updatedChar: CharacterData) => {
+    const state = get();
+    const updatedParty = state.party.map((char) =>
+      char.name === updatedChar.name ? updatedChar : char,
+    );
+
+    set({
+      party: updatedParty,
+    });
+
+    state.nextLevelingChar();
+  },
+
+  nextLevelingChar: () => {
+    const state = get();
+    const nextIndex = state.currentLevelingCharIndex + 1;
+
+    if (nextIndex >= state.levelingUpChars.length) {
+      const shouldContinueCombat = state.gameStatus === GameStatus.Combat;
+
+      set({
+        levelingUpChars: [],
+        isLevelingUp: false,
+        currentLevelingCharIndex: -1,
+      });
+
+      if (shouldContinueCombat) {
+        setTimeout(() => {
+          const { isCurrentFighterEnemy, performEnemyTurn } = get();
+          if (isCurrentFighterEnemy()) {
+            performEnemyTurn();
+          }
+        }, 500);
+      }
+    } else {
+      set({
+        currentLevelingCharIndex: nextIndex,
+      });
+    }
+  },
 
   rest: (camp: Camp) =>
     set((state) => {
@@ -481,7 +554,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     set((state) => {
       const inventory = state.inventory;
 
-      if(item.cost > state.goldPieces) {
+      if (item.cost > state.goldPieces) {
         return {
           activityLog: [
             ...state.activityLog,
