@@ -621,6 +621,8 @@ export const useGameStore = create<GameState>((set, get) => ({
             const newHealth = Math.max(0, enemy.health - spell.effect.amount);
 
             if (newHealth <= 0) {
+              const defeatedEnemyIndex = combatOrder.findIndex((x) => x.name === enemy.name);
+              
               updatedEnemies = updatedEnemies.filter((e) => e.id !== enemy.id);
               combatOrder = combatOrder.filter((x) => x.name !== enemy.name);
               newAccumulatedExp += enemy.expGain ?? 10;
@@ -628,6 +630,12 @@ export const useGameStore = create<GameState>((set, get) => ({
               logBuilder.add(
                 `${enemy.name} takes ${spell.effect.amount} damage and is defeated!`,
               );
+
+              if (defeatedEnemyIndex <= state.activeFighterIndex) {
+                nextIndex = state.activeFighterIndex % Math.max(1, combatOrder.length);
+              } else {
+                nextIndex = (state.activeFighterIndex + 1) % Math.max(1, combatOrder.length);
+              }
 
               const completion = handleCombatCompletion(
                 updatedEnemies,
@@ -648,6 +656,13 @@ export const useGameStore = create<GameState>((set, get) => ({
               };
               const newRoomInstances = new Map(state.roomInstances);
               newRoomInstances.set(state.room, updatedRoom);
+
+              setTimeout(() => {
+                const { gameStatus, isCurrentFighterEnemy, performEnemyTurn } = get();
+                if (gameStatus === GameStatus.Combat && isCurrentFighterEnemy()) {
+                  performEnemyTurn();
+                }
+              }, 500);
 
               return {
                 party: updatedParty,
@@ -672,6 +687,18 @@ export const useGameStore = create<GameState>((set, get) => ({
             }
           } else if (spell.effect.target === "all") {
             const defeatedEnemies: string[] = [];
+            const defeatedIndices: number[] = [];
+            
+            combatOrder.forEach((fighter, index) => {
+              if ('health' in fighter && 'id' in fighter) {
+                const enemy = updatedEnemies.find(e => e.name === fighter.name);
+                if (enemy && enemy.health - spell.effect.amount <= 0) {
+                  defeatedEnemies.push(enemy.name);
+                  defeatedIndices.push(index);
+                }
+              }
+            });
+            
             updatedEnemies = updatedEnemies
               .map((enemy) => {
                 const newHealth = Math.max(
@@ -679,7 +706,6 @@ export const useGameStore = create<GameState>((set, get) => ({
                   enemy.health - spell.effect.amount,
                 );
                 if (newHealth <= 0) {
-                  defeatedEnemies.push(enemy.name);
                   newAccumulatedExp += enemy.expGain ?? 10;
                 }
                 return { ...enemy, health: newHealth };
@@ -689,8 +715,17 @@ export const useGameStore = create<GameState>((set, get) => ({
             combatOrder = combatOrder.filter(
               (x) => !defeatedEnemies.includes(x.name),
             );
-
             if (defeatedEnemies.length > 0) {
+              const defeatedBeforeOrAtCurrent = defeatedIndices.filter(
+                idx => idx <= state.activeFighterIndex
+              ).length;
+              
+              if (defeatedBeforeOrAtCurrent > 0) {
+                nextIndex = state.activeFighterIndex % Math.max(1, combatOrder.length);
+              } else {
+                nextIndex = (state.activeFighterIndex + 1) % Math.max(1, combatOrder.length);
+              }
+              
               logBuilder.add(`${defeatedEnemies.join(", ")} defeated!`);
             }
             logBuilder.add(`All enemies take ${spell.effect.amount} damage!`);
