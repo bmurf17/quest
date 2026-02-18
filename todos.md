@@ -1,7 +1,8 @@
-Deaths
-Buy item removes it from shop (certain items)
 Talk to an animal (animal handling -> conditional skills) 
+    Draw an animal 
+    State Checks
 Consumables used by a single char
+Spells using stats
 Char Creation
     Enter the Char's name
     Char is a template
@@ -25,9 +26,9 @@ Split Game State into helper methods
 Game Over
 Transition From One Map to the Next
 World Hub
+Buy item removes it from shop (certain items)
 Sound effects
     Spells
         fireball
         Heal
-Spells using stats
 Crit hits

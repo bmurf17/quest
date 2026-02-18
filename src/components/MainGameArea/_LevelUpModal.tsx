@@ -90,6 +90,7 @@ export default function LevelUpModal() {
       int: 0,
       wis: 0,
       cha: 0,
+      def: 0,
     });
 
     applyLevelUp(updatedChar);
