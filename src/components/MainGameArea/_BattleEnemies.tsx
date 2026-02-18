@@ -42,11 +42,9 @@ export default function BattleEnemies() {
   const handleEnemyClick = (enemy: any) => {
     if (isTargeting) {
       if (targetingSpell) {
-        // Casting a spell on this enemy
         castSpell(targetingSpell, enemy);
         setTargetingSpell(null);
       } else {
-        // Regular attack
         attack(enemy);
       }
       setTargeting(false);
@@ -62,10 +60,8 @@ export default function BattleEnemies() {
 
   const getGlowColor = () => {
     if (targetingSpell) {
-      // Purple glow for spell targeting
       return "drop-shadow(2px 2px 4px rgba(0,0,0,0.5)) drop-shadow(0 0 10px rgba(147,51,234,0.5))";
     }
-    // Red glow for attack targeting
     return "drop-shadow(2px 2px 4px rgba(0,0,0,0.5)) drop-shadow(0 0 10px rgba(255,0,0,0.5))";
   };
 

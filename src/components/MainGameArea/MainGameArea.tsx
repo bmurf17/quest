@@ -20,7 +20,7 @@ export default function MainGameArea() {
   }, [party.length, navigate]);
 
   return (
-    <div className="flex-1 relative bg-cover bg-center bg-battle-background overflow-hidden">
+    <div className="flex-1 relative bg-cover bg-center bg-battle-background bg-pixelated  overflow-hidden">
       
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
         <div className="text-center pointer-events-auto">

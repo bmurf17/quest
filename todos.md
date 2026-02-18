@@ -1,4 +1,3 @@
-Bug: when fireball kills next enemy in combat order order freeze and nothing happens
 Deaths
 Buy item removes it from shop (certain items)
 Talk to an animal (animal handling -> conditional skills) 

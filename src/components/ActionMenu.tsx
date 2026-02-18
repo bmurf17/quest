@@ -98,7 +98,7 @@ export default function ActionMenu() {
                   );
                 },
               )}
-              {(combatOrder[index] as CharacterData).spells.map(
+              {(combatOrder[index] as CharacterData)?.spells.map(
                 (spell, spellIndex) => {
                   const currentCaster = combatOrder[index] as CharacterData;
                   const notEnoughMana = currentCaster.mp < spell.manaCost;

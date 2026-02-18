@@ -353,14 +353,16 @@ export const useGameStore = create<GameState>((set, get) => ({
   rest: (camp: Camp) =>
     set((state) => {
       const updatedParty = state.party.map((member) => {
+        const newHp = Math.min(member.maxHp, member.hp + camp.healAmount);
         return {
           ...member,
-          hp: Math.min(member.maxHp, member.hp + camp.healAmount),
+          hp: newHp,
+          alive: newHp > 0,
         };
       });
 
       const logBuilder = new ActivityLogBuilder().add(
-        `$Your party rests and heals ${camp.healAmount} hp`,
+        `Your party rests and heals ${camp.healAmount} HP. Everyone is ready for battle!`,
       );
 
       return {
@@ -500,15 +502,32 @@ export const useGameStore = create<GameState>((set, get) => ({
     set((state) => {
       const logBuilder = new ActivityLogBuilder().add(`${item.effect}`);
 
+      let newCombatOrder = [...state.combatOrder];
+
       const updatedParty = state.party.map((member) => {
+        const wasDead = !member.alive || member.hp <= 0;
+        const newHp = Math.min(member.maxHp, member.hp + item.hpChange);
+        const isNowAlive = newHp > 0;
+
+        if (wasDead && isNowAlive) {
+          const alreadyInOrder = newCombatOrder.find(
+            (f) => f.name === member.name,
+          );
+          if (state.gameStatus === GameStatus.Combat && !alreadyInOrder) {
+            newCombatOrder.push({ ...member, hp: newHp, alive: true });
+          }
+        }
+
         return {
           ...member,
-          hp: Math.min(member.maxHp, member.hp + item.hpChange),
+          hp: newHp,
+          alive: isNowAlive,
         };
       });
 
       return {
         party: updatedParty,
+        combatOrder: newCombatOrder,
         activityLog: [...state.activityLog, ...logBuilder.build()],
       };
     }),
@@ -621,8 +640,10 @@ export const useGameStore = create<GameState>((set, get) => ({
             const newHealth = Math.max(0, enemy.health - spell.effect.amount);
 
             if (newHealth <= 0) {
-              const defeatedEnemyIndex = combatOrder.findIndex((x) => x.name === enemy.name);
-              
+              const defeatedEnemyIndex = combatOrder.findIndex(
+                (x) => x.name === enemy.name,
+              );
+
               updatedEnemies = updatedEnemies.filter((e) => e.id !== enemy.id);
               combatOrder = combatOrder.filter((x) => x.name !== enemy.name);
               newAccumulatedExp += enemy.expGain ?? 10;
@@ -632,9 +653,12 @@ export const useGameStore = create<GameState>((set, get) => ({
               );
 
               if (defeatedEnemyIndex <= state.activeFighterIndex) {
-                nextIndex = state.activeFighterIndex % Math.max(1, combatOrder.length);
+                nextIndex =
+                  state.activeFighterIndex % Math.max(1, combatOrder.length);
               } else {
-                nextIndex = (state.activeFighterIndex + 1) % Math.max(1, combatOrder.length);
+                nextIndex =
+                  (state.activeFighterIndex + 1) %
+                  Math.max(1, combatOrder.length);
               }
 
               const completion = handleCombatCompletion(
@@ -658,8 +682,12 @@ export const useGameStore = create<GameState>((set, get) => ({
               newRoomInstances.set(state.room, updatedRoom);
 
               setTimeout(() => {
-                const { gameStatus, isCurrentFighterEnemy, performEnemyTurn } = get();
-                if (gameStatus === GameStatus.Combat && isCurrentFighterEnemy()) {
+                const { gameStatus, isCurrentFighterEnemy, performEnemyTurn } =
+                  get();
+                if (
+                  gameStatus === GameStatus.Combat &&
+                  isCurrentFighterEnemy()
+                ) {
                   performEnemyTurn();
                 }
               }, 500);
@@ -688,17 +716,19 @@ export const useGameStore = create<GameState>((set, get) => ({
           } else if (spell.effect.target === "all") {
             const defeatedEnemies: string[] = [];
             const defeatedIndices: number[] = [];
-            
+
             combatOrder.forEach((fighter, index) => {
-              if ('health' in fighter && 'id' in fighter) {
-                const enemy = updatedEnemies.find(e => e.name === fighter.name);
+              if ("health" in fighter && "id" in fighter) {
+                const enemy = updatedEnemies.find(
+                  (e) => e.name === fighter.name,
+                );
                 if (enemy && enemy.health - spell.effect.amount <= 0) {
                   defeatedEnemies.push(enemy.name);
                   defeatedIndices.push(index);
                 }
               }
             });
-            
+
             updatedEnemies = updatedEnemies
               .map((enemy) => {
                 const newHealth = Math.max(
@@ -717,15 +747,18 @@ export const useGameStore = create<GameState>((set, get) => ({
             );
             if (defeatedEnemies.length > 0) {
               const defeatedBeforeOrAtCurrent = defeatedIndices.filter(
-                idx => idx <= state.activeFighterIndex
+                (idx) => idx <= state.activeFighterIndex,
               ).length;
-              
+
               if (defeatedBeforeOrAtCurrent > 0) {
-                nextIndex = state.activeFighterIndex % Math.max(1, combatOrder.length);
+                nextIndex =
+                  state.activeFighterIndex % Math.max(1, combatOrder.length);
               } else {
-                nextIndex = (state.activeFighterIndex + 1) % Math.max(1, combatOrder.length);
+                nextIndex =
+                  (state.activeFighterIndex + 1) %
+                  Math.max(1, combatOrder.length);
               }
-              
+
               logBuilder.add(`${defeatedEnemies.join(", ")} defeated!`);
             }
             logBuilder.add(`All enemies take ${spell.effect.amount} damage!`);
@@ -735,51 +768,51 @@ export const useGameStore = create<GameState>((set, get) => ({
         case "heal":
           if (spell.effect.target === "single" && target && "hp" in target) {
             const character = target as CharacterData;
-
-            if (!character.alive || character.hp <= 0) {
-              logBuilder.add(
-                `${character.name} cannot be healed - they are unconscious!`,
-              );
-              break;
-            }
+            let newCombatOrder = [...state.combatOrder];
 
             updatedParty = updatedParty.map((member) => {
               if (member.name === character.name) {
-                const healAmount = Math.min(
-                  spell.effect.amount,
-                  member.maxHp - member.hp,
-                );
+                const wasDead = !member.alive || member.hp <= 0;
                 const newHp = Math.min(
                   member.maxHp,
                   member.hp + spell.effect.amount,
                 );
-                if (healAmount > 0) {
-                  logBuilder.add(`${member.name} recovers ${healAmount} HP!`);
+
+                if (wasDead && newHp > 0) {
+                  logBuilder.add(`${member.name} has been revived!`);
+                  if (!newCombatOrder.find((f) => f.name === member.name)) {
+                    newCombatOrder.push({ ...member, hp: newHp, alive: true });
+                  }
                 } else {
-                  logBuilder.add(`${member.name} is already at full health!`);
+                  logBuilder.add(`${member.name} recovers HP!`);
                 }
-                return { ...member, hp: newHp };
+
+                return { ...member, hp: newHp, alive: newHp > 0 };
               }
               return member;
             });
+            combatOrder = newCombatOrder;
           } else if (spell.effect.target === "party") {
-            let anyHealed = false;
+            let newCombatOrder = [...state.combatOrder];
             updatedParty = updatedParty.map((member) => {
-              if (member.alive && member.hp > 0 && member.hp < member.maxHp) {
-                const newHp = Math.min(
-                  member.maxHp,
-                  member.hp + spell.effect.amount,
-                );
-                anyHealed = true;
-                return { ...member, hp: newHp };
+              const wasDead = !member.alive || member.hp <= 0;
+              const newHp = Math.min(
+                member.maxHp,
+                member.hp + spell.effect.amount,
+              );
+
+              if (
+                wasDead &&
+                newHp > 0 &&
+                !newCombatOrder.find((f) => f.name === member.name)
+              ) {
+                newCombatOrder.push({ ...member, hp: newHp, alive: true });
               }
-              return member;
+
+              return { ...member, hp: newHp, alive: newHp > 0 };
             });
-            if (anyHealed) {
-              logBuilder.add(`The party recovers ${spell.effect.amount} HP!`);
-            } else {
-              logBuilder.add(`Everyone is already at full health!`);
-            }
+            combatOrder = newCombatOrder;
+            logBuilder.add(`The party recovers ${spell.effect.amount} HP!`);
           }
           break;
       }
