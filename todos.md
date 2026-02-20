@@ -21,6 +21,7 @@ Things to draw
     New Chars
     Animals
     Armour
+    Trees
 Dialogue Trees
 Split Game State into helper methods
 Game Over

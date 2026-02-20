@@ -3,7 +3,8 @@ import { Item } from "./Item";
 export enum NPCType {
   MERCHANT = "merchant",
   QUEST_GIVER = "quest_giver",
-  GENERIC = "generic"
+  GENERIC = "generic",
+  ANIMAL = "animal"
 }
 
 export interface NPC {

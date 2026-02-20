@@ -97,7 +97,6 @@ export const tempRanger: CharacterData = {
   },
   skills: [
     { name: "Acrobatics", ability: "DEX", modifier: "+2" },
-    { name: "Animal Handling", ability: "WIS", modifier: "+1" },
     { name: "Arcana", ability: "INT", modifier: "+1" },
     { name: "Athletics", ability: "STR", modifier: "+2" },
     { name: "Deception", ability: "CHA", modifier: "-1" },

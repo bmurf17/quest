@@ -6,6 +6,7 @@ import Inventory from "./Inventory";
 import Shop from "./Shop";
 import { manaPotion } from "@/types/Item";
 import { Spell } from "@/types/Spell";
+import { partyHasAnimalHandling } from "@/state/utils/DialogueUtils";
 
 export default function ActionMenu() {
   const attack = useGameStore((state) => state.attack);
@@ -16,6 +17,7 @@ export default function ActionMenu() {
   const castSpell = useGameStore((state) => state.castSpell);
   const setTargeting = useGameStore((state) => state.setTargeting);
   const setTargetingSpell = useGameStore((state) => state.setTargetingSpell);
+  const party = useGameStore((state) => state.party);
   const index = useGameStore((state) => state.activeFighterIndex);
   const combatOrder = useGameStore((state) => state.combatOrder);
   const isFighterEnemy = useGameStore((state) => state.isCurrentFighterEnemy());
@@ -38,33 +40,33 @@ export default function ActionMenu() {
       attack(room.enemies[0]);
     } else {
       setTargeting(true);
-      setTargetingSpell(null); 
+      setTargetingSpell(null);
     }
   };
 
   const handleSpellClick = (spell: Spell) => {
     const currentCaster = combatOrder[index] as CharacterData;
-    
+
     if (currentCaster.mp < spell.manaCost) {
       return;
     }
 
-    if (spell.effect.type === 'damage') {
-      if (spell.effect.target === 'single') {
+    if (spell.effect.type === "damage") {
+      if (spell.effect.target === "single") {
         if (room.enemies.length === 1) {
           castSpell(spell, room.enemies[0]);
         } else {
           setTargeting(true);
           setTargetingSpell(spell);
         }
-      } else if (spell.effect.target === 'all') {
+      } else if (spell.effect.target === "all") {
         castSpell(spell);
       }
-    } else if (spell.effect.type === 'heal') {
-      if (spell.effect.target === 'single') {
+    } else if (spell.effect.type === "heal") {
+      if (spell.effect.target === "single") {
         setTargeting(true);
         setTargetingSpell(spell);
-      } else if (spell.effect.target === 'party') {
+      } else if (spell.effect.target === "party") {
         castSpell(spell);
       }
     }
@@ -102,14 +104,14 @@ export default function ActionMenu() {
                 (spell, spellIndex) => {
                   const currentCaster = combatOrder[index] as CharacterData;
                   const notEnoughMana = currentCaster.mp < spell.manaCost;
-                  
+
                   return (
                     <div
                       key={spell.name + spellIndex}
                       className={`rounded h-18 w-full flex items-center justify-center relative ${
-                        notEnoughMana 
-                          ? 'bg-gray-800 cursor-not-allowed opacity-50' 
-                          : 'bg-gray-700 hover:bg-gray-600 cursor-pointer'
+                        notEnoughMana
+                          ? "bg-gray-800 cursor-not-allowed opacity-50"
+                          : "bg-gray-700 hover:bg-gray-600 cursor-pointer"
                       }`}
                       onClick={() => !notEnoughMana && handleSpellClick(spell)}
                       title={`${spell.name} (${spell.manaCost} MP) - ${spell.description}`}
@@ -135,23 +137,29 @@ export default function ActionMenu() {
       ) : (
         <> </>
       )}
+
       {room && room.interaction?.type === "NPC" ? (
         <>
-          <div
-            className="bg-gray-900 rounded hover:bg-gray-600 cursor-pointer flex justify-center items-center p-2 text-white text-center"
-            onClick={() => {
-              if (room && room.interaction?.type === "NPC") {
-                speak(room.interaction.npc as NPC);
-              }
-            }}
-          >
-            {useGameStore.getState().dialogueIndex <
-            room.interaction.npc.dialogue.length - 1
-              ? "Continue Dialogue"
-              : "Speak"}
-          </div>
+          {(room.interaction as { type: "NPC"; npc: NPC }).npc.NPCType ===
+          NPCType.ANIMAL &&
+          !partyHasAnimalHandling(party) ? (
+            <div className="bg-gray-900 rounded flex justify-center items-center p-2 text-gray-500 text-center cursor-not-allowed">
+              Speak (Requires Animal Handling)
+            </div>
+          ) : (
+            <div
+              className="bg-gray-900 rounded hover:bg-gray-600 cursor-pointer flex justify-center items-center p-2 text-white text-center"
+              onClick={() => speak((room.interaction as { type: "NPC"; npc: NPC }).npc)}
+            >
+              {useGameStore.getState().dialogueIndex <
+              (room.interaction as { type: "NPC"; npc: NPC }).npc.dialogue.length - 1
+                ? "Continue Dialogue"
+                : "Speak"}
+            </div>
+          )}
 
-          {room.interaction.npc.NPCType === NPCType.MERCHANT && (
+          {(room.interaction as { type: "NPC"; npc: NPC }).npc.NPCType ===
+            NPCType.MERCHANT && (
             <div
               className="bg-gray-900 rounded hover:bg-gray-600 cursor-pointer flex justify-center items-center p-2 text-white"
               onClick={() => openShop()}
