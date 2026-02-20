@@ -1,3 +1,6 @@
+Database 
+    NPC images
+    NPC inventory
 Talk to an animal (animal handling -> conditional skills) 
     Draw an animal 
     State Checks

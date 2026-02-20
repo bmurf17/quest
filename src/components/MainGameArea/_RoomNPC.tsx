@@ -1,5 +1,6 @@
 import { GameState, useGameStore } from "@/state/GameState";
 import merchant from "../../assets/Merchant.png"
+import horse from "../../../public/images/characters/npc/Horse-1.png"
 
 export default function RoomNPC() {
   const state = useGameStore((state: GameState) => state);
@@ -38,7 +39,7 @@ export default function RoomNPC() {
       </div>
 
       <div className="relative">
-        <img src={merchant} alt="Merchant" className="mx-auto"
+        <img src={horse} alt="horse" className="mx-auto"
           style={{ width: "192px", height: "192px", imageRendering: "pixelated" }}
         />
       </div>
