@@ -12,7 +12,8 @@ export interface NPC {
   dialogue: string[];
   questId?: string;
   discoveryMessage?: string;
-  NPCType: NPCType
+  NPCType: NPCType;
+  img: string;
 }
 
 export type Chest = {

@@ -95,7 +95,8 @@ export async function getAllRooms(): Promise<Room[]> {
               dialogue: interactionData.npcs.dialogue,
               questId: interactionData.npcs.quest_id,
               discoveryMessage: interactionData.npcs.discovery_message,
-              NPCType: interactionData.npcs.npc_type
+              NPCType: interactionData.npcs.npc_type,
+              img: interactionData.npcs.img,
             },
           };
           break;
@@ -111,7 +112,6 @@ export async function getAllRooms(): Promise<Room[]> {
               discoveryMessage: interactionData.chests.discovery_message,
               item: interactionData.chests.item
                 ? {
-                    //id: interactionData.chests.item.id,
                     name: interactionData.chests.item.name,
                     value: interactionData.chests.item.value,
                     img: interactionData.chests.item.img,
@@ -121,8 +121,8 @@ export async function getAllRooms(): Promise<Room[]> {
                     manaChange: interactionData.chests.item.mana_change,
                     stackSize: interactionData.chests.item.stack_size,
                     slot: interactionData.chests.item.slot,
-                    //attack: interactionData.chests.item.attack,
-                    // defense: interactionData.chests.item.defense
+                    cost: interactionData.chests.item.cost,
+                    stats: interactionData.chests.item.stats
                   }
                 : null,
             },

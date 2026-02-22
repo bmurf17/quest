@@ -1,6 +1,4 @@
 import { GameState, useGameStore } from "@/state/GameState";
-import merchant from "../../assets/Merchant.png"
-import horse from "/images/characters/npc/Horse-1.png"
 
 export default function RoomNPC() {
   const state = useGameStore((state: GameState) => state);
@@ -16,6 +14,8 @@ export default function RoomNPC() {
   const dialogueLines = interaction.npc.dialogue;
   const currentLine = dialogueLines[dialogueIndex] || dialogueLines[dialogueLines.length - 1];
   const isEndOfDialogue = dialogueIndex >= dialogueLines.length - 1;
+
+  console.log("Rendering RoomNPC with image:", interaction.npc.img);
 
   return (
     <div className="flex flex-col items-center animate-in fade-in zoom-in duration-300">
@@ -39,7 +39,7 @@ export default function RoomNPC() {
       </div>
 
       <div className="relative">
-        <img src={horse} alt="horse" className="mx-auto"
+        <img src={interaction.npc.img} alt={interaction.npc.name} className="mx-auto"
           style={{ width: "192px", height: "192px", imageRendering: "pixelated" }}
         />
       </div>
