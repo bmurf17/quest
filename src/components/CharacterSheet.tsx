@@ -4,9 +4,47 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CharacterData } from "@/types/Character";
+
+function StatBar({ value, max, color }: { value: number; max: number; color: string }) {
+  const pct = Math.min(100, (value / max) * 100);
+  const isLow = color === "#22C55E" && pct <= 25;
+  return (
+    <div style={{ height: 5, background: "rgba(255,255,255,0.06)", borderRadius: 3, overflow: "hidden" }}>
+      <div style={{ height: "100%", width: `${pct}%`, background: isLow ? "#EF4444" : color, borderRadius: 3, transition: "width 0.3s" }} />
+    </div>
+  );
+}
+
+function SectionHeader({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "20px 0 12px" }}>
+      <span style={{ fontSize: 11, color: "#C9A84C", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, whiteSpace: "nowrap" }}>
+        {children}
+      </span>
+      <div style={{ flex: 1, height: 1, background: "rgba(180,140,80,0.2)" }} />
+    </div>
+  );
+}
+
+function StatRow({ label, value, max, color }: { label: string; value: number; max: number; color: string }) {
+  const pct = (value / max) * 100;
+  const isLow = color === "#22C55E" && pct <= 25;
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+        <span style={{ fontSize: 11, color: isLow ? "#FCA5A5" : color, fontFamily: "'Cinzel', Georgia, serif", fontWeight: 700, letterSpacing: "0.08em" }}>
+          {label}
+        </span>
+        <span style={{ fontSize: 12, color: "#9A8A72", fontFamily: "'Lato', sans-serif" }}>
+          {value}<span style={{ color: "#4B5563" }}>/{max}</span>
+        </span>
+      </div>
+      <StatBar value={value} max={max} color={color} />
+    </div>
+  );
+}
 
 export default function CharacterSheet({
   isOpen = false,
@@ -19,154 +57,124 @@ export default function CharacterSheet({
 }) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl bg-gray-800 text-white">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold">
-            {characterData.name}
-          </DialogTitle>
+      <DialogContent
+        style={{
+          maxWidth: 760,
+          background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 100%)",
+          border: "1px solid rgba(180,140,80,0.25)",
+          borderRadius: 12,
+          padding: 0,
+          overflow: "hidden",
+          fontFamily: "'Lato', sans-serif",
+          color: "#E8DCC8",
+        }}
+      >
+        <style>{`@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@400;700&display=swap');`}</style>
+
+        {/* Header */}
+        <DialogHeader style={{ padding: "20px 24px 16px", borderBottom: "1px solid rgba(180,140,80,0.12)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            {/* Portrait */}
+            <div style={{ width: 64, height: 64, flexShrink: 0, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(180,140,80,0.2)", borderRadius: 8, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <img src={characterData.img} alt={characterData.name} style={{ width: 56, height: 56, imageRendering: "pixelated", filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.8))" }} />
+            </div>
+
+            <div style={{ flex: 1 }}>
+              <DialogTitle style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 700, color: "#E8DCC8", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.04em" }}>
+                {characterData.name}
+              </DialogTitle>
+              <div style={{ display: "flex", gap: 6 }}>
+                {[characterData.race, characterData.class, `Level ${characterData.level}`].map((tag) => (
+                  <span key={tag} style={{ fontSize: 11, color: "#C9A84C", background: "rgba(180,140,80,0.1)", border: "1px solid rgba(180,140,80,0.22)", borderRadius: 4, padding: "2px 9px", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.04em" }}>
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
         </DialogHeader>
 
-        <ScrollArea className="h-[80vh] pr-4">
-          <div className="space-y-6">
-            <div className="grid grid-cols-3 gap-4 p-4 bg-gray-700/50 rounded-lg">
-              <div>
-                <span className="text-sm text-gray-400">Race</span>
-                <p>{characterData.race}</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-400">Class</span>
-                <p>{characterData.class}</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-400">Level</span>
-                <p>{characterData.level}</p>
-              </div>
+        <ScrollArea style={{ height: "75vh" }}>
+          <div style={{ padding: "4px 24px 28px" }}>
+
+            <SectionHeader>Vitals</SectionHeader>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+              <StatRow label="HP" value={characterData.hp} max={characterData.maxHp} color="#22C55E" />
+              <StatRow label="MP" value={characterData.mp} max={characterData.maxMp} color="#6366F1" />
+              <StatRow label="EXP" value={characterData.exp} max={characterData.nextLevelExp} color="#F59E0B" />
             </div>
 
-            <div className="flex items-center gap-4">
-              <img
-                src={characterData.img}
-                alt={"name"}
-                style={{
-                  imageRendering: "pixelated",
-                }}
-                className="w-24 h-24 rounded bg-gray-700"
-              />
-              <div className="flex-1 space-y-2">
-                <div>
-                  <div className="text-sm text-gray-400">HP</div>
-                  <Progress
-                    value={(characterData.hp / characterData.maxHp) * 100}
-                    className="h-2 bg-gray-700"
-                  />
-                  <div className="text-sm mt-1">
-                    {characterData.hp} / {characterData.maxHp}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-400">MP</div>
-                  <Progress
-                    value={(characterData.mp / characterData.maxMp) * 100}
-                    className="h-2 bg-gray-700"
-                  />
-                  <div className="text-sm mt-1">
-                    {characterData.mp} / {characterData.maxMp}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-400">EXP</div>
-                  <Progress
-                    value={(characterData.exp / characterData.nextLevelExp) * 100}
-                    className="h-2 bg-gray-700"
-                  />
-                  <div className="text-sm mt-1">
-                    {characterData.exp} / {characterData.nextLevelExp}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-6 gap-4">
-              {Object.entries(characterData.abilities).map(([key, value]) => (
-                <div
-                  key={key}
-                  className="text-center p-3 bg-gray-700/50 rounded-lg"
-                >
-                  <div className="text-gray-400 uppercase text-sm">{key}</div>
-                  <div className="text-xl font-bold">{value.score}</div>
-                  <div className="text-sm text-gray-300">
-                    {value.modifier >= 0
-                      ? `+${value.modifier}`
-                      : value.modifier}
+            <SectionHeader>Ability Scores</SectionHeader>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 6 }}>
+              {Object.entries(characterData.abilities).map(([key, ability]) => (
+                <div key={key} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(180,140,80,0.12)", borderRadius: 7, padding: "10px 6px", textAlign: "center" }}>
+                  <div style={{ fontSize: 9, color: "#A8916A", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 5 }}>{key}</div>
+                  <div style={{ fontSize: 22, fontWeight: 700, color: "#E8DCC8", fontFamily: "'Cinzel', Georgia, serif", lineHeight: 1 }}>{ability.score}</div>
+                  <div style={{ fontSize: 12, color: ability.modifier >= 0 ? "#6EE7B7" : "#FCA5A5", marginTop: 3 }}>
+                    {ability.modifier >= 0 ? "+" : ""}{ability.modifier}
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold">Skills</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {characterData.skills.map((skill) => (
-                  <div
-                    key={skill.name}
-                    className="flex justify-between p-2 bg-gray-700/50 rounded"
-                  >
-                    <span>
-                      {skill.name} ({skill.ability})
-                    </span>
-                    <span>{skill.modifier}</span>
+            <SectionHeader>Saving Throws</SectionHeader>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 6 }}>
+              {Object.entries(characterData.savingThrows).map(([key, value]) => (
+                <div key={key} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(180,140,80,0.12)", borderRadius: 7, padding: "10px 6px", textAlign: "center" }}>
+                  <div style={{ fontSize: 9, color: "#A8916A", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 5 }}>{key}</div>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: (value as unknown as number) >= 0 ? "#6EE7B7" : "#FCA5A5", fontFamily: "'Cinzel', Georgia, serif", lineHeight: 1 }}>
+                    {(value as unknown as number) >= 0 ? "+" : ""}{value}
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
 
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold">Actions</h3>
-              <div className="space-y-2">
-                {characterData.items.map((item) => (
-                  <div
-                    key={item.action.name}
-                    className="flex justify-between items-center p-2 bg-gray-700/50 rounded"
-                  >
-                    <div className="flex flex-col">
-                      <span className="font-medium">{item.action.name}</span>
-                      <img
-                        src={item.img}
-                        alt={item.action.name}
-                        className="w-16 h-16 rounded bg-gray-700"
-                        style={{
-                          imageRendering: "pixelated",
-                        }}
-                      />
-                    </div>
-                    <div className="flex gap-4 text-sm">
-                      <span>Hit: {item.action.hitDC}</span>
-                      <span>Damage: {item.action.damage}</span>
-                      <span className="text-gray-400">{item.action.type}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold">Saving Throws</h3>
-              <div className="grid grid-cols-6 gap-4">
-                {Object.entries(characterData.savingThrows).map(
-                  ([key, value]) => (
-                    <div
-                      key={key}
-                      className="text-center p-2 bg-gray-700/50 rounded"
-                    >
-                      <div className="text-gray-400 uppercase text-sm">
-                        {key}
+            {characterData.skills?.length > 0 && (
+              <>
+                <SectionHeader>Skills</SectionHeader>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 5 }}>
+                  {characterData.skills.map((skill) => (
+                    <div key={skill.name} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 10px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(180,140,80,0.1)", borderRadius: 5 }}>
+                      <div>
+                        <span style={{ fontSize: 13, color: "#D4C8B0", fontFamily: "'Cinzel', Georgia, serif" }}>{skill.name}</span>
+                        <span style={{ fontSize: 10, color: "#6B5E48", marginLeft: 6, fontFamily: "'Lato', sans-serif" }}>({skill.ability})</span>
                       </div>
-                      <div className="font-medium">{value}</div>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: (skill.modifier as unknown as number) >= 0 ? "#6EE7B7" : "#FCA5A5", fontFamily: "'Cinzel', Georgia, serif" }}>
+                        {(skill.modifier as unknown as number) >= 0 ? "+" : ""}{skill.modifier}
+                      </span>
                     </div>
-                  )
-                )}
-              </div>
-            </div>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {characterData.items?.length > 0 && (
+              <>
+                <SectionHeader>Equipment</SectionHeader>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {characterData.items.map((item) => (
+                    <div key={item.action.name} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", background: "rgba(255,255,255,0.025)", border: "1px solid rgba(180,140,80,0.12)", borderRadius: 7 }}>
+                      <div style={{ width: 44, height: 44, flexShrink: 0, background: "rgba(0,0,0,0.4)", border: "1px solid rgba(180,140,80,0.1)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <img src={item.img} alt={item.action.name} style={{ width: 34, height: 34, imageRendering: "pixelated" }} />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: "#E8DCC8", fontFamily: "'Cinzel', Georgia, serif", marginBottom: 3 }}>{item.action.name}</div>
+                        <div style={{ fontSize: 12, color: "#A8916A" }}>{item.action.type}</div>
+                      </div>
+                      <div style={{ display: "flex", gap: 16, flexShrink: 0 }}>
+                        {[["Hit", item.action.hitDC], ["Dmg", item.action.damage]].map(([label, val]) => (
+                          <div key={label as string} style={{ textAlign: "center" }}>
+                            <div style={{ fontSize: 9, color: "#6B5E48", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 2 }}>{label}</div>
+                            <div style={{ fontSize: 14, fontWeight: 700, color: "#D4C8B0", fontFamily: "'Cinzel', Georgia, serif" }}>{val}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
           </div>
         </ScrollArea>
       </DialogContent>
