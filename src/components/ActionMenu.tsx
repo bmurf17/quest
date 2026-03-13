@@ -20,10 +20,10 @@ interface ActionBtnProps {
 
 function ActionBtn({ onClick, disabled, variant = "default", children, fullWidth, title }: ActionBtnProps) {
   const colors = {
-    default: { bg: "rgba(255,255,255,0.04)", hover: "rgba(180,140,80,0.12)", border: "rgba(180,140,80,0.18)", text: themeColors.goldMuted },
+    default: { bg: "rgba(255,255,255,0.04)", hover: "rgba(180,140,80,0.12)", border: themeColors.goldBorder, text: themeColors.goldMuted },
     danger:  { bg: "rgba(220,38,38,0.07)",   hover: "rgba(220,38,38,0.14)",   border: "rgba(220,38,38,0.25)",   text: "#FCA5A5" },
     success: { bg: "rgba(5,150,105,0.07)",    hover: "rgba(5,150,105,0.14)",   border: "rgba(52,211,153,0.25)",  text: "#6EE7B7" },
-    muted:   { bg: "rgba(0,0,0,0.2)",         hover: "rgba(0,0,0,0.2)",        border: "rgba(255,255,255,0.05)", text: "#4B5563" },
+    muted:   { bg: "rgba(0,0,0,0.2)",         hover: "rgba(0,0,0,0.2)",        border: themeColors.subtleBorder, text: "#4B5563" },
   };
   const c = disabled ? colors.muted : colors[variant];
 
@@ -65,7 +65,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   <span style={{ fontSize: 9, color: themeColors.goldMuted, fontFamily: fonts.display, letterSpacing: "0.12em", textTransform: "uppercase" }}>
         {children}
       </span>
-      <div style={{ flex: 1, height: 1, background: "rgba(180,140,80,0.1)" }} />
+  <div style={{ flex: 1, height: 1, background: themeColors.goldBorder }} />
     </div>
   );
 }
@@ -91,8 +91,8 @@ function AbilitySlot({ img, alt, badge, badgeColor = "#6366F1", disabled, onClic
         alignItems: "center",
         justifyContent: "center",
         aspectRatio: "1",
-        background: disabled ? "rgba(0,0,0,0.3)" : "rgba(255,255,255,0.04)",
-        border: `1px solid ${disabled ? "rgba(255,255,255,0.05)" : "rgba(180,140,80,0.2)"}`,
+          background: disabled ? "rgba(0,0,0,0.3)" : "rgba(255,255,255,0.04)",
+  border: `1px solid ${disabled ? themeColors.subtleBorder : themeColors.goldBorder}`,
         borderRadius: 7,
         cursor: disabled ? "not-allowed" : "pointer",
         opacity: disabled ? 0.4 : 1,
@@ -101,13 +101,13 @@ function AbilitySlot({ img, alt, badge, badgeColor = "#6366F1", disabled, onClic
       onMouseEnter={(e) => {
         if (!disabled) {
           e.currentTarget.style.background = "rgba(180,140,80,0.1)";
-          e.currentTarget.style.borderColor = "rgba(212,175,55,0.4)";
+          e.currentTarget.style.borderColor = themeColors.gold;
           e.currentTarget.style.transform = "scale(1.04)";
         }
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.background = disabled ? "rgba(0,0,0,0.3)" : "rgba(255,255,255,0.04)";
-        e.currentTarget.style.borderColor = disabled ? "rgba(255,255,255,0.05)" : "rgba(180,140,80,0.2)";
+  e.currentTarget.style.borderColor = disabled ? themeColors.subtleBorder : themeColors.goldBorder;
         e.currentTarget.style.transform = "scale(1)";
       }}
     >
@@ -116,22 +116,21 @@ function AbilitySlot({ img, alt, badge, badgeColor = "#6366F1", disabled, onClic
         alt={alt}
         style={{ width: "60%", height: "60%", imageRendering: "pixelated", filter: "drop-shadow(0 1px 3px rgba(0,0,0,0.6))" }}
       />
-      {badge !== undefined && (
-        <div style={{
-          position: "absolute",
-          bottom: 3, right: 3,
-          background: badgeColor,
-          color: "#fff",
-          fontSize: 9,
-          fontWeight: 700,
-          fontFamily: "'Lato', sans-serif",
-          padding: "1px 4px",
-          borderRadius: 3,
-          lineHeight: 1.4,
-        }}>
-          {badge}
-        </div>
-      )}
+          {badge !== undefined && (
+            <div style={{
+              position: "absolute",
+              bottom: 3, right: 3,
+              background: badgeColor,
+              color: "#fff",
+              fontSize: 9,
+              fontFamily: fonts.body,
+              padding: "1px 4px",
+              borderRadius: 3,
+              lineHeight: 1.4,
+            }}>
+              {badge}
+            </div>
+          )}
     </div>
   );
 }

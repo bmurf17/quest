@@ -37,19 +37,19 @@ export default function ActivityLog({ activityLog }: Props) {
     <>
       <style>{`
         .log-line { transition: background 0.1s; }
-        .log-line:hover { background: rgba(180,140,80,0.05) !important; }
+  .log-line:hover { background: rgba(180,140,80,0.05) !important; }
         .log-scroll::-webkit-scrollbar { width: 3px; }
         .log-scroll::-webkit-scrollbar-track { background: transparent; }
         .log-scroll::-webkit-scrollbar-thumb { background: rgba(180,140,80,0.2); border-radius: 2px; }
       `}</style>
 
       <div style={{
-        display: "flex",
-        flexDirection: "column",
-        background: "rgba(0,0,0,0.35)",
-        border: "1px solid rgba(180,140,80,0.15)",
-        borderRadius: 8,
-        overflow: "hidden",
+  display: "flex",
+  flexDirection: "column",
+  background: "rgba(0,0,0,0.35)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 8,
+  overflow: "hidden",
       }}>
 
         <div style={{
@@ -72,7 +72,7 @@ export default function ActivityLog({ activityLog }: Props) {
           </span>
           <span style={{
             fontSize: 10,
-            color: "#4B5563",
+            color: colors.muted,
             fontFamily: fonts.body,
           }}>
             {activityLog.length} entries
@@ -91,11 +91,11 @@ export default function ActivityLog({ activityLog }: Props) {
           {activityLog.length === 0 ? (
             <div style={{
               padding: "20px 12px",
-              textAlign: "center",
-              color: "#374151",
-              fontSize: 12,
-              fontFamily: "'Lato', sans-serif",
-              fontStyle: "italic",
+                textAlign: "center",
+                color: colors.muted,
+                fontSize: 12,
+                fontFamily: fonts.body,
+                fontStyle: "italic",
             }}>
               The chronicle awaits your deeds…
             </div>
@@ -119,8 +119,8 @@ export default function ActivityLog({ activityLog }: Props) {
                 >
                   <span style={{
                     fontSize: 9,
-                    color: "#3A3228",
-                    fontFamily: "'Lato', sans-serif",
+                    color: colors.textMuted,
+                    fontFamily: fonts.body,
                     minWidth: 22,
                     textAlign: "right",
                     flexShrink: 0,
@@ -142,8 +142,8 @@ export default function ActivityLog({ activityLog }: Props) {
 
                   <span style={{
                     fontSize: 13,
-                    color: isRecent ? "#E8DCC8" : "#9A8A72",
-                    fontFamily: "'Lato', sans-serif",
+                    color: isRecent ? colors.text : colors.textMuted,
+                    fontFamily: fonts.body,
                     lineHeight: 1.5,
                     flex: 1,
                   }}>

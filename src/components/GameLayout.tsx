@@ -17,7 +17,7 @@ const LABEL_STYLE: React.CSSProperties = {
 const DIVIDER: React.CSSProperties = {
   flex: 1,
   height: 1,
-  background: "rgba(180,140,80,0.15)",
+  background: colors.goldBorder,
 };
 
 export default function GameLayout() {
@@ -43,9 +43,9 @@ export default function GameLayout() {
         overflow: "hidden",
       }}>
 
-        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(to right, transparent, rgba(212,175,55,0.5) 30%, rgba(212,175,55,0.5) 70%, transparent)", pointerEvents: "none" }} />
+  <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: `linear-gradient(to right, transparent, ${colors.gold} 30%, ${colors.gold} 70%, transparent)`, pointerEvents: "none" }} />
 
-        <div style={{ borderRight: "1px solid rgba(180,140,80,0.12)", padding: "8px", overflow: "hidden", display: "flex", flexDirection: "column" }}>
+  <div style={{ borderRight: `1px solid ${colors.goldBorder}`, padding: "8px", overflow: "hidden", display: "flex", flexDirection: "column" }}>
            <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0, marginBottom: 6 }}>
             <span style={LABEL_STYLE}>Log</span>
             <div style={DIVIDER} />
@@ -53,7 +53,7 @@ export default function GameLayout() {
           <ActivityLog activityLog={activityLog} />
         </div>
 
-        <div style={{ borderRight: "1px solid rgba(180,140,80,0.12)", padding: "8px 10px", display: "flex", flexDirection: "column", gap: 6, overflow: "hidden" }}>
+  <div style={{ borderRight: `1px solid ${colors.goldBorder}`, padding: "8px 10px", display: "flex", flexDirection: "column", gap: 6, overflow: "hidden" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
             <span style={LABEL_STYLE}>Party</span>
             <div style={DIVIDER} />

@@ -25,7 +25,7 @@ function StatBar({
         background: "rgba(0,0,0,0.5)",
         borderRadius: 2,
         overflow: "hidden",
-        border: "1px solid rgba(255,255,255,0.04)",
+        border: `1px solid ${colors.subtleBorder}`,
       }}
     >
       <div
@@ -108,7 +108,7 @@ export default function Party({ party }: Props) {
           <span
             style={{
               fontSize: 12,
-              color: "#6EE7B7",
+              color: colors.success,
               fontFamily: fonts.display,
               letterSpacing: "0.06em",
             }}
@@ -119,7 +119,7 @@ export default function Party({ party }: Props) {
       )}
 
       <div
-        style={{
+  style={{
           flex: 1,
           minHeight: 0,
           display: "flex",
@@ -150,7 +150,7 @@ export default function Party({ party }: Props) {
                   : isLowHp
                     ? "rgba(239,68,68,0.05)"
                     : "rgba(255,255,255,0.025)",
-                border: `1px solid ${isDead ? "rgba(255,255,255,0.05)" : isLowHp ? "rgba(239,68,68,0.3)" : "rgba(180,140,80,0.18)"}`,
+                border: `1px solid ${isDead ? colors.subtleBorder : isLowHp ? 'rgba(239,68,68,0.3)' : colors.goldBorder}`,
                 borderRadius: 6,
                 overflow: "hidden",
                 opacity: isDead ? 0.4 : 1,
@@ -189,15 +189,15 @@ export default function Party({ party }: Props) {
                 >
                   <div
                     style={{
-                      fontSize: 9,
-                      fontWeight: 700,
-                      color: colors.text,
-                      fontFamily: fonts.display,
-                      letterSpacing: "0.03em",
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
+                        fontSize: 9,
+                        fontWeight: 700,
+                        color: colors.text,
+                        fontFamily: fonts.display,
+                        letterSpacing: "0.03em",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
                   >
                     {character.name}
                   </div>
