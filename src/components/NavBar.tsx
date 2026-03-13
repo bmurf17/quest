@@ -16,8 +16,8 @@ export default function NavBar() {
     <>
       <style>{`
         .nav-link { transition: color 0.15s, background 0.15s, border-color 0.15s; }
-        .nav-link:hover .nav-icon-wrap { border-color: rgba(212,175,55,0.5) !important; background: rgba(212,175,55,0.1) !important; color: #D4AF37 !important; }
-        .nav-link:hover .nav-label { color: #C9A84C !important; }
+        .nav-link:hover .nav-icon-wrap { border-color: ${colors.goldBorder} !important; background: rgba(212,175,55,0.1) !important; color: ${colors.gold} !important; }
+        .nav-link:hover .nav-label { color: ${colors.goldMuted} !important; }
       `}</style>
 
       <nav style={{
@@ -27,7 +27,7 @@ export default function NavBar() {
         padding: "0 20px",
         height: 52,
         background: "rgba(10,9,6,0.95)",
-        borderBottom: "1px solid rgba(180,140,80,0.15)",
+  borderBottom: `1px solid ${colors.goldBorder}`,
         backdropFilter: "blur(8px)",
         flexShrink: 0,
         position: "relative",
@@ -37,8 +37,8 @@ export default function NavBar() {
         <Link to="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 8 }}>
           <div style={{
             width: 24, height: 24,
-            background: "rgba(212,175,55,0.12)",
-            border: "1px solid rgba(212,175,55,0.3)",
+            background: colors.goldMuted + "22",
+            border: `1px solid ${colors.goldBorder}`,
             borderRadius: 5,
             display: "flex", alignItems: "center", justifyContent: "center",
           }}>

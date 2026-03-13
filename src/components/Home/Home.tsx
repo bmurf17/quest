@@ -18,8 +18,8 @@ export default function Home() {
           to   { opacity: 1; transform: translateY(0); }
         }
         @keyframes glow-pulse {
-          0%, 100% { box-shadow: 0 0 20px rgba(212,175,55,0.15), inset 0 0 20px rgba(212,175,55,0.03); }
-          50%       { box-shadow: 0 0 40px rgba(212,175,55,0.25), inset 0 0 30px rgba(212,175,55,0.06); }
+          0%, 100% { box-shadow: 0 0 20px ${colors.gold}33, inset 0 0 20px ${colors.gold}0D; }
+          50%       { box-shadow: 0 0 40px ${colors.gold}40, inset 0 0 30px ${colors.gold}0F; }
         }
 
         .home-title   { animation: rise 1.2s ease both, flicker 6s ease-in-out 1.5s infinite; }
@@ -28,19 +28,19 @@ export default function Home() {
         .home-btn     { animation: rise 1.2s ease 0.5s both; }
         .home-settings { animation: rise 1.2s ease 0.65s both; }
 
-        .start-btn {
+  .start-btn {
           position: relative;
           display: inline-flex;
           align-items: center;
           gap: 12px;
           padding: 16px 40px;
-          background: linear-gradient(135deg, #B4965A 0%, #D4AF37 50%, #B4965A 100%);
+          background: linear-gradient(135deg, ${colors.gold} 0%, ${colors.gold} 50%, ${colors.gold} 100%);
           border: none;
           border-radius: 8px;
           color: #0d0b07;
           font-size: 16px;
           font-weight: 700;
-          font-family: 'Cinzel', Georgia, serif;
+          font-family: ${fonts.display};
           letter-spacing: 0.1em;
           text-decoration: none;
           cursor: pointer;
@@ -50,25 +50,25 @@ export default function Home() {
         .start-btn:hover  { transform: scale(1.04); filter: brightness(1.1); }
         .start-btn:active { transform: scale(0.97); }
 
-        .settings-link {
+  .settings-link {
           display: inline-flex;
           align-items: center;
           gap: 8px;
           padding: 10px 24px;
           background: transparent;
-          border: 1px solid rgba(180,140,80,0.25);
+          border: 1px solid ${colors.goldBorder};
           border-radius: 6px;
-          color: #9CA3AF;
+          color: ${colors.muted};
           font-size: 13px;
-          font-family: 'Cinzel', Georgia, serif;
+          font-family: ${fonts.display};
           letter-spacing: 0.08em;
           text-decoration: none;
           cursor: pointer;
           transition: all 0.2s;
         }
         .settings-link:hover {
-          color: #D4AF37;
-          border-color: rgba(212,175,55,0.4);
+          color: ${colors.gold};
+          border-color: ${colors.goldBorder};
           background: rgba(212,175,55,0.06);
         }
       `}</style>
@@ -81,7 +81,7 @@ export default function Home() {
         alignItems: "center",
         justifyContent: "center",
         padding: "40px 24px",
-        fontFamily: "'Crimson Text', Georgia, serif",
+  fontFamily: fonts.body,
         position: "relative",
         overflow: "hidden",
       }}>
@@ -112,7 +112,7 @@ export default function Home() {
             color: colors.text,
             letterSpacing: "0.08em",
             lineHeight: 1.1,
-            textShadow: "0 2px 40px rgba(212,175,55,0.15)",
+            textShadow: `0 2px 40px ${colors.gold}26`,
           }}>
             Qwest
           </h1>

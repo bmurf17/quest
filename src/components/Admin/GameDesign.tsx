@@ -54,10 +54,10 @@ export default function Admin() {
 
         <div style={{ maxWidth: 700, margin: "0 auto 48px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 10 }}>
-            <div style={{
-              width: 42, height: 42,
-              background: "rgba(212,175,55,0.1)",
-              border: "1px solid rgba(212,175,55,0.3)",
+        <div style={{
+          width: 42, height: 42,
+          background: colors.goldMuted + "22",
+          border: `1px solid ${colors.goldBorder}`,
               borderRadius: 10,
               display: "flex", alignItems: "center", justifyContent: "center",
             }}>
@@ -156,8 +156,8 @@ export default function Admin() {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{
                         fontSize: 15, fontWeight: 600,
-                        color: "#E8DCC8",
-                        fontFamily: "'Cinzel', Georgia, serif",
+                        color: colors.text,
+                        fontFamily: fonts.display,
                         letterSpacing: "0.03em",
                         marginBottom: 3,
                       }}>

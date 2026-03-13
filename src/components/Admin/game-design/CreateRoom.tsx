@@ -6,6 +6,7 @@ import { useState } from "react";
 import mushroom from "/images/Mushroom.png";
 import blord from "/images/Blord.png";
 import { NPCType } from "@/types/RoomInteractions";
+import { colors, fonts } from "@/theme";
 
 const directionToDbEnum = (direction: Directions): string => {
   const map: { [key in Directions]: string } = {
@@ -195,9 +196,9 @@ const Label = ({
       fontWeight: 600,
       letterSpacing: "0.08em",
       textTransform: "uppercase",
-      color: "#9CA3AF",
-      marginBottom: 6,
-      fontFamily: "'Cinzel', Georgia, serif",
+      color: colors.muted,
+        marginBottom: 6,
+        fontFamily: fonts.display,
     }}
   >
     {children}
@@ -207,14 +208,14 @@ const Label = ({
 const inputStyle: React.CSSProperties = {
   width: "100%",
   background: "rgba(0,0,0,0.4)",
-  border: "1px solid rgba(180,140,80,0.25)",
+  border: `1px solid ${colors.goldBorder}`,
   borderRadius: 6,
   padding: "9px 12px",
-  color: "#E8DCC8",
+  color: colors.text,
   fontSize: 14,
   outline: "none",
   boxSizing: "border-box",
-  fontFamily: "'Crimson Text', Georgia, serif",
+  fontFamily: fonts.body,
   transition: "border-color 0.2s",
 };
 
@@ -241,7 +242,7 @@ const StyledInput = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
       e.currentTarget.style.borderColor = "rgba(212,175,55,0.6)";
     }}
     onBlur={(e) => {
-      e.currentTarget.style.borderColor = "rgba(180,140,80,0.25)";
+      e.currentTarget.style.borderColor = `${colors.goldBorder}`;
     }}
   />
 );
@@ -278,22 +279,21 @@ const Divider = ({ label }: { label: string }) => (
       margin: "20px 0 16px",
     }}
   >
-    <div
+      <div
       style={{
         flex: 1,
         height: 1,
-        background:
-          "linear-gradient(to right, transparent, rgba(180,140,80,0.3))",
+        background: `linear-gradient(to right, transparent, ${colors.goldBorder})`,
       }}
     />
     <span
       style={{
-        fontSize: 11,
-        fontWeight: 700,
-        letterSpacing: "0.12em",
-        textTransform: "uppercase",
-        color: "#B4965A",
-        fontFamily: "'Cinzel', Georgia, serif",
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
+  color: colors.goldMuted,
+  fontFamily: fonts.display,
       }}
     >
       {label}
@@ -856,11 +856,11 @@ export default function ManageRooms() {
               marginBottom: 8,
             }}
           >
-            <div
+              <div
               style={{
                 width: 3,
                 height: 28,
-                background: "linear-gradient(to bottom, #D4AF37, transparent)",
+                background: `linear-gradient(to bottom, ${colors.gold}, transparent)`,
                 borderRadius: 2,
               }}
             />
@@ -869,8 +869,8 @@ export default function ManageRooms() {
                 margin: 0,
                 fontSize: 28,
                 fontWeight: 700,
-                color: "#E8DCC8",
-                fontFamily: "'Cinzel', Georgia, serif",
+                color: colors.text,
+                fontFamily: fonts.display,
                 letterSpacing: "0.05em",
               }}
             >
@@ -883,17 +883,17 @@ export default function ManageRooms() {
                 gap: 6,
                 alignItems: "center",
                 background: "rgba(212,175,55,0.08)",
-                border: "1px solid rgba(212,175,55,0.2)",
+                border: `1px solid ${colors.goldBorder}`,
                 borderRadius: 20,
                 padding: "4px 12px 4px 8px",
               }}
             >
-              <span style={{ color: "#D4AF37" }}>{icons.compass}</span>
+              <span style={{ color: colors.gold }}>{icons.compass}</span>
               <span
                 style={{
                   fontSize: 12,
-                  color: "#B4965A",
-                  fontFamily: "'Cinzel', Georgia, serif",
+                  color: colors.goldMuted,
+                  fontFamily: fonts.display,
                   letterSpacing: "0.08em",
                 }}
               >
@@ -925,18 +925,18 @@ export default function ManageRooms() {
             overflow: "hidden",
           }}
         >
-          <div
-            style={{
-              position: "absolute",
-              top: 12,
-              left: 12,
-              width: 20,
-              height: 20,
-              borderTop: "1px solid rgba(212,175,55,0.4)",
-              borderLeft: "1px solid rgba(212,175,55,0.4)",
-              borderRadius: "2px 0 0 0",
-            }}
-          />
+            <div
+              style={{
+                position: "absolute",
+                top: 12,
+                left: 12,
+                width: 20,
+                height: 20,
+                borderTop: `1px solid ${colors.goldBorder}`,
+                borderLeft: `1px solid ${colors.goldBorder}`,
+                borderRadius: "2px 0 0 0",
+              }}
+            />
           <div
             style={{
               position: "absolute",
@@ -1069,13 +1069,13 @@ export default function ManageRooms() {
                   padding: "11px 28px",
                   background: isSubmitting
                     ? "rgba(180,140,80,0.2)"
-                    : "linear-gradient(135deg, #B4965A 0%, #D4AF37 50%, #B4965A 100%)",
+                    : `linear-gradient(135deg, ${colors.gold} 0%, ${colors.gold} 50%, ${colors.gold} 100%)`,
                   border: "none",
                   borderRadius: 6,
-                  color: isSubmitting ? "#9CA3AF" : "#0d0b07",
+                  color: isSubmitting ? colors.muted : "#0d0b07",
                   fontSize: 14,
                   fontWeight: 700,
-                  fontFamily: "'Cinzel', Georgia, serif",
+                  fontFamily: fonts.display,
                   letterSpacing: "0.08em",
                   cursor: isSubmitting ? "not-allowed" : "pointer",
                   transition: "opacity 0.2s, transform 0.1s",

@@ -2,7 +2,7 @@ import { useGameStore } from "@/state/GameState";
 import { Directions } from "@/types/Directions";
 import { Room } from "@/types/Room";
 import React, { useState, useRef, useEffect } from "react";
-import { colors, fonts } from "../../../theme";
+import { colors, fonts } from "@/theme";
 
 const MAX_DEPTH = 5;
 const ROOM_DISTANCE = 160;
@@ -16,7 +16,7 @@ const interactionConfig: Record<
   chest:  { color: "#F59E0B", bg: "rgba(217,119,6,0.15)",  border: "rgba(217,119,6,0.45)",  label: "Chest", icon: "📦" },
   camp:   { color: "#34D399", bg: "rgba(5,150,105,0.15)",  border: "rgba(5,150,105,0.45)",  label: "Camp", icon: "🔥" },
   Combat: { color: "#F87171", bg: "rgba(220,38,38,0.15)",  border: "rgba(220,38,38,0.45)",  label: "Combat", icon: "⚔️" },
-  none:   { color: "#9CA3AF", bg: "rgba(255,255,255,0.04)", border: "rgba(180,140,80,0.2)", label: "Empty", icon: "◇" },
+  none:   { color: "#9CA3AF", bg: "rgba(255,255,255,0.04)", border: colors.goldBorder, label: "Empty", icon: "◇" },
 };
 
 const getInteractionKey = (room: Room): string => {
@@ -71,12 +71,12 @@ const Connector = ({ x1, y1, x2, y2, direction }: ConnectorProps) => {
 
   return (
     <g>
-  <line x1={sx} y1={sy} x2={ex} y2={ey} stroke="rgba(180,140,80,0.15)" strokeWidth={1.5} />
-  <circle cx={mx} cy={my} r={3} fill="rgba(180,140,80,0.3)" />
+  <line x1={sx} y1={sy} x2={ex} y2={ey} stroke={colors.goldBorder} strokeWidth={1.5} />
+  <circle cx={mx} cy={my} r={3} fill={colors.goldBorder} />
   <text
         x={mx + (isVertical ? 5 : 0)}
         y={my + (!isVertical ? -4 : 0)}
-  fill="rgba(180,140,80,0.5)"
+  fill={colors.goldBorder}
   fontSize={9}
   fontFamily={fonts.display}
         textAnchor="middle"
@@ -265,14 +265,13 @@ function RoomPopup({ room, onClose }: { room: Room; onClose: () => void }) {
       }}
     >
       <div
-        onClick={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
         style={{
           background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 100%)",
           border: `1px solid ${cfg.border}`,
           borderRadius: 12,
           padding: 28,
           width: 340,
-          maxHeight: "80vh",
           overflowY: "auto",
           position: "relative",
           fontFamily: "'Crimson Text', Georgia, serif",
@@ -294,12 +293,12 @@ function RoomPopup({ room, onClose }: { room: Room; onClose: () => void }) {
         <div style={{ marginBottom: 20 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
             <div style={{ width: 2, height: 18, background: cfg.color, borderRadius: 1 }} />
-            <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: "#E8DCC8", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.04em" }}>
+            <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: colors.text, fontFamily: fonts.display, letterSpacing: "0.04em" }}>
               {room.name}
             </h3>
           </div>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: cfg.bg, border: `1px solid ${cfg.border}`, borderRadius: 4, padding: "2px 10px", marginLeft: 10 }}>
-            <span style={{ fontSize: 12, color: cfg.color, fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.06em" }}>{cfg.label}</span>
+            <span style={{ fontSize: 12, color: cfg.color, fontFamily: fonts.display, letterSpacing: "0.06em" }}>{cfg.label}</span>
           </div>
         </div>
 
@@ -329,17 +328,17 @@ function RoomPopup({ room, onClose }: { room: Room; onClose: () => void }) {
         {room.enemies?.length > 0 && room.enemies.map((enemy, i) => (
           <div key={enemy.name + i} style={{ marginTop: i > 0 ? 12 : 0 }}>
             {i === 0 && (
-              <div style={{ fontSize: 11, color: "#9CA3AF", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 6 }}>
-                Enemies
-              </div>
+              <div style={{ fontSize: 11, color: colors.muted, fontFamily: fonts.display, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 6 }}>
+                  Enemies
+                </div>
             )}
-            <div style={{ background: "rgba(220,38,38,0.08)", border: "1px solid rgba(220,38,38,0.2)", borderRadius: 6, padding: "10px 12px" }}>
-              <div style={{ fontSize: 14, fontWeight: 600, color: "#FCA5A5", marginBottom: 8, fontFamily: "'Cinzel', Georgia, serif" }}>{enemy.name}</div>
+      <div style={{ background: "rgba(220,38,38,0.08)", border: "1px solid rgba(220,38,38,0.2)", borderRadius: 6, padding: "10px 12px" }}>
+      <div style={{ fontSize: 14, fontWeight: 600, color: colors.danger, marginBottom: 8, fontFamily: fonts.display }}>{enemy.name}</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 16px" }}>
                 {[["HP", enemy.health], ["STR", enemy.strength], ["DEF", enemy.defense], ["DEX", enemy.dex]].map(([stat, val]) => (
                   <div key={stat as string} style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span style={{ fontSize: 11, color: "#9CA3AF", fontFamily: "'Cinzel', Georgia, serif" }}>{stat}</span>
-                    <span style={{ fontSize: 13, color: "#E8DCC8" }}>{val}</span>
+        <span style={{ fontSize: 11, color: colors.muted, fontFamily: fonts.display }}>{stat}</span>
+        <span style={{ fontSize: 13, color: colors.text }}>{val}</span>
                   </div>
                 ))}
               </div>
@@ -371,17 +370,17 @@ function RoomPopup({ room, onClose }: { room: Room; onClose: () => void }) {
             width: "100%",
             padding: "10px",
             background: "transparent",
-            border: "1px solid rgba(180,140,80,0.3)",
+            border: `1px solid ${colors.goldBorder}`,
             borderRadius: 6,
-            color: "#B4965A",
+            color: colors.goldMuted,
             fontSize: 13,
-            fontFamily: "'Cinzel', Georgia, serif",
+            fontFamily: fonts.display,
             letterSpacing: "0.08em",
             cursor: "pointer",
             transition: "all 0.15s",
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(180,140,80,0.1)"; e.currentTarget.style.color = "#D4AF37"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#B4965A"; }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(180,140,80,0.1)"; e.currentTarget.style.color = colors.gold; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = colors.goldMuted; }}
         >
           Close
         </button>
@@ -467,13 +466,13 @@ export default function RoomMap() {
 
         <div style={{ padding: "24px 28px 16px", flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4 }}>
-            <div style={{ width: 3, height: 28, background: "linear-gradient(to bottom, #D4AF37, transparent)", borderRadius: 2 }} />
-            <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: "#E8DCC8", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.05em" }}>
+            <div style={{ width: 3, height: 28, background: `linear-gradient(to bottom, ${colors.gold}, transparent)`, borderRadius: 2 }} />
+            <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: colors.text, fontFamily: fonts.display, letterSpacing: "0.05em" }}>
               Realm Map
             </h1>
             <div style={{ marginLeft: "auto", display: "flex", gap: 6, alignItems: "center", background: "rgba(212,175,55,0.08)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 20, padding: "4px 12px 4px 8px" }}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth={1.5} width={14} height={14}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" /></svg>
-              <span style={{ fontSize: 12, color: "#B4965A", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.08em" }}>{rooms.length} rooms</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke={colors.gold} strokeWidth={1.5} width={14} height={14}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" /></svg>
+              <span style={{ fontSize: 12, color: colors.goldMuted, fontFamily: fonts.display, letterSpacing: "0.08em" }}>{rooms.length} rooms</span>
             </div>
           </div>
           <p style={{ margin: 0, paddingLeft: 15, color: "#6B7280", fontSize: 14, fontFamily: "'Crimson Text', Georgia, serif" }}>
