@@ -4,19 +4,61 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Progress } from "@/components/ui/progress";
 import { CharacterData } from "@/types/Character";
 import { useState } from "react";
 import { Plus, Minus } from "lucide-react";
 import { useGameStore } from "@/state/GameState";
-import { Button } from "../ui/button";
+import { colors, fonts } from "@/theme";
+
+function SectionHeader({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "20px 0 12px" }}>
+      <span
+        style={{
+          fontSize: 11,
+          color: colors.goldMuted,
+          fontFamily: fonts.display,
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
+          fontWeight: 700,
+          whiteSpace: "nowrap",
+        }}
+      >
+        {children}
+      </span>
+      <div style={{ flex: 1, height: 1, background: colors.goldBorder }} />
+    </div>
+  );
+}
+
+function StatBar({ value, max }: { value: number; max: number }) {
+  const pct = Math.min(100, (value / max) * 100);
+  return (
+    <div
+      style={{
+        height: 4,
+        background: "rgba(255,255,255,0.06)",
+        borderRadius: 3,
+        overflow: "hidden",
+        marginTop: 6,
+      }}
+    >
+      <div
+        style={{
+          height: "100%",
+          width: `${pct}%`,
+          background: colors.warning ?? "#F59E0B",
+          borderRadius: 3,
+          transition: "width 0.4s",
+        }}
+      />
+    </div>
+  );
+}
 
 export default function LevelUpModal() {
-  const { 
-    levelingUpChars, 
-    currentLevelingCharIndex,
-    applyLevelUp 
-  } = useGameStore();
+  const { levelingUpChars, currentLevelingCharIndex, applyLevelUp } =
+    useGameStore();
 
   const currentChar = levelingUpChars[currentLevelingCharIndex];
   const [statPoints, setStatPoints] = useState(3);
@@ -27,46 +69,36 @@ export default function LevelUpModal() {
     int: 0,
     wis: 0,
     cha: 0,
-    def: 0
+    def: 0,
   });
 
   if (!currentChar || currentLevelingCharIndex === -1) return null;
 
-  const remainingChars = levelingUpChars.length - currentLevelingCharIndex - 1;
+  const remainingChars =
+    levelingUpChars.length - currentLevelingCharIndex - 1;
 
   const incrementStat = (stat: string) => {
     if (statPoints > 0) {
-      setAllocatedStats(prev => ({
-        ...prev,
-        [stat]: prev[stat] + 1
-      }));
-      setStatPoints(prev => prev - 1);
+      setAllocatedStats((prev) => ({ ...prev, [stat]: prev[stat] + 1 }));
+      setStatPoints((prev) => prev - 1);
     }
   };
 
   const decrementStat = (stat: string) => {
     if (allocatedStats[stat] > 0) {
-      setAllocatedStats(prev => ({
-        ...prev,
-        [stat]: prev[stat] - 1
-      }));
-      setStatPoints(prev => prev + 1);
+      setAllocatedStats((prev) => ({ ...prev, [stat]: prev[stat] - 1 }));
+      setStatPoints((prev) => prev + 1);
     }
   };
 
-  const calculateModifier = (score: number): number => {
-    return Math.floor((score - 10) / 2);
-  };
+  const calculateModifier = (score: number) => Math.floor((score - 10) / 2);
 
   const handleConfirm = () => {
     const updatedAbilities = { ...currentChar.abilities };
     Object.entries(allocatedStats).forEach(([stat, points]) => {
       const key = stat as keyof typeof updatedAbilities;
       const newScore = updatedAbilities[key].score + points;
-      updatedAbilities[key] = {
-        score: newScore,
-        modifier: calculateModifier(newScore)
-      };
+      updatedAbilities[key] = { score: newScore, modifier: calculateModifier(newScore) };
     });
 
     const conIncrease = allocatedStats.con;
@@ -83,141 +115,355 @@ export default function LevelUpModal() {
     };
 
     setStatPoints(3);
-    setAllocatedStats({
-      str: 0,
-      dex: 0,
-      con: 0,
-      int: 0,
-      wis: 0,
-      cha: 0,
-      def: 0,
-    });
-
+    setAllocatedStats({ str: 0, dex: 0, con: 0, int: 0, wis: 0, cha: 0, def: 0 });
     applyLevelUp(updatedChar);
   };
 
   return (
     <Dialog open={true} onOpenChange={() => {}}>
-      <DialogContent className="max-w-2xl bg-gray-800 text-white">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold flex justify-between items-center">
-            <span>Level Up!</span>
-            {remainingChars > 0 && (
-              <span className="text-sm text-gray-400 font-normal">
-                +{remainingChars} more waiting
-              </span>
-            )}
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="space-y-6">
-          <div className="text-center p-4 bg-gray-700/50 rounded-lg">
-            <p className="text-xl mb-2">
-              {currentChar.name} reached level {currentChar.level + 1}!
-            </p>
-            <p className="text-gray-400">
-              Allocate {statPoints} stat {statPoints === 1 ? 'point' : 'points'}
-            </p>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <img
-              src={currentChar.img}
-              alt={currentChar.name}
+      <DialogContent
+        style={{
+          maxWidth: 680,
+          background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 100%)",
+          border: `1px solid ${colors.goldBorder}`,
+          borderRadius: 12,
+          padding: 0,
+          overflow: "hidden",
+          fontFamily: fonts.body,
+          color: colors.text,
+        }}
+      >
+        <DialogHeader
+          style={{
+            padding: "20px 24px 16px",
+            borderBottom: `1px solid ${colors.goldBorder}`,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <div
               style={{
-                imageRendering: "pixelated",
+                width: 64,
+                height: 64,
+                flexShrink: 0,
+                background: "rgba(0,0,0,0.5)",
+                border: `1px solid rgba(180,140,80,0.2)`,
+                borderRadius: 8,
+                overflow: "hidden",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
-              className="w-24 h-24 rounded bg-gray-700"
-            />
-            <div className="flex-1 space-y-2">
-              <div>
-                <div className="text-sm text-gray-400">Level Progress</div>
-                <Progress
-                  value={100}
-                  className="h-2 bg-gray-700"
-                />
-                <div className="text-sm mt-1 text-green-400">
-                  Level {currentChar.level} → {currentChar.level + 1}
-                </div>
+            >
+              <img
+                src={currentChar.img}
+                alt={currentChar.name}
+                style={{
+                  width: 56,
+                  height: 56,
+                  imageRendering: "pixelated",
+                  filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.8))",
+                }}
+              />
+            </div>
+
+            <div style={{ flex: 1 }}>
+              <DialogTitle
+                style={{
+                  margin: "0 0 8px",
+                  fontSize: 22,
+                  fontWeight: 700,
+                  color: colors.text,
+                  fontFamily: fonts.display,
+                  letterSpacing: "0.04em",
+                }}
+              >
+                Level Up!
+              </DialogTitle>
+              <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                {[
+                  currentChar.race,
+                  currentChar.class,
+                  `${currentChar.level} → ${currentChar.level + 1}`,
+                ].map((tag) => (
+                  <span
+                    key={tag}
+                    style={{
+                      fontSize: 11,
+                      color: colors.goldMuted,
+                      background: "rgba(180,140,80,0.1)",
+                      border: `1px solid ${colors.goldBorder}`,
+                      borderRadius: 4,
+                      padding: "2px 9px",
+                      fontFamily: fonts.display,
+                      letterSpacing: "0.04em",
+                    }}
+                  >
+                    {tag}
+                  </span>
+                ))}
+                {remainingChars > 0 && (
+                  <span
+                    style={{
+                      fontSize: 11,
+                      color: colors.textMuted,
+                      fontFamily: fonts.body,
+                      marginLeft: "auto",
+                    }}
+                  >
+                    +{remainingChars} more waiting
+                  </span>
+                )}
               </div>
             </div>
           </div>
+        </DialogHeader>
 
-          <div className="space-y-3">
-            <h3 className="text-lg font-semibold">Ability Scores</h3>
-            <div className="grid grid-cols-2 gap-3">
-              {Object.entries(currentChar.abilities).map(([key, value]) => {
-                const allocated = allocatedStats[key];
-                const newScore = value.score + allocated;
-                const newModifier = calculateModifier(newScore);
-                
-                return (
-                  <div
-                    key={key}
-                    className="flex items-center justify-between p-3 bg-gray-700/50 rounded-lg"
-                  >
-                    <div className="flex-1">
-                      <div className="text-gray-400 uppercase text-sm">{key}</div>
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-xl font-bold">
-                          {newScore}
-                        </span>
-                        {allocated > 0 && (
-                          <span className="text-sm text-green-400">
-                            (+{allocated})
-                          </span>
-                        )}
-                        <span className="text-sm text-gray-300">
-                          {newModifier >= 0 ? `+${newModifier}` : newModifier}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex gap-1">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-8 w-8 p-0 bg-gray-600 hover:bg-gray-500"
-                        onClick={() => decrementStat(key)}
-                        disabled={allocated === 0}
-                      >
-                        <Minus className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-8 w-8 p-0 bg-gray-600 hover:bg-gray-500"
-                        onClick={() => incrementStat(key)}
-                        disabled={statPoints === 0}
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+        <div style={{ padding: "4px 24px 24px" }}>
+          <SectionHeader>Experience</SectionHeader>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: 6,
+            }}
+          >
+            <span
+              style={{
+                fontSize: 11,
+                color: colors.warning ?? "#F59E0B",
+                fontFamily: fonts.display,
+                fontWeight: 700,
+                letterSpacing: "0.08em",
+              }}
+            >
+              EXP
+            </span>
+            <span
+              style={{
+                fontSize: 12,
+                color: colors.textMuted,
+                fontFamily: fonts.body,
+              }}
+            >
+              {currentChar.exp}
+              <span style={{ color: colors.muted }}>
+                /{currentChar.nextLevelExp}
+              </span>
+            </span>
           </div>
+          <StatBar value={currentChar.exp} max={currentChar.nextLevelExp} />
 
-          <div className="flex items-center justify-center p-3 bg-yellow-900/30 border border-yellow-600/50 rounded-lg">
-            <span className="text-lg">
-              {statPoints === 0 ? (
-                <span className="text-green-400">✓ All points allocated</span>
-              ) : (
-                <span>
-                  <span className="font-bold text-yellow-400">{statPoints}</span> stat {statPoints === 1 ? 'point' : 'points'} remaining
-                </span>
-              )}
+          <SectionHeader>Ability Scores</SectionHeader>
+
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "5px 12px",
+              marginBottom: 12,
+              background:
+                statPoints === 0
+                  ? "rgba(34,197,94,0.08)"
+                  : "rgba(180,140,80,0.1)",
+              border: `1px solid ${
+                statPoints === 0 ? colors.success : colors.goldBorder
+              }`,
+              borderRadius: 6,
+            }}
+          >
+            <span
+              style={{
+                fontSize: 12,
+                fontFamily: fonts.display,
+                fontWeight: 700,
+                color: statPoints === 0 ? colors.success : colors.goldMuted,
+                letterSpacing: "0.06em",
+              }}
+            >
+              {statPoints === 0
+                ? "✓  All points allocated"
+                : `${statPoints} stat ${
+                    statPoints === 1 ? "point" : "points"
+                  } remaining`}
             </span>
           </div>
 
-          <Button
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(7, 1fr)",
+              gap: 6,
+            }}
+          >
+            {Object.entries(currentChar.abilities).map(([key, ability]) => {
+              const allocated = allocatedStats[key] ?? 0;
+              const newScore = ability.score + allocated;
+              const newMod = calculateModifier(newScore);
+
+              return (
+                <div
+                  key={key}
+                  style={{
+                    background:
+                      allocated > 0
+                        ? "rgba(180,140,80,0.07)"
+                        : "rgba(255,255,255,0.03)",
+                    border: `1px solid ${
+                      allocated > 0
+                        ? colors.goldMuted
+                        : colors.goldBorder
+                    }`,
+                    borderRadius: 7,
+                    padding: "10px 6px",
+                    textAlign: "center",
+                    transition: "border-color 0.2s, background 0.2s",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: 9,
+                      color: colors.textMuted,
+                      fontFamily: fonts.display,
+                      letterSpacing: "0.1em",
+                      textTransform: "uppercase",
+                      marginBottom: 4,
+                    }}
+                  >
+                    {key}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 20,
+                      fontWeight: 700,
+                      color: colors.text,
+                      fontFamily: fonts.display,
+                      lineHeight: 1,
+                    }}
+                  >
+                    {newScore}
+                  </div>
+                  {allocated > 0 && (
+                    <div
+                      style={{
+                        fontSize: 10,
+                        color: colors.success,
+                        fontFamily: fonts.display,
+                        marginTop: 1,
+                      }}
+                    >
+                      +{allocated}
+                    </div>
+                  )}
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: newMod >= 0 ? colors.success : colors.danger,
+                      marginTop: 2,
+                    }}
+                  >
+                    {newMod >= 0 ? "+" : ""}
+                    {newMod}
+                  </div>
+
+                  {/* +/- controls */}
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      gap: 3,
+                      marginTop: 7,
+                    }}
+                  >
+                    <button
+                      onClick={() => decrementStat(key)}
+                      disabled={allocated === 0}
+                      style={{
+                        width: 20,
+                        height: 20,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        background:
+                          allocated === 0
+                            ? "rgba(255,255,255,0.03)"
+                            : "rgba(180,140,80,0.15)",
+                        border: `1px solid ${
+                          allocated === 0
+                            ? "rgba(255,255,255,0.08)"
+                            : colors.goldBorder
+                        }`,
+                        borderRadius: 4,
+                        cursor: allocated === 0 ? "not-allowed" : "pointer",
+                        color:
+                          allocated === 0 ? colors.muted : colors.goldMuted,
+                        padding: 0,
+                      }}
+                    >
+                      <Minus size={10} />
+                    </button>
+                    <button
+                      onClick={() => incrementStat(key)}
+                      disabled={statPoints === 0}
+                      style={{
+                        width: 20,
+                        height: 20,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        background:
+                          statPoints === 0
+                            ? "rgba(255,255,255,0.03)"
+                            : "rgba(180,140,80,0.15)",
+                        border: `1px solid ${
+                          statPoints === 0
+                            ? "rgba(255,255,255,0.08)"
+                            : colors.goldBorder
+                        }`,
+                        borderRadius: 4,
+                        cursor: statPoints === 0 ? "not-allowed" : "pointer",
+                        color:
+                          statPoints === 0 ? colors.muted : colors.goldMuted,
+                        padding: 0,
+                      }}
+                    >
+                      <Plus size={10} />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Confirm button */}
+          <button
             onClick={handleConfirm}
             disabled={statPoints > 0}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed"
-            size="lg"
+            style={{
+              marginTop: 20,
+              width: "100%",
+              padding: "12px 0",
+              background:
+                statPoints === 0
+                  ? "rgba(180,140,80,0.15)"
+                  : "rgba(255,255,255,0.03)",
+              border: `1px solid ${
+                statPoints === 0 ? colors.goldMuted : "rgba(255,255,255,0.08)"
+              }`,
+              borderRadius: 7,
+              color:
+                statPoints === 0 ? colors.goldMuted : colors.muted,
+              fontFamily: fonts.display,
+              fontSize: 13,
+              fontWeight: 700,
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              cursor: statPoints === 0 ? "pointer" : "not-allowed",
+              transition: "all 0.2s",
+            }}
           >
-            {remainingChars > 0 ? 'Next Character →' : 'Confirm Level Up'}
-          </Button>
+            {remainingChars > 0 ? "Next Character →" : "Confirm Level Up"}
+          </button>
         </div>
       </DialogContent>
     </Dialog>

@@ -239,7 +239,7 @@ const StyledInput = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
     {...props}
     style={{ ...inputStyle, ...props.style }}
     onFocus={(e) => {
-      e.currentTarget.style.borderColor = "rgba(212,175,55,0.6)";
+  e.currentTarget.style.borderColor = colors.gold;
     }}
     onBlur={(e) => {
       e.currentTarget.style.borderColor = `${colors.goldBorder}`;
@@ -262,10 +262,10 @@ const StyledSelect = (props: React.SelectHTMLAttributes<HTMLSelectElement>) => (
       ...props.style,
     }}
     onFocus={(e) => {
-      e.currentTarget.style.borderColor = "rgba(212,175,55,0.6)";
+  e.currentTarget.style.borderColor = colors.gold;
     }}
     onBlur={(e) => {
-      e.currentTarget.style.borderColor = "rgba(180,140,80,0.25)";
+  e.currentTarget.style.borderColor = colors.goldBorder;
     }}
   />
 );
@@ -353,7 +353,7 @@ function InteractionTabs({
               fontWeight: active ? 600 : 400,
               cursor: "pointer",
               transition: "all 0.15s",
-              fontFamily: "'Cinzel', Georgia, serif",
+              fontFamily: fonts.display,
               letterSpacing: "0.03em",
             }}
           >

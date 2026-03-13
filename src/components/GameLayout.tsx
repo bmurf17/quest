@@ -35,7 +35,7 @@ export default function GameLayout() {
         height: 240, 
         flexShrink: 0,
         display: "grid",
-        gridTemplateColumns: "260px 1fr 280px",
+        gridTemplateColumns: "320px 1fr 340px",
         borderTop: "1px solid rgba(180,140,80,0.2)",
         background: "rgba(8,7,5,0.97)",
         position: "relative",

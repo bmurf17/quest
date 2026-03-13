@@ -274,7 +274,7 @@ function RoomPopup({ room, onClose }: { room: Room; onClose: () => void }) {
           width: 340,
           overflowY: "auto",
           position: "relative",
-          fontFamily: "'Crimson Text', Georgia, serif",
+          fontFamily: fonts.body,
         }}
       >
         {["tl","tr","bl","br"].map(pos => (
@@ -348,15 +348,15 @@ function RoomPopup({ room, onClose }: { room: Room; onClose: () => void }) {
 
         {room.neighboringRooms?.length > 0 && (
           <div style={{ marginTop: 16 }}>
-            <div style={{ fontSize: 11, color: "#9CA3AF", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 8 }}>Passages</div>
+            <div style={{ fontSize: 11, color: colors.muted, fontFamily: fonts.display, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 8 }}>Passages</div>
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
               {room.neighboringRooms.map(([dir, neighbor], i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(180,140,80,0.08)", border: "1px solid rgba(180,140,80,0.2)", borderRadius: 4, padding: "3px 8px" }}>
-                  <span style={{ fontSize: 10, color: "#D4AF37", fontFamily: "'Cinzel', Georgia, serif" }}>
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(180,140,80,0.08)", border: `1px solid ${colors.goldBorder}`, borderRadius: 4, padding: "3px 8px" }}>
+                  <span style={{ fontSize: 10, color: colors.gold, fontFamily: fonts.display }}>
                     {Directions[dir as unknown as number]?.toUpperCase?.() ?? dir}
                   </span>
                   <span style={{ fontSize: 10, color: "#6B7280" }}>→</span>
-                  <span style={{ fontSize: 11, color: "#E8DCC8", fontFamily: "'Crimson Text', Georgia, serif" }}>{neighbor.name}</span>
+                  <span style={{ fontSize: 11, color: colors.text, fontFamily: fonts.body }}>{neighbor.name}</span>
                 </div>
               ))}
             </div>

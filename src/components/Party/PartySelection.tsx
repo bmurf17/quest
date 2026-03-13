@@ -22,10 +22,10 @@ function StatBar({ value, max, color }: { value: number; max: number; color: str
 function SectionHeader({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "22px 0 10px" }}>
-      <span style={{ fontSize: 11, color: "#C9A84C", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, whiteSpace: "nowrap" }}>
+      <span style={{ fontSize: 11, color: colors.goldMuted, fontFamily: fonts.display, letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, whiteSpace: "nowrap" }}>
         {children}
       </span>
-      <div style={{ flex: 1, height: 1, background: "rgba(180,140,80,0.2)" }} />
+      <div style={{ flex: 1, height: 1, background: colors.goldBorder }} />
     </div>
   );
 }
@@ -108,7 +108,7 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                     <div style={{ fontSize: 13, fontWeight: 700, color: active ? colors.text : colors.textMuted, fontFamily: fonts.display, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginBottom: 6 }}>
                       {character.name}
                     </div>
-                    <StatBar value={character.hp} max={character.maxHp} color="#EF4444" />
+                    <StatBar value={character.hp} max={character.maxHp} color={colors.danger} />
                     <div style={{ marginTop: 4 }}>
                       <StatBar value={character.mp} max={character.maxMp} color="#6366F1" />
                     </div>
@@ -168,7 +168,7 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                         </div>
                         <div>
                           <div style={{ fontSize: 10, color: colors.textMuted, fontFamily: fonts.display, letterSpacing: "0.1em", textTransform: "uppercase" }}>{key}</div>
-                          <div style={{ fontSize: 13, color: ability.modifier >= 0 ? "#6EE7B7" : "#FCA5A5", marginTop: 1 }}>
+                          <div style={{ fontSize: 13, color: ability.modifier >= 0 ? colors.success : colors.danger, marginTop: 1 }}>
                             {ability.modifier >= 0 ? "+" : ""}{ability.modifier}
                           </div>
                         </div>
@@ -188,8 +188,8 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                               <img src={item.img || "/placeholder.svg"} alt={item.action.name} style={{ width: 64, height: 64, imageRendering: "pixelated" }} />
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{ fontSize: 14, fontWeight: 700, color: "#E8DCC8", fontFamily: "'Cinzel', Georgia, serif" }}>{item.action.name}</div>
-                              <div style={{ fontSize: 12, color: "#A8916A", marginTop: 1 }}>{item.action.type}</div>
+                              <div style={{ fontSize: 14, fontWeight: 700, color: colors.text, fontFamily: fonts.display }}>{item.action.name}</div>
+                              <div style={{ fontSize: 12, color: colors.textMuted, marginTop: 1 }}>{item.action.type}</div>
                               <div style={{ display: "flex", gap: 12, marginTop: 3 }}>
                                 <span style={{ fontSize: 11, color: "#6B5E48" }}>Hit: {item.action.hitDC}</span>
                                 <span style={{ fontSize: 11, color: "#6B5E48" }}>Dmg: {item.action.damage}</span>
@@ -211,7 +211,7 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                               <img src={spell.image || "/placeholder.svg"} alt={spell.name} style={{ width: 64, height: 64, imageRendering: "pixelated" }} />
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{ fontSize: 14, fontWeight: 700, color: "#E8DCC8", fontFamily: "'Cinzel', Georgia, serif" }}>{spell.name}</div>
+                              <div style={{ fontSize: 14, fontWeight: 700, color: colors.text, fontFamily: fonts.display }}>{spell.name}</div>
                               <div style={{ fontSize: 12, color: "#6366F1", marginTop: 1 }}>{spell.manaCost} MP</div>
                               <div style={{ display: "flex", gap: 12, marginTop: 3 }}>
                                 <span style={{ fontSize: 11, color: "#6B5E48" }}>Hit: 6</span>

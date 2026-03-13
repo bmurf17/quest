@@ -36,21 +36,6 @@ Sound effects
 Crit hits
 
 
-1. Create a design token file
-All your colors, fonts, and spacing are repeated inline everywhere — rgba(180,140,80,0.12), "'Cinzel', Georgia, serif", #C9A84C, #E8DCC8 etc. A single theme.ts file with exported constants means a color change propagates everywhere instead of requiring a find-and-replace across 10 files.
-ts// theme.ts
-export const colors = {
-  gold: "#D4AF37",
-  goldMuted: "#C9A84C",
-  goldBorder: "rgba(180,140,80,0.18)",
-  text: "#E8DCC8",
-  textMuted: "#A8916A",
-  // ...
-};
-export const fonts = {
-  display: "'Cinzel', Georgia, serif",
-  body: "'Lato', sans-serif",
-};
 2. Extract shared primitives into a ui/ component folder
 You've already got StatBar, SectionHeader, ActionBtn, and AbilitySlot duplicated or re-implemented across files. Move them to src/components/ui/ so every screen imports the same ones.
 3. Replace the repeated Google Fonts <style> tag
