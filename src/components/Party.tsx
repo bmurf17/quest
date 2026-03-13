@@ -7,23 +7,61 @@ interface Props {
   party: CharacterData[];
 }
 
+function StatBar({
+  value,
+  max,
+  color,
+}: {
+  value: number;
+  max: number;
+  color: string;
+}) {
+  const pct = Math.min(100, (value / max) * 100);
+  const isLow = pct <= 25;
+  return (
+    <div
+      style={{
+        height: 4,
+        background: "rgba(0,0,0,0.5)",
+        borderRadius: 2,
+        overflow: "hidden",
+        border: "1px solid rgba(255,255,255,0.04)",
+      }}
+    >
+      <div
+        style={{
+          height: "100%",
+          width: `${pct}%`,
+          background: isLow ? "#EF4444" : color,
+          borderRadius: 2,
+          transition: "width 0.4s ease",
+          boxShadow: isLow ? "0 0 6px rgba(239,68,68,0.5)" : "none",
+        }}
+      />
+    </div>
+  );
+}
+
 export default function Party({ party }: Props) {
   const [selectedCharacter, setSelectedCharacter] =
     useState<CharacterData>(tempRanger);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   const isTargeting = useGameStore((state) => state.isTargeting);
   const targetingSpell = useGameStore((state) => state.targetingSpell);
   const castSpell = useGameStore((state) => state.castSpell);
   const setTargeting = useGameStore((state) => state.setTargeting);
   const setTargetingSpell = useGameStore((state) => state.setTargetingSpell);
 
+  const isTargetingHeal =
+    isTargeting &&
+    targetingSpell &&
+    targetingSpell.effect.type === "heal" &&
+    targetingSpell.effect.target === "single";
+
   const handleCharacterClick = (character: CharacterData) => {
-    if (isTargeting && targetingSpell && targetingSpell.effect.type === 'heal' && targetingSpell.effect.target === 'single') {
-      if (!character.alive || character.hp <= 0) {
-        return; 
-      }
-      
+    if (isTargetingHeal) {
+      if (!character.alive || character.hp <= 0) return;
       castSpell(targetingSpell, character);
       setTargeting(false);
       setTargetingSpell(null);
@@ -33,80 +71,271 @@ export default function Party({ party }: Props) {
     }
   };
 
-  const isTargetingHeal = isTargeting && targetingSpell && targetingSpell.effect.type === 'heal' && targetingSpell.effect.target === 'single';
-
   return (
     <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Lato:wght@400;700&display=swap');
+        @keyframes heal-pulse { 0%,100% { box-shadow: 0 0 8px rgba(52,211,153,0.3); } 50% { box-shadow: 0 0 18px rgba(52,211,153,0.6); } }
+        .party-card { transition: border-color 0.15s, background 0.15s, transform 0.15s; }
+        .party-card:hover { transform: translateY(-1px); }
+        .party-card-heal { animation: heal-pulse 1.2s ease-in-out infinite; }
+      `}</style>
+
       {isTargetingHeal && (
-        <div className="text-center  text-green-400 text-sm font-bold bg-black bg-opacity-70 rounded-lg px-4 py-2">
-          💚 Select a party member to heal
-        </div>
-      )}
-      <div className="grid grid-cols-3 gap-1 w-full max-w-4xl mx-auto p-1 bg-black/20">
-        {party.map((character, i) => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            padding: "8px 16px",
+            background: "rgba(5,150,105,0.12)",
+            border: "1px solid rgba(52,211,153,0.35)",
+            borderRadius: 6,
+            marginBottom: 8,
+          }}
+        >
           <div
-            key={i}
-            className={`flex flex-col sm:flex-row border-2 bg-[#1a1c23] transition-all ${
-              !character.alive 
-                ? "opacity-40 grayscale border-gray-600" 
-                : isTargetingHeal
-                ? "border-green-500 cursor-pointer hover:border-green-300 hover:brightness-125"
-                : "border-gray-600 cursor-pointer hover:border-white"
-            }`}
-            onClick={() => handleCharacterClick(character)}
             style={{
-              filter: isTargetingHeal && character.alive
-                ? "drop-shadow(0 0 8px rgba(34,197,94,0.5))"
-                : undefined
+              width: 6,
+              height: 6,
+              background: "#34D399",
+              borderRadius: "50%",
+              boxShadow: "0 0 6px rgba(52,211,153,0.8)",
+            }}
+          />
+          <span
+            style={{
+              fontSize: 12,
+              color: "#6EE7B7",
+              fontFamily: "'Cinzel', Georgia, serif",
+              letterSpacing: "0.06em",
             }}
           >
-            <div className="w-full sm:w-24 aspect-square bg-gray-800 flex-shrink-0 border-b-2 sm:border-b-0 sm:border-r-2 border-gray-600">
-              <img
-                className="w-full h-full object-cover"
-                style={{ imageRendering: "pixelated" }}
-                src={character.img}
-                alt={character.name}
-              />
-            </div>
+            Select a party member to heal
+          </span>
+        </div>
+      )}
 
-            <div className="flex-1 flex flex-col justify-center p-2 gap-1 min-w-0">
-              <div className="flex flex-col">
-                <div className="flex justify-between text-[10px] font-mono leading-none mb-0.5">
-                  <span className="text-gray-400">HP</span>
-                  <span className="text-white">{character.hp}</span>
-                </div>
-                <div className="h-2 bg-gray-900 border border-gray-700">
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          display: "flex",
+          gap: 8,
+          overflowX: "auto",
+          overflowY: "hidden",
+        }}
+      >
+        {party.map((character, i) => {
+          const isDead = character.alive === false || character.hp <= 0;
+          const hpPct = (character.hp / character.maxHp) * 100;
+          const isLowHp = hpPct <= 25 && !isDead;
+
+          return (
+            <div
+              key={i}
+              style={{
+                flexShrink: 0,
+                flex: 1,
+                minWidth: 0,
+                maxWidth: 240,
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                background: isDead
+                  ? "rgba(0,0,0,0.2)"
+                  : isLowHp
+                    ? "rgba(239,68,68,0.05)"
+                    : "rgba(255,255,255,0.025)",
+                border: `1px solid ${isDead ? "rgba(255,255,255,0.05)" : isLowHp ? "rgba(239,68,68,0.3)" : "rgba(180,140,80,0.18)"}`,
+                borderRadius: 6,
+                overflow: "hidden",
+                opacity: isDead ? 0.4 : 1,
+                filter: isDead ? "grayscale(1)" : "none",
+                cursor: isDead ? "default" : "pointer",
+              }}
+            >
+              <div
+                style={{
+                  flex: 1,
+                  minHeight: 0,
+                  position: "relative",
+                  overflow: "hidden",
+                }}
+              >
+                <img
+                  src={character.img}
+                  alt={character.name}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    imageRendering: "pixelated",
+                  }}
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    padding: "12px 5px 3px",
+                    background:
+                      "linear-gradient(to top, rgba(0,0,0,0.9), transparent)",
+                  }}
+                >
                   <div
-                    className="h-full bg-emerald-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
-                    style={{ width: `${(character.hp / character.maxHp) * 100}%` }}
-                  />
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 700,
+                      color: "#E8DCC8",
+                      fontFamily: "'Cinzel', Georgia, serif",
+                      letterSpacing: "0.03em",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {character.name}
+                  </div>
                 </div>
-                <div className="text-[9px] text-right text-gray-500 mt-0.5">{character.maxHp}</div>
+                {isDead && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      background: "rgba(0,0,0,0.5)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: 9,
+                        color: "#6B7280",
+                        fontFamily: "'Cinzel', Georgia, serif",
+                        letterSpacing: "0.08em",
+                      }}
+                    >
+                      FALLEN
+                    </span>
+                  </div>
+                )}
               </div>
 
-              <div className="flex flex-col">
-                <div className="flex justify-between text-[10px] font-mono leading-none mb-0.5">
-                  <span className="text-gray-400">MP</span>
-                  <span className="text-white">{character.mp}</span>
+              <div
+                style={{
+                  padding: "5px 6px 6px",
+                  background: "rgba(0,0,0,0.3)",
+                  flexShrink: 0,
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginBottom: 2,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 8,
+                      color: isLowHp ? "#FCA5A5" : "#9CA3AF",
+                      fontFamily: "'Cinzel', Georgia, serif",
+                      fontWeight: 700,
+                      letterSpacing: "0.06em",
+                    }}
+                  >
+                    HP
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 8,
+                      color: isLowHp ? "#FCA5A5" : "#6B7280",
+                      fontFamily: "'Lato', sans-serif",
+                    }}
+                  >
+                    {character.hp}/{character.maxHp}
+                  </span>
                 </div>
-                <div className="h-2 bg-gray-900 border border-gray-700">
+                <div
+                  style={{
+                    height: 3,
+                    background: "rgba(255,255,255,0.06)",
+                    borderRadius: 2,
+                    overflow: "hidden",
+                    marginBottom: 4,
+                  }}
+                >
                   <div
-                    className="h-full bg-blue-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
-                    style={{ width: `${(character.mp / character.maxMp) * 100}%` }}
+                    style={{
+                      height: "100%",
+                      width: `${hpPct}%`,
+                      background: isLowHp ? "#EF4444" : "#22C55E",
+                      borderRadius: 2,
+                      transition: "width 0.3s",
+                    }}
                   />
                 </div>
-                <div className="text-[9px] text-right text-gray-500 mt-0.5">{character.maxMp}</div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginBottom: 2,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 8,
+                      color: "#9CA3AF",
+                      fontFamily: "'Cinzel', Georgia, serif",
+                      fontWeight: 700,
+                      letterSpacing: "0.06em",
+                    }}
+                  >
+                    MP
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 8,
+                      color: "#6B7280",
+                      fontFamily: "'Lato', sans-serif",
+                    }}
+                  >
+                    {character.mp}/{character.maxMp}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    height: 3,
+                    background: "rgba(255,255,255,0.06)",
+                    borderRadius: 2,
+                    overflow: "hidden",
+                  }}
+                >
+                  <div
+                    style={{
+                      height: "100%",
+                      width: `${(character.mp / character.maxMp) * 100}%`,
+                      background: "#6366F1",
+                      borderRadius: 2,
+                      transition: "width 0.3s",
+                    }}
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-
-        <CharacterSheet
-          isOpen={isModalOpen}
-          onOpenChange={setIsModalOpen}
-          characterData={selectedCharacter}
-        />
+          );
+        })}
       </div>
+
+      <CharacterSheet
+        isOpen={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        characterData={selectedCharacter}
+      />
     </>
   );
 }

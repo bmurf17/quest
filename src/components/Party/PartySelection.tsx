@@ -7,333 +7,341 @@ interface PartyPickerProps {
   availableCharacters: CharacterData[];
 }
 
-export function PartySelection({ availableCharacters }: PartyPickerProps) {
-  const [selectedCharacter, setSelectedCharacter] =
-    useState<CharacterData | null>(availableCharacters[0] || null);
-  const [party, setParty] = useState<CharacterData[]>(
-    useGameStore((state: GameState) => state.party)
+const MAX_PARTY_SIZE = 6;
+
+function StatBar({ value, max, color }: { value: number; max: number; color: string }) {
+  const pct = Math.min(100, (value / max) * 100);
+  return (
+    <div style={{ height: 5, background: "rgba(255,255,255,0.07)", borderRadius: 3, overflow: "hidden" }}>
+      <div style={{ height: "100%", width: `${pct}%`, background: color, borderRadius: 3, transition: "width 0.3s" }} />
+    </div>
   );
+}
+
+function SectionHeader({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "22px 0 10px" }}>
+      <span style={{ fontSize: 11, color: "#C9A84C", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, whiteSpace: "nowrap" }}>
+        {children}
+      </span>
+      <div style={{ flex: 1, height: 1, background: "rgba(180,140,80,0.2)" }} />
+    </div>
+  );
+}
+
+export function PartySelection({ availableCharacters }: PartyPickerProps) {
+  const [selectedCharacter, setSelectedCharacter] = useState<CharacterData | null>(availableCharacters[0] || null);
+  const [party, setParty] = useState<CharacterData[]>(useGameStore((state: GameState) => state.party));
   const updateParty = useGameStore((state: GameState) => state.setParty);
   const enterCombat = useGameStore((state: GameState) => state.enterCombat);
 
-  const MAX_PARTY_SIZE = 6;
-
-  const handleClassSelect = (character: CharacterData) => {
-    setSelectedCharacter(character);
-  };
+  const isInParty = selectedCharacter ? party.some((m) => m.class === selectedCharacter.class) : false;
+  const isPartyFull = party.length >= MAX_PARTY_SIZE;
 
   const handleAddToParty = () => {
-    if (selectedCharacter && party.length < MAX_PARTY_SIZE) {
-      const isDuplicate = party.some(
-        (member) => member.class === selectedCharacter.class
-      );
-
-      if (!isDuplicate) {
-        setParty([...party, selectedCharacter]);
-      }
-      updateParty([...party, selectedCharacter]);
+    if (selectedCharacter && !isPartyFull && !isInParty) {
+      const next = [...party, selectedCharacter];
+      setParty(next);
+      updateParty(next);
     }
   };
 
-  const handleRemoveFromParty = (index: number) => {
-    setParty(party.filter((_, i) => i !== index));
-    updateParty(party);
+  const handleRemove = (index: number) => {
+    const next = party.filter((_, i) => i !== index);
+    setParty(next);
+    updateParty(next);
   };
 
   return (
-    <div className="flex gap-4 h-screen p-4 bg-gray-100">
-      <div className="w-64 flex flex-col gap-2 overflow-y-auto">
-        <h2 className="text-xl font-bold    text-gray-800 mb-2">
-          Choose Class
-        </h2>
-        {availableCharacters.map(
-          (character: CharacterData, i: React.Key | null | undefined) => (
-            <div
-              key={i}
-              onClick={() => {
-                handleClassSelect(character);
-              }}
-              className="bg-gray-900 rounded p-2 flex gap-2 hover:bg-slate-300 cursor-pointer"
-            >
-              <div className="w-12 h-12 bg-gray-700 rounded">
-                <img
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@400;700&display=swap');
+        * { box-sizing: border-box; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(180,140,80,0.2); border-radius: 2px; }
+        .char-row:hover { background: rgba(212,175,55,0.07) !important; border-color: rgba(212,175,55,0.25) !important; }
+        .gear-card:hover { border-color: rgba(180,140,80,0.28) !important; background: rgba(255,255,255,0.05) !important; }
+        .remove-btn:hover { background: rgba(220,38,38,0.22) !important; }
+      `}</style>
+
+      <div style={{
+        display: "flex", height: "100vh",
+        background: "#111009",
+        fontFamily: "'Lato', sans-serif",
+        color: "#E8DCC8",
+        overflow: "hidden",
+      }}>
+
+        <div style={{
+          width: 260, flexShrink: 0,
+          borderRight: "1px solid rgba(180,140,80,0.12)",
+          display: "flex", flexDirection: "column", overflow: "hidden",
+          background: "rgba(0,0,0,0.25)",
+        }}>
+          <div style={{ padding: "20px 18px 14px", borderBottom: "1px solid rgba(180,140,80,0.1)" }}>
+            <h2 style={{ margin: 0, fontSize: 11, fontWeight: 700, color: "#C9A84C", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+              Choose Class
+            </h2>
+          </div>
+          <div style={{ flex: 1, overflowY: "auto", padding: "8px 10px", display: "flex", flexDirection: "column", gap: 4 }}>
+            {availableCharacters.map((character, i) => {
+              const active = selectedCharacter?.class === character.class;
+              const inParty = party.some((m) => m.class === character.class);
+              return (
+                <div
+                  key={i}
+                  className="char-row"
+                  onClick={() => setSelectedCharacter(character)}
                   style={{
-                    width: "48px",
-                    height: "48px",
-                    imageRendering: "pixelated",
-                    filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.5))",
+                    display: "flex", alignItems: "center", gap: 12,
+                    padding: "10px 11px", borderRadius: 7,
+                    border: `1px solid ${active ? "rgba(212,175,55,0.4)" : "transparent"}`,
+                    background: active ? "rgba(212,175,55,0.09)" : "transparent",
+                    cursor: "pointer", transition: "background 0.12s, border-color 0.12s",
                   }}
-                  src={character.img}
-                  alt={character.name}
-                />
-              </div>
-              <div className="flex-1">
-                <div className="text-sm">{character.name}</div>
-                <div className="h-2 bg-gray-700 rounded mt-1">
-                  <div
-                    className="h-full bg-green-500 rounded"
-                    style={{
-                      width: `${(character.hp / character.maxHp) * 100}%`,
-                    }}
-                  ></div>
-                </div>
-                <div className="h-2 bg-gray-700 rounded mt-1">
-                  <div
-                    className="h-full bg-blue-500 rounded"
-                    style={{
-                      width: `${(character.mp / character.maxMp) * 100}%`,
-                    }}
-                  ></div>
-                </div>
-              </div>
-            </div>
-          )
-        )}
-      </div>
-
-      <div className="flex-1 overflow-y-auto">
-        {selectedCharacter ? (
-          <div className="h-full">
-            <div>
-              <div className="flex flex-col gap-6 bg-gray-900 p-4 rounded-md">
-                <div>
-                  {" "}
-                  <div className="text-blue-100 text-sm">
-                    {selectedCharacter.race} • {selectedCharacter.class} • Level{" "}
-                    {selectedCharacter.level}
-                  </div>
-                </div>
-                <div className="flex justify-center">
-                  <img
-                    src={selectedCharacter.img || "/placeholder.svg"}
-                    alt={selectedCharacter.name}
-                    style={{
-                      width: "128px",
-                      height: "128px",
-                      imageRendering: "pixelated",
-                      filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.5))",
-                    }}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-red-50 p-4 rounded-lg">
-                    <div className="text-sm text-red-600 font-semibold">
-                      Health Points
-                    </div>
-                    <div className="text-2xl font-bold text-red-700">
-                      {selectedCharacter.hp} / {selectedCharacter.maxHp}
-                    </div>
-                  </div>
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <div className="text-sm text-blue-600 font-semibold">
-                      Mana Points
-                    </div>
-                    <div className="text-2xl font-bold text-blue-700">
-                      {selectedCharacter.mp} / {selectedCharacter.maxMp}
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-semibold text-gray-50 mb-3">
-                    Ability Scores
-                  </h4>
-                  <div className="grid grid-cols-3 gap-3">
-                    {Object.entries(selectedCharacter.abilities).map(
-                      ([key, ability]) => (
-                        <div
-                          key={key}
-                          className="bg-gray-50 p-3 rounded-lg text-center"
-                        >
-                          <div className="text-xs text-gray-600 uppercase font-semibold">
-                            {key}
-                          </div>
-                          <div className="text-xl font-bold text-gray-800">
-                            {ability.score}
-                          </div>
-                          <div className="text-sm text-gray-600">
-                            {ability.modifier >= 0 ? "+" : ""}
-                            {ability.modifier}
-                          </div>
-                        </div>
-                      )
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-semibold text-gray-50 mb-3">Equipment</h4>
-                  <div className="grid grid-cols-2 gap-3">
-                    {selectedCharacter.items.map((item, idx) => (
-                      <div
-                        key={idx}
-                        className="bg-gray-50 p-3 rounded-lg flex items-center gap-3"
-                      >
-                        <img
-                          src={item.img || "/placeholder.svg"}
-                          alt={item.action.name}
-                          style={{
-                            width: "48px",
-                            height: "48px",
-                            imageRendering: "pixelated",
-                            filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.5))",
-                          }}
-                        />
-                        <div className="flex-1">
-                          <div className="font-semibold text-sm text-gray-800">
-                            {item.action.name}
-                          </div>
-                          <div className="text-xs text-gray-600">
-                            {item.action.type}
-                          </div>
-                          <div className="text-xs text-gray-600">
-                            Hit: {item.action.hitDC} • Dmg: {item.action.damage}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-semibold text-gray-50 mb-3">Skills</h4>
-                  <div className="grid grid-cols-2 gap-3">
-                    {selectedCharacter.spells.map((spell, idx) => (
-                      <div
-                        key={idx}
-                        className="bg-gray-50 p-3 rounded-lg flex items-center gap-3"
-                      >
-                        <img
-                          src={spell.image || "/placeholder.svg"}
-                          alt={spell.name}
-                          style={{
-                            width: "48px",
-                            height: "48px",
-                            imageRendering: "pixelated",
-                            filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.5))",
-                          }}
-                        />
-                        <div className="flex-1">
-                          <div className="font-semibold text-sm text-gray-800">
-                            {spell.name}
-                          </div>
-                          <div className="text-xs text-gray-600">
-                            {spell.manaCost} MP
-                          </div>
-                          <div className="text-xs text-gray-600">
-                            Hit: {6} • Dmg: {8}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <button
-                  onClick={handleAddToParty}
-                  disabled={
-                    party.length >= MAX_PARTY_SIZE ||
-                    party.some(
-                      (member) => member.class === selectedCharacter.class
-                    )
-                  }
-                  className={`w-full py-3 rounded-lg font-semibold transition-all ${
-                    party.length >= MAX_PARTY_SIZE ||
-                    party.some(
-                      (member) => member.class === selectedCharacter.class
-                    )
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-green-600 text-white hover:bg-green-700 shadow-md"
-                  }`}
                 >
-                  {party.length >= MAX_PARTY_SIZE
-                    ? "Party Full"
-                    : party.some(
-                        (member) => member.class === selectedCharacter.class
-                      )
-                    ? "Already in Party"
-                    : "Add to Party"}
-                </button>
-              </div>
-            </div>
+                  <div style={{ width: 64, height: 64, flexShrink: 0, background: "rgba(0,0,0,0.5)", borderRadius: 6, overflow: "hidden", border: "1px solid rgba(255,255,255,0.06)" }}>
+                    <img src={character.img} alt={character.name} style={{ width: 64, height: 64, imageRendering: "pixelated" }} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: active ? "#E8DCC8" : "#B0A080", fontFamily: "'Cinzel', Georgia, serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginBottom: 6 }}>
+                      {character.name}
+                    </div>
+                    <StatBar value={character.hp} max={character.maxHp} color="#EF4444" />
+                    <div style={{ marginTop: 4 }}>
+                      <StatBar value={character.mp} max={character.maxMp} color="#6366F1" />
+                    </div>
+                  </div>
+                  {inParty && <div style={{ width: 7, height: 7, background: "#34D399", borderRadius: "50%", flexShrink: 0 }} />}
+                </div>
+              );
+            })}
           </div>
-        ) : (
-          <div className="flex items-center justify-center h-full">
-            <p className="text-gray-500 text-lg">Select a class to preview</p>
-          </div>
-        )}
-      </div>
-
-      <div className="w-80 flex flex-col gap-4 overflow-y-auto">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-800">
-            Your Party ({party.length}/{MAX_PARTY_SIZE})
-          </h2>
         </div>
 
-        {party.length === 0 ? (
-          <div className="bg-white rounded-lg p-8 text-center">
-            <p className="text-gray-500">No party members yet</p>
-            <p className="text-sm text-gray-400 mt-2">
-              Select a class and add them to your party
-            </p>
-          </div>
-        ) : (
-          <div>
-            <div className="flex flex-col gap-4">
-            {party.map((member, index) => (
-              <div key={index} className="relative bg-slate-300 rounded">
-                <div className="bg-gray-900 p-2 flex gap-2">
-                  <div className="text-white text-lg">{member.name}</div>
-                  <div className="text-purple-100 text-xs flex items-center">
-                    {member.class} • Lvl {member.level}
-                  </div>
+        <div style={{ flex: 1, overflowY: "auto", borderRight: "1px solid rgba(180,140,80,0.12)" }}>
+          {selectedCharacter ? (
+            <div style={{ padding: "28px 28px 48px" }}>
+
+              <div style={{ display: "flex", alignItems: "center", gap: 20, marginBottom: 24, padding: "20px 20px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(180,140,80,0.12)", borderRadius: 10 }}>
+                <div style={{ width: 96, height: 96, flexShrink: 0, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(180,140,80,0.2)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <img src={selectedCharacter.img || "/placeholder.svg"} alt={selectedCharacter.name} style={{ width: 80, height: 80, imageRendering: "pixelated", filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.7))" }} />
                 </div>
-                <div className="pt-4">
-                  <div className="flex gap-3">
-                    <img
-                      src={member.img || "/placeholder.svg"}
-                      alt={member.name}
-                      style={{
-                        width: "80px",
-                        height: "480x",
-                        imageRendering: "pixelated",
-                        filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.5))",
-                      }}
-                    />
-                    <div className="flex-1">
-                      <div className="text-sm text-gray-600 mb-1">
-                        HP: {member.hp}/{member.maxHp}
+                <div style={{ flex: 1 }}>
+                  <h3 style={{ margin: "0 0 8px", fontSize: 28, fontWeight: 700, color: "#E8DCC8", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.03em", lineHeight: 1.1 }}>
+                    {selectedCharacter.name}
+                  </h3>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
+                    {[selectedCharacter.race, selectedCharacter.class, `Level ${selectedCharacter.level}`].map((tag) => (
+                      <span key={tag} style={{ fontSize: 12, color: "#C9A84C", background: "rgba(180,140,80,0.1)", border: "1px solid rgba(180,140,80,0.22)", borderRadius: 4, padding: "3px 10px", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.04em" }}>
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                    {[
+                      { label: "HP", value: selectedCharacter.hp, max: selectedCharacter.maxHp, color: "#EF4444" },
+                      { label: "MP", value: selectedCharacter.mp, max: selectedCharacter.maxMp, color: "#6366F1" },
+                    ].map(({ label, value, max, color }) => (
+                      <div key={label}>
+                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+                          <span style={{ fontSize: 11, color: color, fontFamily: "'Cinzel', Georgia, serif", fontWeight: 700, letterSpacing: "0.06em" }}>{label}</span>
+                          <span style={{ fontSize: 12, color: "#9A8A72" }}>{value}<span style={{ color: "#5A4E3A" }}>/{max}</span></span>
+                        </div>
+                        <StatBar value={value} max={max} color={color} />
                       </div>
-                      <div className="text-sm text-gray-600 mb-2">
-                        MP: {member.mp}/{member.maxMp}
-                      </div>
-                      <button
-                        onClick={() => handleRemoveFromParty(index)}
-                        className="text-xs bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-colors"
-                      >
-                        Remove
-                      </button>
-                    </div>
+                    ))}
                   </div>
                 </div>
               </div>
-            ))}
-            </div>
-            <Link to="/game">
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+
+                <div>
+                  <SectionHeader>Ability Scores</SectionHeader>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                    {Object.entries(selectedCharacter.abilities).map(([key, ability]) => (
+                      <div key={key} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(180,140,80,0.12)", borderRadius: 7, padding: "12px 10px", display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ width: 36, height: 36, background: "rgba(0,0,0,0.3)", borderRadius: 5, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                          <span style={{ fontSize: 20, fontWeight: 700, color: "#E8DCC8", fontFamily: "'Cinzel', Georgia, serif", lineHeight: 1 }}>{ability.score}</span>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 10, color: "#A8916A", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.1em", textTransform: "uppercase" }}>{key}</div>
+                          <div style={{ fontSize: 13, color: ability.modifier >= 0 ? "#6EE7B7" : "#FCA5A5", marginTop: 1 }}>
+                            {ability.modifier >= 0 ? "+" : ""}{ability.modifier}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  {selectedCharacter.items?.length > 0 && (
+                    <>
+                      <SectionHeader>Equipment</SectionHeader>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                        {selectedCharacter.items.map((item, idx) => (
+                          <div key={idx} className="gear-card" style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(180,140,80,0.12)", borderRadius: 7, padding: "10px 12px", transition: "border-color 0.12s, background 0.12s" }}>
+                            <div style={{ width: 72, height: 72, background: "rgba(0,0,0,0.4)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                              <img src={item.img || "/placeholder.svg"} alt={item.action.name} style={{ width: 64, height: 64, imageRendering: "pixelated" }} />
+                            </div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontSize: 14, fontWeight: 700, color: "#E8DCC8", fontFamily: "'Cinzel', Georgia, serif" }}>{item.action.name}</div>
+                              <div style={{ fontSize: 12, color: "#A8916A", marginTop: 1 }}>{item.action.type}</div>
+                              <div style={{ display: "flex", gap: 12, marginTop: 3 }}>
+                                <span style={{ fontSize: 11, color: "#6B5E48" }}>Hit: {item.action.hitDC}</span>
+                                <span style={{ fontSize: 11, color: "#6B5E48" }}>Dmg: {item.action.damage}</span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+
+                  {selectedCharacter.spells?.length > 0 && (
+                    <>
+                      <SectionHeader>Skills</SectionHeader>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                        {selectedCharacter.spells.map((spell, idx) => (
+                          <div key={idx} className="gear-card" style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(180,140,80,0.12)", borderRadius: 7, padding: "10px 12px", transition: "border-color 0.12s, background 0.12s" }}>
+                            <div style={{ width: 72, height: 72, background: "rgba(0,0,0,0.4)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                              <img src={spell.image || "/placeholder.svg"} alt={spell.name} style={{ width: 64, height: 64, imageRendering: "pixelated" }} />
+                            </div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontSize: 14, fontWeight: 700, color: "#E8DCC8", fontFamily: "'Cinzel', Georgia, serif" }}>{spell.name}</div>
+                              <div style={{ fontSize: 12, color: "#6366F1", marginTop: 1 }}>{spell.manaCost} MP</div>
+                              <div style={{ display: "flex", gap: 12, marginTop: 3 }}>
+                                <span style={{ fontSize: 11, color: "#6B5E48" }}>Hit: 6</span>
+                                <span style={{ fontSize: 11, color: "#6B5E48" }}>Dmg: 8</span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
               <button
-                className={`w-full py-3 rounded-lg font-semibold transition-all ${
-                  "bg-green-600 text-white hover:bg-green-700 shadow-md mt-4"
-                }`}
-                onClick={enterCombat}
+                onClick={handleAddToParty}
+                disabled={isPartyFull || isInParty}
+                style={{
+                  width: "100%", padding: "15px", borderRadius: 8, 
+                  fontFamily: "'Cinzel', Georgia, serif", fontWeight: 700, fontSize: 14, letterSpacing: "0.08em",
+                  cursor: isPartyFull || isInParty ? "not-allowed" : "pointer",
+                  marginTop: 24, transition: "filter 0.15s, transform 0.1s",
+                  ...(isPartyFull || isInParty
+                    ? { background: "rgba(255,255,255,0.04)", color: "#4B5563", border: "1px solid rgba(255,255,255,0.06)" }
+                    : { background: "linear-gradient(135deg, #B4965A 0%, #D4AF37 50%, #B4965A 100%)", color: "#0d0b07" }),
+                }}
+                onMouseEnter={(e) => { if (!isPartyFull && !isInParty) e.currentTarget.style.filter = "brightness(1.08)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.filter = "none"; }}
+                onMouseDown={(e) => { if (!isPartyFull && !isInParty) e.currentTarget.style.transform = "scale(0.99)"; }}
+                onMouseUp={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
               >
-                {"Start your adventure"}
+                {isPartyFull ? "Party Full" : isInParty ? "Already in Party" : "⊕  Add to Party"}
               </button>
-            </Link>
+
+            </div>
+          ) : (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "#4B5563", fontFamily: "'Cinzel', Georgia, serif", fontSize: 14 }}>
+              Select a class to preview
+            </div>
+          )}
+        </div>
+
+        <div style={{
+          width: 320, flexShrink: 0,
+          display: "flex", flexDirection: "column", overflow: "hidden",
+          background: "rgba(0,0,0,0.2)",
+        }}>
+          <div style={{ padding: "20px 18px 14px", borderBottom: "1px solid rgba(180,140,80,0.1)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <h2 style={{ margin: 0, fontSize: 11, fontWeight: 700, color: "#C9A84C", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+                Your Party
+              </h2>
+              <span style={{ fontSize: 12, color: party.length === MAX_PARTY_SIZE ? "#D4AF37" : "#6B7280", fontFamily: "'Cinzel', Georgia, serif", background: party.length === MAX_PARTY_SIZE ? "rgba(212,175,55,0.1)" : "rgba(255,255,255,0.04)", border: `1px solid ${party.length === MAX_PARTY_SIZE ? "rgba(212,175,55,0.3)" : "rgba(255,255,255,0.08)"}`, borderRadius: 10, padding: "2px 8px" }}>
+                {party.length}/{MAX_PARTY_SIZE}
+              </span>
+            </div>
           </div>
-        )}
+
+          <div style={{ flex: 1, overflowY: "auto", padding: "10px 12px", display: "flex", flexDirection: "column", gap: 8 }}>
+            {party.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "48px 16px" }}>
+                <p style={{ margin: "0 0 6px", color: "#4B5563", fontSize: 13, fontFamily: "'Cinzel', Georgia, serif" }}>No party members</p>
+                <p style={{ margin: 0, color: "#374151", fontSize: 13 }}>Select a class and add them to your party</p>
+              </div>
+            ) : (
+              party.map((member, index) => (
+                <div key={index} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(180,140,80,0.14)", borderRadius: 8, overflow: "hidden" }}>
+                  <div style={{ padding: "9px 12px", borderBottom: "1px solid rgba(180,140,80,0.09)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "#E8DCC8", fontFamily: "'Cinzel', Georgia, serif" }}>{member.name}</div>
+                      <div style={{ fontSize: 11, color: "#7A6A52", marginTop: 1 }}>{member.class} · Lv {member.level}</div>
+                    </div>
+                    <button
+                      className="remove-btn"
+                      onClick={() => handleRemove(index)}
+                      style={{ background: "rgba(220,38,38,0.1)", border: "1px solid rgba(220,38,38,0.2)", borderRadius: 4, color: "#FCA5A5", fontSize: 11, padding: "4px 10px", cursor: "pointer", transition: "background 0.12s", fontFamily: "'Lato', sans-serif" }}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  <div style={{ padding: "12px", display: "flex", gap: 12, alignItems: "flex-start" }}>
+                    <img src={member.img || "/placeholder.svg"} alt={member.name} style={{ width: 72, height: 72, imageRendering: "pixelated", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.6))", flexShrink: 0 }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                        <span style={{ fontSize: 11, color: "#EF4444", fontFamily: "'Cinzel', Georgia, serif", fontWeight: 700, letterSpacing: "0.06em" }}>HP</span>
+                        <span style={{ fontSize: 12, color: "#9A8A72" }}>{member.hp}/{member.maxHp}</span>
+                      </div>
+                      <StatBar value={member.hp} max={member.maxHp} color="#EF4444" />
+                      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, marginBottom: 4 }}>
+                        <span style={{ fontSize: 11, color: "#6366F1", fontFamily: "'Cinzel', Georgia, serif", fontWeight: 700, letterSpacing: "0.06em" }}>MP</span>
+                        <span style={{ fontSize: 12, color: "#9A8A72" }}>{member.mp}/{member.maxMp}</span>
+                      </div>
+                      <StatBar value={member.mp} max={member.maxMp} color="#6366F1" />
+                      <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
+                        {Object.entries(member.abilities).slice(0, 4).map(([key, ability]) => (
+                          <div key={key} style={{ textAlign: "center", background: "rgba(0,0,0,0.25)", borderRadius: 4, padding: "4px 7px", minWidth: 34 }}>
+                            <div style={{ fontSize: 9, color: "#7A6A52", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.08em", textTransform: "uppercase" }}>{key}</div>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: "#D4C8B0", fontFamily: "'Cinzel', Georgia, serif" }}>{ability.score}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {party.length > 0 && (
+            <div style={{ padding: "12px", borderTop: "1px solid rgba(180,140,80,0.1)", flexShrink: 0 }}>
+              <Link to="/game" style={{ textDecoration: "none" }}>
+                <button
+                  onClick={enterCombat}
+                  style={{ width: "100%", padding: "14px", background: "linear-gradient(135deg, #B4965A 0%, #D4AF37 50%, #B4965A 100%)", border: "none", borderRadius: 8, color: "#0d0b07", fontSize: 13, fontWeight: 700, fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.06em", cursor: "pointer", transition: "filter 0.15s, transform 0.1s", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
+                  onMouseEnter={(e) => { e.currentTarget.style.filter = "brightness(1.08)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.filter = "none"; }}
+                  onMouseDown={(e) => { e.currentTarget.style.transform = "scale(0.98)"; }}
+                  onMouseUp={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} width={15} height={15}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                  </svg>
+                  Begin Adventure
+                </button>
+              </Link>
+            </div>
+          )}
+        </div>
+
       </div>
-    </div>
+    </>
   );
 }
