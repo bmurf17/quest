@@ -2,6 +2,7 @@ import { useState } from "react";
 import { CharacterData } from "../../types/Character";
 import { useGameStore, GameState } from "@/state/GameState";
 import { Link } from "react-router-dom";
+import { colors, fonts } from "@/theme";
 
 interface PartyPickerProps {
   availableCharacters: CharacterData[];
@@ -67,8 +68,8 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
       <div style={{
         display: "flex", height: "100vh",
         background: "#111009",
-        fontFamily: "'Lato', sans-serif",
-        color: "#E8DCC8",
+        fontFamily: fonts.body,
+        color: colors.text,
         overflow: "hidden",
       }}>
 
@@ -79,7 +80,7 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
           background: "rgba(0,0,0,0.25)",
         }}>
           <div style={{ padding: "20px 18px 14px", borderBottom: "1px solid rgba(180,140,80,0.1)" }}>
-            <h2 style={{ margin: 0, fontSize: 11, fontWeight: 700, color: "#C9A84C", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+            <h2 style={{ margin: 0, fontSize: 11, fontWeight: 700, color: colors.goldMuted, fontFamily: fonts.display, letterSpacing: "0.12em", textTransform: "uppercase" }}>
               Choose Class
             </h2>
           </div>
@@ -104,7 +105,7 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                     <img src={character.img} alt={character.name} style={{ width: 64, height: 64, imageRendering: "pixelated" }} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: active ? "#E8DCC8" : "#B0A080", fontFamily: "'Cinzel', Georgia, serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginBottom: 6 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: active ? colors.text : colors.textMuted, fontFamily: fonts.display, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginBottom: 6 }}>
                       {character.name}
                     </div>
                     <StatBar value={character.hp} max={character.maxHp} color="#EF4444" />
@@ -112,14 +113,14 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                       <StatBar value={character.mp} max={character.maxMp} color="#6366F1" />
                     </div>
                   </div>
-                  {inParty && <div style={{ width: 7, height: 7, background: "#34D399", borderRadius: "50%", flexShrink: 0 }} />}
+                  {inParty && <div style={{ width: 7, height: 7, background: colors.success, borderRadius: "50%", flexShrink: 0 }} />}
                 </div>
               );
             })}
           </div>
         </div>
 
-        <div style={{ flex: 1, overflowY: "auto", borderRight: "1px solid rgba(180,140,80,0.12)" }}>
+  <div style={{ flex: 1, overflowY: "auto", borderRight: `1px solid ${colors.goldBorder}` }}>
           {selectedCharacter ? (
             <div style={{ padding: "28px 28px 48px" }}>
 
@@ -128,12 +129,12 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                   <img src={selectedCharacter.img || "/placeholder.svg"} alt={selectedCharacter.name} style={{ width: 80, height: 80, imageRendering: "pixelated", filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.7))" }} />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <h3 style={{ margin: "0 0 8px", fontSize: 28, fontWeight: 700, color: "#E8DCC8", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.03em", lineHeight: 1.1 }}>
+                  <h3 style={{ margin: "0 0 8px", fontSize: 28, fontWeight: 700, color: colors.text, fontFamily: fonts.display, letterSpacing: "0.03em", lineHeight: 1.1 }}>
                     {selectedCharacter.name}
                   </h3>
                   <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
                     {[selectedCharacter.race, selectedCharacter.class, `Level ${selectedCharacter.level}`].map((tag) => (
-                      <span key={tag} style={{ fontSize: 12, color: "#C9A84C", background: "rgba(180,140,80,0.1)", border: "1px solid rgba(180,140,80,0.22)", borderRadius: 4, padding: "3px 10px", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.04em" }}>
+                      <span key={tag} style={{ fontSize: 12, color: colors.goldMuted, background: "rgba(180,140,80,0.1)", border: `1px solid ${colors.goldBorder}`, borderRadius: 4, padding: "3px 10px", fontFamily: fonts.display, letterSpacing: "0.04em" }}>
                         {tag}
                       </span>
                     ))}
@@ -145,8 +146,8 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                     ].map(({ label, value, max, color }) => (
                       <div key={label}>
                         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
-                          <span style={{ fontSize: 11, color: color, fontFamily: "'Cinzel', Georgia, serif", fontWeight: 700, letterSpacing: "0.06em" }}>{label}</span>
-                          <span style={{ fontSize: 12, color: "#9A8A72" }}>{value}<span style={{ color: "#5A4E3A" }}>/{max}</span></span>
+                          <span style={{ fontSize: 11, color: color, fontFamily: fonts.display, fontWeight: 700, letterSpacing: "0.06em" }}>{label}</span>
+                          <span style={{ fontSize: 12, color: colors.textMuted }}>{value}<span style={{ color: "#5A4E3A" }}>/{max}</span></span>
                         </div>
                         <StatBar value={value} max={max} color={color} />
                       </div>
@@ -163,10 +164,10 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                     {Object.entries(selectedCharacter.abilities).map(([key, ability]) => (
                       <div key={key} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(180,140,80,0.12)", borderRadius: 7, padding: "12px 10px", display: "flex", alignItems: "center", gap: 10 }}>
                         <div style={{ width: 36, height: 36, background: "rgba(0,0,0,0.3)", borderRadius: 5, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                          <span style={{ fontSize: 20, fontWeight: 700, color: "#E8DCC8", fontFamily: "'Cinzel', Georgia, serif", lineHeight: 1 }}>{ability.score}</span>
+                          <span style={{ fontSize: 20, fontWeight: 700, color: colors.text, fontFamily: fonts.display, lineHeight: 1 }}>{ability.score}</span>
                         </div>
                         <div>
-                          <div style={{ fontSize: 10, color: "#A8916A", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.1em", textTransform: "uppercase" }}>{key}</div>
+                          <div style={{ fontSize: 10, color: colors.textMuted, fontFamily: fonts.display, letterSpacing: "0.1em", textTransform: "uppercase" }}>{key}</div>
                           <div style={{ fontSize: 13, color: ability.modifier >= 0 ? "#6EE7B7" : "#FCA5A5", marginTop: 1 }}>
                             {ability.modifier >= 0 ? "+" : ""}{ability.modifier}
                           </div>

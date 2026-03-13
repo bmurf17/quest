@@ -8,6 +8,10 @@ export const colors = {
   success: "#34D399",
   danger: "#EF4444",
   subtleBorder: "rgba(255,255,255,0.07)",
+  info: "#0099DB",
+  warning: "#F2A444",
+  surface: "#1A1A2E",
+  surfaceAlt: "#2B2033",
 };
 
 export const fonts = {
