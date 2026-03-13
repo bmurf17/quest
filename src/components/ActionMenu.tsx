@@ -2,6 +2,7 @@ import { useGameStore } from "@/state/GameState";
 import { Camp, Chest, NPC, NPCType } from "@/types/RoomInteractions";
 import { CharacterData } from "@/types/Character";
 import { useState } from "react";
+import { colors as themeColors, fonts } from "../theme";
 import Inventory from "./Inventory";
 import Shop from "./Shop";
 import { manaPotion } from "@/types/Item";
@@ -19,7 +20,7 @@ interface ActionBtnProps {
 
 function ActionBtn({ onClick, disabled, variant = "default", children, fullWidth, title }: ActionBtnProps) {
   const colors = {
-    default: { bg: "rgba(255,255,255,0.04)", hover: "rgba(180,140,80,0.12)", border: "rgba(180,140,80,0.18)", text: "#C9A84C" },
+    default: { bg: "rgba(255,255,255,0.04)", hover: "rgba(180,140,80,0.12)", border: "rgba(180,140,80,0.18)", text: themeColors.goldMuted },
     danger:  { bg: "rgba(220,38,38,0.07)",   hover: "rgba(220,38,38,0.14)",   border: "rgba(220,38,38,0.25)",   text: "#FCA5A5" },
     success: { bg: "rgba(5,150,105,0.07)",    hover: "rgba(5,150,105,0.14)",   border: "rgba(52,211,153,0.25)",  text: "#6EE7B7" },
     muted:   { bg: "rgba(0,0,0,0.2)",         hover: "rgba(0,0,0,0.2)",        border: "rgba(255,255,255,0.05)", text: "#4B5563" },
@@ -41,7 +42,7 @@ function ActionBtn({ onClick, disabled, variant = "default", children, fullWidth
         borderRadius: 6,
         color: c.text,
         fontSize: 12,
-        fontFamily: "'Cinzel', Georgia, serif",
+  fontFamily: fonts.display,
         fontWeight: 600,
         letterSpacing: "0.05em",
         cursor: disabled ? "not-allowed" : "pointer",
@@ -61,7 +62,7 @@ function ActionBtn({ onClick, disabled, variant = "default", children, fullWidth
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-      <span style={{ fontSize: 9, color: "#6B5E48", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+  <span style={{ fontSize: 9, color: themeColors.goldMuted, fontFamily: fonts.display, letterSpacing: "0.12em", textTransform: "uppercase" }}>
         {children}
       </span>
       <div style={{ flex: 1, height: 1, background: "rgba(180,140,80,0.1)" }} />
@@ -243,25 +244,25 @@ export default function ActionMenu() {
 
         {npc && (
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            <SectionLabel>Dialogue</SectionLabel>
-            {npc.NPCType === NPCType.ANIMAL && !partyHasAnimalHandling(party) ? (
-              <ActionBtn disabled variant="muted" fullWidth>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} width={13} height={13}><path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" /></svg>
-                Requires Animal Handling
-              </ActionBtn>
-            ) : (
-              <ActionBtn onClick={() => speak(npc)} fullWidth>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} width={13} height={13}><path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" /></svg>
-                {useGameStore.getState().dialogueIndex < npc.dialogue.length - 1 ? "Continue Dialogue" : "Speak"}
-              </ActionBtn>
-            )}
-            {npc.NPCType === NPCType.MERCHANT && (
-              <ActionBtn onClick={() => setIsShopModalOpen(true)} variant="success" fullWidth>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} width={13} height={13}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" /></svg>
-                Browse Wares
-              </ActionBtn>
-            )}
-          </div>
+              <SectionLabel>Dialogue</SectionLabel>
+              {npc.NPCType === NPCType.ANIMAL && !partyHasAnimalHandling(party) ? (
+                <ActionBtn disabled variant="muted" fullWidth>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} width={13} height={13}><path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+                  Requires Animal Handling
+                </ActionBtn>
+              ) : (
+                <ActionBtn onClick={() => speak(npc)} fullWidth>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} width={13} height={13}><path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" /></svg>
+                  {useGameStore.getState().dialogueIndex < npc.dialogue.length - 1 ? "Continue Dialogue" : "Speak"}
+                </ActionBtn>
+              )}
+              {npc.NPCType === NPCType.MERCHANT && (
+                <ActionBtn onClick={() => setIsShopModalOpen(true)} variant="success" fullWidth>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} width={13} height={13}><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+                  Open Shop
+                </ActionBtn>
+              )}
+            </div>
         )}
 
         {chest && (

@@ -1,4 +1,5 @@
 import { GameState, useGameStore } from "../state/GameState";
+import { colors, fonts } from "../theme";
 import Party from "./Party";
 import ActionMenu from "./ActionMenu";
 import MainGameArea from "./MainGameArea/MainGameArea";
@@ -7,8 +8,8 @@ import ActivityLog from "./ActivityLog";
 const LABEL_STYLE: React.CSSProperties = {
   fontSize: 9,
   fontWeight: 700,
-  color: "#C9A84C",
-  fontFamily: "'Cinzel', Georgia, serif",
+  color: colors.goldMuted,
+  fontFamily: fonts.display,
   letterSpacing: "0.12em",
   textTransform: "uppercase" as const,
 };

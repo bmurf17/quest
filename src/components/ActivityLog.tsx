@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
 
+import { colors, fonts } from "../theme";
+
 interface Props {
   activityLog: string[];
 }
@@ -60,19 +62,19 @@ export default function ActivityLog({ activityLog }: Props) {
           flexShrink: 0,
         }}>
           <span style={{
-            fontSize: 10,
-            fontWeight: 700,
-            color: "#C9A84C",
-            fontFamily: "'Cinzel', Georgia, serif",
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
+      fontSize: 10,
+      fontWeight: 700,
+      color: colors.goldMuted,
+      fontFamily: fonts.display,
+      letterSpacing: "0.12em",
+      textTransform: "uppercase",
           }}>
             Chronicle
           </span>
           <span style={{
             fontSize: 10,
             color: "#4B5563",
-            fontFamily: "'Lato', sans-serif",
+            fontFamily: fonts.body,
           }}>
             {activityLog.length} entries
           </span>

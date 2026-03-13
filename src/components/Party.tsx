@@ -42,6 +42,8 @@ function StatBar({
   );
 }
 
+import { colors, fonts } from "../theme";
+
 export default function Party({ party }: Props) {
   const [selectedCharacter, setSelectedCharacter] =
     useState<CharacterData>(tempRanger);
@@ -90,7 +92,7 @@ export default function Party({ party }: Props) {
             gap: 8,
             padding: "8px 16px",
             background: "rgba(5,150,105,0.12)",
-            border: "1px solid rgba(52,211,153,0.35)",
+            border: `1px solid ${colors.success}`,
             borderRadius: 6,
             marginBottom: 8,
           }}
@@ -99,7 +101,7 @@ export default function Party({ party }: Props) {
             style={{
               width: 6,
               height: 6,
-              background: "#34D399",
+              background: colors.success,
               borderRadius: "50%",
               boxShadow: "0 0 6px rgba(52,211,153,0.8)",
             }}
@@ -108,7 +110,7 @@ export default function Party({ party }: Props) {
             style={{
               fontSize: 12,
               color: "#6EE7B7",
-              fontFamily: "'Cinzel', Georgia, serif",
+              fontFamily: fonts.display,
               letterSpacing: "0.06em",
             }}
           >
@@ -133,9 +135,10 @@ export default function Party({ party }: Props) {
           const isLowHp = hpPct <= 25 && !isDead;
 
           return (
-            <div
-              key={i}
-              style={{
+        <div
+          key={i}
+          onClick={() => !isDead && handleCharacterClick(character)}
+          style={{
                 flexShrink: 0,
                 flex: 1,
                 minWidth: 0,
@@ -189,8 +192,8 @@ export default function Party({ party }: Props) {
                     style={{
                       fontSize: 9,
                       fontWeight: 700,
-                      color: "#E8DCC8",
-                      fontFamily: "'Cinzel', Georgia, serif",
+                      color: colors.text,
+                      fontFamily: fonts.display,
                       letterSpacing: "0.03em",
                       whiteSpace: "nowrap",
                       overflow: "hidden",
@@ -214,8 +217,8 @@ export default function Party({ party }: Props) {
                     <span
                       style={{
                         fontSize: 9,
-                        color: "#6B7280",
-                        fontFamily: "'Cinzel', Georgia, serif",
+                        color: colors.muted,
+                        fontFamily: fonts.display,
                         letterSpacing: "0.08em",
                       }}
                     >
@@ -242,8 +245,8 @@ export default function Party({ party }: Props) {
                   <span
                     style={{
                       fontSize: 8,
-                      color: isLowHp ? "#FCA5A5" : "#9CA3AF",
-                      fontFamily: "'Cinzel', Georgia, serif",
+                      color: isLowHp ? colors.danger : colors.muted,
+                      fontFamily: fonts.display,
                       fontWeight: 700,
                       letterSpacing: "0.06em",
                     }}
@@ -253,31 +256,15 @@ export default function Party({ party }: Props) {
                   <span
                     style={{
                       fontSize: 8,
-                      color: isLowHp ? "#FCA5A5" : "#6B7280",
-                      fontFamily: "'Lato', sans-serif",
+                      color: isLowHp ? colors.danger : colors.textMuted,
+                      fontFamily: fonts.body,
                     }}
                   >
                     {character.hp}/{character.maxHp}
                   </span>
                 </div>
-                <div
-                  style={{
-                    height: 3,
-                    background: "rgba(255,255,255,0.06)",
-                    borderRadius: 2,
-                    overflow: "hidden",
-                    marginBottom: 4,
-                  }}
-                >
-                  <div
-                    style={{
-                      height: "100%",
-                      width: `${hpPct}%`,
-                      background: isLowHp ? "#EF4444" : "#22C55E",
-                      borderRadius: 2,
-                      transition: "width 0.3s",
-                    }}
-                  />
+                <div style={{ marginBottom: 4 }}>
+                  <StatBar value={character.hp} max={character.maxHp} color={isLowHp ? colors.danger : colors.success} />
                 </div>
                 <div
                   style={{
@@ -289,8 +276,8 @@ export default function Party({ party }: Props) {
                   <span
                     style={{
                       fontSize: 8,
-                      color: "#9CA3AF",
-                      fontFamily: "'Cinzel', Georgia, serif",
+                      color: colors.muted,
+                      fontFamily: fonts.display,
                       fontWeight: 700,
                       letterSpacing: "0.06em",
                     }}
@@ -300,30 +287,15 @@ export default function Party({ party }: Props) {
                   <span
                     style={{
                       fontSize: 8,
-                      color: "#6B7280",
-                      fontFamily: "'Lato', sans-serif",
+                      color: colors.textMuted,
+                      fontFamily: fonts.body,
                     }}
                   >
                     {character.mp}/{character.maxMp}
                   </span>
                 </div>
-                <div
-                  style={{
-                    height: 3,
-                    background: "rgba(255,255,255,0.06)",
-                    borderRadius: 2,
-                    overflow: "hidden",
-                  }}
-                >
-                  <div
-                    style={{
-                      height: "100%",
-                      width: `${(character.mp / character.maxMp) * 100}%`,
-                      background: "#6366F1",
-                      borderRadius: 2,
-                      transition: "width 0.3s",
-                    }}
-                  />
+                <div>
+                  <StatBar value={character.mp} max={character.maxMp} color="#6366F1" />
                 </div>
               </div>
             </div>

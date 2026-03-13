@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { colors, fonts } from "../../theme";
 
 const navSections = [
   {
@@ -49,7 +50,7 @@ export default function Admin() {
         minHeight: "100vh",
         background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 50%, #0f0e09 100%)",
         padding: "48px 32px 80px",
-        fontFamily: "'Crimson Text', Georgia, serif",
+        fontFamily: fonts.body,
       }}>
 
         <div style={{ maxWidth: 700, margin: "0 auto 48px" }}>
@@ -69,13 +70,13 @@ export default function Admin() {
             <div>
               <h1 style={{
                 margin: 0, fontSize: 30, fontWeight: 700,
-                color: "#E8DCC8",
-                fontFamily: "'Cinzel', Georgia, serif",
+                color: colors.text,
+                fontFamily: fonts.display,
                 letterSpacing: "0.05em",
               }}>
                 Admin Console
               </h1>
-              <p style={{ margin: 0, fontSize: 14, color: "#6B7280" }}>
+              <p style={{ margin: 0, fontSize: 14, color: colors.muted }}>
                 Shape the realm from behind the veil
               </p>
             </div>
@@ -95,8 +96,8 @@ export default function Admin() {
                 <div style={{ width: 2, height: 20, background: "rgba(212,175,55,0.6)", borderRadius: 1 }} />
                 <h2 style={{
                   margin: 0, fontSize: 12, fontWeight: 700,
-                  color: "#B4965A",
-                  fontFamily: "'Cinzel', Georgia, serif",
+                  color: colors.gold,
+                  fontFamily: fonts.display,
                   letterSpacing: "0.12em",
                   textTransform: "uppercase",
                 }}>

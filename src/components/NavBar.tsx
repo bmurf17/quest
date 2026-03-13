@@ -1,5 +1,6 @@
 import { Home, Plus, Shield, Users } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { colors, fonts } from "../theme";
 
 export default function NavBar() {
   const location = useLocation();
@@ -14,7 +15,7 @@ export default function NavBar() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap');
         .nav-link { transition: color 0.15s, background 0.15s, border-color 0.15s; }
         .nav-link:hover .nav-icon-wrap { border-color: rgba(212,175,55,0.5) !important; background: rgba(212,175,55,0.1) !important; color: #D4AF37 !important; }
         .nav-link:hover .nav-label { color: #C9A84C !important; }
@@ -49,8 +50,8 @@ export default function NavBar() {
           <span style={{
             fontSize: 14,
             fontWeight: 700,
-            color: "#C9A84C",
-            fontFamily: "'Cinzel', Georgia, serif",
+            color: colors.goldMuted,
+            fontFamily: fonts.display,
             letterSpacing: "0.08em",
           }}>
             Qwest
@@ -79,9 +80,9 @@ export default function NavBar() {
                   style={{
                     width: 32, height: 32,
                     borderRadius: 7,
-                    border: `1px solid ${active ? "rgba(212,175,55,0.5)" : "rgba(255,255,255,0.07)"}`,
+                    border: `1px solid ${active ? "rgba(212,175,55,0.5)" : colors.subtleBorder}`,
                     background: active ? "rgba(212,175,55,0.12)" : "transparent",
-                    color: active ? "#D4AF37" : "#6B7280",
+                    color: active ? colors.gold : colors.muted,
                     display: "flex", alignItems: "center", justifyContent: "center",
                     position: "relative",
                   }}

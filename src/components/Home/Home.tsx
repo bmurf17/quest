@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 
+import { colors, fonts } from "../../theme";
+
 export default function Home() {
   return (
     <>
@@ -27,7 +29,7 @@ export default function Home() {
         .home-btn     { animation: rise 1.2s ease 0.5s both; }
         .home-settings { animation: rise 1.2s ease 0.65s both; }
 
-        .start-btn {
+  .start-btn {
           position: relative;
           display: inline-flex;
           align-items: center;
@@ -107,8 +109,8 @@ export default function Home() {
             margin: "0 0 12px",
             fontSize: "clamp(40px, 8vw, 72px)",
             fontWeight: 900,
-            fontFamily: "'Cinzel', Georgia, serif",
-            color: "#E8DCC8",
+            fontFamily: fonts.display,
+            color: colors.text,
             letterSpacing: "0.08em",
             lineHeight: 1.1,
             textShadow: "0 2px 40px rgba(212,175,55,0.15)",

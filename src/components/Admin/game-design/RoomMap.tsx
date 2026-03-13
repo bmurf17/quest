@@ -2,6 +2,7 @@ import { useGameStore } from "@/state/GameState";
 import { Directions } from "@/types/Directions";
 import { Room } from "@/types/Room";
 import React, { useState, useRef, useEffect } from "react";
+import { colors, fonts } from "../../../theme";
 
 const MAX_DEPTH = 5;
 const ROOM_DISTANCE = 160;
@@ -70,14 +71,14 @@ const Connector = ({ x1, y1, x2, y2, direction }: ConnectorProps) => {
 
   return (
     <g>
-      <line x1={sx} y1={sy} x2={ex} y2={ey} stroke="rgba(180,140,80,0.15)" strokeWidth={1.5} />
-      <circle cx={mx} cy={my} r={3} fill="rgba(180,140,80,0.3)" />
-      <text
+  <line x1={sx} y1={sy} x2={ex} y2={ey} stroke="rgba(180,140,80,0.15)" strokeWidth={1.5} />
+  <circle cx={mx} cy={my} r={3} fill="rgba(180,140,80,0.3)" />
+  <text
         x={mx + (isVertical ? 5 : 0)}
         y={my + (!isVertical ? -4 : 0)}
-        fill="rgba(180,140,80,0.5)"
-        fontSize={9}
-        fontFamily="'Cinzel', Georgia, serif"
+  fill="rgba(180,140,80,0.5)"
+  fontSize={9}
+  fontFamily={fonts.display}
         textAnchor="middle"
         dominantBaseline="middle"
       >
@@ -139,7 +140,7 @@ const RoomNode = React.memo(({ room, x, y, visitedRooms, depth = 0, onRoomClick,
         onClick={(e) => { e.stopPropagation(); onRoomClick(room); }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        style={{
+  style={{
           position: "absolute",
           left: x,
           top: y,
@@ -162,8 +163,8 @@ const RoomNode = React.memo(({ room, x, y, visitedRooms, depth = 0, onRoomClick,
       >
         <span style={{
           fontSize: 10,
-          fontFamily: "'Cinzel', Georgia, serif",
-          color: isStart ? "#D4AF37" : cfg.color,
+          fontFamily: fonts.display,
+          color: isStart ? colors.gold : cfg.color,
           fontWeight: 600,
           letterSpacing: "0.04em",
           textAlign: "center",
@@ -177,7 +178,7 @@ const RoomNode = React.memo(({ room, x, y, visitedRooms, depth = 0, onRoomClick,
           {room.name}
         </span>
         {key !== "none" && (
-          <span style={{ fontSize: 9, color: cfg.color, opacity: 0.7, fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.05em" }}>
+          <span style={{ fontSize: 9, color: cfg.color, opacity: 0.7, fontFamily: fonts.display, letterSpacing: "0.05em" }}>
             {cfg.label}
           </span>
         )}
@@ -187,10 +188,10 @@ const RoomNode = React.memo(({ room, x, y, visitedRooms, depth = 0, onRoomClick,
             top: -8,
             left: "50%",
             transform: "translateX(-50%)",
-            background: "#D4AF37",
+            background: colors.gold,
             color: "#0d0b07",
             fontSize: 7,
-            fontFamily: "'Cinzel', Georgia, serif",
+            fontFamily: fonts.display,
             fontWeight: 700,
             letterSpacing: "0.1em",
             padding: "1px 6px",
@@ -246,10 +247,10 @@ function RoomPopup({ room, onClose }: { room: Room; onClose: () => void }) {
   const cfg = interactionConfig[key] ?? interactionConfig.none;
 
   const Row = ({ label, value }: { label: string; value: React.ReactNode }) => (
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "6px 0", borderBottom: "1px solid rgba(180,140,80,0.1)" }}>
-      <span style={{ fontSize: 11, color: "#9CA3AF", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.06em", textTransform: "uppercase" }}>{label}</span>
-      <span style={{ fontSize: 14, color: "#E8DCC8", fontFamily: "'Crimson Text', Georgia, serif" }}>{value}</span>
-    </div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "6px 0", borderBottom: "1px solid rgba(180,140,80,0.1)" }}>
+        <span style={{ fontSize: 11, color: colors.muted, fontFamily: fonts.display, letterSpacing: "0.06em", textTransform: "uppercase" }}>{label}</span>
+        <span style={{ fontSize: 14, color: colors.text, fontFamily: fonts.body }}>{value}</span>
+      </div>
   );
 
   return (
