@@ -231,7 +231,7 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                 disabled={isPartyFull || isInParty}
                 style={{
                   width: "100%", padding: "15px", borderRadius: 8, 
-                  fontFamily: "'Cinzel', Georgia, serif", fontWeight: 700, fontSize: 14, letterSpacing: "0.08em",
+                  fontFamily: fonts.display, fontWeight: 700, fontSize: 14, letterSpacing: "0.08em",
                   cursor: isPartyFull || isInParty ? "not-allowed" : "pointer",
                   marginTop: 24, transition: "filter 0.15s, transform 0.1s",
                   ...(isPartyFull || isInParty
@@ -248,7 +248,7 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
 
             </div>
           ) : (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "#4B5563", fontFamily: "'Cinzel', Georgia, serif", fontSize: 14 }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "#4B5563", fontFamily: fonts.display, fontSize: 14 }}>
               Select a class to preview
             </div>
           )}
@@ -259,12 +259,12 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
           display: "flex", flexDirection: "column", overflow: "hidden",
           background: "rgba(0,0,0,0.2)",
         }}>
-          <div style={{ padding: "20px 18px 14px", borderBottom: "1px solid rgba(180,140,80,0.1)" }}>
+      <div style={{ padding: "20px 18px 14px", borderBottom: `1px solid ${colors.goldBorder}` }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <h2 style={{ margin: 0, fontSize: 11, fontWeight: 700, color: "#C9A84C", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+        <h2 style={{ margin: 0, fontSize: 11, fontWeight: 700, color: colors.goldMuted, fontFamily: fonts.display, letterSpacing: "0.12em", textTransform: "uppercase" }}>
                 Your Party
               </h2>
-              <span style={{ fontSize: 12, color: party.length === MAX_PARTY_SIZE ? "#D4AF37" : "#6B7280", fontFamily: "'Cinzel', Georgia, serif", background: party.length === MAX_PARTY_SIZE ? "rgba(212,175,55,0.1)" : "rgba(255,255,255,0.04)", border: `1px solid ${party.length === MAX_PARTY_SIZE ? "rgba(212,175,55,0.3)" : "rgba(255,255,255,0.08)"}`, borderRadius: 10, padding: "2px 8px" }}>
+        <span style={{ fontSize: 12, color: party.length === MAX_PARTY_SIZE ? colors.gold : colors.muted, fontFamily: fonts.display, background: party.length === MAX_PARTY_SIZE ? "rgba(212,175,55,0.1)" : "rgba(255,255,255,0.04)", border: `1px solid ${party.length === MAX_PARTY_SIZE ? "rgba(212,175,55,0.3)" : "rgba(255,255,255,0.08)"}`, borderRadius: 10, padding: "2px 8px" }}>
                 {party.length}/{MAX_PARTY_SIZE}
               </span>
             </div>
@@ -272,8 +272,8 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
 
           <div style={{ flex: 1, overflowY: "auto", padding: "10px 12px", display: "flex", flexDirection: "column", gap: 8 }}>
             {party.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "48px 16px" }}>
-                <p style={{ margin: "0 0 6px", color: "#4B5563", fontSize: 13, fontFamily: "'Cinzel', Georgia, serif" }}>No party members</p>
+                <div style={{ textAlign: "center", padding: "48px 16px" }}>
+                <p style={{ margin: "0 0 6px", color: "#4B5563", fontSize: 13, fontFamily: fonts.display }}>No party members</p>
                 <p style={{ margin: 0, color: "#374151", fontSize: 13 }}>Select a class and add them to your party</p>
               </div>
             ) : (
@@ -281,13 +281,13 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                 <div key={index} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(180,140,80,0.14)", borderRadius: 8, overflow: "hidden" }}>
                   <div style={{ padding: "9px 12px", borderBottom: "1px solid rgba(180,140,80,0.09)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <div>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: "#E8DCC8", fontFamily: "'Cinzel', Georgia, serif" }}>{member.name}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: colors.text, fontFamily: fonts.display }}>{member.name}</div>
                       <div style={{ fontSize: 11, color: "#7A6A52", marginTop: 1 }}>{member.class} · Lv {member.level}</div>
                     </div>
                     <button
                       className="remove-btn"
                       onClick={() => handleRemove(index)}
-                      style={{ background: "rgba(220,38,38,0.1)", border: "1px solid rgba(220,38,38,0.2)", borderRadius: 4, color: "#FCA5A5", fontSize: 11, padding: "4px 10px", cursor: "pointer", transition: "background 0.12s", fontFamily: "'Lato', sans-serif" }}
+                      style={{ background: "rgba(220,38,38,0.1)", border: "1px solid rgba(220,38,38,0.2)", borderRadius: 4, color: "#FCA5A5", fontSize: 11, padding: "4px 10px", cursor: "pointer", transition: "background 0.12s", fontFamily: fonts.body }}
                     >
                       Remove
                     </button>
@@ -296,20 +296,20 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                     <img src={member.img || "/placeholder.svg"} alt={member.name} style={{ width: 72, height: 72, imageRendering: "pixelated", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.6))", flexShrink: 0 }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                        <span style={{ fontSize: 11, color: "#EF4444", fontFamily: "'Cinzel', Georgia, serif", fontWeight: 700, letterSpacing: "0.06em" }}>HP</span>
-                        <span style={{ fontSize: 12, color: "#9A8A72" }}>{member.hp}/{member.maxHp}</span>
+                        <span style={{ fontSize: 11, color: colors.danger, fontFamily: fonts.display, fontWeight: 700, letterSpacing: "0.06em" }}>HP</span>
+                        <span style={{ fontSize: 12, color: colors.textMuted }}>{member.hp}/{member.maxHp}</span>
                       </div>
                       <StatBar value={member.hp} max={member.maxHp} color="#EF4444" />
                       <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, marginBottom: 4 }}>
-                        <span style={{ fontSize: 11, color: "#6366F1", fontFamily: "'Cinzel', Georgia, serif", fontWeight: 700, letterSpacing: "0.06em" }}>MP</span>
-                        <span style={{ fontSize: 12, color: "#9A8A72" }}>{member.mp}/{member.maxMp}</span>
+                        <span style={{ fontSize: 11, color: "#6366F1", fontFamily: fonts.display, fontWeight: 700, letterSpacing: "0.06em" }}>MP</span>
+                        <span style={{ fontSize: 12, color: colors.textMuted }}>{member.mp}/{member.maxMp}</span>
                       </div>
                       <StatBar value={member.mp} max={member.maxMp} color="#6366F1" />
                       <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
                         {Object.entries(member.abilities).slice(0, 4).map(([key, ability]) => (
                           <div key={key} style={{ textAlign: "center", background: "rgba(0,0,0,0.25)", borderRadius: 4, padding: "4px 7px", minWidth: 34 }}>
-                            <div style={{ fontSize: 9, color: "#7A6A52", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.08em", textTransform: "uppercase" }}>{key}</div>
-                            <div style={{ fontSize: 13, fontWeight: 700, color: "#D4C8B0", fontFamily: "'Cinzel', Georgia, serif" }}>{ability.score}</div>
+                            <div style={{ fontSize: 9, color: "#7A6A52", fontFamily: fonts.display, letterSpacing: "0.08em", textTransform: "uppercase" }}>{key}</div>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: "#D4C8B0", fontFamily: fonts.display }}>{ability.score}</div>
                           </div>
                         ))}
                       </div>
@@ -321,11 +321,11 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
           </div>
 
           {party.length > 0 && (
-            <div style={{ padding: "12px", borderTop: "1px solid rgba(180,140,80,0.1)", flexShrink: 0 }}>
+                <div style={{ padding: "12px", borderTop: `1px solid ${colors.goldBorder}`, flexShrink: 0 }}>
               <Link to="/game" style={{ textDecoration: "none" }}>
                 <button
                   onClick={enterCombat}
-                  style={{ width: "100%", padding: "14px", background: "linear-gradient(135deg, #B4965A 0%, #D4AF37 50%, #B4965A 100%)", border: "none", borderRadius: 8, color: "#0d0b07", fontSize: 13, fontWeight: 700, fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.06em", cursor: "pointer", transition: "filter 0.15s, transform 0.1s", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
+                  style={{ width: "100%", padding: "14px", background: `linear-gradient(135deg, ${colors.gold} 0%, ${colors.gold} 50%, ${colors.gold} 100%)`, border: "none", borderRadius: 8, color: "#0d0b07", fontSize: 13, fontWeight: 700, fontFamily: fonts.display, letterSpacing: "0.06em", cursor: "pointer", transition: "filter 0.15s, transform 0.1s", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
                   onMouseEnter={(e) => { e.currentTarget.style.filter = "brightness(1.08)"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.filter = "none"; }}
                   onMouseDown={(e) => { e.currentTarget.style.transform = "scale(0.98)"; }}
