@@ -20,7 +20,8 @@ const northRoom: Room = {
       name: "Merchant",
       dialogue: ["What can I do for you?"],
       discoveryMessage: "Well met travelers!",
-      NPCType: NPCType.MERCHANT
+      NPCType: NPCType.MERCHANT,
+      img: ""
     },
   },
   id: 0

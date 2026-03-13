@@ -1,9 +1,5 @@
 Database 
-    NPC images
     NPC inventory
-Talk to an animal (animal handling -> conditional skills) 
-    Draw an animal 
-    State Checks
 Consumables used by a single char
 Spells using stats
 Char Creation
@@ -12,6 +8,8 @@ Char Creation
     Assign the skills
 Equipment
 Consumables get used
+Consumables do the right thing (mana potions heal hp)
+Consumables progress combat
 Orbements- non equipment that effects stats??
 Mini Map
 Admin
