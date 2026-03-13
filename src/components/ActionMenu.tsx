@@ -192,9 +192,7 @@ export default function ActionMenu() {
 
   return (
     <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Lato:wght@400;700&display=swap');
-      `}</style>
+  <style>{``}</style>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 10, height: "100%", fontFamily: "'Lato', sans-serif" }}>
 

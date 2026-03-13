@@ -6,7 +6,6 @@ export default function Home() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
         * { box-sizing: border-box; }
 
         @keyframes flicker {
@@ -29,7 +28,7 @@ export default function Home() {
         .home-btn     { animation: rise 1.2s ease 0.5s both; }
         .home-settings { animation: rise 1.2s ease 0.65s both; }
 
-  .start-btn {
+        .start-btn {
           position: relative;
           display: inline-flex;
           align-items: center;

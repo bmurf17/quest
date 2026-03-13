@@ -76,7 +76,6 @@ export default function Party({ party }: Props) {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Lato:wght@400;700&display=swap');
         @keyframes heal-pulse { 0%,100% { box-shadow: 0 0 8px rgba(52,211,153,0.3); } 50% { box-shadow: 0 0 18px rgba(52,211,153,0.6); } }
         .party-card { transition: border-color 0.15s, background 0.15s, transform 0.15s; }
         .party-card:hover { transform: translateY(-1px); }

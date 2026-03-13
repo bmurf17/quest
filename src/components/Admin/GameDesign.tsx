@@ -40,7 +40,6 @@ export default function Admin() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
         * { box-sizing: border-box; }
         .admin-card { transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s, background 0.15s; }
         .admin-card:hover { transform: translateY(-2px); }

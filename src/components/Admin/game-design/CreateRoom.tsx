@@ -832,7 +832,7 @@ export default function ManageRooms() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+        
         * { box-sizing: border-box; }
         input[type=number]::-webkit-inner-spin-button { opacity: 0.4; }
         select option { background: #1a1209; color: #E8DCC8; }

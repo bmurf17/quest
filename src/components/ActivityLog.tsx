@@ -36,7 +36,6 @@ export default function ActivityLog({ activityLog }: Props) {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Lato:wght@400&display=swap');
         .log-line { transition: background 0.1s; }
         .log-line:hover { background: rgba(180,140,80,0.05) !important; }
         .log-scroll::-webkit-scrollbar { width: 3px; }

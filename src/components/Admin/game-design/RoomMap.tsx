@@ -461,7 +461,7 @@ export default function RoomMap() {
 
   return (
     <>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap'); * { box-sizing: border-box; }`}</style>
+  <style>{`* { box-sizing: border-box; }`}</style>
 
       <main style={{ minHeight: "100vh", background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 50%, #0f0e09 100%)", display: "flex", flexDirection: "column" }}>
 

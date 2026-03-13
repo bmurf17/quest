@@ -15,7 +15,6 @@ export default function NavBar() {
   return (
     <>
       <style>{`
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap');
         .nav-link { transition: color 0.15s, background 0.15s, border-color 0.15s; }
         .nav-link:hover .nav-icon-wrap { border-color: rgba(212,175,55,0.5) !important; background: rgba(212,175,55,0.1) !important; color: #D4AF37 !important; }
         .nav-link:hover .nav-label { color: #C9A84C !important; }
