@@ -703,6 +703,9 @@ export const useGameStore = create<GameState>((set, get) => ({
                   gameStatus === GameStatus.Exploring ? 0 : newAccumulatedExp,
                 isTargeting: false,
                 targetingSpell: null,
+                levelingUpChars: completion.levelingUpChars || [],
+                isLevelingUp: (completion.levelingUpChars || []).length > 0,
+                currentLevelingCharIndex: (completion.levelingUpChars || []).length > 0 ? 0 : -1,
               };
             } else {
               updatedEnemies = updatedEnemies.map((e) =>
@@ -863,7 +866,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         roomInstances: newRoomInstances,
         accumulatedExp: newAccumulatedExp,
         isTargeting: false,
-        targetingSpell: null,
+        targetingSpell: null
       };
     }),
 }));
