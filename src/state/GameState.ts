@@ -560,7 +560,6 @@ export const useGameStore = create<GameState>((set, get) => ({
         inventory.push(chest.item);
       }
 
-      console.log(inventory);
       return {
         activityLog: [...state.activityLog, ...logBuilder.build()],
         room: updatedRoom,

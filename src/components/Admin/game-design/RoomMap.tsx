@@ -274,7 +274,7 @@ function RoomPopup({ room, onClose }: { room: Room; onClose: () => void }) {
           width: 340,
           overflowY: "auto",
           position: "relative",
-          fontFamily: fonts.body,
+          fontFamily: "'Crimson Text', Georgia, serif",
         }}
       >
         {["tl","tr","bl","br"].map(pos => (
@@ -348,15 +348,15 @@ function RoomPopup({ room, onClose }: { room: Room; onClose: () => void }) {
 
         {room.neighboringRooms?.length > 0 && (
           <div style={{ marginTop: 16 }}>
-            <div style={{ fontSize: 11, color: colors.muted, fontFamily: fonts.display, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 8 }}>Passages</div>
+            <div style={{ fontSize: 11, color: "#9CA3AF", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 8 }}>Passages</div>
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
               {room.neighboringRooms.map(([dir, neighbor], i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(180,140,80,0.08)", border: `1px solid ${colors.goldBorder}`, borderRadius: 4, padding: "3px 8px" }}>
-                  <span style={{ fontSize: 10, color: colors.gold, fontFamily: fonts.display }}>
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(180,140,80,0.08)", border: "1px solid rgba(180,140,80,0.2)", borderRadius: 4, padding: "3px 8px" }}>
+                  <span style={{ fontSize: 10, color: "#D4AF37", fontFamily: "'Cinzel', Georgia, serif" }}>
                     {Directions[dir as unknown as number]?.toUpperCase?.() ?? dir}
                   </span>
                   <span style={{ fontSize: 10, color: "#6B7280" }}>→</span>
-                  <span style={{ fontSize: 11, color: colors.text, fontFamily: fonts.body }}>{neighbor.name}</span>
+                  <span style={{ fontSize: 11, color: "#E8DCC8", fontFamily: "'Crimson Text', Georgia, serif" }}>{neighbor.name}</span>
                 </div>
               ))}
             </div>
@@ -466,13 +466,13 @@ export default function RoomMap() {
 
         <div style={{ padding: "24px 28px 16px", flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4 }}>
-            <div style={{ width: 3, height: 28, background: `linear-gradient(to bottom, ${colors.gold}, transparent)`, borderRadius: 2 }} />
-            <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: colors.text, fontFamily: fonts.display, letterSpacing: "0.05em" }}>
+            <div style={{ width: 3, height: 28, background: "linear-gradient(to bottom, #D4AF37, transparent)", borderRadius: 2 }} />
+            <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: "#E8DCC8", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.05em" }}>
               Realm Map
             </h1>
             <div style={{ marginLeft: "auto", display: "flex", gap: 6, alignItems: "center", background: "rgba(212,175,55,0.08)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 20, padding: "4px 12px 4px 8px" }}>
-              <svg viewBox="0 0 24 24" fill="none" stroke={colors.gold} strokeWidth={1.5} width={14} height={14}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" /></svg>
-              <span style={{ fontSize: 12, color: colors.goldMuted, fontFamily: fonts.display, letterSpacing: "0.08em" }}>{rooms.length} rooms</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth={1.5} width={14} height={14}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" /></svg>
+              <span style={{ fontSize: 12, color: "#B4965A", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.08em" }}>{rooms.length} rooms</span>
             </div>
           </div>
           <p style={{ margin: 0, paddingLeft: 15, color: "#6B7280", fontSize: 14, fontFamily: "'Crimson Text', Georgia, serif" }}>

@@ -15,8 +15,6 @@ export default function RoomNPC() {
   const currentLine = dialogueLines[dialogueIndex] || dialogueLines[dialogueLines.length - 1];
   const isEndOfDialogue = dialogueIndex >= dialogueLines.length - 1;
 
-  console.log("Rendering RoomNPC with image:", interaction.npc.img);
-
   return (
     <div className="flex flex-col items-center animate-in fade-in zoom-in duration-300">
       
