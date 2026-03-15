@@ -8,10 +8,16 @@ import { useEffect } from "react";
 import BattleOrder from "./_BattleOrder";
 import RoomCamp from "./_RoomCamp";
 import LevelUpModal from "./_LevelUpModal";
+import { GameStatus } from "@/types/GameStatus";
 
 export default function MainGameArea() {
   const party = useGameStore((state) => state.party);
   const navigate = useNavigate();
+  const gameStatus = useGameStore((state) => state.gameStatus);
+  const backgroundClass =
+    gameStatus === GameStatus.InTown
+      ? "bg-town-background"
+      : "bg-battle-background";
 
   useEffect(() => {
     if (party.length === 0) {
@@ -20,23 +26,26 @@ export default function MainGameArea() {
   }, [party.length, navigate]);
 
   return (
-    <div style={{
-      width: "100%",
-      height: "100%",
-      position: "relative",
-      overflow: "hidden",
-    }}
-      className="bg-cover bg-center bg-battle-background bg-pixelated"
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        position: "relative",
+        overflow: "hidden",
+      }}
+      className={`bg-cover bg-center ${backgroundClass} bg-pixelated`}
     >
-      <div style={{
-        position: "absolute",
-        inset: 0,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        pointerEvents: "none",
-        zIndex: 10,
-      }}>
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          pointerEvents: "none",
+          zIndex: 10,
+        }}
+      >
         <div style={{ textAlign: "center", pointerEvents: "auto" }}>
           <BattleEnemies />
           <RoomChest />
@@ -46,16 +55,18 @@ export default function MainGameArea() {
         </div>
       </div>
 
-      <div style={{
-        position: "absolute",
-        inset: 0,
-        display: "flex",
-        alignItems: "flex-end",
-        justifyContent: "center",
-        paddingLeft: 256,
-        pointerEvents: "none",
-        zIndex: 20,
-      }}>
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          alignItems: "flex-end",
+          justifyContent: "center",
+          paddingLeft: 256,
+          pointerEvents: "none",
+          zIndex: 20,
+        }}
+      >
         <div style={{ pointerEvents: "auto" }}>
           <RoomNPC />
         </div>

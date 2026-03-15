@@ -6,8 +6,8 @@ export default {
     extend: {
       backgroundImage: {
         "battle-background": "url(../src/assets/area1-background.png)",
+        "town-background": "url(../src/assets/town1-background.png)",
       },
-      // Add a custom utility plugin for pixelated rendering
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

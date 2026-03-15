@@ -9,15 +9,13 @@ import {
   ChevronUp,
 } from "lucide-react";
 
-// ─── Mini-map constants ───────────────────────────────────────────────────────
-
-const CELL = 12;          // px per room box
-const GAP = 4;            // px gap between boxes
-const STEP = CELL + GAP;  // grid step
-const MAX_DEPTH = 4;      // traversal depth
-const VIEW_RADIUS = 3;    // cells visible outward from player in each direction
-const MAP_CELLS = VIEW_RADIUS * 2 + 1; // 7 cells across
-const MAP_SIZE = MAP_CELLS * STEP - GAP; // fixed px size
+const CELL = 12;         
+const GAP = 4;            
+const STEP = CELL + GAP;  
+const MAX_DEPTH = 4;      
+const VIEW_RADIUS = 3;    
+const MAP_CELLS = VIEW_RADIUS * 2 + 1;
+const MAP_SIZE = MAP_CELLS * STEP - GAP; 
 
 const interactionColor: Record<string, string> = {
   NPC:    "#818CF8",
@@ -33,8 +31,6 @@ function getRoomColor(room: Room): string {
   return interactionColor.none;
 }
 
-// ─── Direction helper ─────────────────────────────────────────────────────────
-
 function dirToOffset(dir: any): { dx: number; dy: number } | null {
   if (dir === Directions.North || dir === "North" || dir === 0) return { dx:  0, dy: -1 };
   if (dir === Directions.West  || dir === "West"  || dir === 1) return { dx: -1, dy:  0 };
@@ -42,8 +38,6 @@ function dirToOffset(dir: any): { dx: number; dy: number } | null {
   if (dir === Directions.East  || dir === "East"  || dir === 3) return { dx:  1, dy:  0 };
   return null;
 }
-
-// ─── Layout: grid coords relative to current room (always 0,0) ───────────────
 
 interface RoomPos { room: Room; gx: number; gy: number }
 
@@ -66,21 +60,16 @@ function buildLayout(
   return result;
 }
 
-// ─── MiniMap: fixed viewport, player always centered ─────────────────────────
-
 function MiniMap({ currentRoom }: { currentRoom: Room }) {
   if (!currentRoom) return null;
 
-  // Build layout with current room at grid origin (0, 0)
   const allRooms = buildLayout(currentRoom, 0, 0, new Map(), 0);
   if (allRooms.length === 0) return null;
 
-  // Only render rooms within the viewport radius
   const visible = allRooms.filter(
     r => Math.abs(r.gx) <= VIEW_RADIUS && Math.abs(r.gy) <= VIEW_RADIUS
   );
 
-  // Convert grid coords to pixel coords — player is always at center
   const toPixel = (g: number) => (g + VIEW_RADIUS) * STEP;
 
   return (
@@ -96,14 +85,12 @@ function MiniMap({ currentRoom }: { currentRoom: Room }) {
         flexShrink: 0,
       }}
     >
-      {/* dot grid */}
       <div style={{
         position: "absolute", inset: 0,
         backgroundImage: "radial-gradient(circle, rgba(180,140,80,0.2) 1px, transparent 1px)",
         backgroundSize: "6px 6px",
       }} />
 
-      {/* connector lines */}
       <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
         {visible.map(({ room, gx, gy }) =>
           (room.neighboringRooms ?? []).map(([dir, neighbor], i) => {
@@ -111,7 +98,6 @@ function MiniMap({ currentRoom }: { currentRoom: Room }) {
             if (!off) return null;
             const ngx = gx + off.dx;
             const ngy = gy + off.dy;
-            // Only draw line if neighbor is also in viewport
             if (Math.abs(ngx) > VIEW_RADIUS || Math.abs(ngy) > VIEW_RADIUS) return null;
             return (
               <line
@@ -128,7 +114,6 @@ function MiniMap({ currentRoom }: { currentRoom: Room }) {
         )}
       </svg>
 
-      {/* room boxes */}
       {visible.map(({ room, gx, gy }) => {
         const isCurrent = gx === 0 && gy === 0;
         const color = getRoomColor(room);
@@ -151,7 +136,6 @@ function MiniMap({ currentRoom }: { currentRoom: Room }) {
         );
       })}
 
-      {/* center crosshair marker */}
       <div style={{
         position: "absolute",
         left: toPixel(0) - 1,
@@ -166,8 +150,6 @@ function MiniMap({ currentRoom }: { currentRoom: Room }) {
   );
 }
 
-// ─── MapNav ───────────────────────────────────────────────────────────────────
-
 export default function MapNav() {
   const state = useGameStore((state: GameState) => state);
 
@@ -177,7 +159,6 @@ export default function MapNav() {
         <div className="absolute bottom-4 left-4 text-white">
           <div style={{ display: "flex", alignItems: "flex-end", gap: 10 }}>
 
-            {/* Mini map */}
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
               <span style={{
                 fontSize: 8,
@@ -192,7 +173,6 @@ export default function MapNav() {
               <MiniMap currentRoom={state.room} />
             </div>
 
-            {/* D-pad */}
             <div className="flex flex-col items-center space-y-2">
               <button
                 onClick={() => state.move(Directions.North)}
@@ -228,6 +208,13 @@ export default function MapNav() {
                 <ChevronDown size={24} />
               </button>
             </div>
+
+              <button
+                onClick={() => state.enterTown()}
+                className="p-3 bg-gray-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 active:scale-95 disabled:hover:bg-gray-700 disabled:bg-gray-700"
+              >
+                T
+              </button>
 
           </div>
         </div>

@@ -62,6 +62,8 @@ export interface GameState {
   setLevelingUpChars: (chars: CharacterData[]) => void;
   applyLevelUp: (char: CharacterData) => void;
   nextLevelingChar: () => void;
+  enterTown: () => void;
+  exitTown: () => void;
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -705,7 +707,8 @@ export const useGameStore = create<GameState>((set, get) => ({
                 targetingSpell: null,
                 levelingUpChars: completion.levelingUpChars || [],
                 isLevelingUp: (completion.levelingUpChars || []).length > 0,
-                currentLevelingCharIndex: (completion.levelingUpChars || []).length > 0 ? 0 : -1,
+                currentLevelingCharIndex:
+                  (completion.levelingUpChars || []).length > 0 ? 0 : -1,
               };
             } else {
               updatedEnemies = updatedEnemies.map((e) =>
@@ -866,9 +869,20 @@ export const useGameStore = create<GameState>((set, get) => ({
         roomInstances: newRoomInstances,
         accumulatedExp: newAccumulatedExp,
         isTargeting: false,
-        targetingSpell: null
+        targetingSpell: null,
       };
     }),
+  enterTown: () => {
+    console.log("Entering town...");
+    set(() => ({
+      gameStatus: GameStatus.InTown,
+    }));
+  },
+
+  exitTown: () =>
+    set(() => ({
+      gameStatus: GameStatus.Exploring,
+    })),
 }));
 
 function calcDamage(defense: number, strength: number, dex: number): number {
