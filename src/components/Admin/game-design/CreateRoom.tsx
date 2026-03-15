@@ -98,6 +98,12 @@ const icons = {
       />
     </svg>
   ),
+  Transition: (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} width={18} height={18}>
+    <path strokeLinecap="round" strokeLinejoin="round"
+      d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+  </svg>
+),
   None: (
     <svg
       viewBox="0 0 24 24"
@@ -178,6 +184,7 @@ const icons = {
       />
     </svg>
   ),
+  
 };
 
 
@@ -310,7 +317,7 @@ const Divider = ({ label }: { label: string }) => (
 );
 
 
-const INTERACTION_TYPES = ["NPC", "Chest", "Camp", "Combat", "None"] as const;
+const INTERACTION_TYPES = ["NPC", "Chest", "Camp", "Combat", "Transition", "None"] as const;
 type InteractionType = (typeof INTERACTION_TYPES)[number];
 
 const interactionColors: Record<InteractionType, string> = {
@@ -318,6 +325,7 @@ const interactionColors: Record<InteractionType, string> = {
   Chest: "#D97706",
   Camp: "#059669",
   Combat: "#DC2626",
+  Transition: "#7C3AED",
   None: "#6B7280",
 };
 
@@ -367,8 +375,6 @@ function InteractionTabs({
     </div>
   );
 }
-
-// ─── Interaction sub-forms ────────────────────────────────────────────────────
 
 function NPCForm() {
   return (
@@ -544,7 +550,25 @@ function CampForm() {
   );
 }
 
-// ─── Toast notification ────────────────────────────────────────────────────────
+function TransitionForm() {
+  return (
+    <>
+      <FieldGroup id="destination" label="Destination">
+        <StyledSelect id="destination" name="destination">
+          <option value="next_dungeon">Next Dungeon</option>
+          <option value="sanctuary" disabled>Sanctuary (Coming Soon)</option>
+        </StyledSelect>
+      </FieldGroup>
+      <FieldGroup id="discoveryMessage" label="Discovery Message">
+        <StyledInput
+          id="discoveryMessage"
+          name="discoveryMessage"
+          placeholder="e.g. A dark archway hums with energy…"
+        />
+      </FieldGroup>
+    </>
+  );
+}
 
 function Toast({
   type,
@@ -755,7 +779,30 @@ export default function ManageRooms() {
 
         if (interactionError)
           throw new Error(`Failed to link camp: ${interactionError.message}`);
-      }
+      } else if (interaction === "Transition") {
+        const destination = formData.get("destination")?.toString() || "next_dungeon";
+        const discoveryMessage = formData.get("discoveryMessage")?.toString() || "";
+
+        const { data: transitionData, error: transitionError } = await supabase
+          .from("transitions")
+          .insert({ destination, discovery_message: discoveryMessage || null })
+          .select()
+          .single();
+
+        if (transitionError)
+          throw new Error(`Failed to create transition: ${transitionError.message}`);
+
+        const { error: interactionError } = await supabase
+          .from("room_interactions")
+          .insert({
+            room_id: newRoomId,
+            interaction_type: "transition",
+            transition_id: transitionData.id,
+          });
+
+        if (interactionError)
+          throw new Error(`Failed to link transition: ${interactionError.message}`);
+    }
 
       if (direction && neighboringRoom.id) {
         const directionEnum = +direction;
@@ -1049,6 +1096,7 @@ export default function ManageRooms() {
                 )}
                 {interaction === "Chest" && <ChestForm />}
                 {interaction === "Camp" && <CampForm />}
+                {interaction === "Transition" && <TransitionForm />}
               </div>
             )}
 

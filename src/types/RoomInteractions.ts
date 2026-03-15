@@ -33,10 +33,19 @@ export interface Camp {
   discoveryMessage?: string;
 }
 
+export type TransitionDestination = "next_dungeon" | "sanctuary";
+
+export interface Transition {
+  destination: TransitionDestination;
+  sanctuaryAvailable: boolean; 
+  discoveryMessage?: string;
+}
+
 export type RoomInteraction =
   | { type: "NPC"; npc: NPC }
   | { type: "chest"; chest: Chest }
-  | { type: "camp"; camp: Camp };
+  | { type: "camp"; camp: Camp }
+  | { type: "transition"; transition: Transition };
 
 export function getDiscoveryMessage(interaction: RoomInteraction): string {
   switch (interaction.type) {
@@ -56,6 +65,13 @@ export function getDiscoveryMessage(interaction: RoomInteraction): string {
       return (
         interaction.camp.discoveryMessage ||
         `You find a peaceful camping spot where you can rest.`
+      );
+    case "transition":
+      return (
+        interaction.transition.discoveryMessage ||
+        (interaction.transition.destination === "next_dungeon"
+          ? `A passage leading deeper into the dungeon looms before you.`
+          : `A warm light beckons — a sanctuary lies ahead.`)
       );
     default:
       return `There's something interesting in this room.`;
