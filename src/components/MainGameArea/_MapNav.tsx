@@ -2,6 +2,7 @@ import { useGameStore, GameState } from "@/state/GameState";
 import { Directions } from "@/types/Directions";
 import { GameStatus } from "@/types/GameStatus";
 import { Room } from "@/types/Room";
+import { Camp, Chest, NPC, RoomInteraction, Transition } from "@/types/RoomInteractions";
 import {
   ChevronDown,
   ChevronLeft,
@@ -9,37 +10,46 @@ import {
   ChevronUp,
 } from "lucide-react";
 
-const CELL = 12;         
-const GAP = 4;            
-const STEP = CELL + GAP;  
-const MAX_DEPTH = 4;      
-const VIEW_RADIUS = 3;    
+const CELL = 12;
+const GAP = 4;
+const STEP = CELL + GAP;
+const MAX_DEPTH = 4;
+const VIEW_RADIUS = 3;
 const MAP_CELLS = VIEW_RADIUS * 2 + 1;
-const MAP_SIZE = MAP_CELLS * STEP - GAP; 
+const MAP_SIZE = MAP_CELLS * STEP - GAP;
 
 const interactionColor: Record<string, string> = {
-  NPC:    "#818CF8",
-  chest:  "#F59E0B",
-  camp:   "#34D399",
+  NPC: "#818CF8",
+  chest: "#F59E0B",
+  camp: "#34D399",
   Combat: "#F87171",
-  none:   "#4B5563",
+  none: "#4B5563",
 };
 
 function getRoomColor(room: Room): string {
-  if (room.interaction) return interactionColor[room.interaction.type] ?? interactionColor.none;
+  if (room.interaction)
+    return interactionColor[room.interaction.type] ?? interactionColor.none;
   if (room.enemies?.length > 0) return interactionColor.Combat;
   return interactionColor.none;
 }
 
 function dirToOffset(dir: any): { dx: number; dy: number } | null {
-  if (dir === Directions.North || dir === "North" || dir === 0) return { dx:  0, dy: -1 };
-  if (dir === Directions.West  || dir === "West"  || dir === 1) return { dx: -1, dy:  0 };
-  if (dir === Directions.South || dir === "South" || dir === 2) return { dx:  0, dy:  1 };
-  if (dir === Directions.East  || dir === "East"  || dir === 3) return { dx:  1, dy:  0 };
+  if (dir === Directions.North || dir === "North" || dir === 0)
+    return { dx: 0, dy: -1 };
+  if (dir === Directions.West || dir === "West" || dir === 1)
+    return { dx: -1, dy: 0 };
+  if (dir === Directions.South || dir === "South" || dir === 2)
+    return { dx: 0, dy: 1 };
+  if (dir === Directions.East || dir === "East" || dir === 3)
+    return { dx: 1, dy: 0 };
   return null;
 }
 
-interface RoomPos { room: Room; gx: number; gy: number }
+interface RoomPos {
+  room: Room;
+  gx: number;
+  gy: number;
+}
 
 function buildLayout(
   room: Room,
@@ -51,11 +61,13 @@ function buildLayout(
   if (depth > MAX_DEPTH || visited.has(room.name)) return [];
   visited.set(room.name, { gx, gy });
   const result: RoomPos[] = [{ room, gx, gy }];
-  for (const [dir, neighbor] of (room.neighboringRooms ?? [])) {
+  for (const [dir, neighbor] of room.neighboringRooms ?? []) {
     if (visited.has(neighbor.name)) continue;
     const off = dirToOffset(dir);
     if (!off) continue;
-    result.push(...buildLayout(neighbor, gx + off.dx, gy + off.dy, visited, depth + 1));
+    result.push(
+      ...buildLayout(neighbor, gx + off.dx, gy + off.dy, visited, depth + 1),
+    );
   }
   return result;
 }
@@ -67,7 +79,7 @@ function MiniMap({ currentRoom }: { currentRoom: Room }) {
   if (allRooms.length === 0) return null;
 
   const visible = allRooms.filter(
-    r => Math.abs(r.gx) <= VIEW_RADIUS && Math.abs(r.gy) <= VIEW_RADIUS
+    (r) => Math.abs(r.gx) <= VIEW_RADIUS && Math.abs(r.gy) <= VIEW_RADIUS,
   );
 
   const toPixel = (g: number) => (g + VIEW_RADIUS) * STEP;
@@ -85,20 +97,33 @@ function MiniMap({ currentRoom }: { currentRoom: Room }) {
         flexShrink: 0,
       }}
     >
-      <div style={{
-        position: "absolute", inset: 0,
-        backgroundImage: "radial-gradient(circle, rgba(180,140,80,0.2) 1px, transparent 1px)",
-        backgroundSize: "6px 6px",
-      }} />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage:
+            "radial-gradient(circle, rgba(180,140,80,0.2) 1px, transparent 1px)",
+          backgroundSize: "6px 6px",
+        }}
+      />
 
-      <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
+      <svg
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          pointerEvents: "none",
+        }}
+      >
         {visible.map(({ room, gx, gy }) =>
           (room.neighboringRooms ?? []).map(([dir, neighbor], i) => {
             const off = dirToOffset(dir);
             if (!off) return null;
             const ngx = gx + off.dx;
             const ngy = gy + off.dy;
-            if (Math.abs(ngx) > VIEW_RADIUS || Math.abs(ngy) > VIEW_RADIUS) return null;
+            if (Math.abs(ngx) > VIEW_RADIUS || Math.abs(ngy) > VIEW_RADIUS)
+              return null;
             return (
               <line
                 key={`${room.name}-${i}`}
@@ -110,7 +135,7 @@ function MiniMap({ currentRoom }: { currentRoom: Room }) {
                 strokeWidth={1}
               />
             );
-          })
+          }),
         )}
       </svg>
 
@@ -128,7 +153,9 @@ function MiniMap({ currentRoom }: { currentRoom: Room }) {
               height: CELL,
               borderRadius: 2,
               background: isCurrent ? color : `${color}55`,
-              border: isCurrent ? `1px solid ${color}` : "1px solid rgba(180,140,80,0.2)",
+              border: isCurrent
+                ? `1px solid ${color}`
+                : "1px solid rgba(180,140,80,0.2)",
               boxShadow: isCurrent ? `0 0 6px ${color}` : "none",
               transition: "all 0.2s",
             }}
@@ -136,16 +163,18 @@ function MiniMap({ currentRoom }: { currentRoom: Room }) {
         );
       })}
 
-      <div style={{
-        position: "absolute",
-        left: toPixel(0) - 1,
-        top: toPixel(0) - 1,
-        width: CELL + 2,
-        height: CELL + 2,
-        borderRadius: 3,
-        border: "1px solid rgba(212,175,55,0.6)",
-        pointerEvents: "none",
-      }} />
+      <div
+        style={{
+          position: "absolute",
+          left: toPixel(0) - 1,
+          top: toPixel(0) - 1,
+          width: CELL + 2,
+          height: CELL + 2,
+          borderRadius: 3,
+          border: "1px solid rgba(212,175,55,0.6)",
+          pointerEvents: "none",
+        }}
+      />
     </div>
   );
 }
@@ -153,21 +182,24 @@ function MiniMap({ currentRoom }: { currentRoom: Room }) {
 export default function MapNav() {
   const state = useGameStore((state: GameState) => state);
 
+  const room = state.room;
+  const transition = room?.interaction?.type === "transition" ? room.interaction.transition as Transition : null;
   return (
     <>
       {state.gameStatus === GameStatus.Exploring ? (
         <div className="absolute bottom-4 left-4 text-white">
           <div style={{ display: "flex", alignItems: "flex-end", gap: 10 }}>
-
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              <span style={{
-                fontSize: 8,
-                color: "rgba(180,140,80,0.6)",
-                fontFamily: "'Cinzel', Georgia, serif",
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-                textAlign: "center",
-              }}>
+              <span
+                style={{
+                  fontSize: 8,
+                  color: "rgba(180,140,80,0.6)",
+                  fontFamily: "'Cinzel', Georgia, serif",
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  textAlign: "center",
+                }}
+              >
                 Map
               </span>
               <MiniMap currentRoom={state.room} />
@@ -177,7 +209,11 @@ export default function MapNav() {
               <button
                 onClick={() => state.move(Directions.North)}
                 className="p-3 bg-gray-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 active:scale-95 disabled:hover:bg-gray-700 disabled:bg-gray-700"
-                disabled={!state.room.neighboringRooms.some(([dir]) => dir === Directions.North)}
+                disabled={
+                  !state.room.neighboringRooms.some(
+                    ([dir]) => dir === Directions.North,
+                  )
+                }
               >
                 <ChevronUp size={24} />
               </button>
@@ -186,7 +222,11 @@ export default function MapNav() {
                 <button
                   onClick={() => state.move(Directions.West)}
                   className="p-3 bg-gray-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 active:scale-95 disabled:hover:bg-gray-700 disabled:bg-gray-700"
-                  disabled={!state.room.neighboringRooms.some(([dir]) => dir === Directions.West)}
+                  disabled={
+                    !state.room.neighboringRooms.some(
+                      ([dir]) => dir === Directions.West,
+                    )
+                  }
                 >
                   <ChevronLeft size={24} />
                 </button>
@@ -194,7 +234,11 @@ export default function MapNav() {
                 <button
                   onClick={() => state.move(Directions.East)}
                   className="p-3 bg-gray-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 active:scale-95 disabled:hover:bg-gray-700 disabled:bg-gray-700"
-                  disabled={!state.room.neighboringRooms.some(([dir]) => dir === Directions.East)}
+                  disabled={
+                    !state.room.neighboringRooms.some(
+                      ([dir]) => dir === Directions.East,
+                    )
+                  }
                 >
                   <ChevronRight size={24} />
                 </button>
@@ -203,19 +247,24 @@ export default function MapNav() {
               <button
                 onClick={() => state.move(Directions.South)}
                 className="p-3 bg-gray-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 active:scale-95 disabled:hover:bg-gray-700 disabled:bg-gray-700"
-                disabled={!state.room.neighboringRooms.some(([dir]) => dir === Directions.South)}
+                disabled={
+                  !state.room.neighboringRooms.some(
+                    ([dir]) => dir === Directions.South,
+                  )
+                }
               >
                 <ChevronDown size={24} />
               </button>
             </div>
 
+            {transition && (
               <button
                 onClick={() => state.enterTown()}
                 className="p-3 bg-gray-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 active:scale-95 disabled:hover:bg-gray-700 disabled:bg-gray-700"
               >
                 T
               </button>
-
+            )}
           </div>
         </div>
       ) : (

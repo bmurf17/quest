@@ -191,8 +191,6 @@ export default function ActionMenu() {
 
   return (
     <>
-  <style>{``}</style>
-
       <div style={{ display: "flex", flexDirection: "column", gap: 10, height: "100%", fontFamily: "'Lato', sans-serif" }}>
 
         {inCombat && !isFighterEnemy && currentFighter && (

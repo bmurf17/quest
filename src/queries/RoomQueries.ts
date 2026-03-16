@@ -42,7 +42,8 @@ export async function getAllRooms(): Promise<Room[]> {
         interaction_type,
         npcs(*),
         chests(*, item:items(*)),
-        camps(*)
+        camps(*),
+        transitions(*)
         `
       )
       .then(({ data, error }) => {
@@ -139,6 +140,16 @@ export async function getAllRooms(): Promise<Room[]> {
             },
           };
           break;
+          case "transition":
+      interaction = {
+        type: "transition",
+        transition: {
+          destination: interactionData.transitions.destination,
+          discoveryMessage: interactionData.transitions.discovery_message ?? undefined,
+          sanctuaryAvailable: interactionData.transitions.sanctuary_available ?? undefined,
+        },
+      };
+      break;
       }
     }
 
