@@ -7,16 +7,11 @@ Char Creation
     Char is a template
     Assign the skills
 Equipment
-Consumables get used
-Consumables do the right thing (mana potions heal hp)
-Consumables progress combat
 Orbements- non equipment that effects stats??
-Mini Map
 Admin
     More control over room stuff
     Export db as backup
     Set Character Skill Trees
-    Create Transition (one map to the next) Rooms
 Things to draw
     Axe
     New Chars
