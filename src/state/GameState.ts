@@ -502,10 +502,9 @@ export const useGameStore = create<GameState>((set, get) => ({
       };
     }),
 
-  useConsumable: (item: Consumable) =>
+useConsumable: (item: Consumable) => {
     set((state) => {
       const logBuilder = new ActivityLogBuilder().add(`${item.effect}`);
-
       let newCombatOrder = [...state.combatOrder];
 
       const updatedParty = state.party.map((member) => {
@@ -538,13 +537,37 @@ export const useGameStore = create<GameState>((set, get) => ({
             ]
           : state.inventory;
 
+      const nextFighterIndex =
+        state.gameStatus === GameStatus.Combat
+          ? (state.activeFighterIndex + 1) % newCombatOrder.length
+          : state.activeFighterIndex;
+
       return {
         party: updatedParty,
         combatOrder: newCombatOrder,
         activityLog: [...state.activityLog, ...logBuilder.build()],
         inventory: updatedInventory,
+        activeFighterIndex: nextFighterIndex,
       };
-    }),
+    });
+
+    setTimeout(() => {
+      const {
+        gameStatus,
+        isCurrentFighterEnemy,
+        performEnemyTurn,
+        isLevelingUp,
+      } = get();
+      if (
+        gameStatus === GameStatus.Combat &&
+        isCurrentFighterEnemy() &&
+        !isLevelingUp
+      ) {
+        performEnemyTurn();
+      }
+    }, 500);
+  },
+
 
   takeFromChest: (chest: Chest) =>
     set((state) => {

@@ -198,7 +198,7 @@ export default function ActionMenu() {
             {currentFighter.items?.length > 0 && (
               <>
                 <SectionLabel>Weapons</SectionLabel>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6, marginBottom: 10, marginLeft: 4 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6, marginBottom: 4, marginLeft: 4 }}>
                   {currentFighter.items.map((item, idx) => (
                     <AbilitySlot
                       key={item.action.name + idx}
