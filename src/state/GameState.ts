@@ -529,10 +529,20 @@ export const useGameStore = create<GameState>((set, get) => ({
         };
       });
 
+      const itemIndex = state.inventory.findIndex((i) => i.name === item.name);
+      const updatedInventory =
+        itemIndex !== -1
+          ? [
+              ...state.inventory.slice(0, itemIndex),
+              ...state.inventory.slice(itemIndex + 1),
+            ]
+          : state.inventory;
+
       return {
         party: updatedParty,
         combatOrder: newCombatOrder,
         activityLog: [...state.activityLog, ...logBuilder.build()],
+        inventory: updatedInventory,
       };
     }),
 
@@ -640,10 +650,16 @@ export const useGameStore = create<GameState>((set, get) => ({
             "health" in target
           ) {
             const enemy = target as Enemy;
-            const currentAttacker = state.combatOrder[state.activeFighterIndex] as CharacterData;
+            const currentAttacker = state.combatOrder[
+              state.activeFighterIndex
+            ] as CharacterData;
             const currentIntelligence = currentAttacker.abilities.int.score;
             const currentWisdom = currentAttacker.abilities.wis.score;
-            const damage = calcDamage(enemy.defense, currentWisdom, currentIntelligence);
+            const damage = calcDamage(
+              enemy.defense,
+              currentWisdom,
+              currentIntelligence,
+            );
 
             const newHealth = Math.max(0, enemy.health - damage);
 
@@ -721,9 +737,7 @@ export const useGameStore = create<GameState>((set, get) => ({
               updatedEnemies = updatedEnemies.map((e) =>
                 e.id === enemy.id ? { ...e, health: newHealth } : e,
               );
-              logBuilder.add(
-                `${enemy.name} takes ${damage} damage!`,
-              );
+              logBuilder.add(`${enemy.name} takes ${damage} damage!`);
             }
           } else if (spell.effect.target === "all") {
             const defeatedEnemies: string[] = [];
