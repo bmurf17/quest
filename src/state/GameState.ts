@@ -356,9 +356,11 @@ export const useGameStore = create<GameState>((set, get) => ({
     set((state) => {
       const updatedParty = state.party.map((member) => {
         const newHp = Math.min(member.maxHp, member.hp + camp.healAmount);
+        const newMp = Math.min(member.maxMp, member.mp + camp.healAmount);
         return {
           ...member,
           hp: newHp,
+          mp: newMp,
           alive: newHp > 0,
         };
       });
@@ -638,7 +640,12 @@ export const useGameStore = create<GameState>((set, get) => ({
             "health" in target
           ) {
             const enemy = target as Enemy;
-            const newHealth = Math.max(0, enemy.health - spell.effect.amount);
+            const currentAttacker = state.combatOrder[state.activeFighterIndex] as CharacterData;
+            const currentIntelligence = currentAttacker.abilities.int.score;
+            const currentWisdom = currentAttacker.abilities.wis.score;
+            const damage = calcDamage(enemy.defense, currentWisdom, currentIntelligence);
+
+            const newHealth = Math.max(0, enemy.health - damage);
 
             if (newHealth <= 0) {
               const defeatedEnemyIndex = combatOrder.findIndex(
@@ -650,7 +657,7 @@ export const useGameStore = create<GameState>((set, get) => ({
               newAccumulatedExp += enemy.expGain ?? 10;
 
               logBuilder.add(
-                `${enemy.name} takes ${spell.effect.amount} damage and is defeated!`,
+                `${enemy.name} takes ${damage} damage and is defeated!`,
               );
 
               if (defeatedEnemyIndex <= state.activeFighterIndex) {
@@ -715,7 +722,7 @@ export const useGameStore = create<GameState>((set, get) => ({
                 e.id === enemy.id ? { ...e, health: newHealth } : e,
               );
               logBuilder.add(
-                `${enemy.name} takes ${spell.effect.amount} damage!`,
+                `${enemy.name} takes ${damage} damage!`,
               );
             }
           } else if (spell.effect.target === "all") {
@@ -872,8 +879,8 @@ export const useGameStore = create<GameState>((set, get) => ({
         targetingSpell: null,
       };
     }),
+
   enterTown: () => {
-    console.log("Entering town...");
     set(() => ({
       gameStatus: GameStatus.InTown,
     }));

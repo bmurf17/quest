@@ -198,7 +198,7 @@ export default function ActionMenu() {
             {currentFighter.items?.length > 0 && (
               <>
                 <SectionLabel>Weapons</SectionLabel>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6, marginBottom: 10 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6, marginBottom: 10, marginLeft: 4 }}>
                   {currentFighter.items.map((item, idx) => (
                     <AbilitySlot
                       key={item.action.name + idx}
@@ -215,7 +215,7 @@ export default function ActionMenu() {
             {currentFighter.spells?.length > 0 && (
               <>
                 <SectionLabel>Skills</SectionLabel>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6, marginLeft: 4  }}>
                   {currentFighter.spells.map((spell, idx) => {
                     const notEnoughMana = currentFighter.mp < spell.manaCost;
                     return (

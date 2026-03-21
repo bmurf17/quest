@@ -32,7 +32,7 @@ export default function GameLayout() {
       </div>
 
      <div style={{
-        height: 240, 
+        height: 260, 
         flexShrink: 0,
         display: "grid",
         gridTemplateColumns: "320px 1fr 340px",
