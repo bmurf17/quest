@@ -45,15 +45,17 @@ function StatBar({
 import { colors, fonts } from "../theme";
 
 export default function Party({ party }: Props) {
-  const [selectedCharacter, setSelectedCharacter] =
-    useState<CharacterData>(tempRanger);
+  const [selectedCharacter, setSelectedCharacter] = useState<CharacterData>(tempRanger);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const isTargeting = useGameStore((state) => state.isTargeting);
   const targetingSpell = useGameStore((state) => state.targetingSpell);
+  const targetingConsumable = useGameStore((state) => state.targetingConsumable);
   const castSpell = useGameStore((state) => state.castSpell);
+  const useConsumable = useGameStore((state) => state.useConsumable);
   const setTargeting = useGameStore((state) => state.setTargeting);
   const setTargetingSpell = useGameStore((state) => state.setTargetingSpell);
+  const setTargetingConsumable = useGameStore((state) => state.setTargetingConsumable);
 
   const isTargetingHeal =
     isTargeting &&
@@ -61,12 +63,18 @@ export default function Party({ party }: Props) {
     targetingSpell.effect.type === "heal" &&
     targetingSpell.effect.target === "single";
 
+  const isTargetingConsumable = isTargeting && !!targetingConsumable;
+
   const handleCharacterClick = (character: CharacterData) => {
     if (isTargetingHeal) {
       if (!character.alive || character.hp <= 0) return;
       castSpell(targetingSpell, character);
       setTargeting(false);
       setTargetingSpell(null);
+    } else if (isTargetingConsumable) {
+      useConsumable(targetingConsumable, character);
+      setTargeting(false);
+      setTargetingConsumable(null);
     } else {
       setSelectedCharacter(character);
       setIsModalOpen(true);

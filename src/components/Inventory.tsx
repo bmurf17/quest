@@ -7,6 +7,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useGameStore } from "@/state/GameState";
 import { colors, fonts } from "@/theme";
+import { GameStatus } from "@/types/GameStatus";
 import { Consumable, Item } from "@/types/Item";
 
 export default function Inventory({
@@ -19,7 +20,19 @@ export default function Inventory({
   inventory: Item[];
 }) {
   const useConsumable = useGameStore((state) => state.useConsumable);
+  const setTargeting = useGameStore((state) => state.setTargeting);
+  const setTargetingConsumable = useGameStore((state) => state.setTargetingConsumable);
+  const gameStatus = useGameStore((state) => state.gameStatus);
 
+  const handleUseItem = (item: Item) => {
+    if (gameStatus === GameStatus.Combat) {
+      onOpenChange?.(false);
+      setTargeting(true);
+      setTargetingConsumable(item as Consumable);
+    } else {
+      useConsumable(item as Consumable);
+    }
+  };
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent
@@ -72,7 +85,7 @@ export default function Inventory({
               inventory.map((item) => (
                 <div
                   key={item.name}
-                  onClick={() => useConsumable(item as Consumable)}
+                  onClick={() => handleUseItem(item)}
                   style={{
                     display: "flex",
                     alignItems: "center",

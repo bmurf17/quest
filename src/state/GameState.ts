@@ -41,7 +41,7 @@ export interface GameState {
   enterCombat: () => void;
   isCurrentFighterEnemy: () => boolean;
   performEnemyTurn: () => void;
-  useConsumable: (item: Consumable) => void;
+  useConsumable: (item: Consumable, target?: CharacterData) => void;
   buyItem: (item: Item) => void;
   dialogueIndex: number;
   advanceDialogue: () => void;
@@ -64,6 +64,8 @@ export interface GameState {
   nextLevelingChar: () => void;
   enterTown: () => void;
   exitTown: () => void;
+  targetingConsumable: Consumable | null;
+  setTargetingConsumable: (item: Consumable | null) => void;
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -93,6 +95,9 @@ export const useGameStore = create<GameState>((set, get) => ({
   isLevelingUp: false,
   levelingUpChars: [],
   currentLevelingCharIndex: -1,
+  targetingConsumable: null,
+
+  setTargetingConsumable: (item) => set({ targetingConsumable: item }),
 
   setTargeting: (targeting: boolean) =>
     set(() => ({
@@ -502,12 +507,13 @@ export const useGameStore = create<GameState>((set, get) => ({
       };
     }),
 
-useConsumable: (item: Consumable) => {
+useConsumable: (item: Consumable,  target?: CharacterData) => {
     set((state) => {
       const logBuilder = new ActivityLogBuilder().add(`${item.effect}`);
       let newCombatOrder = [...state.combatOrder];
 
       const updatedParty = state.party.map((member) => {
+        if (target && member.name !== target.name) return member;
         const wasDead = !member.alive || member.hp <= 0;
         const newHp = Math.min(member.maxHp, member.hp + item.hpChange);
         const isNowAlive = newHp > 0;
