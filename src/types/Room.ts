@@ -24,10 +24,8 @@ const northRoom: Room = {
       img: ""
     },
   },
-  id: 0
+  id: -1
 };
-
-
 
 export const startRoom: Room = {
   name: "Start Room",

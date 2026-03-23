@@ -438,6 +438,10 @@ export const useGameStore = create<GameState>((set, get) => ({
     set(() => ({
       room: rooms[0],
       rooms: rooms,
+      roomInstances: rooms.reduce((map, room) => {
+        map.set(room.id, room);
+        return map;
+      }, new Map()),
     })),
 
   addRoom: (room: Room) =>
