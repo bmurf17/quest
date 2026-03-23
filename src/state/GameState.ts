@@ -939,7 +939,7 @@ useConsumable: (item: Consumable,  target?: CharacterData) => {
     })),
 }));
 
-function calcDamage(defense: number, strength: number, dex: number): number {
+export function calcDamage(defense: number, strength: number, dex: number): number {
   const hitChance = dex + Math.floor(Math.random() * 20) + 1;
   if (hitChance >= defense) {
     const damage = strength + Math.floor(Math.random() * 6) + 1;
@@ -968,11 +968,11 @@ class ActivityLogBuilder {
   }
 }
 
-function isEnemy(f: CharacterData | Enemy | undefined): f is Enemy {
+export function isEnemy(f: CharacterData | Enemy | undefined): f is Enemy {
   return !!f && "health" in f && "id" in f;
 }
 
-function safeNextIndex(currentIndex: number, length: number): number {
+export function safeNextIndex(currentIndex: number, length: number): number {
   if (!length || length <= 0) return 0;
   return (currentIndex + 1) % length;
 }
