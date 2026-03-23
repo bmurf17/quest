@@ -21,7 +21,7 @@ export interface GameState {
   party: CharacterData[];
   activityLog: string[];
   room: Room;
-  roomInstances: Map<Room, Room>;
+  roomInstances: Map<number, Room>;
   gameStatus: GameStatus;
   rooms: Room[];
   combatOrder: (CharacterData | Enemy)[];
@@ -73,9 +73,9 @@ export const useGameStore = create<GameState>((set, get) => ({
   activityLog: ["You start your adventure."],
   room: startRoom,
   gameStatus: GameStatus.Exploring,
-  roomInstances: new Map<Room, Room>([
+  roomInstances: new Map<number, Room>([
     [
-      startRoom,
+      startRoom.id,
       { ...startRoom, enemies: startRoom.enemies.map((e) => ({ ...e })) },
     ],
   ]),
@@ -206,7 +206,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       let logMessage: string;
 
       const currentRoomInstance =
-        state.roomInstances.get(state.room) || state.room;
+        state.roomInstances.get(state.room.id) || state.room;
 
       if (newHealth <= 0) {
         updatedEnemies = currentRoomInstance.enemies.filter(
@@ -388,7 +388,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         return state;
       }
 
-      let roomInstance = state.roomInstances.get(targetRoomTemplate);
+  let roomInstance = state.roomInstances.get(targetRoomTemplate.id);
       if (!roomInstance) {
         roomInstance = {
           ...targetRoomTemplate,
@@ -421,8 +421,8 @@ export const useGameStore = create<GameState>((set, get) => ({
           }!`,
         );
 
-      const newRoomInstances = new Map(state.roomInstances);
-      newRoomInstances.set(targetRoomTemplate, roomInstance);
+  const newRoomInstances = new Map(state.roomInstances);
+  newRoomInstances.set(targetRoomTemplate.id, roomInstance);
 
       return {
         activityLog: [...state.activityLog, ...logBuilder.build()],
@@ -462,7 +462,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   updateChest: (chest: Chest) =>
     set((state) => {
       const currentRoomInstance =
-        state.roomInstances.get(state.room) || state.room;
+        state.roomInstances.get(state.room.id) || state.room;
       const logBuilder = new ActivityLogBuilder().add(
         `You have opened the chest!`,
       );
@@ -471,14 +471,14 @@ export const useGameStore = create<GameState>((set, get) => ({
         interaction: { type: "chest", chest: chest },
       };
 
-      const originalTemplate = [...state.roomInstances.entries()].find(
-        ([template, instance]) =>
-          instance === currentRoomInstance || template === state.room,
+      const originalTemplateId = [...state.roomInstances.entries()].find(
+        ([templateId, instance]) =>
+          instance === currentRoomInstance || templateId === state.room.id,
       )?.[0];
 
       const newRoomInstances = new Map(state.roomInstances);
-      if (originalTemplate) {
-        newRoomInstances.set(originalTemplate, updatedRoom);
+      if (originalTemplateId !== undefined) {
+        newRoomInstances.set(originalTemplateId, updatedRoom);
       }
 
       return {
@@ -576,7 +576,7 @@ useConsumable: (item: Consumable,  target?: CharacterData) => {
   takeFromChest: (chest: Chest) =>
     set((state) => {
       const currentRoomInstance =
-        state.roomInstances.get(state.room) || state.room;
+        state.roomInstances.get(state.room.id) || state.room;
       const logBuilder = new ActivityLogBuilder().add(
         `You take from the chest!`,
       );
@@ -585,14 +585,14 @@ useConsumable: (item: Consumable,  target?: CharacterData) => {
         interaction: { type: "chest", chest: { ...chest } },
       };
 
-      const originalTemplate = [...state.roomInstances.entries()].find(
-        ([template, instance]) =>
-          instance === currentRoomInstance || template === state.room,
+      const originalTemplateId = [...state.roomInstances.entries()].find(
+        ([templateId, instance]) =>
+          instance === currentRoomInstance || templateId === state.room.id,
       )?.[0];
 
       const newRoomInstances = new Map(state.roomInstances);
-      if (originalTemplate) {
-        newRoomInstances.set(originalTemplate, updatedRoom);
+      if (originalTemplateId !== undefined) {
+        newRoomInstances.set(originalTemplateId, updatedRoom);
       }
 
       const inventory = state.inventory;
@@ -654,7 +654,7 @@ useConsumable: (item: Consumable,  target?: CharacterData) => {
       );
 
       let updatedParty = state.party;
-      let updatedEnemies = (state.roomInstances.get(state.room) || state.room)
+  let updatedEnemies = (state.roomInstances.get(state.room.id) || state.room)
         .enemies;
       let combatOrder = state.combatOrder;
       let nextIndex = safeNextIndex(
@@ -726,13 +726,13 @@ useConsumable: (item: Consumable,  target?: CharacterData) => {
               gameStatus = completion.status;
 
               const currentRoomInstance =
-                state.roomInstances.get(state.room) || state.room;
+                state.roomInstances.get(state.room.id) || state.room;
               const updatedRoom = {
                 ...currentRoomInstance,
                 enemies: updatedEnemies,
               };
               const newRoomInstances = new Map(state.roomInstances);
-              newRoomInstances.set(state.room, updatedRoom);
+              newRoomInstances.set(state.room.id, updatedRoom);
 
               setTimeout(() => {
                 const { gameStatus, isCurrentFighterEnemy, performEnemyTurn } =
@@ -873,10 +873,10 @@ useConsumable: (item: Consumable,  target?: CharacterData) => {
       }
 
       const currentRoomInstance =
-        state.roomInstances.get(state.room) || state.room;
+        state.roomInstances.get(state.room.id) || state.room;
       const updatedRoom = { ...currentRoomInstance, enemies: updatedEnemies };
-      const newRoomInstances = new Map(state.roomInstances);
-      newRoomInstances.set(state.room, updatedRoom);
+  const newRoomInstances = new Map(state.roomInstances);
+  newRoomInstances.set(state.room.id, updatedRoom);
 
       if (
         updatedEnemies.length === 0 &&

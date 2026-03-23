@@ -62,21 +62,21 @@ export const finalizeAttackState = (
   isDefeated: boolean = false,
   defeatedCount: number = 0
 ) => {
-  const currentRoomInstance = state.roomInstances.get(state.room) || state.room;
+  const currentRoomInstance = state.roomInstances.get(state.room.id) || state.room;
 
   const updatedRoom = {
     ...currentRoomInstance,
     enemies: updatedEnemies,
   };
 
-  const originalTemplate = [...state.roomInstances.entries()].find(
-    ([template, instance]) =>
-      instance === currentRoomInstance || template === state.room,
+  const originalTemplateId = [...state.roomInstances.entries()].find(
+    ([templateId, instance]) =>
+      instance === currentRoomInstance || templateId === state.room.id,
   )?.[0];
 
   const newRoomInstances = new Map(state.roomInstances);
-  if (originalTemplate) {
-    newRoomInstances.set(originalTemplate, updatedRoom);
+  if (originalTemplateId !== undefined) {
+    newRoomInstances.set(originalTemplateId, updatedRoom);
   }
 
   return {
