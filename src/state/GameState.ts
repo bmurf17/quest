@@ -117,9 +117,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   isCurrentFighterEnemy: () => {
     const state = get();
     const currentFighter = state.combatOrder[state.activeFighterIndex];
-    return (
-      currentFighter && "health" in currentFighter && "id" in currentFighter
-    );
+  return isEnemy(currentFighter);
   },
 
   performEnemyTurn: () => {
@@ -136,13 +134,13 @@ export const useGameStore = create<GameState>((set, get) => ({
       livingMembers[Math.floor(Math.random() * livingMembers.length)];
 
     set((state) => {
-      var damage = calcDamage(
+      const damage = calcDamage(
         target.abilities.def.score,
         currentEnemy.dex,
         currentEnemy.strength,
       );
-      var newHealth = Math.max(0, target.hp - damage);
-      var combatOrder = state.combatOrder;
+      const newHealth = Math.max(0, target.hp - damage);
+      let combatOrder = state.combatOrder;
 
       const updatedParty = state.party.map((member) => {
         if (member.name === target.name) {
@@ -151,7 +149,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         return member;
       });
 
-      var logMessage = `${currentEnemy.name} attacked ${
+      let logMessage = `${currentEnemy.name} attacked ${
         target.name
       } for ${damage} damage! ${target.name}'s HP: ${newHealth}`;
 
@@ -164,8 +162,10 @@ export const useGameStore = create<GameState>((set, get) => ({
         });
       }
 
-      const nextIndex =
-        (state.activeFighterIndex + 1) % state.combatOrder.length;
+      const nextIndex = safeNextIndex(
+        state.activeFighterIndex,
+        state.combatOrder.length,
+      );
 
       return {
         party: updatedParty,
@@ -175,12 +175,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       };
     });
 
-    setTimeout(() => {
-      const { isCurrentFighterEnemy, performEnemyTurn } = get();
-      if (isCurrentFighterEnemy()) {
-        performEnemyTurn();
-      }
-    }, 500);
+  scheduleEnemyTurn(get);
   },
 
   attack: (enemy: Enemy) => {
@@ -197,12 +192,15 @@ export const useGameStore = create<GameState>((set, get) => ({
           ? currentAttacker.abilities.str.score
           : currentAttacker.strength;
 
-      const damage = calcDamage(enemy.defense, currentStr, currentDex);
-      const newHealth = enemy.health - damage;
+  const damage = calcDamage(enemy.defense, currentStr, currentDex);
+  const newHealth = enemy.health - damage;
       const hitEnemyId = enemy.id;
       const hitCount = state.lastHitCounter + 1;
 
-      let nextIndex = (state.activeFighterIndex + 1) % state.combatOrder.length;
+      let nextIndex = safeNextIndex(
+        state.activeFighterIndex,
+        state.combatOrder.length,
+      );
       let combatOrder = state.combatOrder;
       let updatedEnemies: Enemy[];
       let logMessage: string;
@@ -613,8 +611,6 @@ useConsumable: (item: Consumable,  target?: CharacterData) => {
 
   buyItem(item) {
     set((state) => {
-      const inventory = state.inventory;
-
       if (item.cost > state.goldPieces) {
         return {
           activityLog: [
@@ -624,9 +620,10 @@ useConsumable: (item: Consumable,  target?: CharacterData) => {
         };
       }
 
-      inventory.push(item);
+      const inventory = [...state.inventory, item];
+
       return {
-        inventory: inventory,
+        inventory,
         goldPieces: state.goldPieces - item.cost,
       };
     });
@@ -660,7 +657,10 @@ useConsumable: (item: Consumable,  target?: CharacterData) => {
       let updatedEnemies = (state.roomInstances.get(state.room) || state.room)
         .enemies;
       let combatOrder = state.combatOrder;
-      let nextIndex = (state.activeFighterIndex + 1) % state.combatOrder.length;
+      let nextIndex = safeNextIndex(
+        state.activeFighterIndex,
+        state.combatOrder.length,
+      );
       let newAccumulatedExp = state.accumulatedExp;
       let gameStatus = state.gameStatus;
 
@@ -676,7 +676,7 @@ useConsumable: (item: Consumable,  target?: CharacterData) => {
           if (
             spell.effect.target === "single" &&
             target &&
-            "health" in target
+            isEnemy(target)
           ) {
             const enemy = target as Enemy;
             const currentAttacker = state.combatOrder[
@@ -773,7 +773,7 @@ useConsumable: (item: Consumable,  target?: CharacterData) => {
             const defeatedIndices: number[] = [];
 
             combatOrder.forEach((fighter, index) => {
-              if ("health" in fighter && "id" in fighter) {
+              if (isEnemy(fighter)) {
                 const enemy = updatedEnemies.find(
                   (e) => e.name === fighter.name,
                 );
@@ -962,4 +962,27 @@ class ActivityLogBuilder {
   build(): string[] {
     return [...this.messages];
   }
+}
+
+function isEnemy(f: CharacterData | Enemy | undefined): f is Enemy {
+  return !!f && "health" in f && "id" in f;
+}
+
+function safeNextIndex(currentIndex: number, length: number): number {
+  if (!length || length <= 0) return 0;
+  return (currentIndex + 1) % length;
+}
+
+function scheduleEnemyTurn(getState: () => any, delay = 500) {
+  setTimeout(() => {
+    const { gameStatus, isCurrentFighterEnemy, performEnemyTurn, isLevelingUp } =
+      getState();
+    if (
+      gameStatus === GameStatus.Combat &&
+      isCurrentFighterEnemy() &&
+      !isLevelingUp
+    ) {
+      performEnemyTurn();
+    }
+  }, delay);
 }
