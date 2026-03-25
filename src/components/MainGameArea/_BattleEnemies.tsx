@@ -1,8 +1,8 @@
 import { GameState, useGameStore } from "@/state/GameState";
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo } from "react";
 import { useSound } from "@/hooks/useSound";
 
-export default function BattleEnemies() {
+function BattleEnemiesComponent() {
   const state = useGameStore((state: GameState) => state);
   const currentRoom = state.room;
   const lastHitEnemyId = useGameStore((state) => state.lastHitEnemyId);
@@ -112,3 +112,5 @@ export default function BattleEnemies() {
     </>
   );
 }
+
+export default memo(BattleEnemiesComponent);

@@ -5,7 +5,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { CharacterData } from "@/types/Character";
-import { useState } from "react";
+import { useState, memo } from "react";
 import { Plus, Minus } from "lucide-react";
 import { useGameStore } from "@/state/GameState";
 import { colors, fonts } from "@/theme";
@@ -56,7 +56,7 @@ function StatBar({ value, max }: { value: number; max: number }) {
   );
 }
 
-export default function LevelUpModal() {
+function LevelUpModalComponent() {
   const { levelingUpChars, currentLevelingCharIndex, applyLevelUp } =
     useGameStore();
 
@@ -469,3 +469,5 @@ export default function LevelUpModal() {
     </Dialog>
   );
 }
+
+export default memo(LevelUpModalComponent);
