@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import BattleOrder from "./_BattleOrder";
 import RoomCamp from "./_RoomCamp";
 import LevelUpModal from "./_LevelUpModal";
+import GameOverModal from "./_GameOverModal";
 import { GameStatus } from "@/types/GameStatus";
 
 export default function MainGameArea() {
@@ -73,6 +74,7 @@ export default function MainGameArea() {
       </div>
 
       <LevelUpModal />
+      <GameOverModal />
     </div>
   );
 }

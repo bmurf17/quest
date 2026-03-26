@@ -162,6 +162,20 @@ export const useGameStore = create<GameState>((set, get) => ({
         });
       }
 
+      const isPartyDefeated = updatedParty.every(
+        (member) => member.hp <= 0 || !member.alive,
+      );
+
+      if (isPartyDefeated) {
+        return {
+          party: updatedParty,
+          activityLog: [...state.activityLog, logMessage, "Your party has been defeated..."],
+          activeFighterIndex: 0,
+          combatOrder: [],
+          gameStatus: GameStatus.GameOver,
+        };
+      }
+
       const nextIndex = safeNextIndex(
         state.activeFighterIndex,
         state.combatOrder.length,

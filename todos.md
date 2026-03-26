@@ -1,6 +1,5 @@
 Database 
     NPC inventory
-Consumables used by a single char
 Spells using stats
 Char Creation
     Enter the Char's name
@@ -20,7 +19,6 @@ Things to draw
     Trees
 Dialogue Trees
 Split Game State into helper methods
-Game Over
 Transition From One Map to the Next
 World Hub
 Buy item removes it from shop (certain items)
