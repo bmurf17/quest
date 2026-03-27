@@ -28,6 +28,7 @@ Sound effects
         Heal
 Crit hits
 Achievements 
+Quests
 
 
 2. Extract shared primitives into a ui/ component folder

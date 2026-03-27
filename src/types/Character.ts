@@ -94,6 +94,60 @@ export type CharacterData = {
   nextLevelExp: number;
 };
 
+const defaultSavingThrows: SavingThrows = {
+  str: "+2",
+  dex: "+4",
+  con: "0",
+  int: "+1",
+  wis: "+1",
+  cha: "-1",
+};
+
+const defaultSpells: Spell[] = [
+  {
+    name: "Fireball",
+    manaCost: 5,
+    image: fireball,
+    effect: { type: 'damage', amount: 15, target: 'single' },
+    description: "Hurls a blazing fireball at an enemy"
+  },
+  {
+    name: "Heal",
+    manaCost: 3,
+    image: heal,
+    effect: { type: 'heal', amount: 20, target: 'single' },
+    description: "Restores health to a party member"
+  },
+];
+
+const defaultSkills: Skill[] = [
+  { name: "Acrobatics", ability: "DEX", modifier: "+2" },
+  { name: "Animal Handling", ability: "WIS", modifier: "+1" },
+  { name: "Arcana", ability: "INT", modifier: "+1" },
+  { name: "Athletics", ability: "STR", modifier: "+2" },
+  { name: "Deception", ability: "CHA", modifier: "-1" },
+];
+
+const shortswordItem: Item = {
+  img: sword,
+  action: {
+    name: "Shortsword",
+    hitDC: "+4",
+    damage: { numDice: 1, dieSize: 6, bonus: 2 },
+    type: "Melee Weapon",
+  },
+};
+
+const staffItem: Item = {
+  img: staff,
+  action: {
+    name: "Staff",
+    hitDC: "+6",
+    damage: { numDice: 1, dieSize: 8, bonus: 2 },
+    type: "Ranged Weapon",
+  },
+};
+
 export const tempRanger: CharacterData = {
   name: "Ranger Example",
   race: "Human",
@@ -119,50 +173,9 @@ export const tempRanger: CharacterData = {
     { name: "Athletics", ability: "STR", modifier: "+2" },
     { name: "Deception", ability: "CHA", modifier: "-1" },
   ],
-  items: [
-    {
-      img: staff,
-      action: {
-        name: "Staff",
-        hitDC: "+6",
-        damage: { numDice: 1, dieSize: 8, bonus: 2 },
-        type: "Ranged Weapon",
-      },
-    },
-    {
-      img: sword,
-      action: {
-        name: "Shortsword",
-        hitDC: "+4",
-        damage: { numDice: 1, dieSize: 6, bonus: 2 },
-        type: "Melee Weapon",
-      },
-    },
-  ],
-  savingThrows: {
-    str: "+2",
-    dex: "+4",
-    con: "0",
-    int: "+1",
-    wis: "+1",
-    cha: "-1",
-  },
-  spells: [
-  {
-    name: "Fireball",
-    manaCost: 5,
-    image: fireball,
-    effect: { type: 'damage', amount: 15, target: 'single' },
-    description: "Hurls a blazing fireball at an enemy"
-  },
-  {
-    name: "Heal",
-    manaCost: 3,
-    image: heal,
-    effect: { type: 'heal', amount: 20, target: 'single' },
-    description: "Restores health to a party member"
-  },
-  ],
+  items: [staffItem, shortswordItem],
+  savingThrows: defaultSavingThrows,
+  spells: defaultSpells,
   type: "character",
   alive: true,
   exp: 0,
@@ -188,13 +201,7 @@ export const tempWarrior: CharacterData = {
     cha: { score: 12, modifier: 1 },
     def: { score: 12, modifier: 1 },
   },
-  skills: [
-    { name: "Acrobatics", ability: "DEX", modifier: "+2" },
-    { name: "Animal Handling", ability: "WIS", modifier: "+1" },
-    { name: "Arcana", ability: "INT", modifier: "+1" },
-    { name: "Athletics", ability: "STR", modifier: "+2" },
-    { name: "Deception", ability: "CHA", modifier: "-1" },
-  ],
+  skills: defaultSkills,
   items: [
     {
       img: spear,
@@ -205,42 +212,12 @@ export const tempWarrior: CharacterData = {
         type: "Melee Weapon",
       },
     },
-    {
-      img: sword,
-      action: {
-        name: "Shortsword",
-        hitDC: "+4",
-        damage: { numDice: 1, dieSize: 6, bonus: 2 },
-        type: "Melee Weapon",
-      },
-    },
+    shortswordItem,
   ],
-  savingThrows: {
-    str: "+2",
-    dex: "+4",
-    con: "0",
-    int: "+1",
-    wis: "+1",
-    cha: "-1",
-  },
+  savingThrows: defaultSavingThrows,
   type: "character",
   alive: true,
-  spells: [
-  {
-    name: "Fireball",
-    manaCost: 5,
-    image: fireball,
-    effect: { type: 'damage', amount: 15, target: 'single' },
-    description: "Hurls a blazing fireball at an enemy"
-  },
-  {
-    name: "Heal",
-    manaCost: 3,
-    image: heal,
-    effect: { type: 'heal', amount: 20, target: 'single' },
-    description: "Restores health to a party member"
-  },
-  ],
+  spells: defaultSpells,
   exp: 0,
   nextLevelExp: 50
 };
@@ -264,13 +241,7 @@ export const tempCleric: CharacterData = {
     cha: { score: 12, modifier: 1 },
     def: { score: 15, modifier: 1 },
   },
-  skills: [
-    { name: "Acrobatics", ability: "DEX", modifier: "+2" },
-    { name: "Animal Handling", ability: "WIS", modifier: "+1" },
-    { name: "Arcana", ability: "INT", modifier: "+1" },
-    { name: "Athletics", ability: "STR", modifier: "+2" },
-    { name: "Deception", ability: "CHA", modifier: "-1" },
-  ],
+  skills: defaultSkills,
   items: [
     {
       img: staff,
@@ -281,42 +252,12 @@ export const tempCleric: CharacterData = {
         type: "Ranged Weapon",
       },
     },
-    {
-      img: sword,
-      action: {
-        name: "Shortsword",
-        hitDC: "+4",
-        damage: { numDice: 1, dieSize: 6, bonus: 2 },
-        type: "Melee Weapon",
-      },
-    },
+    shortswordItem,
   ],
-  savingThrows: {
-    str: "+2",
-    dex: "+4",
-    con: "0",
-    int: "+1",
-    wis: "+1",
-    cha: "-1",
-  },
+  savingThrows: defaultSavingThrows,
   type: "character",
   alive: true,
-  spells: [
-  {
-    name: "Fireball",
-    manaCost: 5,
-    image: fireball,
-    effect: { type: 'damage', amount: 15, target: 'single' },
-    description: "Hurls a blazing fireball at an enemy"
-  },
-  {
-    name: "Heal",
-    manaCost: 3,
-    image: heal,
-    effect: { type: 'heal', amount: 20, target: 'single' },
-    description: "Restores health to a party member"
-  },
-  ],
+  spells: defaultSpells,
   exp: 0,
   nextLevelExp: 50
 };
@@ -340,59 +281,12 @@ export const tempWizard: CharacterData = {
     cha: { score: 17, modifier: 1 },
     def: { score: 12, modifier: 1 },
   },
-  skills: [
-    { name: "Acrobatics", ability: "DEX", modifier: "+2" },
-    { name: "Animal Handling", ability: "WIS", modifier: "+1" },
-    { name: "Arcana", ability: "INT", modifier: "+1" },
-    { name: "Athletics", ability: "STR", modifier: "+2" },
-    { name: "Deception", ability: "CHA", modifier: "-1" },
-  ],
-  items: [
-    {
-      img: staff,
-      action: {
-        name: "Staff",
-        hitDC: "+6",
-        damage: { numDice: 1, dieSize: 8, bonus: 2 },
-        type: "Ranged Weapon",
-      },
-    },
-    {
-      img: sword,
-      action: {
-        name: "Shortsword",
-        hitDC: "+4",
-        damage: { numDice: 1, dieSize: 6, bonus: 2 },
-        type: "Melee Weapon",
-      },
-    },
-  ],
-  savingThrows: {
-    str: "+2",
-    dex: "+4",
-    con: "0",
-    int: "+1",
-    wis: "+1",
-    cha: "-1",
-  },
+  skills: defaultSkills,
+  items: [staffItem, shortswordItem],
+  savingThrows: defaultSavingThrows,
   type: "character",
   alive: true,
-  spells: [
-  {
-    name: "Fireball",
-    manaCost: 5,
-    image: fireball,
-    effect: { type: 'damage', amount: 15, target: 'single' },
-    description: "Hurls a blazing fireball at an enemy"
-  },
-  {
-    name: "Heal",
-    manaCost: 3,
-    image: heal,
-    effect: { type: 'heal', amount: 20, target: 'single' },
-    description: "Restores health to a party member"
-  },
-  ],
+  spells: defaultSpells,
   exp: 0,
   nextLevelExp: 50
 };
@@ -416,13 +310,7 @@ export const tempAssassin: CharacterData = {
     cha: { score: 12, modifier: 1 },
     def: { score: 12, modifier: 1 },
   },
-  skills: [
-    { name: "Acrobatics", ability: "DEX", modifier: "+2" },
-    { name: "Animal Handling", ability: "WIS", modifier: "+1" },
-    { name: "Arcana", ability: "INT", modifier: "+1" },
-    { name: "Athletics", ability: "STR", modifier: "+2" },
-    { name: "Deception", ability: "CHA", modifier: "-1" },
-  ],
+  skills: defaultSkills,
   items: [
     {
       img: longbow,
@@ -433,42 +321,12 @@ export const tempAssassin: CharacterData = {
         type: "Ranged Weapon",
       },
     },
-    {
-      img: sword,
-      action: {
-        name: "Shortsword",
-        hitDC: "+4",
-        damage: { numDice: 1, dieSize: 6, bonus: 2 },
-        type: "Melee Weapon",
-      },
-    },
+    shortswordItem,
   ],
-  savingThrows: {
-    str: "+2",
-    dex: "+4",
-    con: "0",
-    int: "+1",
-    wis: "+1",
-    cha: "-1",
-  },
+  savingThrows: defaultSavingThrows,
   type: "character",
   alive: true,
-  spells: [
-  {
-    name: "Fireball",
-    manaCost: 5,
-    image: fireball,
-    effect: { type: 'damage', amount: 15, target: 'single' },
-    description: "Hurls a blazing fireball at an enemy"
-  },
-  {
-    name: "Heal",
-    manaCost: 3,
-    image: heal,
-    effect: { type: 'heal', amount: 20, target: 'single' },
-    description: "Restores health to a party member"
-  },
-  ],
+  spells: defaultSpells,
   exp: 0,
   nextLevelExp: 50
 };
@@ -493,59 +351,12 @@ export const tempBarbarian: CharacterData = {
     cha: { score: 12, modifier: 1 },
     def: { score: 14, modifier: 1 },
   },
-  skills: [
-    { name: "Acrobatics", ability: "DEX", modifier: "+2" },
-    { name: "Animal Handling", ability: "WIS", modifier: "+1" },
-    { name: "Arcana", ability: "INT", modifier: "+1" },
-    { name: "Athletics", ability: "STR", modifier: "+2" },
-    { name: "Deception", ability: "CHA", modifier: "-1" },
-  ],
-  items: [
-    {
-      img: staff,
-      action: {
-        name: "Staff",
-        hitDC: "+6",
-        damage: { numDice: 1, dieSize: 8, bonus: 2 },
-        type: "Ranged Weapon",
-      },
-    },
-    {
-      img: sword,
-      action: {
-        name: "Shortsword",
-        hitDC: "+4",
-        damage: { numDice: 1, dieSize: 6, bonus: 2 },
-        type: "Melee Weapon",
-      },
-    },
-  ],
-  savingThrows: {
-    str: "+2",
-    dex: "+4",
-    con: "0",
-    int: "+1",
-    wis: "+1",
-    cha: "-1",
-  },
+  skills: defaultSkills,
+  items: [staffItem, shortswordItem],
+  savingThrows: defaultSavingThrows,
   type: "character",
   alive: true,
-  spells: [
-  {
-    name: "Fireball",
-    manaCost: 5,
-    image: fireball,
-    effect: { type: 'damage', amount: 15, target: 'single' },
-    description: "Hurls a blazing fireball at an enemy"
-  },
-  {
-    name: "Heal",
-    manaCost: 3,
-    image: heal,
-    effect: { type: 'heal', amount: 20, target: 'single' },
-    description: "Restores health to a party member"
-  },
-  ],
+  spells: defaultSpells,
   exp: 0,
   nextLevelExp: 50
 };
@@ -569,59 +380,12 @@ export const tempBard: CharacterData = {
     cha: { score: 12, modifier: 1 },
     def: { score: 12, modifier: 1 },
   },
-  skills: [
-    { name: "Acrobatics", ability: "DEX", modifier: "+2" },
-    { name: "Animal Handling", ability: "WIS", modifier: "+1" },
-    { name: "Arcana", ability: "INT", modifier: "+1" },
-    { name: "Athletics", ability: "STR", modifier: "+2" },
-    { name: "Deception", ability: "CHA", modifier: "-1" },
-  ],
-  items: [
-    {
-      img: staff,
-      action: {
-        name: "Staff",
-        hitDC: "+6",
-        damage: { numDice: 1, dieSize: 8, bonus: 2 },
-        type: "Ranged Weapon",
-      },
-    },
-    {
-      img: sword,
-      action: {
-        name: "Shortsword",
-        hitDC: "+4",
-        damage: { numDice: 1, dieSize: 6, bonus: 2 },
-        type: "Melee Weapon",
-      },
-    },
-  ],
-  savingThrows: {
-    str: "+2",
-    dex: "+4",
-    con: "0",
-    int: "+1",
-    wis: "+1",
-    cha: "-1",
-  },
+  skills: defaultSkills,
+  items: [staffItem, shortswordItem],
+  savingThrows: defaultSavingThrows,
   type: "character",
   alive: true,
-  spells: [
-  {
-    name: "Fireball",
-    manaCost: 5,
-    image: fireball,
-    effect: { type: 'damage', amount: 15, target: 'single' },
-    description: "Hurls a blazing fireball at an enemy"
-  },
-  {
-    name: "Heal",
-    manaCost: 3,
-    image: heal,
-    effect: { type: 'heal', amount: 20, target: 'single' },
-    description: "Restores health to a party member"
-  },
-  ],
+  spells: defaultSpells,
   exp: 0,
   nextLevelExp: 50
 };

@@ -74,6 +74,7 @@ export interface GameState {
   nextLevelingChar: () => void;
   enterTown: () => void;
   exitTown: () => void;
+  restInTown: () => void;
   targetingConsumable: Consumable | null;
   setTargetingConsumable: (item: Consumable | null) => void;
 }
@@ -962,6 +963,24 @@ useConsumable: (item: Consumable,  target?: CharacterData) => {
     set(() => ({
       gameStatus: GameStatus.Exploring,
     })),
+
+  restInTown: () =>
+    set((state) => {
+      const updatedParty = state.party.map((member) => ({
+        ...member,
+        hp: member.maxHp,
+        mp: member.maxMp,
+        alive: member.maxHp > 0,
+      }));
+
+      return {
+        party: updatedParty,
+        activityLog: [
+          ...state.activityLog,
+          "You rest at the inn. Your party is fully restored!",
+        ],
+      };
+    }),
 }));
 
 export function calcDamage(defense: number, strength: number, dex: number, weaponDamage: number = 0): number {
