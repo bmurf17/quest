@@ -1,4 +1,4 @@
-import { CharacterData } from "@/types/Character";
+import { CharacterData, rollDamageDice } from "@/types/Character";
 import { Directions } from "@/types/Directions";
 import { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
@@ -16,6 +16,16 @@ import {
   finalizeAttackState,
 } from "./utils/CombatUtils";
 import { Spell } from "@/types/Spell";
+
+function getWeaponDamage(attacker: CharacterData | Enemy): number {
+  if ("items" in attacker && attacker.items && attacker.items.length > 0) {
+    const weapon = attacker.items[0];
+    if (weapon.action) {
+      return rollDamageDice(weapon.action.damage);
+    }
+  }
+  return 0;
+}
 
 export interface GameState {
   party: CharacterData[];
@@ -206,8 +216,9 @@ export const useGameStore = create<GameState>((set, get) => ({
           ? currentAttacker.abilities.str.score
           : currentAttacker.strength;
 
-  const damage = calcDamage(enemy.defense, currentStr, currentDex);
-  const newHealth = enemy.health - damage;
+      const weaponDmg = getWeaponDamage(currentAttacker);
+      const damage = calcDamage(enemy.defense, currentStr, currentDex, weaponDmg);
+      const newHealth = enemy.health - damage;
       const hitEnemyId = enemy.id;
       const hitCount = state.lastHitCounter + 1;
 
@@ -953,11 +964,12 @@ useConsumable: (item: Consumable,  target?: CharacterData) => {
     })),
 }));
 
-export function calcDamage(defense: number, strength: number, dex: number): number {
+export function calcDamage(defense: number, strength: number, dex: number, weaponDamage: number = 0): number {
   const hitChance = dex + Math.floor(Math.random() * 20) + 1;
   if (hitChance >= defense) {
-    const damage = strength + Math.floor(Math.random() * 6) + 1;
-    return Math.max(1, damage - defense);
+    const baseDamage = strength + Math.floor(Math.random() * 6) + 1;
+    const totalDamage = baseDamage + weaponDamage;
+    return Math.max(1, totalDamage - defense);
   }
   return 0;
 }

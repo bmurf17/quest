@@ -1,6 +1,6 @@
 import { useGameStore } from "@/state/GameState";
 import { Camp, Chest, NPC, NPCType } from "@/types/RoomInteractions";
-import { CharacterData } from "@/types/Character";
+import { CharacterData, formatDamageDice } from "@/types/Character";
 import { useState } from "react";
 import { colors as themeColors, fonts } from "../theme";
 import Inventory from "./Inventory";
@@ -204,7 +204,7 @@ export default function ActionMenu() {
                       key={item.action.name + idx}
                       img={item.img}
                       alt={item.action.name}
-                      title={`${item.action.name} — Hit: ${item.action.hitDC} · Dmg: ${item.action.damage}`}
+                      title={`${item.action.name} — Hit: ${item.action.hitDC} · Dmg: ${formatDamageDice(item.action.damage)}`}
                       onClick={handleAttackClick}
                     />
                   ))}

@@ -5,7 +5,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CharacterData } from "@/types/Character";
+import { CharacterData, formatDamageDice } from "@/types/Character";
 import { colors, fonts } from "../theme";
 
 function StatBar({ value, max, color }: { value: number; max: number; color: string }) {
@@ -163,7 +163,7 @@ export default function CharacterSheet({
                             <div style={{ fontSize: 12, color: colors.textMuted }}>{item.action.type}</div>
                       </div>
                       <div style={{ display: "flex", gap: 16, flexShrink: 0 }}>
-                        {[["Hit", item.action.hitDC], ["Dmg", item.action.damage]].map(([label, val]) => (
+                        {[["Hit", item.action.hitDC], ["Dmg", formatDamageDice(item.action.damage)]].map(([label, val]) => (
                           <div key={label as string} style={{ textAlign: "center" }}>
                                 <div style={{ fontSize: 9, color: colors.textMuted, fontFamily: fonts.display, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 2 }}>{label}</div>
                                 <div style={{ fontSize: 14, fontWeight: 700, color: colors.goldMuted, fontFamily: fonts.display }}>{val}</div>

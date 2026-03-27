@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CharacterData } from "../../types/Character";
+import { CharacterData, formatDamageDice } from "../../types/Character";
 import { useGameStore, GameState } from "@/state/GameState";
 import { Link } from "react-router-dom";
 import { colors, fonts } from "@/theme";
@@ -562,7 +562,7 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                                 <span
                                   style={{ fontSize: 11, color: "#6B5E48" }}
                                 >
-                                  Dmg: {item.action.damage}
+                                  Dmg: {formatDamageDice(item.action.damage)}
                                 </span>
                               </div>
                             </div>

@@ -34,10 +34,28 @@ type Skill = {
   modifier: string;
 };
 
+export type DamageDice = {
+  numDice: number;
+  dieSize: number;
+  bonus: number;
+};
+
+export function rollDamageDice(dice: DamageDice): number {
+  let total = 0;
+  for (let i = 0; i < dice.numDice; i++) {
+    total += Math.floor(Math.random() * dice.dieSize) + 1;
+  }
+  return total + dice.bonus;
+}
+
+export function formatDamageDice(dice: DamageDice): string {
+  return `${dice.numDice}d${dice.dieSize}${dice.bonus >= 0 ? '+' : ''}${dice.bonus}`;
+}
+
 type Action = {
   name: string;
   hitDC: string;
-  damage: string;
+  damage: DamageDice;
   type: "Ranged Weapon" | "Melee Weapon";
 };
 
@@ -103,11 +121,11 @@ export const tempRanger: CharacterData = {
   ],
   items: [
     {
-      img: longbow,
+      img: staff,
       action: {
-        name: "Longbow",
+        name: "Staff",
         hitDC: "+6",
-        damage: "1d8+2",
+        damage: { numDice: 1, dieSize: 8, bonus: 2 },
         type: "Ranged Weapon",
       },
     },
@@ -116,7 +134,7 @@ export const tempRanger: CharacterData = {
       action: {
         name: "Shortsword",
         hitDC: "+4",
-        damage: "1d6+2",
+        damage: { numDice: 1, dieSize: 6, bonus: 2 },
         type: "Melee Weapon",
       },
     },
@@ -183,7 +201,7 @@ export const tempWarrior: CharacterData = {
       action: {
         name: "Spear",
         hitDC: "+6",
-        damage: "1d8+2",
+        damage: { numDice: 1, dieSize: 8, bonus: 2 },
         type: "Melee Weapon",
       },
     },
@@ -192,7 +210,7 @@ export const tempWarrior: CharacterData = {
       action: {
         name: "Shortsword",
         hitDC: "+4",
-        damage: "1d6+2",
+        damage: { numDice: 1, dieSize: 6, bonus: 2 },
         type: "Melee Weapon",
       },
     },
@@ -259,7 +277,7 @@ export const tempCleric: CharacterData = {
       action: {
         name: "staff",
         hitDC: "+1",
-        damage: "1d4+2",
+        damage: { numDice: 1, dieSize: 4, bonus: 2 },
         type: "Ranged Weapon",
       },
     },
@@ -268,7 +286,7 @@ export const tempCleric: CharacterData = {
       action: {
         name: "Shortsword",
         hitDC: "+4",
-        damage: "1d6+2",
+        damage: { numDice: 1, dieSize: 6, bonus: 2 },
         type: "Melee Weapon",
       },
     },
@@ -335,7 +353,7 @@ export const tempWizard: CharacterData = {
       action: {
         name: "Staff",
         hitDC: "+6",
-        damage: "1d8+2",
+        damage: { numDice: 1, dieSize: 8, bonus: 2 },
         type: "Ranged Weapon",
       },
     },
@@ -344,7 +362,7 @@ export const tempWizard: CharacterData = {
       action: {
         name: "Shortsword",
         hitDC: "+4",
-        damage: "1d6+2",
+        damage: { numDice: 1, dieSize: 6, bonus: 2 },
         type: "Melee Weapon",
       },
     },
@@ -411,7 +429,7 @@ export const tempAssassin: CharacterData = {
       action: {
         name: "Longbow",
         hitDC: "+6",
-        damage: "1d8+2",
+        damage: { numDice: 1, dieSize: 8, bonus: 2 },
         type: "Ranged Weapon",
       },
     },
@@ -420,7 +438,7 @@ export const tempAssassin: CharacterData = {
       action: {
         name: "Shortsword",
         hitDC: "+4",
-        damage: "1d6+2",
+        damage: { numDice: 1, dieSize: 6, bonus: 2 },
         type: "Melee Weapon",
       },
     },
@@ -488,7 +506,7 @@ export const tempBarbarian: CharacterData = {
       action: {
         name: "Staff",
         hitDC: "+6",
-        damage: "1d8+2",
+        damage: { numDice: 1, dieSize: 8, bonus: 2 },
         type: "Ranged Weapon",
       },
     },
@@ -497,7 +515,7 @@ export const tempBarbarian: CharacterData = {
       action: {
         name: "Shortsword",
         hitDC: "+4",
-        damage: "1d6+2",
+        damage: { numDice: 1, dieSize: 6, bonus: 2 },
         type: "Melee Weapon",
       },
     },
@@ -564,7 +582,7 @@ export const tempBard: CharacterData = {
       action: {
         name: "Staff",
         hitDC: "+6",
-        damage: "1d8+2",
+        damage: { numDice: 1, dieSize: 8, bonus: 2 },
         type: "Ranged Weapon",
       },
     },
@@ -573,7 +591,7 @@ export const tempBard: CharacterData = {
       action: {
         name: "Shortsword",
         hitDC: "+4",
-        damage: "1d6+2",
+        damage: { numDice: 1, dieSize: 6, bonus: 2 },
         type: "Melee Weapon",
       },
     },
