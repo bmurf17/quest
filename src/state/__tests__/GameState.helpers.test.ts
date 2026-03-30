@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
 import { safeNextIndex, calcDamage, isEnemy } from '../GameState';
-import { tempRanger } from '@/types/Character';
 
 describe('GameState helpers', () => {
   it('safeNextIndex returns 0 when length is 0', () => {

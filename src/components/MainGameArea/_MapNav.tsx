@@ -2,7 +2,7 @@ import { useGameStore, GameState } from "@/state/GameState";
 import { Directions } from "@/types/Directions";
 import { GameStatus } from "@/types/GameStatus";
 import { Room } from "@/types/Room";
-import { Camp, Chest, NPC, RoomInteraction, Transition } from "@/types/RoomInteractions";
+import { Transition } from "@/types/RoomInteractions";
 import {
   ChevronDown,
   ChevronLeft,
@@ -117,7 +117,7 @@ function MiniMap({ currentRoom }: { currentRoom: Room }) {
         }}
       >
         {visible.map(({ room, gx, gy }) =>
-          (room.neighboringRooms ?? []).map(([dir, neighbor], i) => {
+          (room.neighboringRooms ?? []).map(([dir], i) => {
             const off = dirToOffset(dir);
             if (!off) return null;
             const ngx = gx + off.dx;
