@@ -1,6 +1,6 @@
 import { Directions } from "@/types/Directions";
 import { Enemy } from "@/types/Enemy";
-import { Room } from "@/types/Room";
+import { Room, Section } from "@/types/Room";
 import { RoomInteraction } from "@/types/RoomInteractions";
 import { createClient } from "@supabase/supabase-js";
 
@@ -165,6 +165,7 @@ export async function getAllRooms(): Promise<Room[]> {
     return {
       id: room.id,
       name: room.name,
+      sectionId: room.section_id,
       enemies: enemiesByRoom.get(room.id) || [],
       neighboringRooms,
       interaction,
@@ -174,6 +175,7 @@ export async function getAllRooms(): Promise<Room[]> {
 
   const finalRooms: Room[] = roomObjects.map((roomObj) => ({
     name: roomObj.name,
+    sectionId: roomObj.sectionId,
     enemies: roomObj.enemies,
     neighboringRooms: [] as [Directions, Room][],
     interaction: roomObj.interaction,
@@ -201,4 +203,19 @@ export async function getRoomById(roomId: number): Promise<Room | null> {
 export async function getRoomByName(name: string): Promise<Room | null> {
   const rooms = await getAllRooms();
   return rooms.find((r) => r.name === name) || null;
+}
+
+export async function getSections(): Promise<Section[]> {
+  const { data, error } = await supabase
+    .from("sections")
+    .select("id, name")
+    .order("id");
+
+  if (error) throw error;
+  return data as Section[];
+}
+
+export async function getRoomsBySection(sectionId: number): Promise<Room[]> {
+  const allRooms = await getAllRooms();
+  return allRooms.filter((r) => r.sectionId === sectionId);
 }

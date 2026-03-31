@@ -835,6 +835,7 @@ export default function ManageRooms() {
 
       const room: Room = {
         name: roomName,
+        sectionId: 0,
         enemies: [],
         neighboringRooms: [],
         interaction:

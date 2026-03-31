@@ -3,7 +3,7 @@ import { Directions } from "@/types/Directions";
 import { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
 import { Consumable, healthPotion, Item } from "@/types/Item";
-import { Room, startRoom } from "@/types/Room";
+import { Room, Section, startRoom } from "@/types/Room";
 import {
   Camp,
   Chest,
@@ -77,6 +77,13 @@ export interface GameState {
   restInTown: () => void;
   targetingConsumable: Consumable | null;
   setTargetingConsumable: (item: Consumable | null) => void;
+  currentSection: number | null;
+  beatenSections: number[];
+  availableSections: Section[];
+  loadSections: (sections: Section[]) => void;
+  startSection: (sectionId: number, rooms: Room[]) => void;
+  completeSection: () => void;
+  isSectionUnlocked: (sectionId: number) => boolean;
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -107,6 +114,9 @@ export const useGameStore = create<GameState>((set, get) => ({
   levelingUpChars: [],
   currentLevelingCharIndex: -1,
   targetingConsumable: null,
+  currentSection: null,
+  beatenSections: [],
+  availableSections: [],
 
   setTargetingConsumable: (item) => set({ targetingConsumable: item }),
 
@@ -462,12 +472,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   setRooms: (rooms: Room[]) =>
     set(() => ({
-      room: rooms[0],
       rooms: rooms,
-      roomInstances: rooms.reduce((map, room) => {
-        map.set(room.id, room);
-        return map;
-      }, new Map()),
     })),
 
   addRoom: (room: Room) =>
@@ -954,9 +959,23 @@ useConsumable: (item: Consumable,  target?: CharacterData) => {
     }),
 
   enterTown: () => {
-    set(() => ({
-      gameStatus: GameStatus.InTown,
-    }));
+    set((state) => {
+      const updates: Partial<GameState> = { gameStatus: GameStatus.InTown };
+
+      if (state.currentSection !== null && !state.beatenSections.includes(state.currentSection)) {
+        const sectionName =
+          state.availableSections.find((s) => s.id === state.currentSection)?.name ?? "the area";
+        updates.beatenSections = [...state.beatenSections, state.currentSection];
+        updates.activityLog = [
+          ...state.activityLog,
+          `You return to town. ${sectionName} has been completed!`,
+        ];
+      } else {
+        updates.activityLog = [...state.activityLog, "You return to town."];
+      }
+
+      return updates;
+    });
   },
 
   exitTown: () =>
@@ -981,6 +1000,58 @@ useConsumable: (item: Consumable,  target?: CharacterData) => {
         ],
       };
     }),
+
+  loadSections: (sections) => set({ availableSections: sections }),
+
+  startSection: (sectionId, rooms) =>
+    set((state) => {
+      const sectionRooms = rooms.filter((r) => r.sectionId === sectionId);
+      if (sectionRooms.length === 0) return state;
+
+      const firstRoom = sectionRooms[0];
+      const roomInstance = {
+        ...firstRoom,
+        enemies: firstRoom.enemies.map((e) => ({ ...e })),
+      };
+
+      return {
+        currentSection: sectionId,
+        room: roomInstance,
+        rooms,
+        roomInstances: new Map([[firstRoom.id, roomInstance]]),
+        gameStatus: GameStatus.Exploring,
+        combatOrder: firstRoom.enemies.length > 0
+          ? [...state.party, ...firstRoom.enemies]
+          : [],
+        activityLog: [
+          ...state.activityLog,
+          `You begin exploring ${state.availableSections.find((s) => s.id === sectionId)?.name ?? "an unknown area"}...`,
+        ],
+      };
+    }),
+
+  completeSection: () =>
+    set((state) => {
+      if (state.currentSection === null) return state;
+      if (state.beatenSections.includes(state.currentSection)) return state;
+
+      const sectionName =
+        state.availableSections.find((s) => s.id === state.currentSection)?.name ?? "the area";
+
+      return {
+        beatenSections: [...state.beatenSections, state.currentSection],
+        activityLog: [
+          ...state.activityLog,
+          `You have completed ${sectionName}!`,
+        ],
+      };
+    }),
+
+  isSectionUnlocked: (sectionId) => {
+    const state = get();
+    if (sectionId === 1) return true;
+    return state.beatenSections.includes(sectionId - 1);
+  },
 }));
 
 export function calcDamage(defense: number, strength: number, dex: number, weaponDamage: number = 0): number {

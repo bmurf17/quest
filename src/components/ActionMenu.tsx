@@ -5,6 +5,7 @@ import { useState } from "react";
 import { colors as themeColors, fonts } from "../theme";
 import Inventory from "./Inventory";
 import Shop from "./Shop";
+import SectionSelector from "./SectionSelector";
 import { manaPotion } from "@/types/Item";
 import { Spell } from "@/types/Spell";
 import { partyHasAnimalHandling } from "@/state/utils/DialogueUtils";
@@ -156,6 +157,7 @@ export default function ActionMenu() {
 
   const [isInventoryModalOpen, setIsInventoryModalOpen] = useState(false);
   const [isShopModalOpen, setIsShopModalOpen] = useState(false);
+  const [isSectionSelectorOpen, setIsSectionSelectorOpen] = useState(false);
 
   const handleAttackClick = () => {
     if (room.enemies.length === 1) {
@@ -317,6 +319,14 @@ export default function ActionMenu() {
             <SectionLabel>Town</SectionLabel>
             <ActionBtn
               variant="success"
+              onClick={() => setIsSectionSelectorOpen(true)}
+              fullWidth
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} width={13} height={13}><path strokeLinecap="round" strokeLinejoin="round" d="m6.115 5.19.372 1.111a4.956 4.956 0 0 0 2.348 2.348l1.111.372a1 1 0 0 1 0 1.894l-1.111.372a4.956 4.956 0 0 0-2.348 2.348l-.372 1.111a1 1 0 0 1-1.894 0l-.372-1.111a4.956 4.956 0 0 0-2.348-2.348l-1.111-.372a1 1 0 0 1 0-1.894l1.111-.372a4.956 4.956 0 0 0 2.348-2.348l.372-1.111a1 1 0 0 1 1.894 0ZM17.657 6.343a1 1 0 0 1 0 1.414l-.636.636a4.956 4.956 0 0 0-2.348 2.348l-.636.636a1 1 0 0 1-1.414 0l-.636-.636a4.956 4.956 0 0 0-2.348-2.348l-.636-.636a1 1 0 0 1 0-1.414l.636-.636a4.956 4.956 0 0 0 2.348-2.348l.636-.636a1 1 0 0 1 1.414 0l.636.636a4.956 4.956 0 0 0 2.348 2.348l.636.636ZM10 13a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" /></svg>
+              Explore
+            </ActionBtn>
+            <ActionBtn
+              variant="success"
               onClick={() => setIsShopModalOpen(true)}
               fullWidth
             >
@@ -354,6 +364,10 @@ export default function ActionMenu() {
         onOpenChange={setIsShopModalOpen}
         inventory={[manaPotion]}
         ownersName={npc?.name ?? "Shopkeeper"}
+      />
+      <SectionSelector
+        isOpen={isSectionSelectorOpen}
+        onOpenChange={setIsSectionSelectorOpen}
       />
     </>
   );
