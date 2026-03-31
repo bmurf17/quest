@@ -412,8 +412,15 @@ function Legend() {
 }
 
 export default function RoomMap() {
-  const rooms = useGameStore((state) => state.rooms);
-  const startRoom = rooms.find((x) => x.name === "Start Room");
+  const allRooms = useGameStore((state) => state.rooms);
+  const availableSections = useGameStore((state) => state.availableSections);
+  const [selectedSectionId, setSelectedSectionId] = useState<number | null>(null);
+
+  const rooms = selectedSectionId !== null
+    ? allRooms.filter((r) => r.sectionId === selectedSectionId)
+    : allRooms;
+
+  const startRoom = rooms.length > 0 ? rooms[0] : null;
   const containerRef = useRef<HTMLDivElement>(null);
   const isDraggingRef = useRef(false);
   const dragStartRef = useRef({ x: 0, y: 0 });
@@ -470,9 +477,37 @@ export default function RoomMap() {
             <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: "#E8DCC8", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.05em" }}>
               Realm Map
             </h1>
-            <div style={{ marginLeft: "auto", display: "flex", gap: 6, alignItems: "center", background: "rgba(212,175,55,0.08)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 20, padding: "4px 12px 4px 8px" }}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth={1.5} width={14} height={14}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" /></svg>
-              <span style={{ fontSize: 12, color: "#B4965A", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.08em" }}>{rooms.length} rooms</span>
+            <div style={{ marginLeft: "auto", display: "flex", gap: 6, alignItems: "center" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(180,140,80,0.15)", borderRadius: 20, padding: "4px 12px 4px 8px" }}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="#B4965A" strokeWidth={1.5} width={14} height={14}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" /></svg>
+                <span style={{ fontSize: 12, color: "#B4965A", fontFamily: "'Cinzel', Georgia, serif", letterSpacing: "0.08em" }}>{rooms.length} rooms</span>
+              </div>
+              <select
+                value={selectedSectionId ?? ""}
+                onChange={(e) => setSelectedSectionId(e.target.value ? Number(e.target.value) : null)}
+                style={{
+                  background: "rgba(0,0,0,0.4)",
+                  border: "1px solid rgba(180,140,80,0.3)",
+                  borderRadius: 6,
+                  padding: "5px 28px 5px 10px",
+                  color: "#E8DCC8",
+                  fontSize: 12,
+                  fontFamily: "'Cinzel', Georgia, serif",
+                  letterSpacing: "0.04em",
+                  outline: "none",
+                  cursor: "pointer",
+                  appearance: "none",
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'%3E%3Cpath stroke='%239CA3AF' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "right 8px center",
+                  backgroundSize: 14,
+                }}
+              >
+                <option value="">All Sections</option>
+                {availableSections.map((s) => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
             </div>
           </div>
           <p style={{ margin: 0, paddingLeft: 15, color: "#6B7280", fontSize: 14, fontFamily: "'Crimson Text', Georgia, serif" }}>

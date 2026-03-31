@@ -2,7 +2,7 @@ import { supabase } from "@/queries/RoomQueries";
 import { useGameStore } from "@/state/GameState";
 import { Directions } from "@/types/Directions";
 import { Room, startRoom } from "@/types/Room";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import mushroom from "/images/Mushroom.png";
 import blord from "/images/Blord.png";
 import { NPCType } from "@/types/RoomInteractions";
@@ -635,6 +635,7 @@ function Toast({
 export default function ManageRooms() {
   const [interaction, setInteraction] = useState<InteractionType>("NPC");
   const [neighboringRoom, setNeighboringRoom] = useState(startRoom);
+  const [selectedSectionId, setSelectedSectionId] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<{
     type: "success" | "error";
@@ -642,14 +643,25 @@ export default function ManageRooms() {
   } | null>(null);
 
   const rooms = useGameStore((state) => state.rooms);
+  const availableSections = useGameStore((state) => state.availableSections);
   const addRoom = useGameStore((state) => state.addRoom);
   const updateRoom = useGameStore((state) => state.updateRoom);
+
+  useEffect(() => {
+    if (availableSections.length > 0 && selectedSectionId === null) {
+      setSelectedSectionId(availableSections[0].id);
+    }
+  }, [availableSections, selectedSectionId]);
 
   const enemyImgs = [mushroom, blord];
 
   const directionOptions = Object.entries(Directions)
     .filter(([, value]) => typeof value === "string")
     .map(([key, value]) => ({ label: value as string, value: key }));
+
+  const sectionRooms = selectedSectionId !== null
+    ? rooms.filter((r) => r.sectionId === selectedSectionId)
+    : rooms;
 
   const showToast = (type: "success" | "error", message: string) => {
     setToast({ type, message });
@@ -667,7 +679,7 @@ export default function ManageRooms() {
 
       const { data: newRoomData, error: roomError } = await supabase
         .from("rooms")
-        .insert({ name: roomName })
+        .insert({ name: roomName, section_id: selectedSectionId })
         .select()
         .single();
 
@@ -835,7 +847,7 @@ export default function ManageRooms() {
 
       const room: Room = {
         name: roomName,
-        sectionId: 0,
+        sectionId: selectedSectionId ?? 0,
         enemies: [],
         neighboringRooms: [],
         interaction:
@@ -888,7 +900,6 @@ export default function ManageRooms() {
 
       <main
         style={{
-          minHeight: "100vh",
           background:
             "linear-gradient(160deg, #0d0b07 0%, #1a1209 50%, #0f0e09 100%)",
           padding: "32px 24px 64px",
@@ -1025,6 +1036,24 @@ export default function ManageRooms() {
           <form onSubmit={handleSubmit}>
             <Divider label="Room Identity" />
 
+            <FieldGroup id="section" label="Section">
+              <StyledSelect
+                id="section"
+                name="section"
+                value={selectedSectionId ?? ""}
+                onChange={(e) => {
+                  setSelectedSectionId(e.target.value ? Number(e.target.value) : null);
+                  setNeighboringRoom(startRoom);
+                }}
+              >
+                {availableSections.map((section) => (
+                  <option key={section.id} value={section.id}>
+                    {section.name}
+                  </option>
+                ))}
+              </StyledSelect>
+            </FieldGroup>
+
             <FieldGroup id="name" label="Room Name">
               <StyledInput
                 id="name"
@@ -1049,13 +1078,13 @@ export default function ManageRooms() {
                   id="neighboringRooms"
                   name="neighboringRooms"
                   onChange={(e) => {
-                    const selected = rooms.find(
+                    const selected = sectionRooms.find(
                       (r) => r.name === e.target.value,
                     );
                     if (selected) setNeighboringRoom(selected);
                   }}
                 >
-                  {rooms.map((room, i) => (
+                  {sectionRooms.map((room, i) => (
                     <option key={`${room.name}-${i}`} value={room.name}>
                       {room.name}
                     </option>

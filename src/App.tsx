@@ -10,6 +10,7 @@ import { getAllRooms, getSections } from "./queries/RoomQueries";
 import { useGameStore } from "./state/GameState";
 import ManageRooms from "./components/Admin/game-design/CreateRoom";
 import RoomMap from "./components/Admin/game-design/RoomMap";
+import ManageSections from "./components/Admin/game-design/ManageSections";
 
 const CharacterCreation = lazy(() => import("./components/CharacterCreation/CharacterCreation"));
 const Admin = lazy(() => import("./components/Admin/GameDesign"));
@@ -30,14 +31,10 @@ function App() {
   useEffect(() => {
     const loadRooms = async () => {
       try {
-        console.log('Loading rooms and sections...');
         const [rooms, sections] = await Promise.all([getAllRooms(), getSections()]);
-        console.log('Rooms loaded:', rooms);
-        console.log('Sections loaded:', sections);
         setRooms(rooms);
         loadSections(sections);
         if (sections.length > 0) {
-          console.log('Starting section:', sections[0]);
           startSection(sections[0].id, rooms);
         }
       } catch (error) {
@@ -59,6 +56,7 @@ function App() {
             <Route path={"/create"} element={<CharacterCreation />} />
             <Route path={"/admin/game-design/rooms"} element={<ManageRooms />} />
             <Route path={"/admin/game-design/roomMap"} element={<RoomMap />} />
+            <Route path={"/admin/game-design/sections"} element={<ManageSections />} />
             <Route path={"/admin"} element={<Admin />} />
           </Routes>
         </Suspense>
