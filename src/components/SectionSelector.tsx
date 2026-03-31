@@ -5,7 +5,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useGameStore } from "@/state/GameState";
-import { getRoomsBySection } from "@/queries/RoomQueries";
 import { colors, fonts } from "@/theme";
 
 export default function SectionSelector({
@@ -19,13 +18,13 @@ export default function SectionSelector({
   const beatenSections = useGameStore((s) => s.beatenSections);
   const isSectionUnlocked = useGameStore((s) => s.isSectionUnlocked);
   const startSection = useGameStore((s) => s.startSection);
+  const rooms = useGameStore((s) => s.rooms);
 
   const handleExplore = async (sectionId: number) => {
     if (!isSectionUnlocked(sectionId)) return;
     if (beatenSections.includes(sectionId)) return;
 
     try {
-      const rooms = await getRoomsBySection(sectionId);
       startSection(sectionId, rooms);
       onOpenChange(false);
     } catch (err) {

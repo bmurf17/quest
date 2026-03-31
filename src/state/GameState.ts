@@ -1017,7 +1017,6 @@ useConsumable: (item: Consumable,  target?: CharacterData) => {
       return {
         currentSection: sectionId,
         room: roomInstance,
-        rooms,
         roomInstances: new Map([[firstRoom.id, roomInstance]]),
         gameStatus: GameStatus.Exploring,
         combatOrder: firstRoom.enemies.length > 0
