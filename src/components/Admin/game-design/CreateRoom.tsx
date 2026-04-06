@@ -404,60 +404,189 @@ function NPCForm() {
   );
 }
 
-function CombatForm({ enemyImgs }: { enemyImgs: string[] }) {
+interface EnemyEntry {
+  name: string;
+  health: number;
+  strength: number;
+  dex: number;
+  defense: number;
+  img: string;
+}
+
+const defaultEnemy = (enemyImgs: string[]): EnemyEntry => ({
+  name: "",
+  health: 100,
+  strength: 10,
+  dex: 10,
+  defense: 10,
+  img: enemyImgs[0] ?? "",
+});
+
+function CombatForm({
+  enemyImgs,
+  enemies,
+  onChange,
+}: {
+  enemyImgs: string[];
+  enemies: EnemyEntry[];
+  onChange: (enemies: EnemyEntry[]) => void;
+}) {
+  const updateEnemy = (index: number, field: keyof EnemyEntry, value: string | number) => {
+    const updated = enemies.map((e, i) =>
+      i === index ? { ...e, [field]: value } : e
+    );
+    onChange(updated);
+  };
+
+  const addEnemy = () => {
+    onChange([...enemies, defaultEnemy(enemyImgs)]);
+  };
+
+  const removeEnemy = (index: number) => {
+    if (enemies.length <= 1) return;
+    onChange(enemies.filter((_, i) => i !== index));
+  };
+
   return (
     <>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-        <div style={{ gridColumn: "1 / -1" }}>
-          <FieldGroup id="enemyName" label="Enemy Name">
-            <StyledInput
-              id="enemyName"
-              name="enemyName"
-              placeholder="e.g. Goblin Scout"
-            />
-          </FieldGroup>
+      {enemies.map((enemy, index) => (
+        <div
+          key={index}
+          style={{
+            position: "relative",
+            marginBottom: enemies.length > 1 && index < enemies.length - 1 ? 20 : 4,
+            paddingBottom: enemies.length > 1 && index < enemies.length - 1 ? 20 : 0,
+            borderBottom:
+              enemies.length > 1 && index < enemies.length - 1
+                ? "1px solid rgba(180,140,80,0.15)"
+                : "none",
+          }}
+        >
+          {enemies.length > 1 && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: 12,
+              }}
+            >
+              <span
+                style={{
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: "#DC2626",
+                  fontFamily: fonts.display,
+                  letterSpacing: "0.06em",
+                }}
+              >
+                Enemy {index + 1}
+              </span>
+              <button
+                type="button"
+                onClick={() => removeEnemy(index)}
+                style={{
+                  background: "rgba(220,38,38,0.15)",
+                  border: "1px solid rgba(220,38,38,0.4)",
+                  borderRadius: 4,
+                  color: "#FCA5A5",
+                  fontSize: 12,
+                  cursor: "pointer",
+                  padding: "3px 10px",
+                  fontFamily: fonts.display,
+                }}
+              >
+                Remove
+              </button>
+            </div>
+          )}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div style={{ gridColumn: "1 / -1" }}>
+              <FieldGroup id={`enemyName-${index}`} label="Enemy Name">
+                <StyledInput
+                  id={`enemyName-${index}`}
+                  placeholder="e.g. Goblin Scout"
+                  value={enemy.name}
+                  onChange={(e) => updateEnemy(index, "name", e.target.value)}
+                />
+              </FieldGroup>
+            </div>
+            <FieldGroup id={`health-${index}`} label="Health">
+              <StyledInput
+                id={`health-${index}`}
+                type="number"
+                value={enemy.health}
+                onChange={(e) => updateEnemy(index, "health", parseInt(e.target.value) || 0)}
+              />
+            </FieldGroup>
+            <FieldGroup id={`enemyImg-${index}`} label="Enemy Sprite">
+              <StyledSelect
+                id={`enemyImg-${index}`}
+                value={enemy.img}
+                onChange={(e) => updateEnemy(index, "img", e.target.value)}
+              >
+                {enemyImgs.map((img, i) => (
+                  <option key={i} value={img}>
+                    {img.split("/").pop()?.replace(".png", "") ?? img}
+                  </option>
+                ))}
+              </StyledSelect>
+            </FieldGroup>
+          </div>
+          <div
+            style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}
+          >
+            <FieldGroup id={`strength-${index}`} label="Strength">
+              <StyledInput
+                id={`strength-${index}`}
+                type="number"
+                value={enemy.strength}
+                onChange={(e) => updateEnemy(index, "strength", parseInt(e.target.value) || 0)}
+              />
+            </FieldGroup>
+            <FieldGroup id={`dex-${index}`} label="Dexterity">
+              <StyledInput
+                id={`dex-${index}`}
+                type="number"
+                value={enemy.dex}
+                onChange={(e) => updateEnemy(index, "dex", parseInt(e.target.value) || 0)}
+              />
+            </FieldGroup>
+            <FieldGroup id={`defense-${index}`} label="Defense">
+              <StyledInput
+                id={`defense-${index}`}
+                type="number"
+                value={enemy.defense}
+                onChange={(e) => updateEnemy(index, "defense", parseInt(e.target.value) || 0)}
+              />
+            </FieldGroup>
+          </div>
         </div>
-        <FieldGroup id="health" label="Health">
-          <StyledInput
-            id="health"
-            name="health"
-            type="number"
-            defaultValue={100}
-          />
-        </FieldGroup>
-        <FieldGroup id="enemyImg" label="Enemy Sprite">
-          <StyledSelect id="enemyImg" name="enemyImg">
-            {enemyImgs.map((img, i) => (
-              <option key={i} value={img}>
-                {img.split("/").pop()?.replace(".png", "") ?? img}
-              </option>
-            ))}
-          </StyledSelect>
-        </FieldGroup>
-      </div>
-      <div
-        style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}
+      ))}
+      <button
+        type="button"
+        onClick={addEnemy}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          marginTop: 8,
+          padding: "8px 16px",
+          background: "rgba(220,38,38,0.1)",
+          border: "1px dashed rgba(220,38,38,0.4)",
+          borderRadius: 6,
+          color: "#F87171",
+          fontSize: 13,
+          fontWeight: 600,
+          cursor: "pointer",
+          fontFamily: fonts.display,
+          letterSpacing: "0.04em",
+          width: "100%",
+          justifyContent: "center",
+        }}
       >
-        <FieldGroup id="strength" label="Strength">
-          <StyledInput
-            id="strength"
-            name="strength"
-            type="number"
-            defaultValue={10}
-          />
-        </FieldGroup>
-        <FieldGroup id="dex" label="Dexterity">
-          <StyledInput id="dex" name="dex" type="number" defaultValue={10} />
-        </FieldGroup>
-        <FieldGroup id="defense" label="Defense">
-          <StyledInput
-            id="defense"
-            name="defense"
-            type="number"
-            defaultValue={10}
-          />
-        </FieldGroup>
-      </div>
+        + Add Enemy
+      </button>
     </>
   );
 }
@@ -634,6 +763,7 @@ function Toast({
 
 export default function ManageRooms() {
   const [interaction, setInteraction] = useState<InteractionType>("NPC");
+  const [enemies, setEnemies] = useState<EnemyEntry[]>([]);
   const [neighboringRoom, setNeighboringRoom] = useState(startRoom);
   const [selectedSectionId, setSelectedSectionId] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -689,30 +819,34 @@ export default function ManageRooms() {
       const newRoomId = newRoomData.id;
 
       if (interaction === "Combat") {
-        const enemyName = formData.get("enemyName")?.toString() || "";
-        const health = parseInt(formData.get("health")?.toString() || "100");
-        const strength = parseInt(formData.get("strength")?.toString() || "10");
-        const dex = parseInt(formData.get("dex")?.toString() || "10");
-        const defense = parseInt(formData.get("defense")?.toString() || "10");
-        const img = formData.get("enemyImg")?.toString() || "";
+        for (const enemy of enemies) {
+          if (!enemy.name) continue;
 
-        const { data: enemyData, error: enemyError } = await supabase
-          .from("enemies")
-          .insert({ name: enemyName, health, strength, dex, defense, img })
-          .select()
-          .single();
+          const { data: enemyData, error: enemyError } = await supabase
+            .from("enemies")
+            .insert({
+              name: enemy.name,
+              health: enemy.health,
+              strength: enemy.strength,
+              dex: enemy.dex,
+              defense: enemy.defense,
+              img: enemy.img,
+            })
+            .select()
+            .single();
 
-        if (enemyError)
-          throw new Error(`Failed to create enemy: ${enemyError.message}`);
+          if (enemyError)
+            throw new Error(`Failed to create enemy: ${enemyError.message}`);
 
-        const { error: roomEnemyError } = await supabase
-          .from("room_enemies")
-          .insert({ room_id: newRoomId, enemy_id: enemyData.id });
+          const { error: roomEnemyError } = await supabase
+            .from("room_enemies")
+            .insert({ room_id: newRoomId, enemy_id: enemyData.id });
 
-        if (roomEnemyError)
-          throw new Error(
-            `Failed to link enemy to room: ${roomEnemyError.message}`,
-          );
+          if (roomEnemyError)
+            throw new Error(
+              `Failed to link enemy to room: ${roomEnemyError.message}`,
+            );
+        }
       } else if (interaction === "NPC") {
         const npcName = formData.get("npcName")?.toString() || "";
         const dialogue = formData.get("dialogue")?.toString() || "";
@@ -1107,7 +1241,15 @@ export default function ManageRooms() {
 
             <div style={{ marginBottom: 20 }}>
               <Label htmlFor="interaction">Type</Label>
-              <InteractionTabs value={interaction} onChange={setInteraction} />
+              <InteractionTabs
+                value={interaction}
+                onChange={(v) => {
+                  setInteraction(v);
+                  if (v === "Combat" && enemies.length === 0) {
+                    setEnemies([defaultEnemy(enemyImgs)]);
+                  }
+                }}
+              />
             </div>
 
             {interaction !== "None" && (
@@ -1122,7 +1264,11 @@ export default function ManageRooms() {
               >
                 {interaction === "NPC" && <NPCForm />}
                 {interaction === "Combat" && (
-                  <CombatForm enemyImgs={enemyImgs} />
+                  <CombatForm
+                    enemyImgs={enemyImgs}
+                    enemies={enemies}
+                    onChange={setEnemies}
+                  />
                 )}
                 {interaction === "Chest" && <ChestForm />}
                 {interaction === "Camp" && <CampForm />}
