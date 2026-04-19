@@ -7,8 +7,12 @@ import { Room, Section, startRoom } from "@/types/Room";
 import {
   Camp,
   Chest,
+  DialogueNode,
+  DialogueOutcome,
+  DialogueOutcomeType,
   getDiscoveryMessage,
   NPC,
+  NPCDisposition,
 } from "@/types/RoomInteractions";
 import { create } from "zustand";
 import {
@@ -55,6 +59,14 @@ export interface GameState {
   buyItem: (item: Item) => void;
   dialogueIndex: number;
   advanceDialogue: () => void;
+  activeDialogue: DialogueNode | null;
+  currentDialogueNodeId: string | null;
+  conversationFlags: Record<string, Record<string, string>>;
+  startDialogue: (npc: NPC, node: DialogueNode) => void;
+  selectDialogueChoice: (choiceId: string) => void;
+  checkSkillCondition: (skill: string, dc: number) => boolean;
+  applyOutcome: (outcome: DialogueOutcome, npc: NPC) => void;
+  setDisposition: (npc: NPC, disposition: NPCDisposition) => void;
   lastHitEnemyId: string | null;
   lastHitCounter: number;
   castSpell: (spell: Spell, target?: Enemy | CharacterData) => void;
@@ -117,6 +129,9 @@ export const useGameStore = create<GameState>((set, get) => ({
   currentSection: null,
   beatenSections: [],
   availableSections: [],
+  activeDialogue: null,
+  currentDialogueNodeId: null,
+  conversationFlags: {},
 
   setTargetingConsumable: (item) => set({ targetingConsumable: item }),
 
@@ -341,6 +356,125 @@ export const useGameStore = create<GameState>((set, get) => ({
       }
       return state;
     }),
+
+  startDialogue: (npc: NPC, node: DialogueNode) => {
+    set({
+      activeDialogue: node,
+      currentDialogueNodeId: node.id,
+      dialogueIndex: 0,
+      activityLog: [...get().activityLog, `${npc.name}: ${node.text}`],
+    });
+  },
+
+  selectDialogueChoice: (choiceId: string) => {
+    const state = get();
+    if (!state.activeDialogue) return;
+
+    const choice = state.activeDialogue.choices?.find(c => c.id === choiceId);
+    if (!choice) return;
+
+    const newActivityLog = [...state.activityLog, `You: ${choice.text}`];
+    set({ activityLog: newActivityLog });
+
+    if (choice.skillCondition) {
+      const passed = state.checkSkillCondition(choice.skillCondition.skill, choice.skillCondition.dc);
+      const nextNodeId = passed 
+        ? choice.skillCondition.successNodeId 
+        : choice.skillCondition.failureNodeId;
+      
+      if (nextNodeId) {
+        set({ currentDialogueNodeId: nextNodeId });
+      }
+    } else if (choice.nextNodeId) {
+      set({ currentDialogueNodeId: choice.nextNodeId });
+    }
+
+    if (choice.outcome) {
+      const roomNpc = state.room.interaction?.type === "NPC" ? state.room.interaction.npc : null;
+      if (roomNpc) {
+        state.applyOutcome(choice.outcome, roomNpc);
+}
+    }
+  },
+
+  checkSkillCondition: (skill: string, dc: number): boolean => {
+    const state = get();
+    const party = state.party;
+    
+    for (const char of party) {
+      const skillObj = char.skills?.find(s => s.name.toLowerCase() === skill.toLowerCase());
+      if (skillObj) {
+        const modifier = parseInt(skillObj.modifier);
+        const roll = Math.floor(Math.random() * 20) + 1;
+        const total = roll + modifier;
+        return total >= dc;
+      }
+    }
+
+    const roll = Math.floor(Math.random() * 20) + 1;
+    return roll >= dc;
+  },
+
+  applyOutcome: (outcome: DialogueOutcome, npc: NPC) => {
+    const state = get();
+    const npcId = npc.id?.toString() || npc.name;
+
+    switch (outcome.type) {
+      case DialogueOutcomeType.NPC_HOSTILE:
+        state.setDisposition(npc, NPCDisposition.HOSTILE);
+        state.addToLog(`${npc.name} becomes hostile!`);
+        break;
+case DialogueOutcomeType.NPC_FRIENDLY:
+        state.setDisposition(npc, NPCDisposition.FRIENDLY);
+        state.addToLog(`${npc.name} is now friendly toward you.`);
+        break;
+      case DialogueOutcomeType.NPC_LEAVE:
+        set({ 
+          room: { ...get().room, interaction: null },
+          activeDialogue: null,
+          currentDialogueNodeId: null,
+        });
+        state.addToLog(`${npc.name} storms off in anger!`);
+        break;
+      case DialogueOutcomeType.QUEST_START:
+        if (outcome.value) {
+          state.addToLog(`Quest started: ${outcome.value}`);
+        }
+        break;
+      case DialogueOutcomeType.ITEM_GIVE:
+        if (outcome.value) {
+          state.addToLog(`Received: ${outcome.value}`);
+        }
+        break;
+      case DialogueOutcomeType.END_CONVERSATION:
+        set({
+          activeDialogue: null,
+          currentDialogueNodeId: null,
+        });
+        break;
+    }
+
+    if (outcome.flagKey && outcome.flagValue) {
+      const flags = { ...state.conversationFlags };
+      if (!flags[npcId]) flags[npcId] = {};
+      flags[npcId][outcome.flagKey] = outcome.flagValue;
+      set({ conversationFlags: flags });
+    }
+  },
+
+  setDisposition: (npc: NPC, disposition: NPCDisposition) => {
+    set((state) => {
+      const updatedRoom = { ...state.room };
+      if (updatedRoom.interaction?.type === "NPC" && 
+          updatedRoom.interaction.npc.name === npc.name) {
+        updatedRoom.interaction = {
+          type: "NPC",
+          npc: { ...npc, disposition },
+        };
+      }
+      return { room: updatedRoom };
+    });
+  },
 
   setLevelingUpChars: (chars: CharacterData[]) => {
     set({

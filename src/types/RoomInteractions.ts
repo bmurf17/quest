@@ -7,13 +7,64 @@ export enum NPCType {
   ANIMAL = "animal"
 }
 
+export enum NPCDisposition {
+  NEUTRAL = "neutral",
+  FRIENDLY = "friendly",
+  HOSTILE = "hostile"
+}
+
+export enum DialogueOutcomeType {
+  NONE = "none",
+  QUEST_START = "quest_start",
+  ITEM_GIVE = "item_give",
+  NPC_JOIN = "npc_join",
+  NPC_HOSTILE = "npc_hostile",
+  NPC_FRIENDLY = "npc_friendly",
+  NPC_LEAVE = "npc_leave",
+  END_CONVERSATION = "end_conversation"
+}
+
+export interface SkillCondition {
+  skill: string;
+  dc: number;
+  successNodeId?: string;
+  failureNodeId?: string;
+}
+
+export interface DialogueOutcome {
+  type: DialogueOutcomeType;
+  value?: string;
+  flagKey?: string;
+  flagValue?: string;
+}
+
+export interface DialogueChoice {
+  id: string;
+  text: string;
+  nextNodeId: string | null;
+  skillCondition?: SkillCondition;
+  outcome?: DialogueOutcome;
+}
+
+export interface DialogueNode {
+  id: string;
+  text: string;
+  speaker: "NPC";
+  choices?: DialogueChoice[];
+  outcome?: DialogueOutcome;
+  isEndpoint: boolean;
+}
+
 export interface NPC {
+  id?: number;
   name: string;
   dialogue: string[];
+  dialogueId?: string;
   questId?: string;
   discoveryMessage?: string;
   NPCType: NPCType;
   img: string;
+  disposition?: NPCDisposition;
 }
 
 export type Chest = {

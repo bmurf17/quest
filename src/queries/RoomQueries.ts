@@ -91,6 +91,7 @@ export async function getAllRooms(): Promise<Room[]> {
           interaction = {
             type: "NPC",
             npc: {
+              id: interactionData.npcs.id,
               name: interactionData.npcs.name,
               dialogue: interactionData.npcs.dialogue,
               questId: interactionData.npcs.quest_id,
