@@ -8,17 +8,49 @@ interface Props {
 
 const classifyLog = (log: string): { color: string; prefix: string } => {
   const l = log.toLowerCase();
-  if (l.includes("defeated") || l.includes("died") || l.includes("slain") || l.includes("dead"))
+  if (
+    l.includes("defeated") ||
+    l.includes("died") ||
+    l.includes("slain") ||
+    l.includes("dead")
+  )
     return { color: "#FCA5A5", prefix: "✦" };
-  if (l.includes("damage") || l.includes("hit") || l.includes("attack") || l.includes("strike"))
+  if (
+    l.includes("damage") ||
+    l.includes("hit") ||
+    l.includes("attack") ||
+    l.includes("strike")
+  )
     return { color: "#F87171", prefix: "⚔" };
-  if (l.includes("heal") || l.includes("restore") || l.includes("recover") || l.includes("hp"))
+  if (
+    l.includes("heal") ||
+    l.includes("restore") ||
+    l.includes("recover") ||
+    l.includes("hp")
+  )
     return { color: "#6EE7B7", prefix: "✚" };
-  if (l.includes("mana") || l.includes("mp") || l.includes("spell") || l.includes("cast") || l.includes("magic"))
+  if (
+    l.includes("mana") ||
+    l.includes("mp") ||
+    l.includes("spell") ||
+    l.includes("cast") ||
+    l.includes("magic")
+  )
     return { color: "#818CF8", prefix: "✦" };
-  if (l.includes("found") || l.includes("chest") || l.includes("item") || l.includes("loot") || l.includes("gold"))
+  if (
+    l.includes("found") ||
+    l.includes("chest") ||
+    l.includes("item") ||
+    l.includes("loot") ||
+    l.includes("gold")
+  )
     return { color: "#FCD34D", prefix: "◈" };
-  if (l.includes("enter") || l.includes("room") || l.includes("arrived") || l.includes("discover"))
+  if (
+    l.includes("enter") ||
+    l.includes("room") ||
+    l.includes("arrived") ||
+    l.includes("discover")
+  )
     return { color: "#C9A84C", prefix: "▸" };
   if (l.includes("miss") || l.includes("evad") || l.includes("dodge"))
     return { color: "#9CA3AF", prefix: "◌" };
@@ -43,38 +75,45 @@ export default function ActivityLog({ activityLog }: Props) {
         .log-scroll::-webkit-scrollbar-thumb { background: rgba(180,140,80,0.2); border-radius: 2px; }
       `}</style>
 
-      <div style={{
-  display: "flex",
-  flexDirection: "column",
-  background: "rgba(0,0,0,0.35)",
-  border: `1px solid ${colors.goldBorder}`,
-  borderRadius: 8,
-  overflow: "hidden",
-      }}>
-
-        <div style={{
+      <div
+        style={{
           display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "8px 12px",
-          borderBottom: "1px solid rgba(180,140,80,0.12)",
-          flexShrink: 0,
-        }}>
-          <span style={{
-      fontSize: 10,
-      fontWeight: 700,
-      color: colors.goldMuted,
-      fontFamily: fonts.display,
-      letterSpacing: "0.12em",
-      textTransform: "uppercase",
-          }}>
+          flexDirection: "column",
+          background: "rgba(0,0,0,0.35)",
+          border: `1px solid ${colors.goldBorder}`,
+          borderRadius: 8,
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "8px 12px",
+            borderBottom: "1px solid rgba(180,140,80,0.12)",
+            flexShrink: 0,
+          }}
+        >
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              color: colors.goldMuted,
+              fontFamily: fonts.display,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+            }}
+          >
             Chronicle
           </span>
-          <span style={{
-            fontSize: 10,
-            color: colors.muted,
-            fontFamily: fonts.body,
-          }}>
+          <span
+            style={{
+              fontSize: 10,
+              color: colors.muted,
+              fontFamily: fonts.body,
+            }}
+          >
             {activityLog.length} entries
           </span>
         </div>
@@ -89,14 +128,16 @@ export default function ActivityLog({ activityLog }: Props) {
           }}
         >
           {activityLog.length === 0 ? (
-            <div style={{
-              padding: "20px 12px",
+            <div
+              style={{
+                padding: "20px 12px",
                 textAlign: "center",
                 color: colors.muted,
                 fontSize: 12,
                 fontFamily: fonts.body,
                 fontStyle: "italic",
-            }}>
+              }}
+            >
               The chronicle awaits your deeds…
             </div>
           ) : (
@@ -113,40 +154,48 @@ export default function ActivityLog({ activityLog }: Props) {
                     gap: 8,
                     padding: "4px 8px",
                     borderRadius: 4,
-                    background: isRecent ? "rgba(180,140,80,0.06)" : "transparent",
+                    background: isRecent
+                      ? "rgba(180,140,80,0.06)"
+                      : "transparent",
                     marginBottom: 1,
                   }}
                 >
-                  <span style={{
-                    fontSize: 9,
-                    color: colors.textMuted,
-                    fontFamily: fonts.body,
-                    minWidth: 22,
-                    textAlign: "right",
-                    flexShrink: 0,
-                    userSelect: "none",
-                  }}>
+                  <span
+                    style={{
+                      fontSize: 9,
+                      color: colors.textMuted,
+                      fontFamily: fonts.body,
+                      minWidth: 22,
+                      textAlign: "right",
+                      flexShrink: 0,
+                      userSelect: "none",
+                    }}
+                  >
                     {i + 1}
                   </span>
 
-                  <span style={{
-                    fontSize: 10,
-                    color,
-                    flexShrink: 0,
-                    opacity: 0.8,
-                    userSelect: "none",
-                    lineHeight: 1.6,
-                  }}>
+                  <span
+                    style={{
+                      fontSize: 10,
+                      color,
+                      flexShrink: 0,
+                      opacity: 0.8,
+                      userSelect: "none",
+                      lineHeight: 1.6,
+                    }}
+                  >
                     {prefix}
                   </span>
 
-                  <span style={{
-                    fontSize: 13,
-                    color: isRecent ? colors.text : colors.textMuted,
-                    fontFamily: fonts.body,
-                    lineHeight: 1.5,
-                    flex: 1,
-                  }}>
+                  <span
+                    style={{
+                      fontSize: 13,
+                      color: isRecent ? colors.text : colors.textMuted,
+                      fontFamily: fonts.body,
+                      lineHeight: 1.5,
+                      flex: 1,
+                    }}
+                  >
                     {log}
                   </span>
                 </div>
@@ -155,7 +204,6 @@ export default function ActivityLog({ activityLog }: Props) {
           )}
           <div ref={bottomRef} />
         </div>
-
       </div>
     </>
   );
