@@ -27,12 +27,14 @@ function App() {
   const setRooms = useGameStore(state => state.setRooms);
   const loadSections = useGameStore(state => state.loadSections);
   const startSection = useGameStore(state => state.startSection);
+  const preloadDialogueTrees = useGameStore(state => state.preloadDialogueTrees);
 
   useEffect(() => {
     const loadRooms = async () => {
       try {
         const [rooms, sections] = await Promise.all([getAllRooms(), getSections()]);
         setRooms(rooms);
+        preloadDialogueTrees(rooms);
         loadSections(sections);
         if (sections.length > 0) {
           startSection(sections[0].id, rooms);

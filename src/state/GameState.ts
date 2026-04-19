@@ -20,6 +20,7 @@ import {
   finalizeAttackState,
 } from "./utils/CombatUtils";
 import { Spell } from "@/types/Spell";
+import { getDialogueForNPC } from "@/queries/DialogueQueries";
 
 function getWeaponDamage(attacker: CharacterData | Enemy): number {
   if ("items" in attacker && attacker.items && attacker.items.length > 0) {
@@ -62,7 +63,9 @@ export interface GameState {
   activeDialogue: DialogueNode | null;
   currentDialogueNodeId: string | null;
   conversationFlags: Record<string, Record<string, string>>;
-  startDialogue: (npc: NPC, node: DialogueNode) => void;
+  dialogueTrees: Map<number, DialogueNode>;
+  startDialogue: (npc: NPC, node?: DialogueNode) => void;
+  preloadDialogueTrees: (rooms: Room[]) => void;
   selectDialogueChoice: (choiceId: string) => void;
   checkSkillCondition: (skill: string, dc: number) => boolean;
   applyOutcome: (outcome: DialogueOutcome, npc: NPC) => void;
@@ -132,6 +135,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   activeDialogue: null,
   currentDialogueNodeId: null,
   conversationFlags: {},
+  dialogueTrees: new Map<number, DialogueNode>(),
 
   setTargetingConsumable: (item) => set({ targetingConsumable: item }),
 
@@ -357,12 +361,47 @@ export const useGameStore = create<GameState>((set, get) => ({
       return state;
     }),
 
-  startDialogue: (npc: NPC, node: DialogueNode) => {
+  startDialogue: (npc: NPC, node?: DialogueNode | undefined) => {
+    const tree = node || (npc.id ? get().dialogueTrees.get(npc.id) : null);
+    if (!tree) {
+      if (npc.id) {
+        getDialogueForNPC(npc.id).then((fetchedTree) => {
+          if (fetchedTree) {
+            set((state) => {
+              const updated = new Map(state.dialogueTrees);
+              updated.set(npc.id!, fetchedTree);
+              return { dialogueTrees: updated, activeDialogue: fetchedTree, currentDialogueNodeId: fetchedTree.id };
+            });
+          }
+        });
+      }
+      return;
+    }
     set({
-      activeDialogue: node,
-      currentDialogueNodeId: node.id,
+      activeDialogue: tree,
+      currentDialogueNodeId: tree.id,
       dialogueIndex: 0,
-      activityLog: [...get().activityLog, `${npc.name}: ${node.text}`],
+      activityLog: [...get().activityLog, `${npc.name}: ${tree.text}`],
+    });
+  },
+
+  preloadDialogueTrees: (rooms: Room[]) => {
+    rooms.forEach((room) => {
+      if (room.interaction?.type === "NPC" && room.interaction.npc.id) {
+        const npcId = room.interaction.npc.id;
+        const existing = get().dialogueTrees.get(npcId);
+        if (!existing) {
+          getDialogueForNPC(npcId).then((tree) => {
+            if (tree) {
+              set((state) => {
+                const updated = new Map(state.dialogueTrees);
+                updated.set(npcId, tree);
+                return { dialogueTrees: updated };
+              });
+            }
+          });
+        }
+      }
     });
   },
 
@@ -601,6 +640,8 @@ case DialogueOutcomeType.NPC_FRIENDLY:
         gameStatus: status,
         combatOrder: combatOrder,
         dialogueIndex: 0,
+        activeDialogue: null,
+        currentDialogueNodeId: null,
       };
     }),
 

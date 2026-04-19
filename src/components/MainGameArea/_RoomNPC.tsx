@@ -1,36 +1,34 @@
 import { GameState, useGameStore } from "@/state/GameState";
 import { DialogueNode } from "@/types/RoomInteractions";
-import { getDialogueForNPC } from "@/queries/DialogueQueries";
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 
 export default function RoomNPC() {
   const state = useGameStore((state: GameState) => state);
   const currentRoom = state.room;
   const dialogueIndex = useGameStore((state) => state.dialogueIndex);
   const activeDialogue = useGameStore((state) => state.activeDialogue);
-  const startDialogue = useGameStore((state) => state.startDialogue);
-  const selectDialogueChoice = useGameStore((state) => state.selectDialogueChoice);
-  const [isLoading, setIsLoading] = useState(false);
+  const dialogueTrees = useGameStore((state) => state.dialogueTrees);
+  const startDialogue = useGameStore((state: GameState) => state.startDialogue);
+  const selectDialogueChoice = useGameStore((state: GameState) => state.selectDialogueChoice);
+  const npcIdRef = useRef<number | null>(null);
 
   const interaction = currentRoom?.interaction;
+  const npcId = interaction?.type === "NPC" ? interaction.npc.id : null;
 
   useEffect(() => {
-    if (interaction?.type === "NPC" && interaction.npc.id && !activeDialogue && !isLoading) {
-      setIsLoading(true);
-      getDialogueForNPC(interaction.npc.id!).then((dialogue) => {
-        if (dialogue) {
-          startDialogue(interaction.npc, dialogue);
-        }
-        setIsLoading(false);
-      });
+    if (!interaction || interaction.type !== "NPC" || !npcId) return;
+    if (npcIdRef.current === npcId) return;
+    npcIdRef.current = npcId;
+    
+    const cachedTree = dialogueTrees.get(npcId);
+    if (cachedTree) {
+      startDialogue(interaction.npc, cachedTree);
+    } else {
+      startDialogue(interaction.npc);
     }
-  }, [interaction, activeDialogue, startDialogue, isLoading]);
+  }, [npcId, dialogueTrees]);
 
   if (!currentRoom || interaction?.type !== "NPC") {
-    return null;
-  }
-
-  if (isLoading) {
     return null;
   }
 
