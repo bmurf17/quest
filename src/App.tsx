@@ -11,6 +11,7 @@ import { useGameStore } from "./state/GameState";
 import ManageRooms from "./components/Admin/game-design/CreateRoom";
 import RoomMap from "./components/Admin/game-design/RoomMap";
 import ManageSections from "./components/Admin/game-design/ManageSections";
+import ManageDialogues from "./components/Admin/game-design/ManageDialogues";
 
 const CharacterCreation = lazy(() => import("./components/CharacterCreation/CharacterCreation"));
 const Admin = lazy(() => import("./components/Admin/GameDesign"));
@@ -59,6 +60,7 @@ function App() {
             <Route path={"/admin/game-design/rooms"} element={<ManageRooms />} />
             <Route path={"/admin/game-design/roomMap"} element={<RoomMap />} />
             <Route path={"/admin/game-design/sections"} element={<ManageSections />} />
+            <Route path={"/admin/game-design/dialogues"} element={<ManageDialogues />} />
             <Route path={"/admin"} element={<Admin />} />
           </Routes>
         </Suspense>
