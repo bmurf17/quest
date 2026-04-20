@@ -2,11 +2,8 @@ import { Directions } from "@/types/Directions";
 import { Enemy } from "@/types/Enemy";
 import { Room, Section } from "@/types/Room";
 import { RoomInteraction } from "@/types/RoomInteractions";
-import { createClient } from "@supabase/supabase-js";
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-export const supabase = createClient(supabaseUrl, supabaseKey);
+import { supabase } from "@/lib/supabase";
+export { supabase };
 
 export async function getAllRooms(): Promise<Room[]> {
   const { data: rooms, error: roomsError } = await supabase
