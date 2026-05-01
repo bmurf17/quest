@@ -2,7 +2,7 @@ import { supabase } from "@/queries/RoomQueries";
 import { useGameStore } from "@/state/GameState";
 import { Directions } from "@/types/Directions";
 import { Room, startRoom } from "@/types/Room";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import mushroom from "/images/Mushroom.png";
 import blord from "/images/Blord.png";
 import { NPCType } from "@/types/RoomInteractions";
@@ -772,6 +772,9 @@ export default function ManageRooms() {
     message: string;
   } | null>(null);
 
+  // ref to synchronously guard against double-submit (rapid double-clicks)
+  const submittingRef = useRef(false);
+
   const rooms = useGameStore((state) => state.rooms);
   const availableSections = useGameStore((state) => state.availableSections);
   const addRoom = useGameStore((state) => state.addRoom);
@@ -800,7 +803,10 @@ export default function ManageRooms() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setIsSubmitting(true);
+  // Prevent concurrent submissions (state updates are async; use ref for sync guard)
+  if (submittingRef.current) return;
+  submittingRef.current = true;
+  setIsSubmitting(true);
 
     try {
       const formData = new FormData(event.currentTarget);
@@ -1020,6 +1026,7 @@ export default function ManageRooms() {
       console.error("Error creating room:", err);
     } finally {
       setIsSubmitting(false);
+      submittingRef.current = false;
     }
   };
 
