@@ -218,7 +218,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
       const nextIndex = safeNextIndex(
         state.activeFighterIndex,
-        state.combatOrder.length,
+        combatOrder.length,
       );
 
       return {
@@ -268,6 +268,11 @@ export const useGameStore = create<GameState>((set, get) => ({
           (e) => e.id !== enemy.id,
         );
         combatOrder = combatOrder.filter((x) => x.name !== enemy.name);
+
+        nextIndex = safeNextIndex(
+          state.activeFighterIndex,
+          combatOrder.length,
+        );
 
         const newAccumulatedExp = state.accumulatedExp + (enemy.expGain ?? 10);
 
