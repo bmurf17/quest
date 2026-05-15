@@ -32,3 +32,4 @@ Quests
 Make the battle order scrollable
 Can use spells outside of combat 
 Heal Dead Party Members
+Saving
