@@ -157,7 +157,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   isCurrentFighterEnemy: () => {
     const state = get();
     const currentFighter = state.combatOrder[state.activeFighterIndex];
-  return isEnemy(currentFighter);
+    return isEnemy(currentFighter);
   },
 
   performEnemyTurn: () => {
@@ -209,7 +209,11 @@ export const useGameStore = create<GameState>((set, get) => ({
       if (isPartyDefeated) {
         return {
           party: updatedParty,
-          activityLog: [...state.activityLog, logMessage, "Your party has been defeated..."],
+          activityLog: [
+            ...state.activityLog,
+            logMessage,
+            "Your party has been defeated...",
+          ],
           activeFighterIndex: 0,
           combatOrder: [],
           gameStatus: GameStatus.GameOver,
@@ -229,7 +233,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       };
     });
 
-  scheduleEnemyTurn(get);
+    scheduleEnemyTurn(get);
   },
 
   attack: (enemy: Enemy) => {
@@ -247,7 +251,12 @@ export const useGameStore = create<GameState>((set, get) => ({
           : currentAttacker.strength;
 
       const weaponDmg = getWeaponDamage(currentAttacker);
-      const damage = calcDamage(enemy.defense, currentStr, currentDex, weaponDmg);
+      const damage = calcDamage(
+        enemy.defense,
+        currentStr,
+        currentDex,
+        weaponDmg,
+      );
       const newHealth = enemy.health - damage;
       const hitEnemyId = enemy.id;
       const hitCount = state.lastHitCounter + 1;
@@ -269,10 +278,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         );
         combatOrder = combatOrder.filter((x) => x.name !== enemy.name);
 
-        nextIndex = safeNextIndex(
-          state.activeFighterIndex,
-          combatOrder.length,
-        );
+        nextIndex = safeNextIndex(state.activeFighterIndex, combatOrder.length);
 
         const newAccumulatedExp = state.accumulatedExp + (enemy.expGain ?? 10);
 
@@ -375,7 +381,11 @@ export const useGameStore = create<GameState>((set, get) => ({
             set((state) => {
               const updated = new Map(state.dialogueTrees);
               updated.set(npc.id!, fetchedTree);
-              return { dialogueTrees: updated, activeDialogue: fetchedTree, currentDialogueNodeId: fetchedTree.id };
+              return {
+                dialogueTrees: updated,
+                activeDialogue: fetchedTree,
+                currentDialogueNodeId: fetchedTree.id,
+              };
             });
           }
         });
@@ -414,18 +424,21 @@ export const useGameStore = create<GameState>((set, get) => ({
     const state = get();
     if (!state.activeDialogue) return;
 
-    const choice = state.activeDialogue.choices?.find(c => c.id === choiceId);
+    const choice = state.activeDialogue.choices?.find((c) => c.id === choiceId);
     if (!choice) return;
 
     const newActivityLog = [...state.activityLog, `You: ${choice.text}`];
     set({ activityLog: newActivityLog });
 
     if (choice.skillCondition) {
-      const passed = state.checkSkillCondition(choice.skillCondition.skill, choice.skillCondition.dc);
-      const nextNodeId = passed 
-        ? choice.skillCondition.successNodeId 
+      const passed = state.checkSkillCondition(
+        choice.skillCondition.skill,
+        choice.skillCondition.dc,
+      );
+      const nextNodeId = passed
+        ? choice.skillCondition.successNodeId
         : choice.skillCondition.failureNodeId;
-      
+
       if (nextNodeId) {
         set({ currentDialogueNodeId: nextNodeId });
       }
@@ -434,19 +447,24 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
 
     if (choice.outcome) {
-      const roomNpc = state.room.interaction?.type === "NPC" ? state.room.interaction.npc : null;
+      const roomNpc =
+        state.room.interaction?.type === "NPC"
+          ? state.room.interaction.npc
+          : null;
       if (roomNpc) {
         state.applyOutcome(choice.outcome, roomNpc);
-}
+      }
     }
   },
 
   checkSkillCondition: (skill: string, dc: number): boolean => {
     const state = get();
     const party = state.party;
-    
+
     for (const char of party) {
-      const skillObj = char.skills?.find(s => s.name.toLowerCase() === skill.toLowerCase());
+      const skillObj = char.skills?.find(
+        (s) => s.name.toLowerCase() === skill.toLowerCase(),
+      );
       if (skillObj) {
         const modifier = parseInt(skillObj.modifier);
         const roll = Math.floor(Math.random() * 20) + 1;
@@ -462,18 +480,24 @@ export const useGameStore = create<GameState>((set, get) => ({
   applyOutcome: (outcome: DialogueOutcome, npc: NPC) => {
     const state = get();
     const npcId = npc.id?.toString() || npc.name;
+    console.log("Applying outcome:", outcome);
 
     switch (outcome.type) {
       case DialogueOutcomeType.NPC_HOSTILE:
         state.setDisposition(npc, NPCDisposition.HOSTILE);
         state.addToLog(`${npc.name} becomes hostile!`);
         break;
-case DialogueOutcomeType.NPC_FRIENDLY:
+      case DialogueOutcomeType.NPC_FRIENDLY:
         state.setDisposition(npc, NPCDisposition.FRIENDLY);
         state.addToLog(`${npc.name} is now friendly toward you.`);
+        set({
+          room: { ...get().room },
+          activeDialogue: null,
+          currentDialogueNodeId: null,
+        });
         break;
       case DialogueOutcomeType.NPC_LEAVE:
-        set({ 
+        set({
           room: { ...get().room, interaction: null },
           activeDialogue: null,
           currentDialogueNodeId: null,
@@ -509,8 +533,10 @@ case DialogueOutcomeType.NPC_FRIENDLY:
   setDisposition: (npc: NPC, disposition: NPCDisposition) => {
     set((state) => {
       const updatedRoom = { ...state.room };
-      if (updatedRoom.interaction?.type === "NPC" && 
-          updatedRoom.interaction.npc.name === npc.name) {
+      if (
+        updatedRoom.interaction?.type === "NPC" &&
+        updatedRoom.interaction.npc.name === npc.name
+      ) {
         updatedRoom.interaction = {
           type: "NPC",
           npc: { ...npc, disposition },
@@ -602,7 +628,7 @@ case DialogueOutcomeType.NPC_FRIENDLY:
         return state;
       }
 
-  let roomInstance = state.roomInstances.get(targetRoomTemplate.id);
+      let roomInstance = state.roomInstances.get(targetRoomTemplate.id);
       if (!roomInstance) {
         roomInstance = {
           ...targetRoomTemplate,
@@ -635,8 +661,8 @@ case DialogueOutcomeType.NPC_FRIENDLY:
           }!`,
         );
 
-  const newRoomInstances = new Map(state.roomInstances);
-  newRoomInstances.set(targetRoomTemplate.id, roomInstance);
+      const newRoomInstances = new Map(state.roomInstances);
+      newRoomInstances.set(targetRoomTemplate.id, roomInstance);
 
       return {
         activityLog: [...state.activityLog, ...logBuilder.build()],
@@ -720,7 +746,7 @@ case DialogueOutcomeType.NPC_FRIENDLY:
       };
     }),
 
-useConsumable: (item: Consumable,  target?: CharacterData) => {
+  useConsumable: (item: Consumable, target?: CharacterData) => {
     set((state) => {
       const logBuilder = new ActivityLogBuilder().add(`${item.effect}`);
       let newCombatOrder = [...state.combatOrder];
@@ -786,7 +812,6 @@ useConsumable: (item: Consumable,  target?: CharacterData) => {
       }
     }, 500);
   },
-
 
   takeFromChest: (chest: Chest) =>
     set((state) => {
@@ -869,8 +894,9 @@ useConsumable: (item: Consumable,  target?: CharacterData) => {
       );
 
       let updatedParty = state.party;
-  let updatedEnemies = (state.roomInstances.get(state.room.id) || state.room)
-        .enemies;
+      let updatedEnemies = (
+        state.roomInstances.get(state.room.id) || state.room
+      ).enemies;
       let combatOrder = state.combatOrder;
       let nextIndex = safeNextIndex(
         state.activeFighterIndex,
@@ -888,11 +914,7 @@ useConsumable: (item: Consumable,  target?: CharacterData) => {
 
       switch (spell.effect.type) {
         case "damage":
-          if (
-            spell.effect.target === "single" &&
-            target &&
-            isEnemy(target)
-          ) {
+          if (spell.effect.target === "single" && target && isEnemy(target)) {
             const enemy = target as Enemy;
             const currentAttacker = state.combatOrder[
               state.activeFighterIndex
@@ -1090,8 +1112,8 @@ useConsumable: (item: Consumable,  target?: CharacterData) => {
       const currentRoomInstance =
         state.roomInstances.get(state.room.id) || state.room;
       const updatedRoom = { ...currentRoomInstance, enemies: updatedEnemies };
-  const newRoomInstances = new Map(state.roomInstances);
-  newRoomInstances.set(state.room.id, updatedRoom);
+      const newRoomInstances = new Map(state.roomInstances);
+      newRoomInstances.set(state.room.id, updatedRoom);
 
       if (
         updatedEnemies.length === 0 &&
@@ -1142,10 +1164,17 @@ useConsumable: (item: Consumable,  target?: CharacterData) => {
     set((state) => {
       const updates: Partial<GameState> = { gameStatus: GameStatus.InTown };
 
-      if (state.currentSection !== null && !state.beatenSections.includes(state.currentSection)) {
+      if (
+        state.currentSection !== null &&
+        !state.beatenSections.includes(state.currentSection)
+      ) {
         const sectionName =
-          state.availableSections.find((s) => s.id === state.currentSection)?.name ?? "the area";
-        updates.beatenSections = [...state.beatenSections, state.currentSection];
+          state.availableSections.find((s) => s.id === state.currentSection)
+            ?.name ?? "the area";
+        updates.beatenSections = [
+          ...state.beatenSections,
+          state.currentSection,
+        ];
         updates.activityLog = [
           ...state.activityLog,
           `You return to town. ${sectionName} has been completed!`,
@@ -1199,9 +1228,10 @@ useConsumable: (item: Consumable,  target?: CharacterData) => {
         room: roomInstance,
         roomInstances: new Map([[firstRoom.id, roomInstance]]),
         gameStatus: GameStatus.Exploring,
-        combatOrder: firstRoom.enemies.length > 0
-          ? [...state.party, ...firstRoom.enemies]
-          : [],
+        combatOrder:
+          firstRoom.enemies.length > 0
+            ? [...state.party, ...firstRoom.enemies]
+            : [],
         activityLog: [
           ...state.activityLog,
           `You begin exploring ${state.availableSections.find((s) => s.id === sectionId)?.name ?? "an unknown area"}...`,
@@ -1215,7 +1245,8 @@ useConsumable: (item: Consumable,  target?: CharacterData) => {
       if (state.beatenSections.includes(state.currentSection)) return state;
 
       const sectionName =
-        state.availableSections.find((s) => s.id === state.currentSection)?.name ?? "the area";
+        state.availableSections.find((s) => s.id === state.currentSection)
+          ?.name ?? "the area";
 
       return {
         beatenSections: [...state.beatenSections, state.currentSection],
@@ -1233,7 +1264,12 @@ useConsumable: (item: Consumable,  target?: CharacterData) => {
   },
 }));
 
-export function calcDamage(defense: number, strength: number, dex: number, weaponDamage: number = 0): number {
+export function calcDamage(
+  defense: number,
+  strength: number,
+  dex: number,
+  weaponDamage: number = 0,
+): number {
   const hitChance = dex + Math.floor(Math.random() * 20) + 1;
   if (hitChance >= defense) {
     const baseDamage = strength + Math.floor(Math.random() * 6) + 1;
@@ -1274,8 +1310,12 @@ export function safeNextIndex(currentIndex: number, length: number): number {
 
 function scheduleEnemyTurn(getState: () => any, delay = 500) {
   setTimeout(() => {
-    const { gameStatus, isCurrentFighterEnemy, performEnemyTurn, isLevelingUp } =
-      getState();
+    const {
+      gameStatus,
+      isCurrentFighterEnemy,
+      performEnemyTurn,
+      isLevelingUp,
+    } = getState();
     if (
       gameStatus === GameStatus.Combat &&
       isCurrentFighterEnemy() &&
