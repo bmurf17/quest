@@ -1,4 +1,6 @@
 import { Item } from "./Item";
+import { Room } from "./Room";
+import { Enemy } from "./Enemy";
 
 export enum NPCType {
   MERCHANT = "merchant",
@@ -55,19 +57,33 @@ export interface DialogueNode {
   isEndpoint: boolean;
 }
 
+export type QuestType =
+  | { type: "fetch"; item: Item }
+  | { type: "defeat"; enemy: Enemy }
+  | { type: "explore"; requireRoom: Room }
+
+export interface Quest {
+  id: number;
+  name: string;
+  description: string;
+  type: QuestType;
+  objectives: string[];
+  rewards: Item[];
+}
+
 export interface NPC {
   id?: number;
   name: string;
   dialogue: string[];
   dialogueId?: string;
-  questId?: string;
+  quest?: Quest;
   discoveryMessage?: string;
   NPCType: NPCType;
   img: string;
   disposition?: NPCDisposition;
 }
 
-export type Chest = {
+export interface Chest {
   id: number;
   itemId: string;
   quantity: number;

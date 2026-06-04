@@ -650,6 +650,14 @@ export default function ActionMenu() {
         isOpen={isQuestDescriptionOpen}
         onOpenChange={setIsQuestDescriptionOpen}
         npcsName={npc?.name ?? "Quest Giver"}
+        quest={npc?.quest || {
+          id: 0,
+          name: "Unknown Quest",
+          description: "No description available.",
+          type: { type: "fetch", item: manaPotion },
+          objectives: [],
+          rewards: [manaPotion]
+        }}
       />
     </>
   );

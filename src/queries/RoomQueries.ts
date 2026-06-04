@@ -36,7 +36,14 @@ export async function getAllRooms(): Promise<Room[]> {
         `
         room_id,
         interaction_type,
-        npcs(*),
+        npcs(
+          *,
+          quest:quests(
+            *,
+            objectives:quest_objectives(*),
+            rewards:quest_rewards(item:items(*))
+          )
+        ),
         chests(*, item:items(*)),
         camps(*),
         transitions(*)
@@ -87,14 +94,86 @@ export async function getAllRooms(): Promise<Room[]> {
         case "NPC":
           interaction = {
             type: "NPC",
-            npc: {
+              npc: {
               id: interactionData.npcs.id,
               name: interactionData.npcs.name,
               dialogue: interactionData.npcs.dialogue,
-              questId: interactionData.npcs.quest_id,
               discoveryMessage: interactionData.npcs.discovery_message,
               NPCType: interactionData.npcs.npc_type,
               img: interactionData.npcs.img,
+              quest: interactionData.npcs.quest
+                ? (() => {
+                    const q = interactionData.npcs.quest;
+                    const mapItem = (it: any) =>
+                      it
+                        ? {
+                            name: it.name,
+                            value: it.value,
+                            img: it.img,
+                            type: it.type,
+                            effect: it.effect,
+                            hpChange: it.hp_change,
+                            manaChange: it.mana_change,
+                            stackSize: it.stack_size,
+                            slot: it.slot,
+                            cost: it.cost,
+                            stats: it.stats,
+                          }
+                        : null;
+
+                    let questTypeObj: any;
+                    switch (q.quest_type) {
+                      case "fetch":
+                        questTypeObj = {
+                          type: "fetch",
+                          item: mapItem(q.fetch_item),
+                        };
+                        break;
+                      case "defeat":
+                        questTypeObj = {
+                          type: "defeat",
+                          enemy: q.defeat_enemy
+                            ? {
+                                ...(q.defeat_enemy as any),
+                              }
+                            : ({ id: q.defeat_enemy_id } as any),
+                        };
+                        break;
+                      case "explore":
+                        questTypeObj = {
+                          type: "explore",
+                          requireRoom: q.explore_room
+                            ? {
+                                id: q.explore_room.id,
+                                name: q.explore_room.name,
+                                sectionId: q.explore_room.section_id,
+                                enemies: [],
+                                neighboringRooms: [],
+                                interaction: null,
+                              }
+                            : ({ id: q.explore_room_id } as any),
+                        };
+                        break;
+                      default:
+                        questTypeObj = { type: "fetch", item: null };
+                    }
+
+                    return {
+                      id: q.id,
+                      name: q.name,
+                      description: q.description,
+                      type: questTypeObj,
+                      objectives: q.objectives
+                        ? q.objectives.map((o: any) => o.objective)
+                        : [],
+                      rewards: q.rewards
+                        ? q.rewards
+                            .map((r: any) => (r.item ? mapItem(r.item) : null))
+                            .filter(Boolean)
+                        : [],
+                    };
+                  })()
+                : undefined,
             },
           };
           break;

@@ -5,15 +5,18 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Quest } from "@/types/RoomInteractions";
 
 export default function QuestDescription({
   isOpen = false,
   onOpenChange,
   npcsName,
+  quest
 }: {
   isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
   npcsName: string;
+  quest: Quest;
 }) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -28,8 +31,24 @@ export default function QuestDescription({
           <div className="flex flex-col">
             <p className="text-lg font-bold">Quest Description</p>
             <p className="mt-2">
-              Help {npcsName} find the lost treasure hidden in the ancient ruins.
+              Help {npcsName} {quest.description}
             </p>
+            <p className="mt-2">
+              Quest Objectives:
+            </p>
+            <ul className="list-disc list-inside">
+              {quest.objectives.map((objective, index) => (
+                <li key={index}>{objective}</li>
+              ))}
+            </ul>
+            <p className="mt-2">
+              Quest Rewards:
+            </p>
+            <ul className="list-disc list-inside">
+              {quest.rewards.map((reward, index) => (
+                <li key={index}>{reward.name}</li>
+              ))}
+            </ul>
           </div>
         </ScrollArea>
       </DialogContent>
