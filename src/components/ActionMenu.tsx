@@ -10,6 +10,7 @@ import { manaPotion } from "@/types/Item";
 import { Spell } from "@/types/Spell";
 import { partyHasAnimalHandling } from "@/state/utils/DialogueUtils";
 import { GameStatus } from "@/types/GameStatus";
+import QuestDescription from "./QuestDescription";
 
 interface ActionBtnProps {
   onClick?: () => void;
@@ -219,6 +220,7 @@ export default function ActionMenu() {
   const [isInventoryModalOpen, setIsInventoryModalOpen] = useState(false);
   const [isShopModalOpen, setIsShopModalOpen] = useState(false);
   const [isSectionSelectorOpen, setIsSectionSelectorOpen] = useState(false);
+  const [isQuestDescriptionOpen, setIsQuestDescriptionOpen] = useState(false);
 
   const handleAttackClick = () => {
     if (room.enemies.length === 1) {
@@ -402,7 +404,7 @@ export default function ActionMenu() {
             )}
             {npc.NPCType === NPCType.QUEST_GIVER && (
               <ActionBtn
-                onClick={() => setIsShopModalOpen(true)}
+                onClick={() => setIsQuestDescriptionOpen(true)}
                 variant="success"
                 fullWidth
               >
@@ -642,6 +644,12 @@ export default function ActionMenu() {
       <SectionSelector
         isOpen={isSectionSelectorOpen}
         onOpenChange={setIsSectionSelectorOpen}
+      />
+
+      <QuestDescription
+        isOpen={isQuestDescriptionOpen}
+        onOpenChange={setIsQuestDescriptionOpen}
+        npcsName={npc?.name ?? "Quest Giver"}
       />
     </>
   );
