@@ -61,14 +61,6 @@ export default function Inventory({
             }}>
               Inventory
             </DialogTitle>
-            <span style={{
-              fontSize: 11,
-              color: colors.textMuted,
-              fontFamily: fonts.display,
-              letterSpacing: "0.06em",
-            }}>
-              {inventory.length} {inventory.length === 1 ? "item" : "items"}
-            </span>
           </div>
         </DialogHeader>
 
