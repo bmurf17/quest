@@ -18,6 +18,7 @@ export default function QuestDescription({
   npcsName: string;
   quest: Quest;
 }) {
+   console.log("Rendering QuestDescription with quest:", quest);
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-xl bg-gray-800 text-white">
@@ -44,6 +45,12 @@ export default function QuestDescription({
             <p className="mt-2">
               Quest Rewards:
             </p>
+            {quest.type.type === "defeat" ? (
+              <p className="mt-2">
+                Defeat <span className="font-bold text-yellow-400">{quest.type.enemy.name}</span> to complete the quest.
+              </p>
+            ) : (<></>)}
+
             <ul className="list-disc list-inside">
               {quest.rewards.map((reward, index) => (
                 <li key={index}>{reward.name}</li>

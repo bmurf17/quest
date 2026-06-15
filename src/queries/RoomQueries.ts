@@ -47,7 +47,7 @@ export async function getAllRooms(): Promise<Room[]> {
         chests(*, item:items(*)),
         camps(*),
         transitions(*)
-        `
+        `,
       )
       .then(({ data, error }) => {
         if (error) throw error;
@@ -85,169 +85,171 @@ export async function getAllRooms(): Promise<Room[]> {
     neighboringRooms: [Directions, number][];
   };
 
-  const roomObjects: RoomWithNeighborIds[] = rooms!.map((room) => {
-    let interaction: RoomInteraction | null = null;
-    const interactionData = interactionsByRoom.get(room.id);
+  const roomObjects: RoomWithNeighborIds[] = await Promise.all(
+    rooms!.map(async (room) => {
+      let interaction: RoomInteraction | null = null;
+      const interactionData = interactionsByRoom.get(room.id);
 
-    if (interactionData) {
-      switch (interactionData.interaction_type) {
-        case "NPC":
-          interaction = {
-            type: "NPC",
-              npc: {
-              id: interactionData.npcs.id,
-              name: interactionData.npcs.name,
-              dialogue: interactionData.npcs.dialogue,
-              discoveryMessage: interactionData.npcs.discovery_message,
-              NPCType: interactionData.npcs.npc_type,
-              img: interactionData.npcs.img,
-              quest: interactionData.npcs.quest
-                ? (() => {
-                    const q = interactionData.npcs.quest;
-                    const mapItem = (it: any) =>
-                      it
-                        ? {
-                            name: it.name,
-                            value: it.value,
-                            img: it.img,
-                            type: it.type,
-                            effect: it.effect,
-                            hpChange: it.hp_change,
-                            manaChange: it.mana_change,
-                            stackSize: it.stack_size,
-                            slot: it.slot,
-                            cost: it.cost,
-                            stats: it.stats,
-                          }
-                        : null;
-
-                    let questTypeObj: any;
-                    switch (q.quest_type) {
-                      case "fetch":
-                        questTypeObj = {
-                          type: "fetch",
-                          item: mapItem(q.fetch_item),
-                        };
-                        break;
-                      case "defeat":
-                        questTypeObj = {
-                          type: "defeat",
-                          enemy: q.defeat_enemy
-                            ? {
-                                ...(q.defeat_enemy as any),
-                              }
-                            : ({ id: q.defeat_enemy_id } as any),
-                        };
-                        break;
-                      case "explore":
-                        questTypeObj = {
-                          type: "explore",
-                          requireRoom: q.explore_room
-                            ? {
-                                id: q.explore_room.id,
-                                name: q.explore_room.name,
-                                sectionId: q.explore_room.section_id,
-                                enemies: [],
-                                neighboringRooms: [],
-                                interaction: null,
-                              }
-                            : ({ id: q.explore_room_id } as any),
-                        };
-                        break;
-                      default:
-                        questTypeObj = { type: "fetch", item: null };
+      if (interactionData) {
+        switch (interactionData.interaction_type) {
+          case "NPC": {
+            let mappedQuest: any | undefined = undefined;
+            if (interactionData.npcs.quest) {
+              const q = interactionData.npcs.quest;
+              const mapItem = (it: any) =>
+                it
+                  ? {
+                      name: it.name,
+                      value: it.value,
+                      img: it.img,
+                      type: it.type,
+                      effect: it.effect,
+                      hpChange: it.hp_change,
+                      manaChange: it.mana_change,
+                      stackSize: it.stack_size,
+                      slot: it.slot,
+                      cost: it.cost,
+                      stats: it.stats,
                     }
+                  : null;
 
-                    return {
-                      id: q.id,
-                      name: q.name,
-                      description: q.description,
-                      type: questTypeObj,
-                      objectives: q.objectives
-                        ? q.objectives.map((o: any) => o.objective)
-                        : [],
-                      rewards: q.rewards
-                        ? q.rewards
-                            .map((r: any) => (r.item ? mapItem(r.item) : null))
-                            .filter(Boolean)
-                        : [],
-                    };
-                  })()
-                : undefined,
-            },
-          };
-          break;
-        case "chest":
-          interaction = {
-            type: "chest",
-            chest: {
-              id: interactionData.chests.id,
-              itemId: interactionData.chests.item_id,
-              quantity: interactionData.chests.quantity,
-              isLocked: interactionData.chests.is_locked,
-              isOpen: interactionData.chests.is_open,
-              discoveryMessage: interactionData.chests.discovery_message,
-              item: interactionData.chests.item
-                ? {
-                    name: interactionData.chests.item.name,
-                    value: interactionData.chests.item.value,
-                    img: interactionData.chests.item.img,
-                    type: interactionData.chests.item.type,
-                    effect: interactionData.chests.item.effect,
-                    hpChange: interactionData.chests.item.hp_change,
-                    manaChange: interactionData.chests.item.mana_change,
-                    stackSize: interactionData.chests.item.stack_size,
-                    slot: interactionData.chests.item.slot,
-                    cost: interactionData.chests.item.cost,
-                    stats: interactionData.chests.item.stats
-                  }
-                : null,
-            },
-          };
-          break;
-        case "camp":
-          interaction = {
-            type: "camp",
-            camp: {
-              healAmount: interactionData.camps.heal_amount,
-              restoresMana: interactionData.camps.restores_mana,
-              cost: interactionData.camps.cost,
-              discoveryMessage: interactionData.camps.discovery_message,
-            },
-          };
-          break;
+              let questTypeObj: any;
+              console.log("Mapping quest type for quest:", q);
+              switch (q.quest_type) {
+                case "fetch":
+                  questTypeObj = {
+                    type: "fetch",
+                    item: mapItem(q.fetch_item),
+                  };
+                  break;
+                case "defeat":
+                  questTypeObj = {
+                    type: "defeat",
+                    enemy: await getEnemyById(q.defeat_enemy_id),
+                  };
+                  break;
+                case "explore":
+                  questTypeObj = {
+                    type: "explore",
+                    requireRoom: q.explore_room
+                      ? {
+                          id: q.explore_room.id,
+                          name: q.explore_room.name,
+                          sectionId: q.explore_room.section_id,
+                          enemies: [],
+                          neighboringRooms: [],
+                          interaction: null,
+                        }
+                      : ({ id: q.explore_room_id } as any),
+                  };
+                  break;
+                default:
+                  questTypeObj = { type: "fetch", item: null };
+              }
+
+              mappedQuest = {
+                id: q.id,
+                name: q.name,
+                description: q.description,
+                type: questTypeObj,
+                objectives: q.objectives
+                  ? q.objectives.map((o: any) => o.objective)
+                  : [],
+                rewards: q.rewards
+                  ? q.rewards
+                      .map((r: any) => (r.item ? mapItem(r.item) : null))
+                      .filter(Boolean)
+                  : [],
+              };
+            }
+
+            interaction = {
+              type: "NPC",
+              npc: {
+                id: interactionData.npcs.id,
+                name: interactionData.npcs.name,
+                dialogue: interactionData.npcs.dialogue,
+                discoveryMessage: interactionData.npcs.discovery_message,
+                NPCType: interactionData.npcs.npc_type,
+                img: interactionData.npcs.img,
+                quest: mappedQuest,
+              },
+            };
+            break;
+          }
+          case "chest":
+            interaction = {
+              type: "chest",
+              chest: {
+                id: interactionData.chests.id,
+                itemId: interactionData.chests.item_id,
+                quantity: interactionData.chests.quantity,
+                isLocked: interactionData.chests.is_locked,
+                isOpen: interactionData.chests.is_open,
+                discoveryMessage: interactionData.chests.discovery_message,
+                item: interactionData.chests.item
+                  ? {
+                      name: interactionData.chests.item.name,
+                      value: interactionData.chests.item.value,
+                      img: interactionData.chests.item.img,
+                      type: interactionData.chests.item.type,
+                      effect: interactionData.chests.item.effect,
+                      hpChange: interactionData.chests.item.hp_change,
+                      manaChange: interactionData.chests.item.mana_change,
+                      stackSize: interactionData.chests.item.stack_size,
+                      slot: interactionData.chests.item.slot,
+                      cost: interactionData.chests.item.cost,
+                      stats: interactionData.chests.item.stats,
+                    }
+                  : null,
+              },
+            };
+            break;
+          case "camp":
+            interaction = {
+              type: "camp",
+              camp: {
+                healAmount: interactionData.camps.heal_amount,
+                restoresMana: interactionData.camps.restores_mana,
+                cost: interactionData.camps.cost,
+                discoveryMessage: interactionData.camps.discovery_message,
+              },
+            };
+            break;
           case "transition":
-      interaction = {
-        type: "transition",
-        transition: {
-          destination: interactionData.transitions.destination,
-          discoveryMessage: interactionData.transitions.discovery_message ?? undefined,
-          sanctuaryAvailable: interactionData.transitions.sanctuary_available ?? undefined,
+            interaction = {
+              type: "transition",
+              transition: {
+                destination: interactionData.transitions.destination,
+                discoveryMessage:
+                  interactionData.transitions.discovery_message ?? undefined,
+                sanctuaryAvailable:
+                  interactionData.transitions.sanctuary_available ?? undefined,
+              },
+            };
+            break;
+        }
+      }
+
+      const neighbors = neighborsByRoom.get(room.id) || [];
+      const neighboringRooms: [Directions, number][] = neighbors.map(
+        ([dirStr, roomId]) => {
+          const direction =
+            Directions[dirStr as unknown as keyof typeof Directions];
+          return [direction, roomId];
         },
+      );
+
+      return {
+        id: room.id,
+        name: room.name,
+        sectionId: room.section_id,
+        enemies: enemiesByRoom.get(room.id) || [],
+        neighboringRooms,
+        interaction,
       };
-      break;
-      }
-    }
-
-    // Convert string directions to enum values
-    const neighbors = neighborsByRoom.get(room.id) || [];
-    const neighboringRooms: [Directions, number][] = neighbors.map(
-      ([dirStr, roomId]) => {
-        const direction =
-          Directions[dirStr as unknown as keyof typeof Directions];
-        return [direction, roomId];
-      }
-    );
-
-    return {
-      id: room.id,
-      name: room.name,
-      sectionId: room.section_id,
-      enemies: enemiesByRoom.get(room.id) || [],
-      neighboringRooms,
-      interaction,
-    };
-  });
+    }),
+  );
   const roomMap = new Map<number, Room>();
 
   const finalRooms: Room[] = roomObjects.map((roomObj) => ({
@@ -265,7 +267,7 @@ export async function getAllRooms(): Promise<Room[]> {
 
   roomObjects.forEach((roomObj, index) => {
     finalRooms[index].neighboringRooms = roomObj.neighboringRooms.map(
-      ([direction, roomId]) => [direction, roomMap.get(roomId)!]
+      ([direction, roomId]) => [direction, roomMap.get(roomId)!],
     ) as [Directions, Room][];
   });
 
@@ -295,4 +297,15 @@ export async function getSections(): Promise<Section[]> {
 export async function getRoomsBySection(sectionId: number): Promise<Room[]> {
   const allRooms = await getAllRooms();
   return allRooms.filter((r) => r.sectionId === sectionId);
+}
+
+export async function getEnemyById(enemyId: number): Promise<Enemy | null> {
+  const { data, error } = await supabase
+    .from("enemies")
+    .select("id, name, health")
+    .eq("id", enemyId)
+    .single();
+
+  if (error) throw error;
+  return data as unknown as Enemy | null;
 }
