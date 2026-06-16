@@ -19,7 +19,6 @@ export default function QuestDescription({
   npcsName: string;
   quest: Quest;
 }) {
-  console.log("Rendering QuestDescription with quest:", quest);
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent
@@ -65,7 +64,7 @@ export default function QuestDescription({
           </div>
         </DialogHeader>
 
-        <ScrollArea style={{ height: "60vh" }}>
+        <ScrollArea style={{ height: "95vh" }}>
           <div
             style={{
               padding: "10px 14px 20px",
@@ -223,6 +222,33 @@ export default function QuestDescription({
             </div>
           </div>
         </ScrollArea>
+        <div className="flex h-16">
+          <button
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 6,
+              padding: "10px 12px",
+              background: "rgba(5,150,105,0.07)",
+              border: `1px solid rgba(52,211,153,0.25)`,
+              borderRadius: 6,
+              color: "#6EE7B7",
+              fontSize: 12,
+              fontFamily: fonts.display,
+              fontWeight: 600,
+              letterSpacing: "0.05em",
+              cursor: "pointer",
+              transition: "background 0.15s, border-color 0.15s",
+              width: "100%",
+              opacity: 1,
+              userSelect: "none",
+              margin: "8px",
+            }}
+          >
+            <span>Accept Quest</span>
+          </button>
+        </div>
       </DialogContent>
     </Dialog>
   );
