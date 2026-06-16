@@ -114,7 +114,6 @@ export async function getAllRooms(): Promise<Room[]> {
                   : null;
 
               let questTypeObj: any;
-              console.log("Mapping quest type for quest:", q);
               switch (q.quest_type) {
                 case "fetch":
                   questTypeObj = {

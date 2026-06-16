@@ -309,6 +309,7 @@ export const useGameStore = create<GameState>((set, get) => ({
             hitCount,
             true,
             defeatedCount,
+            state.quests,
           ),
           party: completion.updatedParty,
           accumulatedExp:
@@ -338,6 +339,7 @@ export const useGameStore = create<GameState>((set, get) => ({
             hitCount,
             false,
             0,
+            state.quests
           ),
           isTargeting: false,
         };
@@ -483,7 +485,6 @@ export const useGameStore = create<GameState>((set, get) => ({
   applyOutcome: (outcome: DialogueOutcome, npc: NPC) => {
     const state = get();
     const npcId = npc.id?.toString() || npc.name;
-    console.log("Applying outcome:", outcome);
 
     switch (outcome.type) {
       case DialogueOutcomeType.NPC_HOSTILE:

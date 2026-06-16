@@ -182,7 +182,6 @@ export default function QuestDescription({
               </div>
             )}
 
-            {/* Rewards */}
             <div
               style={{
                 padding: "10px 12px",

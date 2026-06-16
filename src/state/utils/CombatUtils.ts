@@ -2,31 +2,32 @@ import { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
 import { GameState } from "../GameState";
 import { CharacterData } from "@/types/Character";
+import { Quest } from "@/types/RoomInteractions";
 
 export const handleCombatCompletion = (
-  enemies: Enemy[], 
-  currentNextIndex: number, 
+  enemies: Enemy[],
+  currentNextIndex: number,
   party: CharacterData[],
-  accumulatedExp?: number
+  accumulatedExp?: number,
 ) => {
   const isVictory = enemies.length === 0;
-  
+
   if (isVictory) {
     const totalExpGained = accumulatedExp ?? 10;
-    
+
     const levelingUpChars: CharacterData[] = [];
-    
-    const updatedParty = party.map(char => {
+
+    const updatedParty = party.map((char) => {
       if (char.alive) {
         const newExp = char.exp + totalExpGained;
-        
+
         if (newExp >= char.nextLevelExp) {
           levelingUpChars.push({ ...char, exp: newExp });
         }
-        
+
         return {
           ...char,
-          exp: newExp
+          exp: newExp,
         };
       }
       return char;
@@ -37,7 +38,7 @@ export const handleCombatCompletion = (
       status: GameStatus.Exploring,
       logSuffix: ` All enemies defeated! Party gained ${totalExpGained} exp!`,
       updatedParty,
-      levelingUpChars
+      levelingUpChars,
     };
   }
 
@@ -46,7 +47,7 @@ export const handleCombatCompletion = (
     status: GameStatus.Combat,
     logSuffix: "",
     updatedParty: party,
-    levelingUpChars: []
+    levelingUpChars: [],
   };
 };
 
@@ -60,9 +61,11 @@ export const finalizeAttackState = (
   hitEnemyId: string,
   lastHitCounter: number,
   isDefeated: boolean = false,
-  defeatedCount: number = 0
+  defeatedCount: number = 0,
+  quests: Quest[],
 ) => {
-  const currentRoomInstance = state.roomInstances.get(state.room.id) || state.room;
+  const currentRoomInstance =
+    state.roomInstances.get(state.room.id) || state.room;
 
   const updatedRoom = {
     ...currentRoomInstance,
@@ -78,6 +81,20 @@ export const finalizeAttackState = (
   if (originalTemplateId !== undefined) {
     newRoomInstances.set(originalTemplateId, updatedRoom);
   }
+  const lastDefeatedEnemyId = isDefeated ? hitEnemyId : null;
+
+  const updatedQuests = quests.map((quest) => {
+    if (
+      quest.type.type === "defeat" &&
+      quest.type.enemy.id.toString() === lastDefeatedEnemyId
+    ) {
+      return {
+        ...quest,
+        status: "completed",
+      };
+    }
+    return quest;
+  });
 
   return {
     room: updatedRoom,
@@ -89,6 +106,7 @@ export const finalizeAttackState = (
     lastHitEnemyId: hitEnemyId,
     lastHitCounter: lastHitCounter,
     lastDefeatedEnemyId: isDefeated ? hitEnemyId : null,
-    lastDefeatedCounter: isDefeated ? defeatedCount : state.lastDefeatedCounter
+    lastDefeatedCounter: isDefeated ? defeatedCount : state.lastDefeatedCounter,
+    quests: updatedQuests,
   };
 };
