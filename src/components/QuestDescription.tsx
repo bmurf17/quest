@@ -7,6 +7,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Quest } from "@/types/RoomInteractions";
 import { colors, fonts } from "@/theme";
+import { useGameStore } from "@/state/GameState";
 
 export default function QuestDescription({
   isOpen = false,
@@ -19,6 +20,8 @@ export default function QuestDescription({
   npcsName: string;
   quest: Quest;
 }) {
+  const { acceptQuest } = useGameStore();
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent
@@ -224,6 +227,10 @@ export default function QuestDescription({
         </ScrollArea>
         <div className="flex h-16">
           <button
+            onClick={() => {
+              acceptQuest(quest);
+              onOpenChange?.(false);
+            }}
             style={{
               display: "flex",
               alignItems: "center",

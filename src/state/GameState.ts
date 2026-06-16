@@ -13,6 +13,7 @@ import {
   getDiscoveryMessage,
   NPC,
   NPCDisposition,
+  Quest,
 } from "@/types/RoomInteractions";
 import { create } from "zustand";
 import {
@@ -99,6 +100,8 @@ export interface GameState {
   startSection: (sectionId: number, rooms: Room[]) => void;
   completeSection: () => void;
   isSectionUnlocked: (sectionId: number) => boolean;
+  quests: Quest[];
+  acceptQuest: (quest: Quest) => void;
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -1261,6 +1264,18 @@ export const useGameStore = create<GameState>((set, get) => ({
     const state = get();
     if (sectionId === 1) return true;
     return state.beatenSections.includes(sectionId - 1);
+  },
+
+  quests: [],
+
+  acceptQuest: (quest: Quest) => {
+    set((state) => ({
+      quests: [...state.quests, quest],
+      activityLog: [
+        ...state.activityLog,
+        `You have accepted the quest: ${quest.name}`,
+      ],
+    }));
   },
 }));
 
