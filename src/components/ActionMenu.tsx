@@ -10,7 +10,9 @@ import { manaPotion } from "@/types/Item";
 import { Spell } from "@/types/Spell";
 import { partyHasAnimalHandling } from "@/state/utils/DialogueUtils";
 import { GameStatus } from "@/types/GameStatus";
-import QuestDescription from "./QuestDescription";
+import QuestDescription from "./Quests/_QuestDescription";
+import QuestList from "./Quests/QuestList";
+import QuestOffer from "./Quests/QuestOffer";
 
 interface ActionBtnProps {
   onClick?: () => void;
@@ -221,6 +223,7 @@ export default function ActionMenu() {
   const [isShopModalOpen, setIsShopModalOpen] = useState(false);
   const [isSectionSelectorOpen, setIsSectionSelectorOpen] = useState(false);
   const [isQuestDescriptionOpen, setIsQuestDescriptionOpen] = useState(false);
+  const [isQuestListOpen, setIsQuestListOpen] = useState(false);
 
   const handleAttackClick = () => {
     if (room.enemies.length === 1) {
@@ -605,7 +608,7 @@ export default function ActionMenu() {
           style={{
             marginTop: "auto",
             display: "flex",
-            flexDirection: "column",
+            flexDirection: "row",
             gap: 6,
           }}
         >
@@ -627,6 +630,24 @@ export default function ActionMenu() {
             </svg>
             Inventory
           </ActionBtn>
+          <div style={{ height: 1, background: "rgba(180,140,80,0.1)" }} />
+          <ActionBtn onClick={() => setIsQuestListOpen(true)} fullWidth>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.5}
+              width={13}
+              height={13}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4.5 19.5V6a2.25 2.25 0 0 1 2.25-2.25h8.25A2.25 2.25 0 0 1 17.25 6v13.5m-12.75 0a2.25 2.25 0 0 0 2.25 2.25h8.25a2.25 2.25 0 0 0 2.25-2.25m-12.75 0h12.75M7.5 8.25h6M7.5 11.25h6M7.5 14.25h3.75M19.5 6.75v9a1.5 1.5 0 0 1-1.5 1.5h-.75"
+              />
+            </svg>
+            Quests
+          </ActionBtn>
         </div>
       </div>
 
@@ -645,19 +666,24 @@ export default function ActionMenu() {
         isOpen={isSectionSelectorOpen}
         onOpenChange={setIsSectionSelectorOpen}
       />
+      <QuestList
+        isOpen={isQuestListOpen}
+        onOpenChange={setIsQuestListOpen}
+      />
 
-      <QuestDescription
+      <QuestOffer
         isOpen={isQuestDescriptionOpen}
         onOpenChange={setIsQuestDescriptionOpen}
-        npcsName={npc?.name ?? "Quest Giver"}
-        quest={npc?.quest || {
-          id: 0,
-          name: "Unknown Quest",
-          description: "No description available.",
-          type: { type: "fetch", item: manaPotion },
-          objectives: [],
-          rewards: [manaPotion]
-        }}
+        quest={
+          npc?.quest || {
+            id: 0,
+            name: "Unknown Quest",
+            description: "No description available.",
+            type: { type: "fetch", item: manaPotion },
+            objectives: [],
+            rewards: [manaPotion],
+          }
+        }
       />
     </>
   );
