@@ -69,6 +69,8 @@ export interface Quest {
   type: QuestType;
   objectives: string[];
   rewards: Item[];
+  accepted: boolean;
+  completed: boolean;
 }
 
 export interface NPC {

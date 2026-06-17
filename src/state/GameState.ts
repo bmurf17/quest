@@ -339,7 +339,7 @@ export const useGameStore = create<GameState>((set, get) => ({
             hitCount,
             false,
             0,
-            state.quests
+            state.quests,
           ),
           isTargeting: false,
         };
@@ -1269,15 +1269,58 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   quests: [],
 
-  acceptQuest: (quest: Quest) => {
-    set((state) => ({
-      quests: [...state.quests, quest],
-      activityLog: [
-        ...state.activityLog,
-        `You have accepted the quest: ${quest.name}`,
-      ],
-    }));
-  },
+  // acceptQuest: (quest: Quest) => {
+  //   set((state) => ({
+  //
+
+  //   }));
+  // },
+  acceptQuest: (quest: Quest) =>
+    set((state) => {
+      const currentRoomInstance =
+        state.roomInstances.get(state.room.id) || state.room;
+
+      const npc: NPC | null =
+        currentRoomInstance &&
+        currentRoomInstance.interaction &&
+        currentRoomInstance.interaction.type === "NPC"
+          ? currentRoomInstance.interaction.npc
+          : null;
+      if (npc) {
+        const updatedQuest: Quest = {
+          ...quest,
+          accepted: true,
+          completed: false,
+        };
+        npc.quest = updatedQuest;
+
+        const updatedRoom: Room = {
+          ...currentRoomInstance,
+          interaction: { type: "NPC", npc: npc },
+        };
+
+        const originalTemplateId = [...state.roomInstances.entries()].find(
+          ([templateId, instance]) =>
+            instance === currentRoomInstance || templateId === state.room.id,
+        )?.[0];
+
+        const newRoomInstances = new Map(state.roomInstances);
+        if (originalTemplateId !== undefined) {
+          newRoomInstances.set(originalTemplateId, updatedRoom);
+        }
+
+        return {
+          room: updatedRoom,
+          roomInstances: newRoomInstances,
+          activityLog: [
+            ...state.activityLog,
+            `You have accepted the quest: ${quest.name}`,
+          ],
+          quests: [...state.quests, updatedQuest],
+        };
+      }
+      return {};
+    }),
 }));
 
 export function calcDamage(

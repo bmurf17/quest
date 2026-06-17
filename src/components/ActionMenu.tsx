@@ -10,7 +10,6 @@ import { manaPotion } from "@/types/Item";
 import { Spell } from "@/types/Spell";
 import { partyHasAnimalHandling } from "@/state/utils/DialogueUtils";
 import { GameStatus } from "@/types/GameStatus";
-import QuestDescription from "./Quests/_QuestDescription";
 import QuestList from "./Quests/QuestList";
 import QuestOffer from "./Quests/QuestOffer";
 
@@ -666,10 +665,7 @@ export default function ActionMenu() {
         isOpen={isSectionSelectorOpen}
         onOpenChange={setIsSectionSelectorOpen}
       />
-      <QuestList
-        isOpen={isQuestListOpen}
-        onOpenChange={setIsQuestListOpen}
-      />
+      <QuestList isOpen={isQuestListOpen} onOpenChange={setIsQuestListOpen} />
 
       <QuestOffer
         isOpen={isQuestDescriptionOpen}

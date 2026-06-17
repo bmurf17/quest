@@ -110,6 +110,7 @@ export default function QuestDescription({
               acceptQuest(quest);
               onAccepted?.();
             }}
+            disabled={quest.accepted || quest.completed}
             style={{
               display: "flex",
               alignItems: "center",
@@ -119,7 +120,7 @@ export default function QuestDescription({
               background: "rgba(5,150,105,0.07)",
               border: `1px solid rgba(52,211,153,0.25)`,
               borderRadius: 6,
-              color: "#6EE7B7",
+              color: quest.accepted || quest.completed ? "gray" : "#6EE7B7",
               fontSize: 12,
               fontFamily: fonts.display,
               fontWeight: 600,
@@ -130,6 +131,7 @@ export default function QuestDescription({
               opacity: 1,
               userSelect: "none",
               margin: "8px",
+    
             }}
           >
             <span>Accept Quest</span>

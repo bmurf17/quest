@@ -159,6 +159,8 @@ export async function getAllRooms(): Promise<Room[]> {
                       .map((r: any) => (r.item ? mapItem(r.item) : null))
                       .filter(Boolean)
                   : [],
+                accepted: false,
+                completed: false,
               };
             }
 
