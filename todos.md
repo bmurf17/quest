@@ -17,11 +17,9 @@ Things to draw
     Animals
     Armour
     Trees
-Dialogue Trees
 Split Game State into helper methods
-Transition From One Map to the Next
 World Hub
-Buy item removes it from shop (certain items)
+Buy item removes it from shop (certain items shop stock)
 Sound effects
     Spells
         fireball
