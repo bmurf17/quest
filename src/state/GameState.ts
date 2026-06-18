@@ -1,4 +1,5 @@
-import { CharacterData, rollDamageDice } from "@/types/Character";
+import { getDialogueForNPC } from "@/queries/DialogueQueries";
+import { CharacterData } from "@/types/Character";
 import { Directions } from "@/types/Directions";
 import { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
@@ -15,23 +16,16 @@ import {
   NPCDisposition,
   Quest,
 } from "@/types/RoomInteractions";
+import { Spell } from "@/types/Spell";
 import { create } from "zustand";
 import {
-  handleCombatCompletion,
   finalizeAttackState,
+  getWeaponDamage,
+  handleCombatCompletion,
+  isEnemy,
+  safeNextIndex,
 } from "./utils/CombatUtils";
-import { Spell } from "@/types/Spell";
-import { getDialogueForNPC } from "@/queries/DialogueQueries";
-
-function getWeaponDamage(attacker: CharacterData | Enemy): number {
-  if ("items" in attacker && attacker.items && attacker.items.length > 0) {
-    const weapon = attacker.items[0];
-    if (weapon.action) {
-      return rollDamageDice(weapon.action.damage);
-    }
-  }
-  return 0;
-}
+import { handleSpell } from "./utils/SpellUtils";
 
 export interface GameState {
   party: CharacterData[];
@@ -890,50 +884,17 @@ export const useGameStore = create<GameState>((set, get) => ({
       });
 
       switch (spell.effect.type) {
-        case "damage":
-          if (spell.effect.target === "single" && target && isEnemy(target)) {
-            const enemy = target as Enemy;
-            const currentAttacker = state.combatOrder[
-              state.activeFighterIndex
-            ] as CharacterData;
-            const currentIntelligence = currentAttacker.abilities.int.score;
-            const currentWisdom = currentAttacker.abilities.wis.score;
-            const damage = calcDamage(
-              enemy.defense,
-              currentWisdom,
-              currentIntelligence,
+        default:
+          {
+            const result = handleSpell(
+              spell,
+              target,
+              state,
+              logBuilder,
+              calcDamage,
             );
-
-            const newHealth = Math.max(0, enemy.health - damage);
-
-            if (newHealth <= 0) {
-              const defeatedEnemyIndex = combatOrder.findIndex(
-                (x) => x.name === enemy.name,
-              );
-
-              updatedEnemies = updatedEnemies.filter((e) => e.id !== enemy.id);
-              combatOrder = combatOrder.filter((x) => x.name !== enemy.name);
-              newAccumulatedExp += enemy.expGain ?? 10;
-
-              logBuilder.add(
-                `${enemy.name} takes ${damage} damage and is defeated!`,
-              );
-
-              if (defeatedEnemyIndex <= state.activeFighterIndex) {
-                nextIndex =
-                  state.activeFighterIndex % Math.max(1, combatOrder.length);
-              } else {
-                nextIndex =
-                  (state.activeFighterIndex + 1) %
-                  Math.max(1, combatOrder.length);
-              }
-
-              const completion = handleCombatCompletion(
-                updatedEnemies,
-                nextIndex,
-                updatedParty,
-                newAccumulatedExp,
-              );
+            if (result.earlyCompletion) {
+              const completion = result.earlyCompletion.completion;
 
               nextIndex = completion.nextIndex;
               updatedParty = completion.updatedParty;
@@ -943,7 +904,7 @@ export const useGameStore = create<GameState>((set, get) => ({
                 state.roomInstances.get(state.room.id) || state.room;
               const updatedRoom = {
                 ...currentRoomInstance,
-                enemies: updatedEnemies,
+                enemies: result.updatedEnemies,
               };
               const newRoomInstances = new Map(state.roomInstances);
               newRoomInstances.set(state.room.id, updatedRoom);
@@ -962,13 +923,15 @@ export const useGameStore = create<GameState>((set, get) => ({
               return {
                 party: updatedParty,
                 activityLog: [...state.activityLog, ...logBuilder.build()],
-                combatOrder,
+                combatOrder: result.combatOrder,
                 activeFighterIndex: nextIndex,
                 gameStatus: gameStatus,
                 room: updatedRoom,
                 roomInstances: newRoomInstances,
                 accumulatedExp:
-                  gameStatus === GameStatus.Exploring ? 0 : newAccumulatedExp,
+                  gameStatus === GameStatus.Exploring
+                    ? 0
+                    : result.newAccumulatedExp,
                 isTargeting: false,
                 targetingSpell: null,
                 levelingUpChars: completion.levelingUpChars || [],
@@ -976,112 +939,14 @@ export const useGameStore = create<GameState>((set, get) => ({
                 currentLevelingCharIndex:
                   (completion.levelingUpChars || []).length > 0 ? 0 : -1,
               };
-            } else {
-              updatedEnemies = updatedEnemies.map((e) =>
-                e.id === enemy.id ? { ...e, health: newHealth } : e,
-              );
-              logBuilder.add(`${enemy.name} takes ${damage} damage!`);
             }
-          } else if (spell.effect.target === "all") {
-            const defeatedEnemies: string[] = [];
-            const defeatedIndices: number[] = [];
 
-            combatOrder.forEach((fighter, index) => {
-              if (isEnemy(fighter)) {
-                const enemy = updatedEnemies.find(
-                  (e) => e.name === fighter.name,
-                );
-                if (enemy && enemy.health - spell.effect.amount <= 0) {
-                  defeatedEnemies.push(enemy.name);
-                  defeatedIndices.push(index);
-                }
-              }
-            });
-
-            updatedEnemies = updatedEnemies
-              .map((enemy) => {
-                const newHealth = Math.max(
-                  0,
-                  enemy.health - spell.effect.amount,
-                );
-                if (newHealth <= 0) {
-                  newAccumulatedExp += enemy.expGain ?? 10;
-                }
-                return { ...enemy, health: newHealth };
-              })
-              .filter((e) => e.health > 0);
-
-            combatOrder = combatOrder.filter(
-              (x) => !defeatedEnemies.includes(x.name),
-            );
-            if (defeatedEnemies.length > 0) {
-              const defeatedBeforeOrAtCurrent = defeatedIndices.filter(
-                (idx) => idx <= state.activeFighterIndex,
-              ).length;
-
-              if (defeatedBeforeOrAtCurrent > 0) {
-                nextIndex =
-                  state.activeFighterIndex % Math.max(1, combatOrder.length);
-              } else {
-                nextIndex =
-                  (state.activeFighterIndex + 1) %
-                  Math.max(1, combatOrder.length);
-              }
-
-              logBuilder.add(`${defeatedEnemies.join(", ")} defeated!`);
-            }
-            logBuilder.add(`All enemies take ${spell.effect.amount} damage!`);
-          }
-          break;
-
-        case "heal":
-          if (spell.effect.target === "single" && target && "hp" in target) {
-            const character = target as CharacterData;
-            let newCombatOrder = [...state.combatOrder];
-
-            updatedParty = updatedParty.map((member) => {
-              if (member.name === character.name) {
-                const wasDead = !member.alive || member.hp <= 0;
-                const newHp = Math.min(
-                  member.maxHp,
-                  member.hp + spell.effect.amount,
-                );
-
-                if (wasDead && newHp > 0) {
-                  logBuilder.add(`${member.name} has been revived!`);
-                  if (!newCombatOrder.find((f) => f.name === member.name)) {
-                    newCombatOrder.push({ ...member, hp: newHp, alive: true });
-                  }
-                } else {
-                  logBuilder.add(`${member.name} recovers HP!`);
-                }
-
-                return { ...member, hp: newHp, alive: newHp > 0 };
-              }
-              return member;
-            });
-            combatOrder = newCombatOrder;
-          } else if (spell.effect.target === "party") {
-            let newCombatOrder = [...state.combatOrder];
-            updatedParty = updatedParty.map((member) => {
-              const wasDead = !member.alive || member.hp <= 0;
-              const newHp = Math.min(
-                member.maxHp,
-                member.hp + spell.effect.amount,
-              );
-
-              if (
-                wasDead &&
-                newHp > 0 &&
-                !newCombatOrder.find((f) => f.name === member.name)
-              ) {
-                newCombatOrder.push({ ...member, hp: newHp, alive: true });
-              }
-
-              return { ...member, hp: newHp, alive: newHp > 0 };
-            });
-            combatOrder = newCombatOrder;
-            logBuilder.add(`The party recovers ${spell.effect.amount} HP!`);
+            updatedParty = result.updatedParty;
+            updatedEnemies = result.updatedEnemies;
+            combatOrder = result.combatOrder;
+            nextIndex = result.nextIndex;
+            newAccumulatedExp = result.newAccumulatedExp;
+            gameStatus = result.gameStatus;
           }
           break;
       }
@@ -1242,16 +1107,16 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   acceptQuest: (quest: Quest) =>
     set((state) => {
-        return {
-          activityLog: [
-            ...state.activityLog,
-            `You have accepted the quest: ${quest.name}`,
-          ],
+      return {
+        activityLog: [
+          ...state.activityLog,
+          `You have accepted the quest: ${quest.name}`,
+        ],
         quests: [
           ...state.quests,
           { ...quest, accepted: true, completed: false },
         ],
-        };
+      };
     }),
 }));
 
@@ -1288,15 +1153,6 @@ class ActivityLogBuilder {
   build(): string[] {
     return [...this.messages];
   }
-}
-
-export function isEnemy(f: CharacterData | Enemy | undefined): f is Enemy {
-  return !!f && "health" in f && "id" in f;
-}
-
-export function safeNextIndex(currentIndex: number, length: number): number {
-  if (!length || length <= 0) return 0;
-  return (currentIndex + 1) % length;
 }
 
 function scheduleEnemyTurn(getState: () => any, delay = 500) {
