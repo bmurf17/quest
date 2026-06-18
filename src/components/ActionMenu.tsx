@@ -1,5 +1,5 @@
 import { useGameStore } from "@/state/GameState";
-import { Camp, Chest, NPC, NPCType } from "@/types/RoomInteractions";
+import { Camp, Chest, NPC, NPCType, Quest } from "@/types/RoomInteractions";
 import { CharacterData, formatDamageDice } from "@/types/Character";
 import { useState } from "react";
 import { colors as themeColors, fonts } from "../theme";

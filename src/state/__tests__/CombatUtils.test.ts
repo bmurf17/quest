@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { finalizeAttackState } from '../utils/CombatUtils';
 import { Enemy } from '@/types/Enemy';
 import { startRoom } from '@/types/Room';
+import { Quest } from '@/types/RoomInteractions';
+import { manaPotion } from '@/types/Item';
 
 describe('CombatUtils finalizeAttackState', () => {
   it('updates roomInstances map using room id keys', () => {
@@ -15,6 +17,17 @@ describe('CombatUtils finalizeAttackState', () => {
     };
 
     const updatedEnemies: Enemy[] = [];
+
+      const tempQuest: Quest = {
+        id: 0,
+        name: "Unknown Quest",
+        description: "No description available.",
+        type: { type: "fetch", item: manaPotion },
+        objectives: [],
+        rewards: [manaPotion],
+        accepted: false,
+        completed: false,
+      };
 
     const result = finalizeAttackState(
       fakeState,
@@ -33,6 +46,7 @@ describe('CombatUtils finalizeAttackState', () => {
       1,
       true,
       1,
+      [tempQuest]
     );
 
     expect(result.roomInstances instanceof Map).toBe(true);

@@ -1,7 +1,7 @@
 import { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
 import { GameState } from "../GameState";
-import { CharacterData } from "@/types/Character";
+import { CharacterData, rollDamageDice } from "@/types/Character";
 import { Quest } from "@/types/RoomInteractions";
 
 export const handleCombatCompletion = (
@@ -110,3 +110,40 @@ export const finalizeAttackState = (
     quests: updatedQuests,
   };
 };
+
+export function getWeaponDamage(attacker: CharacterData | Enemy): number {
+  if ("items" in attacker && attacker.items && attacker.items.length > 0) {
+    const weapon = attacker.items[0];
+    if (weapon.action) {
+      return rollDamageDice(weapon.action.damage);
+    }
+  }
+  return 0;
+}
+
+export function isEnemy(f: CharacterData | Enemy | undefined): f is Enemy {
+  return !!f && "health" in f && "id" in f;
+}
+
+export function safeNextIndex(currentIndex: number, length: number): number {
+  if (!length || length <= 0) return 0;
+  return (currentIndex + 1) % length;
+}
+
+export function scheduleEnemyTurn(getState: () => any, delay = 500) {
+  setTimeout(() => {
+    const {
+      gameStatus,
+      isCurrentFighterEnemy,
+      performEnemyTurn,
+      isLevelingUp,
+    } = getState();
+    if (
+      gameStatus === GameStatus.Combat &&
+      isCurrentFighterEnemy() &&
+      !isLevelingUp
+    ) {
+      performEnemyTurn();
+    }
+  }, delay);
+}
