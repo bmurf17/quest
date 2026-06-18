@@ -217,6 +217,7 @@ export default function ActionMenu() {
   const inventory = useGameStore((state) => state.inventory);
   const gameStatus = useGameStore((state) => state.gameStatus);
   const restInTown = useGameStore((state) => state.restInTown);
+  const quests = useGameStore((state) => state.quests);
 
   const [isInventoryModalOpen, setIsInventoryModalOpen] = useState(false);
   const [isShopModalOpen, setIsShopModalOpen] = useState(false);
@@ -267,6 +268,20 @@ export default function ActionMenu() {
       : null;
   const camp =
     room?.interaction?.type === "camp" ? (room.interaction.camp as Camp) : null;
+
+  const tempQuest: Quest = {
+    id: 0,
+    name: "Unknown Quest",
+    description: "No description available.",
+    type: { type: "fetch", item: manaPotion },
+    objectives: [],
+    rewards: [manaPotion],
+    accepted: false,
+    completed: false,
+  };
+  const isQuestAlreadyAccepted = npc?.quest
+    ? quests.some((q) => q.id === npc.quest?.id)
+    : false;
 
   return (
     <>
@@ -671,14 +686,9 @@ export default function ActionMenu() {
         isOpen={isQuestDescriptionOpen}
         onOpenChange={setIsQuestDescriptionOpen}
         quest={
-          npc?.quest || {
-            id: 0,
-            name: "Unknown Quest",
-            description: "No description available.",
-            type: { type: "fetch", item: manaPotion },
-            objectives: [],
-            rewards: [manaPotion],
-          }
+          npc?.quest
+            ? { ...npc.quest, accepted: isQuestAlreadyAccepted }
+            : tempQuest
         }
       />
     </>
