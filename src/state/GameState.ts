@@ -18,6 +18,8 @@ import {
 } from "@/types/RoomInteractions";
 import { Spell } from "@/types/Spell";
 import { create } from "zustand";
+import type { SaveData } from "./saveLoad";
+import { denormalizeNeighbors } from "./saveLoad";
 import {
   finalizeAttackState,
   getWeaponDamage,
@@ -96,6 +98,7 @@ export interface GameState {
   isSectionUnlocked: (sectionId: number) => boolean;
   quests: Quest[];
   acceptQuest: (quest: Quest) => void;
+  loadGame: (data: SaveData) => void;
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -1118,6 +1121,69 @@ export const useGameStore = create<GameState>((set, get) => ({
         ],
       };
     }),
+
+  loadGame: (data: SaveData) => {
+    const state = get();
+
+    const roomLookup = new Map<number, Room>();
+    for (const room of state.rooms) {
+      roomLookup.set(room.id, room);
+    }
+
+    const roomInstances = new Map<number, Room>();
+    for (const [id, roomData] of data.roomInstances) {
+      const room = denormalizeNeighbors(roomData, roomLookup);
+      roomInstances.set(id, room);
+      roomLookup.set(id, room);
+    }
+
+    for (const room of roomInstances.values()) {
+      roomLookup.set(room.id, room);
+    }
+
+    const dialogueTrees = new Map<number, DialogueNode>();
+    for (const [id, node] of data.dialogueTrees) {
+      dialogueTrees.set(id, node);
+    }
+
+    const currentRoom = roomInstances.get(data.currentRoomId)
+      || denormalizeNeighbors(
+          { ...state.rooms.find((r) => r.id === data.currentRoomId), neighboringRooms: [] },
+          roomLookup,
+        );
+
+    set({
+      party: data.party,
+      activityLog: data.activityLog,
+      inventory: data.inventory,
+      goldPieces: data.goldPieces,
+      accumulatedExp: data.accumulatedExp,
+      quests: data.quests,
+      conversationFlags: data.conversationFlags,
+      currentSection: data.currentSection,
+      beatenSections: data.beatenSections,
+      availableSections: data.availableSections,
+      room: currentRoom,
+      roomInstances,
+      gameStatus: data.gameStatus,
+      combatOrder: data.combatOrder,
+      activeFighterIndex: data.activeFighterIndex,
+      activeDialogue: data.activeDialogue,
+      currentDialogueNodeId: data.currentDialogueNodeId,
+      dialogueIndex: data.dialogueIndex,
+      lastHitEnemyId: data.lastHitEnemyId,
+      lastHitCounter: data.lastHitCounter,
+      lastDefeatedEnemyId: data.lastDefeatedEnemyId,
+      lastDefeatedCounter: data.lastDefeatedCounter,
+      isTargeting: data.isTargeting,
+      targetingSpell: data.targetingSpell,
+      targetingConsumable: data.targetingConsumable,
+      isLevelingUp: data.isLevelingUp,
+      levelingUpChars: data.levelingUpChars,
+      currentLevelingCharIndex: data.currentLevelingCharIndex,
+      dialogueTrees,
+    });
+  },
 }));
 
 export function calcDamage(

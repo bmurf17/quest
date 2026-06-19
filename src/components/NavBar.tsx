@@ -1,9 +1,12 @@
-import { Home, Plus, Shield, Users } from "lucide-react";
+import { Bug, Home, Plus, Shield, Users } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { useState } from "react";
 import { colors, fonts } from "../theme";
+import DevPanel from "./DevPanel";
 
 export default function NavBar() {
   const location = useLocation();
+  const [devOpen, setDevOpen] = useState(false);
 
   const navItems = [
     { icon: <Home size={16} />, path: "/", label: "Home" },
@@ -91,9 +94,34 @@ export default function NavBar() {
               </Link>
             );
           })}
+
+          <button
+            onClick={() => setDevOpen((o) => !o)}
+            className="nav-link"
+            style={{
+              textDecoration: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: "4px 6px",
+              background: "none", border: "none", cursor: "pointer",
+            }}
+          >
+            <div
+              className="nav-icon-wrap"
+              style={{
+                width: 32, height: 32,
+                borderRadius: 7,
+                border: `1px solid ${devOpen ? "rgba(212,175,55,0.5)" : colors.subtleBorder}`,
+                background: devOpen ? "rgba(212,175,55,0.12)" : "transparent",
+                color: devOpen ? colors.gold : colors.muted,
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}
+            >
+              <Bug size={16} />
+            </div>
+          </button>
         </div>
 
       </nav>
+
+      {devOpen && <DevPanel />}
     </>
   );
 }
