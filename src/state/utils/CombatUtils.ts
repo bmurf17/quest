@@ -147,3 +147,18 @@ export function scheduleEnemyTurn(getState: () => any, delay = 500) {
     }
   }, delay);
 }
+
+export function calcDamage(
+  defense: number,
+  strength: number,
+  dex: number,
+  weaponDamage: number = 0,
+): number {
+  const hitChance = dex + Math.floor(Math.random() * 20) + 1;
+  if (hitChance >= defense) {
+    const baseDamage = strength + Math.floor(Math.random() * 6) + 1;
+    const totalDamage = baseDamage + weaponDamage;
+    return Math.max(1, totalDamage - defense);
+  }
+  return 0;
+}

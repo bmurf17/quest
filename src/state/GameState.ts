@@ -21,11 +21,13 @@ import { create } from "zustand";
 import type { SaveData } from "./saveLoad";
 import { denormalizeNeighbors } from "./saveLoad";
 import {
+  calcDamage,
   finalizeAttackState,
   getWeaponDamage,
   handleCombatCompletion,
   isEnemy,
   safeNextIndex,
+  scheduleEnemyTurn,
 } from "./utils/CombatUtils";
 import { handleSpell } from "./utils/SpellUtils";
 
@@ -1186,20 +1188,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 }));
 
-export function calcDamage(
-  defense: number,
-  strength: number,
-  dex: number,
-  weaponDamage: number = 0,
-): number {
-  const hitChance = dex + Math.floor(Math.random() * 20) + 1;
-  if (hitChance >= defense) {
-    const baseDamage = strength + Math.floor(Math.random() * 6) + 1;
-    const totalDamage = baseDamage + weaponDamage;
-    return Math.max(1, totalDamage - defense);
-  }
-  return 0;
-}
+
 
 class ActivityLogBuilder {
   private messages: string[] = [];
@@ -1219,22 +1208,4 @@ class ActivityLogBuilder {
   build(): string[] {
     return [...this.messages];
   }
-}
-
-function scheduleEnemyTurn(getState: () => any, delay = 500) {
-  setTimeout(() => {
-    const {
-      gameStatus,
-      isCurrentFighterEnemy,
-      performEnemyTurn,
-      isLevelingUp,
-    } = getState();
-    if (
-      gameStatus === GameStatus.Combat &&
-      isCurrentFighterEnemy() &&
-      !isLevelingUp
-    ) {
-      performEnemyTurn();
-    }
-  }, delay);
 }
