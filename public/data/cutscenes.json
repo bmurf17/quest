@@ -1,0 +1,32 @@
+[
+  {
+    "id": "intro",
+    "scenes": [
+      {
+        "text": "Long ago, in the kingdom of Eldoria, a great darkness began to stir..."
+      },
+      {
+        "text": "From the depths of the Forgotten Mines, twisted creatures emerged, spreading fear across the land."
+      },
+      {
+        "text": "The king has called upon brave adventurers to venture into the mines and put an end to the evil once and for all."
+      }
+    ],
+    "nextCutsceneId": "chapter1_start"
+  },
+  {
+    "id": "chapter1_start",
+    "scenes": [
+      {
+        "text": "You awake in the village of Oakhaven. The morning air is crisp, carrying the scent of smoke from a nearby fire."
+      },
+      {
+        "text": "The villagers gather in the town square. A weathered notice board bears the king's seal \u2014 a call for heroes."
+      },
+      {
+        "text": "An old merchant approaches your party. 'So you're the ones? The mines lie east of here. Be careful \u2014 few who enter ever return.'"
+      }
+    ],
+    "nextCutsceneId": null
+  }
+]

@@ -110,11 +110,17 @@ export interface Transition {
   discoveryMessage?: string;
 }
 
+export interface CutsceneRef {
+  cutsceneId: string;
+  discoveryMessage?: string;
+}
+
 export type RoomInteraction =
   | { type: "NPC"; npc: NPC }
   | { type: "chest"; chest: Chest }
   | { type: "camp"; camp: Camp }
-  | { type: "transition"; transition: Transition };
+  | { type: "transition"; transition: Transition }
+  | { type: "cutscene"; cutscene: CutsceneRef };
 
 export function getDiscoveryMessage(interaction: RoomInteraction): string {
   switch (interaction.type) {
@@ -141,6 +147,11 @@ export function getDiscoveryMessage(interaction: RoomInteraction): string {
         (interaction.transition.destination === "next_dungeon"
           ? `A passage leading deeper into the dungeon looms before you.`
           : `A warm light beckons — a sanctuary lies ahead.`)
+      );
+    case "cutscene":
+      return (
+        interaction.cutscene.discoveryMessage ||
+        `A vision begins to unfold before your eyes...`
       );
     default:
       return `There's something interesting in this room.`;

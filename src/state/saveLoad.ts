@@ -39,6 +39,8 @@ export interface SaveData {
   levelingUpChars: CharacterData[];
   currentLevelingCharIndex: number;
   dialogueTrees: [number, any][];
+  activeCutsceneId: string | null;
+  cutsceneSceneIndex: number;
 }
 
 const SAVE_PREFIX = "quest_save_";
@@ -149,6 +151,8 @@ export function saveToSlot(slotName: string): void {
     levelingUpChars: state.levelingUpChars,
     currentLevelingCharIndex: state.currentLevelingCharIndex,
     dialogueTrees,
+    activeCutsceneId: state.activeCutscene?.id ?? null,
+    cutsceneSceneIndex: state.cutsceneSceneIndex,
   };
 
   localStorage.setItem(SAVE_PREFIX + slotName, JSON.stringify(data));

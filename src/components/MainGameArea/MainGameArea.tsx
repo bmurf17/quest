@@ -4,17 +4,25 @@ import MapNav from "./_MapNav";
 import RoomChest from "./_RoomChest";
 import RoomNPC from "./_RoomNPC";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import BattleOrder from "./_BattleOrder";
 import RoomCamp from "./_RoomCamp";
 import LevelUpModal from "./_LevelUpModal";
 import GameOverModal from "./_GameOverModal";
 import { GameStatus } from "@/types/GameStatus";
+import CutsceneOverlay from "./_CutsceneOverlay";
 
 export default function MainGameArea() {
   const party = useGameStore((state) => state.party);
   const navigate = useNavigate();
   const gameStatus = useGameStore((state) => state.gameStatus);
+  const room = useGameStore((state) => state.room);
+  const activeCutscene = useGameStore((state) => state.activeCutscene);
+  const playCutscene = useGameStore((state) => state.playCutscene);
+  const advanceCutsceneScene = useGameStore(
+    (state) => state.advanceCutsceneScene,
+  );
+
   const backgroundClass =
     gameStatus === GameStatus.InTown
       ? "bg-town-background"
@@ -25,6 +33,48 @@ export default function MainGameArea() {
       navigate("/party");
     }
   }, [party.length, navigate]);
+
+  useEffect(() => {
+    if (room.interaction?.type === "cutscene") {
+      playCutscene(room.interaction.cutscene.cutsceneId);
+    }
+  }, [room.id, playCutscene]);
+
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (
+        activeCutscene &&
+        (e.key === "Enter" || e.key === " " || e.key === "Escape")
+      ) {
+        e.preventDefault();
+        advanceCutsceneScene();
+      }
+    },
+    [activeCutscene, advanceCutsceneScene],
+  );
+
+  useEffect(() => {
+    if (activeCutscene) {
+      window.addEventListener("keydown", handleKeyDown);
+      return () => window.removeEventListener("keydown", handleKeyDown);
+    }
+  }, [activeCutscene, handleKeyDown]);
+
+  if (activeCutscene) {
+    return (
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          position: "relative",
+          overflow: "hidden",
+        }}
+        className={`bg-cover bg-center ${backgroundClass} bg-pixelated`}
+      >
+        <CutsceneOverlay />
+      </div>
+    );
+  }
 
   return (
     <div

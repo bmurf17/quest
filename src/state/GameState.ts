@@ -5,6 +5,7 @@ import { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
 import { Consumable, healthPotion, Item } from "@/types/Item";
 import { Room, Section, startRoom } from "@/types/Room";
+import { Cutscene } from "@/types/Cutscene";
 import {
   Camp,
   Chest,
@@ -100,6 +101,13 @@ export interface GameState {
   isSectionUnlocked: (sectionId: number) => boolean;
   quests: Quest[];
   acceptQuest: (quest: Quest) => void;
+  cutscenes: Map<string, Cutscene>;
+  activeCutscene: Cutscene | null;
+  cutsceneSceneIndex: number;
+  loadCutscenes: (cutscenes: Cutscene[]) => void;
+  playCutscene: (id: string) => void;
+  advanceCutsceneScene: () => void;
+  endCutscene: () => void;
   loadGame: (data: SaveData) => void;
 }
 
@@ -139,6 +147,9 @@ export const useGameStore = create<GameState>((set, get) => ({
   conversationFlags: {},
   dialogueTrees: new Map<number, DialogueNode>(),
   quests: [],
+  cutscenes: new Map<string, Cutscene>(),
+  activeCutscene: null,
+  cutsceneSceneIndex: 0,
 
   setTargetingConsumable: (item) => set({ targetingConsumable: item }),
 
@@ -1124,6 +1135,59 @@ export const useGameStore = create<GameState>((set, get) => ({
       };
     }),
 
+  loadCutscenes: (cutscenes: Cutscene[]) =>
+    set(() => {
+      const cutsceneMap = new Map<string, Cutscene>();
+      for (const cutscene of cutscenes) {
+        cutsceneMap.set(cutscene.id, cutscene);
+      }
+      return { cutscenes: cutsceneMap };
+    }),
+
+  playCutscene: (id: string) =>
+    set((state) => {
+      const cutscene = state.cutscenes.get(id);
+      if (!cutscene) return state;
+      return {
+        activeCutscene: cutscene,
+        cutsceneSceneIndex: 0,
+        activityLog: [
+          ...state.activityLog,
+          `A vision begins to unfold before your eyes...`,
+        ],
+      };
+    }),
+
+  advanceCutsceneScene: () =>
+    set((state) => {
+      if (!state.activeCutscene) return state;
+      const nextIndex = state.cutsceneSceneIndex + 1;
+      if (nextIndex < state.activeCutscene.scenes.length) {
+        return { cutsceneSceneIndex: nextIndex };
+      }
+      if (state.activeCutscene.nextCutsceneId) {
+        const nextCutscene = state.cutscenes.get(
+          state.activeCutscene.nextCutsceneId,
+        );
+        if (nextCutscene) {
+          return {
+            activeCutscene: nextCutscene,
+            cutsceneSceneIndex: 0,
+          };
+        }
+      }
+      return {
+        activeCutscene: null,
+        cutsceneSceneIndex: 0,
+      };
+    }),
+
+  endCutscene: () =>
+    set(() => ({
+      activeCutscene: null,
+      cutsceneSceneIndex: 0,
+    })),
+
   loadGame: (data: SaveData) => {
     const state = get();
 
@@ -1184,6 +1248,10 @@ export const useGameStore = create<GameState>((set, get) => ({
       levelingUpChars: data.levelingUpChars,
       currentLevelingCharIndex: data.currentLevelingCharIndex,
       dialogueTrees,
+      activeCutscene: data.activeCutsceneId
+        ? state.cutscenes.get(data.activeCutsceneId) ?? null
+        : null,
+      cutsceneSceneIndex: data.cutsceneSceneIndex ?? 0,
     });
   },
 }));

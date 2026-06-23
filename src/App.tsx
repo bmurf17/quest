@@ -29,6 +29,7 @@ function App() {
   const loadSections = useGameStore(state => state.loadSections);
   const startSection = useGameStore(state => state.startSection);
   const preloadDialogueTrees = useGameStore(state => state.preloadDialogueTrees);
+  const loadCutscenes = useGameStore(state => state.loadCutscenes);
 
   useEffect(() => {
     const loadRooms = async () => {
@@ -37,6 +38,10 @@ function App() {
         setRooms(rooms);
         preloadDialogueTrees(rooms);
         loadSections(sections);
+
+        const cutsceneRes = await fetch("/data/cutscenes.json");
+        const cutsceneData = await cutsceneRes.json();
+        loadCutscenes(cutsceneData);
         if (sections.length > 0) {
           startSection(sections[0].id, rooms);
         }
@@ -46,7 +51,7 @@ function App() {
     };
 
     loadRooms();
-  }, [setRooms, loadSections, startSection]);
+  }, [setRooms, loadSections, startSection, loadCutscenes]);
   return (
     <Router>
       <div className="flex flex-col h-screen bg-gray-900 text-white">

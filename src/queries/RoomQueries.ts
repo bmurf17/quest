@@ -229,6 +229,16 @@ export async function getAllRooms(): Promise<Room[]> {
               },
             };
             break;
+          case "cutscene":
+            interaction = {
+              type: "cutscene",
+              cutscene: {
+                cutsceneId: "intro",
+                discoveryMessage:
+                  interactionData.discovery_message ?? undefined,
+              },
+            };
+            break;
         }
       }
 
