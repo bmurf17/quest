@@ -70,6 +70,7 @@ export default function CharacterOverview() {
   return (
     <div>
       <SectionHeader>Character</SectionHeader>
+      <StatLine label="Name" value={character.name || "Not set"} />
       <StatLine label="Origin" value={character.origin || "Not selected"} />
       <StatLine label="Race" value={character.race || "Not selected"} />
       <StatLine label="Subrace" value={character.subrace || "Not selected"} />

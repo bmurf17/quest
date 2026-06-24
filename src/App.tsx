@@ -62,7 +62,7 @@ function App() {
             <Route path={"/"} element={<Home />} />
             <Route path={"/game"} element={<GameLayout />} />
             <Route path={"/party-selection"} element={<PartySelection availableCharacters={[tempRanger, tempWarrior, tempCleric, tempWizard, tempAssassin, tempBarbarian, tempBard]} />} />
-            <Route path={"/party"} element={<PartyManagement availableCharacters={[tempRanger, tempWarrior, tempCleric, tempWizard, tempAssassin, tempBarbarian, tempBard]} />} />
+            <Route path={"/party"} element={<PartyManagement />} />
             <Route path={"/create"} element={<CharacterCreation />} />
             <Route path={"/admin/game-design/rooms"} element={<ManageRooms />} />
             <Route path={"/admin/game-design/roomMap"} element={<RoomMap />} />

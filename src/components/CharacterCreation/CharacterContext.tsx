@@ -1,11 +1,13 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 
 interface Character {
+  name: string;
   origin: string;
   race: string;
   subrace: string;
   class: string;
   background: string;
+  image: string;
   abilities: {
     strength: number;
     dexterity: number;
@@ -13,6 +15,7 @@ interface Character {
     intelligence: number;
     wisdom: number;
     charisma: number;
+    defense: number;
   };
 }
 
@@ -27,18 +30,21 @@ export const CharacterContext = createContext<CharacterContextType | undefined>(
 
 export function CharacterProvider({ children }: { children: ReactNode }) {
   const [character, setCharacter] = useState<Character>({
+    name: "",
     origin: "",
     race: "",
     subrace: "",
     class: "",
     background: "",
+    image: "",
     abilities: {
-      strength: 10,
-      dexterity: 10,
-      constitution: 10,
-      intelligence: 10,
-      wisdom: 10,
-      charisma: 10,
+      strength: 8,
+      dexterity: 8,
+      constitution: 8,
+      intelligence: 8,
+      wisdom: 8,
+      charisma: 8,
+      defense: 8,
     },
   });
 
