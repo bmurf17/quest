@@ -11,6 +11,7 @@ interface PartyPickerProps {
 
 const MAX_PARTY_SIZE = 6;
 
+
 function SectionHeader({ children }: { children: React.ReactNode }) {
   return (
     <div
@@ -39,7 +40,7 @@ function SectionHeader({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function PartySelection({ availableCharacters }: PartyPickerProps) {
+export function PartyManagement({ availableCharacters }: PartyPickerProps) {
   const [selectedCharacter, setSelectedCharacter] =
     useState<CharacterData | null>(availableCharacters[0] || null);
   const [party, setParty] = useState<CharacterData[]>(

@@ -1,62 +1,110 @@
 import { useCharacter } from "../CharacterContext";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { colors, fonts } from "@/theme";
+
+const BACKGROUNDS = ["Acolyte", "Charlatan", "Criminal", "Entertainer", "Folk Hero"];
 
 export default function BackgroundForm() {
   const { character, updateCharacter } = useCharacter();
 
-  const handleBackgroundChange = (value: string) => {
-    updateCharacter("background", value);
-  };
-
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Choose Your Background</h2>
-      <RadioGroup
-        value={character.background}
-        onValueChange={handleBackgroundChange}
-      >
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem
-            value="acolyte"
-            id="bg-acolyte"
-            className="border-yellow-500 text-yellow-500 focus:ring-yellow-500 data-[state=checked]:bg-yellow-500"
-          />
-          <Label htmlFor="bg-acolyte">Acolyte</Label>
+    <>
+      <style>{`
+        .bg-card:hover { background: rgba(212,175,55,0.07) !important; border-color: rgba(212,175,55,0.25) !important; }
+      `}</style>
+      <div>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            margin: "0 0 18px",
+          }}
+        >
+          <span
+            style={{
+              fontSize: 11,
+              color: colors.goldMuted,
+              fontFamily: fonts.display,
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              fontWeight: 700,
+              whiteSpace: "nowrap",
+            }}
+          >
+            Choose Your Background
+          </span>
+          <div style={{ flex: 1, height: 1, background: colors.goldBorder }} />
         </div>
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem
-            value="charlatan"
-            id="bg-charlatan"
-            className="border-yellow-500 text-yellow-500 focus:ring-yellow-500 data-[state=checked]:bg-yellow-500"
-          />
-          <Label htmlFor="bg-charlatan">Charlatan</Label>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 6,
+          }}
+        >
+          {BACKGROUNDS.map((bg) => {
+            const active = character.background === bg.toLowerCase().replace(" ", "-");
+            return (
+              <div
+                key={bg}
+                className="bg-card"
+                onClick={() =>
+                  updateCharacter("background", bg.toLowerCase().replace(" ", "-"))
+                }
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  padding: "12px 14px",
+                  borderRadius: 7,
+                  border: `1px solid ${active ? "rgba(212,175,55,0.4)" : "rgba(180,140,80,0.12)"}`,
+                  background: active
+                    ? "rgba(212,175,55,0.09)"
+                    : "rgba(255,255,255,0.03)",
+                  cursor: "pointer",
+                  transition: "background 0.12s, border-color 0.12s",
+                }}
+              >
+                <div
+                  style={{
+                    width: 16,
+                    height: 16,
+                    borderRadius: "50%",
+                    border: `2px solid ${active ? colors.gold : "rgba(180,140,80,0.3)"}`,
+                    background: active ? colors.gold : "transparent",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                    transition: "all 0.12s",
+                  }}
+                >
+                  {active && (
+                    <div
+                      style={{
+                        width: 6,
+                        height: 6,
+                        borderRadius: "50%",
+                        background: "#0d0b07",
+                      }}
+                    />
+                  )}
+                </div>
+                <span
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 700,
+                    color: active ? colors.text : colors.textMuted,
+                    fontFamily: fonts.display,
+                  }}
+                >
+                  {bg}
+                </span>
+              </div>
+            );
+          })}
         </div>
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem
-            value="criminal"
-            id="bg-criminal"
-            className="border-yellow-500 text-yellow-500 focus:ring-yellow-500 data-[state=checked]:bg-yellow-500"
-          />
-          <Label htmlFor="bg-criminal">Criminal</Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem
-            value="entertainer"
-            id="bg-entertainer"
-            className="border-yellow-500 text-yellow-500 focus:ring-yellow-500 data-[state=checked]:bg-yellow-500"
-          />
-          <Label htmlFor="bg-entertainer">Entertainer</Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem
-            value="folk-hero"
-            id="bg-folk-hero"
-            className="border-yellow-500 text-yellow-500 focus:ring-yellow-500 data-[state=checked]:bg-yellow-500"
-          />
-          <Label htmlFor="bg-folk-hero">Folk Hero</Label>
-        </div>
-      </RadioGroup>
-    </div>
+      </div>
+    </>
   );
 }
