@@ -1,9 +1,8 @@
+import { MAX_SCORE, POINT_BUDGET } from "@/consts/constants";
 import { useCharacter } from "../CharacterContext";
 import { colors, fonts } from "@/theme";
 
 const BASE = 8;
-const MAX_SCORE = 18;
-const POINT_BUDGET = 18;
 const ABILITY_KEYS = [
   "strength",
   "dexterity",

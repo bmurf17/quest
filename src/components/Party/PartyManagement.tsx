@@ -11,9 +11,7 @@ import {
 } from "../CharacterCreation/CharacterContext";
 import OriginForm from "../CharacterCreation/forms/OriginForm";
 import RaceForm from "../CharacterCreation/forms/RaceForm";
-import SubraceForm from "../CharacterCreation/forms/SubraceForm";
 import ClassForm from "../CharacterCreation/forms/ClassForm";
-import BackgroundForm from "../CharacterCreation/forms/BackgroundForm";
 import AbilitiesForm from "../CharacterCreation/forms/AbilitesForm";
 import ImageForm from "../CharacterCreation/forms/ImageForm";
 import CharacterOverview from "../CharacterCreation/CharacterOverview";
@@ -26,6 +24,7 @@ import bardImg from "../../assets/Bard.png";
 import barbarianImg from "../../assets/Barbarian.png";
 import assassinImg from "../../assets/Assassin.png";
 import swordImg from "../../assets/Sword.png";
+import { MAX_SCORE, POINT_BUDGET } from "@/consts/constants";
 
 
 const MAX_PARTY_SIZE = 6;
@@ -34,9 +33,7 @@ const TABS = [
   { key: "name", label: "Name" },
   { key: "origin", label: "Origin" },
   { key: "race", label: "Race" },
-  { key: "subrace", label: "Subrace" },
   { key: "class", label: "Class" },
-  { key: "background", label: "Background" },
   { key: "abilities", label: "Abilities" },
   { key: "image", label: "Portrait" },
 ] as const;
@@ -216,8 +213,8 @@ function CreateCharacterView({
     character.race &&
     character.class &&
     character.image &&
-    Object.values(abilities).every((v) => v >= 1 && v <= 20) &&
-    totalSpent === 10;
+    Object.values(abilities).every((v) => v >= 1 && v <= MAX_SCORE) &&
+    totalSpent === POINT_BUDGET;
 
   const handleCreate = () => {
     if (!canCreate) return;
@@ -378,9 +375,7 @@ function CreateCharacterView({
           )}
           {activeTab === "origin" && <OriginForm />}
           {activeTab === "race" && <RaceForm />}
-          {activeTab === "subrace" && <SubraceForm />}
           {activeTab === "class" && <ClassForm />}
-          {activeTab === "background" && <BackgroundForm />}
           {activeTab === "abilities" && <AbilitiesForm />}
           {activeTab === "image" && <ImageForm />}
 
@@ -396,7 +391,7 @@ function CreateCharacterView({
               fontSize: 14,
               letterSpacing: "0.08em",
               cursor: canCreate ? "pointer" : "not-allowed",
-              marginTop: 28,
+              marginTop: 16,
               transition: "filter 0.15s, transform 0.1s",
               ...(canCreate
                 ? {
@@ -428,7 +423,7 @@ function CreateCharacterView({
           >
             {canCreate
               ? "⊕  Create Character & Start Party"
-              : "Complete all fields above"}
+              : "Finish the steps above"}
           </button>
         </div>
       </div>

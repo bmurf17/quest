@@ -73,9 +73,7 @@ export default function CharacterOverview() {
       <StatLine label="Name" value={character.name || "Not set"} />
       <StatLine label="Origin" value={character.origin || "Not selected"} />
       <StatLine label="Race" value={character.race || "Not selected"} />
-      <StatLine label="Subrace" value={character.subrace || "Not selected"} />
       <StatLine label="Class" value={character.class || "Not selected"} />
-      <StatLine label="Background" value={character.background || "Not selected"} />
 
       <div style={{ marginTop: 14 }}>
         <SectionHeader>Abilities</SectionHeader>
