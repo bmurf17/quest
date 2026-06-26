@@ -423,7 +423,7 @@ function CreateCharacterView({
           >
             {canCreate
               ? "⊕  Create Character & Start Party"
-              : "Finish the steps above"}
+              : "Finish all steps"}
           </button>
         </div>
       </div>
@@ -849,19 +849,6 @@ function ManagePartyView({
                             }}
                           >
                             {key}
-                          </div>
-                          <div
-                            style={{
-                              fontSize: 13,
-                              color:
-                                ability.modifier >= 0
-                                  ? colors.success
-                                  : colors.danger,
-                              marginTop: 1,
-                            }}
-                          >
-                            {ability.modifier >= 0 ? "+" : ""}
-                            {ability.modifier}
                           </div>
                         </div>
                       </div>

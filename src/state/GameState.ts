@@ -31,6 +31,8 @@ import {
   scheduleEnemyTurn,
 } from "./utils/CombatUtils";
 import { handleSpell } from "./utils/SpellUtils";
+import { TavernConfig, DEFAULT_TAVERN_CONFIG } from "@/types/Tavern";
+import { generateTavernCandidates } from "./utils/TavernUtils";
 
 export interface GameState {
   party: CharacterData[];
@@ -108,6 +110,14 @@ export interface GameState {
   playCutscene: (id: string) => void;
   advanceCutsceneScene: () => void;
   endCutscene: () => void;
+  tavernCandidates: CharacterData[];
+  isTavernOpen: boolean;
+  tavernConfig: TavernConfig;
+  hasRecruitedFromTavern: boolean;
+  openTavern: () => void;
+  closeTavern: () => void;
+  addTavernCharacterToParty: (char: CharacterData) => void;
+  setTavernConfig: (config: TavernConfig) => void;
   loadGame: (data: SaveData) => void;
 }
 
@@ -150,6 +160,10 @@ export const useGameStore = create<GameState>((set, get) => ({
   cutscenes: new Map<string, Cutscene>(),
   activeCutscene: null,
   cutsceneSceneIndex: 0,
+  tavernCandidates: [],
+  isTavernOpen: false,
+  hasRecruitedFromTavern: false,
+  tavernConfig: { ...DEFAULT_TAVERN_CONFIG },
 
   setTargetingConsumable: (item) => set({ targetingConsumable: item }),
 
@@ -1067,6 +1081,64 @@ export const useGameStore = create<GameState>((set, get) => ({
         ],
       };
     }),
+
+  openTavern: () => {
+    set((state) => {
+      const candidates = generateTavernCandidates(state.tavernConfig);
+      return {
+        isTavernOpen: true,
+        hasRecruitedFromTavern: false,
+        tavernCandidates: candidates,
+        activityLog: [
+          ...state.activityLog,
+          "You step into the tavern and look around...",
+        ],
+      };
+    });
+  },
+
+  closeTavern: () =>
+    set(() => ({
+      isTavernOpen: false,
+      tavernCandidates: [],
+    })),
+
+  addTavernCharacterToParty: (char: CharacterData) => {
+    set((state) => {
+      if (state.hasRecruitedFromTavern) {
+        return {
+          activityLog: [
+            ...state.activityLog,
+            "You've already recruited someone from the tavern this visit.",
+          ],
+        };
+      }
+      if (state.party.length >= 6) {
+        return {
+          activityLog: [
+            ...state.activityLog,
+            "Your party is already full!",
+          ],
+        };
+      }
+      const updatedCandidates = state.tavernCandidates.filter(
+        (c) => c.name !== char.name,
+      );
+      return {
+        party: [...state.party, char],
+        hasRecruitedFromTavern: true,
+        tavernCandidates: updatedCandidates,
+        activityLog: [
+          ...state.activityLog,
+          `${char.name} the ${char.class} has joined your party!`,
+        ],
+        isTavernOpen: updatedCandidates.length === 0 ? false : state.isTavernOpen,
+      };
+    });
+  },
+
+  setTavernConfig: (config: TavernConfig) =>
+    set({ tavernConfig: config }),
 
   loadSections: (sections) => set({ availableSections: sections }),
 

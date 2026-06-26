@@ -11,6 +11,7 @@ import LevelUpModal from "./_LevelUpModal";
 import GameOverModal from "./_GameOverModal";
 import { GameStatus } from "@/types/GameStatus";
 import CutsceneOverlay from "./_CutsceneOverlay";
+import TavernOverlay from "./_TavernOverlay";
 
 export default function MainGameArea() {
   const party = useGameStore((state) => state.party);
@@ -97,13 +98,14 @@ export default function MainGameArea() {
           zIndex: 10,
         }}
       >
-        <div style={{ textAlign: "center", pointerEvents: "auto" }}>
-          <BattleEnemies />
-          <RoomChest />
-          <MapNav />
-          <RoomCamp />
-          <BattleOrder />
-        </div>
+          <div style={{ textAlign: "center", pointerEvents: "auto" }}>
+            <BattleEnemies />
+            <RoomChest />
+            <MapNav />
+            <RoomCamp />
+            <BattleOrder />
+             <TavernOverlay />
+          </div>
       </div>
 
       <div
