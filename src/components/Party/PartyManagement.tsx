@@ -49,7 +49,7 @@ const IMAGE_SRC: Record<string, string> = {
 };
 
 const CLASS_HP: Record<string, number> = {
-  barbarian: 14,
+  barbarian: 18,
   bard: 8,
   cleric: 10,
   druid: 8,

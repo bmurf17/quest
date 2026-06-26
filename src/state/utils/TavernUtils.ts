@@ -105,19 +105,41 @@ function generateName(): string {
 
 const ABILITY_KEYS = ["str", "dex", "con", "int", "wis", "cha", "def"] as const;
 
-function generateAbilities(config: TavernConfig) {
+const CLASS_STAT_WEIGHTS: Record<string, string[]> = {
+  warrior: ["str", "dex", "def", "con", "wis", "cha", "int"],
+  ranger: ["dex", "wis", "con", "str", "def", "int", "cha"],
+  cleric: ["wis", "con", "cha", "dex", "str", "int", "def"],
+  wizard: ["int", "wis", "dex", "con", "def", "cha", "str"],
+  assassin: ["dex", "str", "int", "con", "def", "wis", "cha"],
+  barbarian: ["str", "con", "dex", "def", "wis", "cha", "int"],
+  bard: ["cha", "dex", "int", "wis", "con", "str", "def"],
+};
+
+function generateAbilities(config: TavernConfig, cls: string) {
   const base = 8;
   const scores: Record<string, number> = {};
+
   for (const key of ABILITY_KEYS) {
     scores[key] = base;
   }
 
+  const weights = CLASS_STAT_WEIGHTS[cls] || CLASS_STAT_WEIGHTS.warrior;
+
   let remaining = config.statBonusPool;
   while (remaining > 0) {
-    const key = pick(ABILITY_KEYS);
+    const roll = Math.random();
+    let cumulative = 0;
+    let picked = weights[0];
+    for (let i = 0; i < weights.length; i++) {
+      cumulative += 1 / (i + 1);
+      if (roll < cumulative / weights.reduce((s, _, idx) => s + 1 / (idx + 1), 0)) {
+        picked = weights[i];
+        break;
+      }
+    }
     const maxStat = 18;
-    if (scores[key] < maxStat) {
-      scores[key]++;
+    if (scores[picked] < maxStat) {
+      scores[picked]++;
       remaining--;
     }
   }
@@ -157,7 +179,7 @@ function classItem(cls: string) {
 export function generateTavernCharacter(config: TavernConfig): CharacterData {
   const cls = pick(ALL_CLASSES);
   const level = generateLevel(config);
-  const hpBonus = level > 1 ? (level - 1) * roll(4, 8) : 0;
+  const hpBonus = level > 1 ? (level - 1) * roll(5, 9) : 0;
   const mpBonus = level > 1 ? (level - 1) * roll(2, 6) : 0;
 
   const baseHp = CLASS_HP[cls] || 10;
@@ -173,7 +195,7 @@ export function generateTavernCharacter(config: TavernConfig): CharacterData {
     maxHp: baseHp + hpBonus,
     mp: baseMp + mpBonus,
     maxMp: baseMp + mpBonus,
-    abilities: generateAbilities(config),
+    abilities: generateAbilities(config, cls),
     skills: [
       { name: "Acrobatics", ability: "DEX", modifier: "+2" },
       { name: "Animal Handling", ability: "WIS", modifier: "+1" },

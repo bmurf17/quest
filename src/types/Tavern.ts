@@ -7,7 +7,7 @@ export interface TavernConfig {
 
 export const DEFAULT_TAVERN_CONFIG: TavernConfig = {
   minLevel: 1,
-  maxLevel: 3,
-  statBonusPool: 35,
+  maxLevel: 5,
+  statBonusPool: 55,
   candidateCount: 3,
 };

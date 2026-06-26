@@ -1034,7 +1034,13 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   enterTown: () => {
     set((state) => {
-      const updates: Partial<GameState> = { gameStatus: GameStatus.InTown };
+      const candidates = generateTavernCandidates(state.tavernConfig);
+      const updates: Partial<GameState> = {
+        gameStatus: GameStatus.InTown,
+        isTavernOpen: true,
+        hasRecruitedFromTavern: false,
+        tavernCandidates: candidates,
+      };
 
       if (
         state.currentSection !== null &&
@@ -1050,9 +1056,14 @@ export const useGameStore = create<GameState>((set, get) => ({
         updates.activityLog = [
           ...state.activityLog,
           `You return to town. ${sectionName} has been completed!`,
+          "You spot some new faces at the tavern...",
         ];
       } else {
-        updates.activityLog = [...state.activityLog, "You return to town."];
+        updates.activityLog = [
+          ...state.activityLog,
+          "You return to town.",
+          "You spot some new faces at the tavern...",
+        ];
       }
 
       return updates;
@@ -1082,20 +1093,14 @@ export const useGameStore = create<GameState>((set, get) => ({
       };
     }),
 
-  openTavern: () => {
-    set((state) => {
-      const candidates = generateTavernCandidates(state.tavernConfig);
-      return {
-        isTavernOpen: true,
-        hasRecruitedFromTavern: false,
-        tavernCandidates: candidates,
-        activityLog: [
-          ...state.activityLog,
-          "You step into the tavern and look around...",
-        ],
-      };
-    });
-  },
+  openTavern: () =>
+    set((state) => ({
+      isTavernOpen: true,
+      activityLog: [
+        ...state.activityLog,
+        "You step into the tavern and look around...",
+      ],
+    })),
 
   closeTavern: () =>
     set(() => ({

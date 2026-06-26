@@ -217,7 +217,6 @@ export default function ActionMenu() {
   const inventory = useGameStore((state) => state.inventory);
   const gameStatus = useGameStore((state) => state.gameStatus);
   const restInTown = useGameStore((state) => state.restInTown);
-  const openTavern = useGameStore((state) => state.openTavern);
   const quests = useGameStore((state) => state.quests);
 
   const [isInventoryModalOpen, setIsInventoryModalOpen] = useState(false);
@@ -615,23 +614,6 @@ export default function ActionMenu() {
                 />
               </svg>
               Rest at Inn
-            </ActionBtn>
-            <ActionBtn variant="success" onClick={() => openTavern()} fullWidth>
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={1.5}
-                width={13}
-                height={13}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M8.62 15.75c-.584.22-1.118.65-1.463 1.25m5.506-6.25A5.25 5.25 0 0 0 3.75 12m11.25 3.75H9m11.25 0h.008v.008h-.008v-.008Zm0-7.5h.008v.008h-.008v-.008Zm-2.25-3.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Z"
-                />
-              </svg>
-              Tavern
             </ActionBtn>
           </div>
         )}
