@@ -2,6 +2,7 @@ import { useCharacter } from "../CharacterContext";
 import { colors, fonts } from "@/theme";
 import warriorImg from "../../../assets/Warrior.png";
 import rogueImg from "../../../assets/Rogue.png";
+import rogue1Img from "../../../assets/Rogue-1.png";
 import clericImg from "../../../assets/Cleric.png";
 import wizardImg from "../../../assets/Wizard.png";
 import bardImg from "../../../assets/Bard.png";
@@ -16,6 +17,7 @@ const IMAGES = [
   { key: "bard", src: bardImg, label: "Bard" },
   { key: "barbarian", src: barbarianImg, label: "Barbarian" },
   { key: "assassin", src: assassinImg, label: "Assassin" },
+  { key: "rogue-1", src: rogue1Img, label: "Rogue 1" },
 ];
 
 export default function ImageForm() {
