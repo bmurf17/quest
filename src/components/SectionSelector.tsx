@@ -4,6 +4,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useGameStore } from "@/state/GameState";
 import { colors, fonts } from "@/theme";
 
@@ -36,29 +37,34 @@ export default function SectionSelector({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent
         style={{
-          background: "#1A1A2E",
+          maxWidth: 450,
+          background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 100%)",
           border: `1px solid ${colors.goldBorder}`,
-          borderRadius: 8,
-          maxWidth: 420,
-          maxHeight: "70vh",
-          overflow: "auto",
+          borderRadius: 12,
+          padding: 0,
+          overflow: "hidden",
           fontFamily: fonts.body,
+          color: colors.text,
         }}
       >
-        <DialogHeader style={{ marginTop: 12 }}>
+        <DialogHeader style={{ padding: "18px 22px 14px", borderBottom: `1px solid ${colors.goldBorder}` }}>
           <DialogTitle
             style={{
-              color: colors.gold,
+              margin: 0,
+              fontSize: 16,
+              fontWeight: 700,
+              color: colors.goldMuted,
               fontFamily: fonts.display,
-              fontSize: 18,
-              letterSpacing: "0.08em",
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
             }}
           >
             Explore
           </DialogTitle>
         </DialogHeader>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <ScrollArea style={{ height: "55vh" }}>
+          <div style={{ padding: "10px 14px 20px", display: "flex", flexDirection: "column", gap: 8 }}>
           {availableSections.map((section) => {
             const beaten = beatenSections.includes(section.id);
             const unlocked = isSectionUnlocked(section.id);
@@ -144,6 +150,7 @@ export default function SectionSelector({
             );
           })}
         </div>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );
