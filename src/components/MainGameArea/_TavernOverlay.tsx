@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useGameStore } from "@/state/GameState";
 import { CharacterData, formatDamageDice } from "@/types/Character";
+import { EquippableItem } from "@/types/Item";
 import { colors, fonts } from "@/theme";
 import {
   Dialog,
@@ -516,7 +517,7 @@ function CharacterDetailDialog({
               ))}
             </div>
 
-            {character.items?.length > 0 && (
+            {Object.values(character.equipment).filter((i): i is EquippableItem => i !== null).length > 0 && (
               <>
                 <SectionHeader>Equipment</SectionHeader>
                 <div
@@ -526,9 +527,9 @@ function CharacterDetailDialog({
                     gap: 6,
                   }}
                 >
-                  {character.items.map((item) => (
+                  {Object.values(character.equipment).filter((i): i is EquippableItem => i !== null).map((item) => (
                     <div
-                      key={item.action.name}
+                      key={item.name}
                       style={{
                         display: "flex",
                         alignItems: "center",
@@ -554,7 +555,7 @@ function CharacterDetailDialog({
                       >
                         <img
                           src={item.img}
-                          alt={item.action.name}
+                          alt={item.name}
                           style={{
                             width: 34,
                             height: 34,
@@ -572,46 +573,48 @@ function CharacterDetailDialog({
                             marginBottom: 3,
                           }}
                         >
-                          {item.action.name}
+                          {item.name}
                         </div>
                         <div style={{ fontSize: 12, color: colors.textMuted }}>
-                          {item.action.type}
+                          {item.action?.type}
                         </div>
                       </div>
-                      <div style={{ display: "flex", gap: 16, flexShrink: 0 }}>
-                        {[
-                          ["Hit", item.action.hitDC],
-                          ["Dmg", formatDamageDice(item.action.damage)],
-                        ].map(([label, val]) => (
-                          <div
-                            key={label as string}
-                            style={{ textAlign: "center" }}
-                          >
+                      {item.action && (
+                        <div style={{ display: "flex", gap: 16, flexShrink: 0 }}>
+                          {[
+                            ["Hit", item.action.hitDC],
+                            ["Dmg", formatDamageDice(item.action.damage)],
+                          ].map(([label, val]) => (
                             <div
-                              style={{
-                                fontSize: 9,
-                                color: colors.textMuted,
-                                fontFamily: fonts.display,
-                                letterSpacing: "0.08em",
-                                textTransform: "uppercase",
-                                marginBottom: 2,
-                              }}
+                              key={label as string}
+                              style={{ textAlign: "center" }}
                             >
-                              {label}
+                              <div
+                                style={{
+                                  fontSize: 9,
+                                  color: colors.textMuted,
+                                  fontFamily: fonts.display,
+                                  letterSpacing: "0.08em",
+                                  textTransform: "uppercase",
+                                  marginBottom: 2,
+                                }}
+                              >
+                                {label}
+                              </div>
+                              <div
+                                style={{
+                                  fontSize: 14,
+                                  fontWeight: 700,
+                                  color: colors.goldMuted,
+                                  fontFamily: fonts.display,
+                                }}
+                              >
+                                {val as string}
+                              </div>
                             </div>
-                            <div
-                              style={{
-                                fontSize: 14,
-                                fontWeight: 700,
-                                color: colors.goldMuted,
-                                fontFamily: fonts.display,
-                              }}
-                            >
-                              {val as string}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

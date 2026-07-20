@@ -112,11 +112,8 @@ export const finalizeAttackState = (
 };
 
 export function getWeaponDamage(attacker: CharacterData | Enemy): number {
-  if ("items" in attacker && attacker.items && attacker.items.length > 0) {
-    const weapon = attacker.items[0];
-    if (weapon.action) {
-      return rollDamageDice(weapon.action.damage);
-    }
+  if ("equipment" in attacker && attacker.equipment.weapon?.action) {
+    return rollDamageDice(attacker.equipment.weapon.action.damage);
   }
   return 0;
 }

@@ -110,6 +110,7 @@ export async function getAllRooms(): Promise<Room[]> {
                       slot: it.slot,
                       cost: it.cost,
                       stats: it.stats,
+                      action: it.action,
                     }
                   : null;
 
@@ -201,6 +202,7 @@ export async function getAllRooms(): Promise<Room[]> {
                       slot: interactionData.chests.item.slot,
                       cost: interactionData.chests.item.cost,
                       stats: interactionData.chests.item.stats,
+                      action: interactionData.chests.item.action,
                     }
                   : null,
               },

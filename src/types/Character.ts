@@ -1,9 +1,5 @@
 import warrior from "../assets/Warrior.png";
 import rogue from "../assets/Rogue.png";
-import longbow from "../assets/BowV1.png";
-import staff from "../assets/Staff.png";
-import sword from "../assets/Sword.png";
-import spear from "../assets/Spear.png";
 import cleric from "../assets/Cleric.png";
 import wizard from "../assets/Wizard.png";
 import bard from "../assets/Bard.png";
@@ -12,6 +8,14 @@ import assassin from "../assets/Assassin.png";
 import fireball from "/images/spells/fireball.png";
 import heal from "/images/spells/heal.png";
 import { Spell } from "./Spell";
+import {
+  DamageDice,
+  EquippableItem,
+  shortsword,
+  staffWeapon,
+  spearWeapon,
+  longbowWeapon,
+} from "./Item";
 
 type Ability = {
   score: number;
@@ -34,12 +38,6 @@ type Skill = {
   modifier: string;
 };
 
-export type DamageDice = {
-  numDice: number;
-  dieSize: number;
-  bonus: number;
-};
-
 export function rollDamageDice(dice: DamageDice): number {
   let total = 0;
   for (let i = 0; i < dice.numDice; i++) {
@@ -52,13 +50,6 @@ export function formatDamageDice(dice: DamageDice): string {
   return `${dice.numDice}d${dice.dieSize}${dice.bonus >= 0 ? '+' : ''}${dice.bonus}`;
 }
 
-type Action = {
-  name: string;
-  hitDC: string;
-  damage: DamageDice;
-  type: "Ranged Weapon" | "Melee Weapon";
-};
-
 type SavingThrows = {
   str: string;
   dex: string;
@@ -68,9 +59,14 @@ type SavingThrows = {
   cha: string;
 };
 
-type Item = {
-  img: string;
-  action: Action;
+export type CharacterEquipment = {
+  helmet: EquippableItem | null;
+  armor: EquippableItem | null;
+  weapon: EquippableItem | null;
+  shield: EquippableItem | null;
+  accessory1: EquippableItem | null;
+  accessory2: EquippableItem | null;
+  boots: EquippableItem | null;
 };
 
 export type CharacterData = {
@@ -85,7 +81,7 @@ export type CharacterData = {
   maxMp: number;
   abilities: AbilityScores;
   skills: Skill[];
-  items: Item[];
+  equipment: CharacterEquipment;
   savingThrows: SavingThrows;
   spells: Spell[];
   type: "character";
@@ -128,24 +124,14 @@ const defaultSkills: Skill[] = [
   { name: "Deception", ability: "CHA", modifier: "-1" },
 ];
 
-const shortswordItem: Item = {
-  img: sword,
-  action: {
-    name: "Shortsword",
-    hitDC: "+4",
-    damage: { numDice: 1, dieSize: 6, bonus: 2 },
-    type: "Melee Weapon",
-  },
-};
-
-const staffItem: Item = {
-  img: staff,
-  action: {
-    name: "Staff",
-    hitDC: "+6",
-    damage: { numDice: 1, dieSize: 8, bonus: 2 },
-    type: "Ranged Weapon",
-  },
+const noEquipment: CharacterEquipment = {
+  helmet: null,
+  armor: null,
+  weapon: null,
+  shield: null,
+  accessory1: null,
+  accessory2: null,
+  boots: null,
 };
 
 export const tempRanger: CharacterData = {
@@ -173,7 +159,7 @@ export const tempRanger: CharacterData = {
     { name: "Athletics", ability: "STR", modifier: "+2" },
     { name: "Deception", ability: "CHA", modifier: "-1" },
   ],
-  items: [staffItem, shortswordItem],
+  equipment: { ...noEquipment, weapon: longbowWeapon },
   savingThrows: defaultSavingThrows,
   spells: defaultSpells,
   type: "character",
@@ -202,18 +188,7 @@ export const tempWarrior: CharacterData = {
     def: { score: 12, modifier: 1 },
   },
   skills: defaultSkills,
-  items: [
-    {
-      img: spear,
-      action: {
-        name: "Spear",
-        hitDC: "+6",
-        damage: { numDice: 1, dieSize: 8, bonus: 2 },
-        type: "Melee Weapon",
-      },
-    },
-    shortswordItem,
-  ],
+  equipment: { ...noEquipment, weapon: spearWeapon },
   savingThrows: defaultSavingThrows,
   type: "character",
   alive: true,
@@ -242,18 +217,7 @@ export const tempCleric: CharacterData = {
     def: { score: 15, modifier: 1 },
   },
   skills: defaultSkills,
-  items: [
-    {
-      img: staff,
-      action: {
-        name: "staff",
-        hitDC: "+1",
-        damage: { numDice: 1, dieSize: 4, bonus: 2 },
-        type: "Ranged Weapon",
-      },
-    },
-    shortswordItem,
-  ],
+  equipment: { ...noEquipment, weapon: { ...staffWeapon, action: { ...staffWeapon.action!, name: "staff", hitDC: "+1", damage: { numDice: 1, dieSize: 4, bonus: 2 } } } },
   savingThrows: defaultSavingThrows,
   type: "character",
   alive: true,
@@ -282,7 +246,7 @@ export const tempWizard: CharacterData = {
     def: { score: 12, modifier: 1 },
   },
   skills: defaultSkills,
-  items: [staffItem, shortswordItem],
+  equipment: { ...noEquipment, weapon: staffWeapon },
   savingThrows: defaultSavingThrows,
   type: "character",
   alive: true,
@@ -311,18 +275,7 @@ export const tempAssassin: CharacterData = {
     def: { score: 12, modifier: 1 },
   },
   skills: defaultSkills,
-  items: [
-    {
-      img: longbow,
-      action: {
-        name: "Longbow",
-        hitDC: "+6",
-        damage: { numDice: 1, dieSize: 8, bonus: 2 },
-        type: "Ranged Weapon",
-      },
-    },
-    shortswordItem,
-  ],
+  equipment: { ...noEquipment, weapon: longbowWeapon },
   savingThrows: defaultSavingThrows,
   type: "character",
   alive: true,
@@ -330,7 +283,6 @@ export const tempAssassin: CharacterData = {
   exp: 0,
   nextLevelExp: 50
 };
-
 
 export const tempBarbarian: CharacterData = {
   name: "Barbarian Example",
@@ -352,7 +304,7 @@ export const tempBarbarian: CharacterData = {
     def: { score: 14, modifier: 1 },
   },
   skills: defaultSkills,
-  items: [staffItem, shortswordItem],
+  equipment: { ...noEquipment, weapon: staffWeapon },
   savingThrows: defaultSavingThrows,
   type: "character",
   alive: true,
@@ -381,7 +333,7 @@ export const tempBard: CharacterData = {
     def: { score: 12, modifier: 1 },
   },
   skills: defaultSkills,
-  items: [staffItem, shortswordItem],
+  equipment: { ...noEquipment, weapon: shortsword },
   savingThrows: defaultSavingThrows,
   type: "character",
   alive: true,

@@ -1,9 +1,9 @@
 import { getDialogueForNPC } from "@/queries/DialogueQueries";
-import { CharacterData } from "@/types/Character";
+import { CharacterData, CharacterEquipment } from "@/types/Character";
 import { Directions } from "@/types/Directions";
 import { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
-import { Consumable, healthPotion, Item } from "@/types/Item";
+import { Consumable, EquippableItem, healthPotion, Item } from "@/types/Item";
 import { Room, Section, startRoom } from "@/types/Room";
 import { Cutscene } from "@/types/Cutscene";
 import {
@@ -60,6 +60,8 @@ export interface GameState {
   performEnemyTurn: () => void;
   useConsumable: (item: Consumable, target?: CharacterData) => void;
   buyItem: (item: Item) => void;
+  equipItem: (characterName: string, itemName: string) => void;
+  unequipItem: (characterName: string, slot: keyof CharacterEquipment) => void;
   dialogueIndex: number;
   advanceDialogue: () => void;
   activeDialogue: DialogueNode | null;
@@ -866,6 +868,74 @@ export const useGameStore = create<GameState>((set, get) => ({
       return {
         inventory,
         goldPieces: state.goldPieces - item.cost,
+      };
+    });
+  },
+
+  equipItem: (characterName: string, itemName: string) => {
+    set((state) => {
+      const itemIndex = state.inventory.findIndex(
+        (i) => i.name === itemName && i.type === "equipment",
+      );
+      if (itemIndex === -1) return state;
+      const item = state.inventory[itemIndex] as EquippableItem;
+
+      const resolveSlot = (equip: CharacterEquipment): keyof CharacterEquipment => {
+        if (item.slot === "accessory") {
+          return equip.accessory1 ? "accessory2" : "accessory1";
+        }
+        return item.slot;
+      };
+
+      const updatedParty = state.party.map((char) => {
+        if (char.name !== characterName) return char;
+        const actualSlot = resolveSlot(char.equipment);
+        const updatedEquipment = { ...char.equipment, [actualSlot]: item };
+        state.addToLog(`${char.name} equipped ${item.name}.`);
+        return {
+          ...char,
+          equipment: updatedEquipment,
+        };
+      });
+
+      const unequippedItem = (() => {
+        const char = state.party.find((c) => c.name === characterName);
+        if (!char) return null;
+        const actualSlot = resolveSlot(char.equipment);
+        return char.equipment[actualSlot];
+      })();
+
+      const updatedInventory = [...state.inventory];
+      updatedInventory.splice(itemIndex, 1);
+      if (unequippedItem) {
+        updatedInventory.push(unequippedItem);
+      }
+
+      return {
+        party: updatedParty,
+        inventory: updatedInventory,
+      };
+    });
+  },
+
+  unequipItem: (characterName: string, slot: keyof CharacterEquipment) => {
+    set((state) => {
+      const char = state.party.find((c) => c.name === characterName);
+      if (!char) return state;
+      const item = char.equipment[slot];
+      if (!item) return state;
+
+      const updatedParty = state.party.map((c) =>
+        c.name === characterName
+          ? { ...c, equipment: { ...c.equipment, [slot]: null } }
+          : c,
+      );
+
+      state.addToLog(`${char.name} unequipped ${item.name}.`);
+
+      return {
+        party: updatedParty,
+        inventory: [...state.inventory, item],
       };
     });
   },

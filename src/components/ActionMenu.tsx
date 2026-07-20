@@ -296,7 +296,7 @@ export default function ActionMenu() {
       >
         {inCombat && !isFighterEnemy && currentFighter && (
           <div>
-            {currentFighter.items?.length > 0 && (
+            {currentFighter.equipment.weapon && (
               <>
                 <SectionLabel>Weapons</SectionLabel>
                 <div
@@ -308,15 +308,12 @@ export default function ActionMenu() {
                     marginLeft: 4,
                   }}
                 >
-                  {currentFighter.items.map((item, idx) => (
-                    <AbilitySlot
-                      key={item.action.name + idx}
-                      img={item.img}
-                      alt={item.action.name}
-                      title={`${item.action.name} — Hit: ${item.action.hitDC} · Dmg: ${formatDamageDice(item.action.damage)}`}
-                      onClick={handleAttackClick}
-                    />
-                  ))}
+                  <AbilitySlot
+                    img={currentFighter.equipment.weapon.img}
+                    alt={currentFighter.equipment.weapon.name}
+                    title={`${currentFighter.equipment.weapon.name} — Hit: ${currentFighter.equipment.weapon.action!.hitDC} · Dmg: ${formatDamageDice(currentFighter.equipment.weapon.action!.damage)}`}
+                    onClick={handleAttackClick}
+                  />
                 </div>
               </>
             )}

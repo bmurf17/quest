@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { CharacterData, formatDamageDice } from "../../types/Character";
+import { EquippableItem } from "../../types/Item";
 import { Spell } from "../../types/Spell";
 import { useGameStore, GameState } from "@/state/GameState";
 import { Link } from "react-router-dom";
@@ -136,9 +137,17 @@ function buildCharacter(
       { name: "Athletics", ability: "STR", modifier: "+2" },
       { name: "Deception", ability: "CHA", modifier: "-1" },
     ],
-    items: [
-      {
+    equipment: {
+      helmet: null,
+      armor: null,
+      weapon: {
+        name: "Shortsword",
+        value: 0,
         img: swordImg,
+        cost: 0,
+        type: "equipment",
+        slot: "weapon",
+        stats: {},
         action: {
           name: "Shortsword",
           hitDC: "+4",
@@ -146,7 +155,11 @@ function buildCharacter(
           type: "Melee Weapon",
         },
       },
-    ],
+      shield: null,
+      accessory1: null,
+      accessory2: null,
+      boots: null,
+    },
     savingThrows: {
       str: "+2",
       dex: "+4",
@@ -858,7 +871,7 @@ function ManagePartyView({
               </div>
 
               <div>
-                {selectedCharacter.items?.length > 0 && (
+                {selectedCharacter.equipment && Object.values(selectedCharacter.equipment).some(v => v !== null) && (
                   <>
                     <SectionHeader>Equipment</SectionHeader>
                     <div
@@ -868,7 +881,15 @@ function ManagePartyView({
                         gap: 6,
                       }}
                     >
-                      {selectedCharacter.items.map((item, idx) => (
+                      {[
+                        selectedCharacter.equipment.helmet,
+                        selectedCharacter.equipment.armor,
+                        selectedCharacter.equipment.weapon,
+                        selectedCharacter.equipment.shield,
+                        selectedCharacter.equipment.accessory1,
+                        selectedCharacter.equipment.accessory2,
+                        selectedCharacter.equipment.boots,
+                      ].filter((i): i is EquippableItem => i !== null).map((item, idx) => (
                         <div
                           key={idx}
                           className="gear-card"
@@ -898,7 +919,7 @@ function ManagePartyView({
                           >
                             <img
                               src={item.img || "/placeholder.svg"}
-                              alt={item.action.name}
+                              alt={item.name}
                               style={{
                                 width: 64,
                                 height: 64,
@@ -915,7 +936,7 @@ function ManagePartyView({
                                 fontFamily: fonts.display,
                               }}
                             >
-                              {item.action.name}
+                              {item.name}
                             </div>
                             <div
                               style={{
@@ -924,7 +945,7 @@ function ManagePartyView({
                                 marginTop: 1,
                               }}
                             >
-                              {item.action.type}
+                              {item.action?.type}
                             </div>
                             <div
                               style={{
@@ -933,17 +954,21 @@ function ManagePartyView({
                                 marginTop: 3,
                               }}
                             >
-                              <span
-                                style={{ fontSize: 11, color: "#6B5E48" }}
-                              >
-                                Hit: {item.action.hitDC}
-                              </span>
-                              <span
-                                style={{ fontSize: 11, color: "#6B5E48" }}
-                              >
-                                Dmg:{" "}
-                                {formatDamageDice(item.action.damage)}
-                              </span>
+                              {item.action && (
+                                <>
+                                  <span
+                                    style={{ fontSize: 11, color: "#6B5E48" }}
+                                  >
+                                    Hit: {item.action.hitDC}
+                                  </span>
+                                  <span
+                                    style={{ fontSize: 11, color: "#6B5E48" }}
+                                  >
+                                    Dmg:{" "}
+                                    {formatDamageDice(item.action.damage)}
+                                  </span>
+                                </>
+                              )}
                             </div>
                           </div>
                         </div>

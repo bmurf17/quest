@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { CharacterData, formatDamageDice } from "../../types/Character";
+import { EquippableItem } from "../../types/Item";
 import { useGameStore, GameState } from "@/state/GameState";
 import { Link } from "react-router-dom";
 import { colors, fonts } from "@/theme";
@@ -448,7 +449,7 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                 </div>
 
                 <div>
-                  {selectedCharacter.items?.length > 0 && (
+                  {selectedCharacter.equipment && Object.values(selectedCharacter.equipment).some(v => v !== null) && (
                     <>
                       <SectionHeader>Equipment</SectionHeader>
                       <div
@@ -458,7 +459,15 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                           gap: 6,
                         }}
                       >
-                        {selectedCharacter.items.map((item, idx) => (
+                        {[
+                          selectedCharacter.equipment.helmet,
+                          selectedCharacter.equipment.armor,
+                          selectedCharacter.equipment.weapon,
+                          selectedCharacter.equipment.shield,
+                          selectedCharacter.equipment.accessory1,
+                          selectedCharacter.equipment.accessory2,
+                          selectedCharacter.equipment.boots,
+                        ].filter((i): i is EquippableItem => i !== null).map((item, idx) => (
                           <div
                             key={idx}
                             className="gear-card"
@@ -488,7 +497,7 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                             >
                               <img
                                 src={item.img || "/placeholder.svg"}
-                                alt={item.action.name}
+                                alt={item.name}
                                 style={{
                                   width: 64,
                                   height: 64,
@@ -505,7 +514,7 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                                   fontFamily: fonts.display,
                                 }}
                               >
-                                {item.action.name}
+                                {item.name}
                               </div>
                               <div
                                 style={{
@@ -514,7 +523,7 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                                   marginTop: 1,
                                 }}
                               >
-                                {item.action.type}
+                                {item.action?.type}
                               </div>
                               <div
                                 style={{
@@ -523,16 +532,20 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                                   marginTop: 3,
                                 }}
                               >
-                                <span
-                                  style={{ fontSize: 11, color: "#6B5E48" }}
-                                >
-                                  Hit: {item.action.hitDC}
-                                </span>
-                                <span
-                                  style={{ fontSize: 11, color: "#6B5E48" }}
-                                >
-                                  Dmg: {formatDamageDice(item.action.damage)}
-                                </span>
+                                {item.action && (
+                                  <>
+                                    <span
+                                      style={{ fontSize: 11, color: "#6B5E48" }}
+                                    >
+                                      Hit: {item.action.hitDC}
+                                    </span>
+                                    <span
+                                      style={{ fontSize: 11, color: "#6B5E48" }}
+                                    >
+                                      Dmg: {formatDamageDice(item.action.damage)}
+                                    </span>
+                                  </>
+                                )}
                               </div>
                             </div>
                           </div>

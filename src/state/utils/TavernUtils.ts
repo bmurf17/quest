@@ -1,4 +1,5 @@
 import { CharacterData } from "@/types/Character";
+import { EquippableItem } from "@/types/Item";
 import { TavernConfig } from "@/types/Tavern";
 import { Spell } from "@/types/Spell";
 
@@ -159,20 +160,21 @@ function generateLevel(config: TavernConfig): number {
   return roll(config.minLevel, config.maxLevel);
 }
 
-function classItem(cls: string) {
+function classItem(cls: string): EquippableItem {
+  const base = { type: 'equipment' as const, slot: 'weapon' as const, value: 2, cost: 3, stats: {} as { attack?: number; defense?: number } };
   switch (cls) {
     case "warrior":
     case "barbarian":
-      return { img: spearImg, action: { name: "Spear", hitDC: "+6", damage: { numDice: 1, dieSize: 8, bonus: 2 }, type: "Melee Weapon" as const } };
+      return { ...base, name: "Spear", img: spearImg, action: { name: "Spear", hitDC: "+6", damage: { numDice: 1, dieSize: 8, bonus: 2 }, type: "Melee Weapon" as const } };
     case "ranger":
     case "assassin":
-      return { img: bowImg, action: { name: "Longbow", hitDC: "+6", damage: { numDice: 1, dieSize: 8, bonus: 2 }, type: "Ranged Weapon" as const } };
+      return { ...base, name: "Longbow", img: bowImg, action: { name: "Longbow", hitDC: "+6", damage: { numDice: 1, dieSize: 8, bonus: 2 }, type: "Ranged Weapon" as const } };
     case "cleric":
     case "wizard":
     case "bard":
-      return { img: staffImg, action: { name: "Staff", hitDC: "+4", damage: { numDice: 1, dieSize: 6, bonus: 2 }, type: "Ranged Weapon" as const } };
+      return { ...base, name: "Staff", img: staffImg, action: { name: "Staff", hitDC: "+4", damage: { numDice: 1, dieSize: 6, bonus: 2 }, type: "Ranged Weapon" as const } };
     default:
-      return { img: swordImg, action: { name: "Shortsword", hitDC: "+4", damage: { numDice: 1, dieSize: 6, bonus: 2 }, type: "Melee Weapon" as const } };
+      return { ...base, name: "Shortsword", img: swordImg, action: { name: "Shortsword", hitDC: "+4", damage: { numDice: 1, dieSize: 6, bonus: 2 }, type: "Melee Weapon" as const } };
   }
 }
 
@@ -203,7 +205,10 @@ export function generateTavernCharacter(config: TavernConfig): CharacterData {
       { name: "Athletics", ability: "STR", modifier: "+2" },
       { name: "Deception", ability: "CHA", modifier: "-1" },
     ],
-    items: [classItem(cls)],
+    equipment: {
+      helmet: null, armor: null, weapon: classItem(cls),
+      shield: null, accessory1: null, accessory2: null, boots: null,
+    },
     savingThrows: {
       str: "+2", dex: "+4", con: "0", int: "+1", wis: "+1", cha: "-1",
     },
