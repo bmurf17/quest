@@ -89,16 +89,23 @@ function BattleOrderComponent() {
                   style={{ willChange: "transform" }}
                 >
                   {'img' in characterOrEnemy ? (
-                    <img
-                      src={characterOrEnemy.img}
-                      alt={characterOrEnemy.name}
-                      style={{
-                        width: "64px",
-                        height: "64x",
-                        imageRendering: "pixelated",
-                        filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.5))",
-                      }}
-                    />
+                    <div className="relative">
+                      {(characterOrEnemy as any).type === 'boss' && (
+                        <div className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-yellow-400 z-10">
+                          P{(characterOrEnemy as any).phase ?? 1}
+                        </div>
+                      )}
+                      <img
+                        src={characterOrEnemy.img}
+                        alt={characterOrEnemy.name}
+                        style={{
+                          width: "64px",
+                          height: "64x",
+                          imageRendering: "pixelated",
+                          filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.5))",
+                        }}
+                      />
+                    </div>
                   ) : (
                     <img
                       src={mushroom}

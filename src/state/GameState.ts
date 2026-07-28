@@ -25,6 +25,7 @@ import { denormalizeNeighbors } from "./saveLoad";
 import {
   addBuff,
   calcDamage,
+  checkBossPhaseChange,
   finalizeAttackState,
   getEffectiveBuffAmount,
   getEnemyMaxHealth,
@@ -204,9 +205,16 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   performEnemyTurn: () => {
     const state = get();
-    const currentEnemy = state.combatOrder[state.activeFighterIndex] as Enemy;
+    let currentEnemy = state.combatOrder[state.activeFighterIndex] as Enemy;
 
     if (!currentEnemy) return;
+
+    const phaseResult = checkBossPhaseChange(currentEnemy);
+    let phaseLog = '';
+    if (phaseResult.phaseChanged) {
+      currentEnemy = { ...currentEnemy, phase: phaseResult.newPhase };
+      phaseLog = `${currentEnemy.name} enters Phase ${phaseResult.newPhase}! `;
+    }
 
     const enemyCooldowns = state.enemyCooldowns.get(currentEnemy.id);
     const move = pickEnemyMove(currentEnemy, enemyCooldowns);
@@ -224,6 +232,17 @@ export const useGameStore = create<GameState>((set, get) => ({
       let logMessage = '';
       let newCooldowns = tickCooldowns(state.enemyCooldowns, currentEnemy.id);
       let newBuffs = tickBuffs(state.activeBuffs);
+
+      if (phaseResult.phaseChanged) {
+        updatedEnemies = updatedEnemies.map((e) =>
+          e.id === currentEnemy.id ? { ...e, phase: phaseResult.newPhase } : e,
+        );
+        combatOrder = combatOrder.map((f) =>
+          'id' in f && f.id === currentEnemy.id
+            ? { ...f, phase: phaseResult.newPhase }
+            : f,
+        );
+      }
 
       switch (effect.type) {
         case 'damage': {
@@ -403,7 +422,7 @@ export const useGameStore = create<GameState>((set, get) => ({
           party: updatedParty,
           activityLog: [
             ...state.activityLog,
-            logMessage,
+            phaseLog + logMessage,
             "Your party has been defeated...",
           ],
           activeFighterIndex: 0,
@@ -421,7 +440,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
       return {
         party: updatedParty,
-        activityLog: [...state.activityLog, logMessage],
+        activityLog: [...state.activityLog, phaseLog + logMessage],
         activeFighterIndex: nextIndex,
         combatOrder: combatOrder,
         enemyCooldowns: newCooldowns,
@@ -484,7 +503,10 @@ export const useGameStore = create<GameState>((set, get) => ({
 
         nextIndex = safeNextIndex(state.activeFighterIndex, combatOrder.length);
 
-        const newAccumulatedExp = state.accumulatedExp + (enemy.expGain ?? 10);
+        const expMultiplier = enemy.type === 'boss'
+          ? Math.max(enemy.phaseThresholds?.length ?? 1, 2)
+          : 1;
+        const newAccumulatedExp = state.accumulatedExp + (enemy.expGain ?? 10) * expMultiplier;
 
         const completion = handleCombatCompletion(
           updatedEnemies,

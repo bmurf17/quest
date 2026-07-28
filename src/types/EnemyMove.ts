@@ -13,6 +13,7 @@ export type EnemyMove = {
   cooldown: number;
   weight: number;
   effect: EnemyMoveEffect;
+  phase?: number;
 };
 
 export type ActiveBuff = {

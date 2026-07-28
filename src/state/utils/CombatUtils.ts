@@ -184,9 +184,13 @@ export function pickEnemyMove(
     return getDefaultEnemyMove();
   }
 
-  const available = cooldowns
-    ? allMoves.filter((m) => (cooldowns.get(m.name) ?? 0) === 0)
-    : allMoves;
+  const currentPhase = enemy.phase ?? 1;
+
+  const available = allMoves.filter((m) => {
+    const onCooldown = cooldowns ? (cooldowns.get(m.name) ?? 0) > 0 : false;
+    const wrongPhase = m.phase !== undefined && m.phase !== currentPhase;
+    return !onCooldown && !wrongPhase;
+  });
 
   if (available.length === 0) {
     return getDefaultEnemyMove();
@@ -206,6 +210,33 @@ export function pickEnemyMove(
   }
 
   return available[available.length - 1];
+}
+
+export function checkBossPhaseChange(
+  enemy: Enemy,
+): { phaseChanged: boolean; newPhase: number; oldPhase: number } {
+  if (!enemy.phaseThresholds || enemy.phaseThresholds.length === 0) {
+    return { phaseChanged: false, newPhase: 1, oldPhase: 1 };
+  }
+
+  const currentPhase = enemy.phase ?? 1;
+  const hpPercent = (enemy.health / getEnemyMaxHealth(enemy)) * 100;
+
+  let newPhase = currentPhase;
+  for (let i = 0; i < enemy.phaseThresholds.length; i++) {
+    if (hpPercent <= enemy.phaseThresholds[i]) {
+      const thresholdPhase = i + 2;
+      if (thresholdPhase > newPhase) {
+        newPhase = thresholdPhase;
+      }
+    }
+  }
+
+  return {
+    phaseChanged: newPhase !== currentPhase,
+    newPhase,
+    oldPhase: currentPhase,
+  };
 }
 
 export function getEffectiveBuffAmount(
