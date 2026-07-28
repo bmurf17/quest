@@ -30,6 +30,7 @@ export type Consumable = BaseItem & {
   effect: string;
   hpChange: number;
   manaChange: number;
+  target: 'single' | 'all';
   stackSize?: number;
 };
 
@@ -55,6 +56,7 @@ export const healthPotion: Consumable = {
     type: "consumable",
     hpChange: 3,
     manaChange: 0,
+    target: 'single',
     cost: 3
 }
 
@@ -66,6 +68,7 @@ export const manaPotion: Consumable = {
     type: "consumable",
     hpChange: 0,
     manaChange: 3,
+    target: 'single',
     cost: 3
 }
 

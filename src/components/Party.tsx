@@ -93,6 +93,42 @@ export default function Party({ party }: Props) {
         </div>
       )}
 
+      {isTargetingConsumable && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            padding: "8px 16px",
+            background: "rgba(5,150,105,0.12)",
+            border: `1px solid ${colors.success}`,
+            borderRadius: 6,
+            marginBottom: 8,
+          }}
+        >
+          <div
+            style={{
+              width: 6,
+              height: 6,
+              background: colors.success,
+              borderRadius: "50%",
+              boxShadow: "0 0 6px rgba(52,211,153,0.8)",
+            }}
+          />
+          <span
+            style={{
+              fontSize: 12,
+              color: colors.success,
+              fontFamily: fonts.display,
+              letterSpacing: "0.06em",
+            }}
+          >
+            Select a party member to use {targetingConsumable?.name}
+          </span>
+        </div>
+      )}
+
       <div
   style={{
           flex: 1,

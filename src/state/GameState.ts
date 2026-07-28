@@ -772,6 +772,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         if (target && member.name !== target.name) return member;
         const wasDead = !member.alive || member.hp <= 0;
         const newHp = Math.min(member.maxHp, member.hp + item.hpChange);
+        const newMp = Math.min(member.maxMp, member.mp + item.manaChange);
         const isNowAlive = newHp > 0;
 
         if (wasDead && isNowAlive) {
@@ -779,13 +780,14 @@ export const useGameStore = create<GameState>((set, get) => ({
             (f) => f.name === member.name,
           );
           if (state.gameStatus === GameStatus.Combat && !alreadyInOrder) {
-            newCombatOrder.push({ ...member, hp: newHp, alive: true });
+            newCombatOrder.push({ ...member, hp: newHp, mp: newMp, alive: true });
           }
         }
 
         return {
           ...member,
           hp: newHp,
+          mp: newMp,
           alive: isNowAlive,
         };
       });
