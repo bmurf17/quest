@@ -1,3 +1,4 @@
+import { EnemyMoveEffect } from "@/types/EnemyMove";
 import { supabase } from "@/queries/RoomQueries";
 import { useGameStore } from "@/state/GameState";
 import { Directions } from "@/types/Directions";
@@ -404,6 +405,15 @@ function NPCForm() {
   );
 }
 
+interface MoveEntry {
+  name: string;
+  description: string;
+  cooldown: number;
+  weight: number;
+  effect: EnemyMoveEffect;
+  phase?: number;
+}
+
 interface EnemyEntry {
   name: string;
   health: number;
@@ -411,6 +421,12 @@ interface EnemyEntry {
   dex: number;
   defense: number;
   img: string;
+  expGain: number;
+  type: 'enemy' | 'boss';
+  maxHealth?: number;
+  phaseThresholds: number[];
+  moves: MoveEntry[];
+  spawns: EnemyEntry[];
 }
 
 const defaultEnemy = (enemyImgs: string[]): EnemyEntry => ({
@@ -420,7 +436,224 @@ const defaultEnemy = (enemyImgs: string[]): EnemyEntry => ({
   dex: 10,
   defense: 10,
   img: enemyImgs[0] ?? "",
+  expGain: 10,
+  type: 'enemy',
+  maxHealth: undefined,
+  phaseThresholds: [],
+  moves: [],
+  spawns: [],
 });
+
+const defaultMove = (): MoveEntry => ({
+  name: '',
+  description: '',
+  cooldown: 0,
+  weight: 1,
+  effect: { type: 'damage', target: 'single' },
+});
+
+function MoveForm({
+  move,
+  index,
+  onChange,
+  onRemove,
+}: {
+  move: MoveEntry;
+  index: number;
+  onChange: (move: MoveEntry) => void;
+  onRemove: () => void;
+}) {
+  const updateMove = (field: string, value: any) => {
+    onChange({ ...move, [field]: value });
+  };
+
+  const updateEffect = (field: string, value: any) => {
+    onChange({ ...move, effect: { ...(move.effect as any), [field]: value } });
+  };
+
+  const effectType = (move.effect as any).type;
+
+  return (
+    <div
+      style={{
+        marginBottom: 12,
+        padding: 12,
+        background: "rgba(0,0,0,0.2)",
+        borderRadius: 6,
+        border: "1px solid rgba(180,140,80,0.15)",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 8,
+        }}
+      >
+        <span style={{ fontSize: 11, fontWeight: 600, color: "#F87171", fontFamily: fonts.display }}>
+          Move {index + 1}
+        </span>
+        <button type="button" onClick={onRemove} style={{
+          background: "rgba(220,38,38,0.15)", border: "1px solid rgba(220,38,38,0.4)",
+          borderRadius: 4, color: "#FCA5A5", fontSize: 11, cursor: "pointer", padding: "2px 8px",
+        }}>Remove</button>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+        <div style={{ gridColumn: "1 / -1" }}>
+          <Label htmlFor={`moveName-${index}`}>Name</Label>
+          <StyledInput id={`moveName-${index}`} placeholder="e.g. Fire Breath" value={move.name}
+            onChange={(e) => updateMove("name", e.target.value)} />
+        </div>
+        <div style={{ gridColumn: "1 / -1" }}>
+          <Label htmlFor={`moveDesc-${index}`}>Description</Label>
+          <StyledInput id={`moveDesc-${index}`} placeholder="Brief description" value={move.description}
+            onChange={(e) => updateMove("description", e.target.value)} />
+        </div>
+        <div>
+          <Label htmlFor={`moveCooldown-${index}`}>Cooldown</Label>
+          <StyledInput id={`moveCooldown-${index}`} type="number" value={move.cooldown}
+            onChange={(e) => updateMove("cooldown", parseInt(e.target.value) || 0)} />
+        </div>
+        <div>
+          <Label htmlFor={`moveWeight-${index}`}>Weight</Label>
+          <StyledInput id={`moveWeight-${index}`} type="number" value={move.weight}
+            onChange={(e) => updateMove("weight", parseInt(e.target.value) || 1)} />
+        </div>
+        <div>
+          <Label htmlFor={`movePhase-${index}`}>Phase (optional)</Label>
+          <StyledInput id={`movePhase-${index}`} type="number" placeholder="e.g. 2" value={move.phase ?? ''}
+            onChange={(e) => updateMove("phase", e.target.value ? parseInt(e.target.value) : undefined)} />
+        </div>
+        <div>
+          <Label htmlFor={`moveEffectType-${index}`}>Effect Type</Label>
+          <StyledSelect id={`moveEffectType-${index}`} value={effectType}
+            onChange={(e) => {
+              const newType = e.target.value;
+              const base: any = { type: newType };
+              if (newType === 'damage') { base.target = 'single'; }
+              else if (newType === 'heal') { base.target = 'self'; }
+              else if (newType === 'buff') { base.stat = 'strength'; base.amount = 2; base.duration = 3; base.target = 'self'; }
+              else if (newType === 'debuff') { base.stat = 'defense'; base.amount = 2; base.duration = 3; }
+              else if (newType === 'spawn') { base.spawnIndex = 0; base.count = 1; }
+              updateMove("effect", base);
+            }}
+          >
+            <option value="damage">Damage</option>
+            <option value="heal">Heal</option>
+            <option value="buff">Buff</option>
+            <option value="debuff">Debuff</option>
+            <option value="spawn">Spawn</option>
+          </StyledSelect>
+        </div>
+        {effectType === 'damage' && (
+          <>
+            <div>
+              <Label htmlFor={`moveTarget-${index}`}>Target</Label>
+              <StyledSelect id={`moveTarget-${index}`} value={(move.effect as any).target}
+                onChange={(e) => updateEffect("target", e.target.value)}>
+                <option value="single">Single</option>
+                <option value="all">All</option>
+                <option value="random">Random</option>
+              </StyledSelect>
+            </div>
+            <div>
+              <Label htmlFor={`moveDice-${index}`}>Damage Dice</Label>
+              <StyledInput id={`moveDice-${index}`} placeholder="e.g. 1d8+2" value={(move.effect as any).damageDice ?? ''}
+                onChange={(e) => updateEffect("damageDice", e.target.value || undefined)} />
+            </div>
+          </>
+        )}
+        {effectType === 'heal' && (
+          <>
+            <div>
+              <Label htmlFor={`healTarget-${index}`}>Target</Label>
+              <StyledSelect id={`healTarget-${index}`} value={(move.effect as any).target}
+                onChange={(e) => updateEffect("target", e.target.value)}>
+                <option value="self">Self</option>
+                <option value="all_allies">All Allies</option>
+                <option value="lowest_hp_ally">Lowest HP Ally</option>
+              </StyledSelect>
+            </div>
+            <div>
+              <Label htmlFor={`healDice-${index}`}>Heal Dice</Label>
+              <StyledInput id={`healDice-${index}`} placeholder="e.g. 2d6" value={(move.effect as any).healDice ?? ''}
+                onChange={(e) => updateEffect("healDice", e.target.value || undefined)} />
+            </div>
+          </>
+        )}
+        {effectType === 'buff' && (
+          <>
+            <div>
+              <Label htmlFor={`buffStat-${index}`}>Stat</Label>
+              <StyledSelect id={`buffStat-${index}`} value={(move.effect as any).stat}
+                onChange={(e) => updateEffect("stat", e.target.value)}>
+                <option value="strength">Strength</option>
+                <option value="defense">Defense</option>
+                <option value="dex">Dexterity</option>
+              </StyledSelect>
+            </div>
+            <div>
+              <Label htmlFor={`buffTarget-${index}`}>Target</Label>
+              <StyledSelect id={`buffTarget-${index}`} value={(move.effect as any).target}
+                onChange={(e) => updateEffect("target", e.target.value)}>
+                <option value="self">Self</option>
+                <option value="all_allies">All Allies</option>
+              </StyledSelect>
+            </div>
+            <div>
+              <Label htmlFor={`buffAmount-${index}`}>Amount</Label>
+              <StyledInput id={`buffAmount-${index}`} type="number" value={(move.effect as any).amount}
+                onChange={(e) => updateEffect("amount", parseInt(e.target.value) || 0)} />
+            </div>
+            <div>
+              <Label htmlFor={`buffDuration-${index}`}>Duration (turns)</Label>
+              <StyledInput id={`buffDuration-${index}`} type="number" value={(move.effect as any).duration}
+                onChange={(e) => updateEffect("duration", parseInt(e.target.value) || 1)} />
+            </div>
+          </>
+        )}
+        {effectType === 'debuff' && (
+          <>
+            <div>
+              <Label htmlFor={`debuffStat-${index}`}>Stat</Label>
+              <StyledSelect id={`debuffStat-${index}`} value={(move.effect as any).stat}
+                onChange={(e) => updateEffect("stat", e.target.value)}>
+                <option value="strength">Strength</option>
+                <option value="defense">Defense</option>
+                <option value="dex">Dexterity</option>
+              </StyledSelect>
+            </div>
+            <div>
+              <Label htmlFor={`debuffAmount-${index}`}>Amount</Label>
+              <StyledInput id={`debuffAmount-${index}`} type="number" value={(move.effect as any).amount}
+                onChange={(e) => updateEffect("amount", parseInt(e.target.value) || 0)} />
+            </div>
+            <div>
+              <Label htmlFor={`debuffDuration-${index}`}>Duration (turns)</Label>
+              <StyledInput id={`debuffDuration-${index}`} type="number" value={(move.effect as any).duration}
+                onChange={(e) => updateEffect("duration", parseInt(e.target.value) || 1)} />
+            </div>
+          </>
+        )}
+        {effectType === 'spawn' && (
+          <>
+            <div>
+              <Label htmlFor={`spawnIndex-${index}`}>Spawn Template Index</Label>
+              <StyledInput id={`spawnIndex-${index}`} type="number" value={(move.effect as any).spawnIndex}
+                onChange={(e) => updateEffect("spawnIndex", parseInt(e.target.value) || 0)} />
+            </div>
+            <div>
+              <Label htmlFor={`spawnCount-${index}`}>Count</Label>
+              <StyledInput id={`spawnCount-${index}`} type="number" value={(move.effect as any).count}
+                onChange={(e) => updateEffect("count", parseInt(e.target.value) || 1)} />
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function CombatForm({
   enemyImgs,
@@ -431,7 +664,7 @@ function CombatForm({
   enemies: EnemyEntry[];
   onChange: (enemies: EnemyEntry[]) => void;
 }) {
-  const updateEnemy = (index: number, field: keyof EnemyEntry, value: string | number) => {
+  const updateEnemy = (index: number, field: keyof EnemyEntry, value: any) => {
     const updated = enemies.map((e, i) =>
       i === index ? { ...e, [field]: value } : e
     );
@@ -445,6 +678,23 @@ function CombatForm({
   const removeEnemy = (index: number) => {
     if (enemies.length <= 1) return;
     onChange(enemies.filter((_, i) => i !== index));
+  };
+
+  const updateMove = (enemyIndex: number, moveIndex: number, move: MoveEntry) => {
+    const enemy = enemies[enemyIndex];
+    const moves = [...enemy.moves];
+    moves[moveIndex] = move;
+    updateEnemy(enemyIndex, 'moves', moves);
+  };
+
+  const addMove = (enemyIndex: number) => {
+    const enemy = enemies[enemyIndex];
+    updateEnemy(enemyIndex, 'moves', [...enemy.moves, defaultMove()]);
+  };
+
+  const removeMove = (enemyIndex: number, moveIndex: number) => {
+    const enemy = enemies[enemyIndex];
+    updateEnemy(enemyIndex, 'moves', enemy.moves.filter((_, i) => i !== moveIndex));
   };
 
   return (
@@ -560,6 +810,82 @@ function CombatForm({
                 onChange={(e) => updateEnemy(index, "defense", parseInt(e.target.value) || 0)}
               />
             </FieldGroup>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginTop: 12 }}>
+            <FieldGroup id={`expGain-${index}`} label="Exp Gain">
+              <StyledInput
+                id={`expGain-${index}`}
+                type="number"
+                value={enemy.expGain}
+                onChange={(e) => updateEnemy(index, "expGain", parseInt(e.target.value) || 0)}
+              />
+            </FieldGroup>
+            <FieldGroup id={`maxHealth-${index}`} label="Max Health (optional)">
+              <StyledInput
+                id={`maxHealth-${index}`}
+                type="number"
+                placeholder="Same as Health if blank"
+                value={enemy.maxHealth ?? ''}
+                onChange={(e) => updateEnemy(index, "maxHealth", e.target.value ? parseInt(e.target.value) : undefined)}
+              />
+            </FieldGroup>
+            <FieldGroup id={`type-${index}`} label="Type">
+              <StyledSelect
+                id={`type-${index}`}
+                value={enemy.type}
+                onChange={(e) => updateEnemy(index, "type", e.target.value as 'enemy' | 'boss')}
+              >
+                <option value="enemy">Enemy</option>
+                <option value="boss">Boss</option>
+              </StyledSelect>
+            </FieldGroup>
+          </div>
+
+          {enemy.type === 'boss' && (
+            <div style={{ marginTop: 8 }}>
+              <FieldGroup id={`phaseThresholds-${index}`} label="Phase Thresholds (% , separated)">
+                <StyledInput
+                  id={`phaseThresholds-${index}`}
+                  placeholder="e.g. 70, 40"
+                  value={enemy.phaseThresholds.join(', ')}
+                  onChange={(e) => {
+                    const vals = e.target.value
+                      .split(',')
+                      .map((s) => parseFloat(s.trim()))
+                      .filter((n) => !isNaN(n));
+                    updateEnemy(index, "phaseThresholds", vals);
+                  }}
+                />
+              </FieldGroup>
+            </div>
+          )}
+
+          <div style={{ marginTop: 16 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#DC2626", fontFamily: fonts.display }}>
+                Moves ({enemy.moves.length})
+              </span>
+              <button type="button" onClick={() => addMove(index)} style={{
+                background: "rgba(220,38,38,0.1)", border: "1px dashed rgba(220,38,38,0.4)",
+                borderRadius: 4, color: "#F87171", fontSize: 11, cursor: "pointer",
+                padding: "2px 10px", fontFamily: fonts.display,
+              }}>+ Add Move</button>
+            </div>
+            {enemy.moves.map((move, moveIndex) => (
+              <MoveForm
+                key={moveIndex}
+                move={move}
+                index={moveIndex}
+                onChange={(m) => updateMove(index, moveIndex, m)}
+                onRemove={() => removeMove(index, moveIndex)}
+              />
+            ))}
+            {enemy.moves.length === 0 && (
+              <p style={{ margin: 0, fontSize: 12, color: "#6B7280", fontStyle: "italic" }}>
+                No custom moves. Enemy will use a basic attack.
+              </p>
+            )}
           </div>
         </div>
       ))}
@@ -837,6 +1163,11 @@ export default function ManageRooms() {
               dex: enemy.dex,
               defense: enemy.defense,
               img: enemy.img,
+              exp_gain: enemy.expGain,
+              type: enemy.type,
+              max_health: enemy.maxHealth ?? null,
+              phase_thresholds: enemy.phaseThresholds.length > 0 ? JSON.stringify(enemy.phaseThresholds) : null,
+              moves: enemy.moves.length > 0 ? JSON.stringify(enemy.moves) : null,
             })
             .select()
             .single();

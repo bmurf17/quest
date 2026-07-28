@@ -55,13 +55,30 @@ export async function getAllRooms(): Promise<Room[]> {
       }),
   ]);
 
+  const mapDbEnemy = (e: any): Enemy => ({
+    id: e.id,
+    name: e.name,
+    health: e.health,
+    maxHealth: e.max_health ?? undefined,
+    strength: e.strength,
+    dex: e.dex,
+    defense: e.defense,
+    img: e.img,
+    expGain: e.exp_gain ?? 10,
+    type: e.type ?? 'enemy',
+    phase: e.type === 'boss' ? 1 : undefined,
+    phaseThresholds: e.phase_thresholds ?? undefined,
+    moves: e.moves ?? undefined,
+    spawns: e.spawns ?? undefined,
+  });
+
   const enemiesByRoom = new Map<number, Enemy[]>();
   enemiesData?.forEach((re) => {
     if (!enemiesByRoom.has(re.room_id)) {
       enemiesByRoom.set(re.room_id, []);
     }
     if (re.enemies) {
-      enemiesByRoom.get(re.room_id)!.push(re.enemies as unknown as Enemy);
+      enemiesByRoom.get(re.room_id)!.push(mapDbEnemy(re.enemies));
     }
   });
 
@@ -315,10 +332,27 @@ export async function getRoomsBySection(sectionId: number): Promise<Room[]> {
 export async function getEnemyById(enemyId: number): Promise<Enemy | null> {
   const { data, error } = await supabase
     .from("enemies")
-    .select("id, name, health")
+    .select("*")
     .eq("id", enemyId)
     .single();
 
   if (error) throw error;
-  return data as unknown as Enemy | null;
+  if (!data) return null;
+
+  return {
+    id: data.id,
+    name: data.name,
+    health: data.health,
+    maxHealth: data.max_health ?? undefined,
+    strength: data.strength,
+    dex: data.dex,
+    defense: data.defense,
+    img: data.img,
+    expGain: data.exp_gain,
+    type: data.type,
+    phase: data.type === 'boss' ? 1 : undefined,
+    phaseThresholds: data.phase_thresholds ?? undefined,
+    moves: data.moves ?? undefined,
+    spawns: data.spawns ?? undefined,
+  } as Enemy;
 }
