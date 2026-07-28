@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { calcDamage } from '../GameState';
-import { safeNextIndex, isEnemy } from '../utils/CombatUtils';
+import { calcDamage, safeNextIndex, isEnemy } from '../utils/CombatUtils';
 
 describe('GameState helpers', () => {
   it('safeNextIndex returns 0 when length is 0', () => {

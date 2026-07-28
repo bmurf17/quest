@@ -3,6 +3,7 @@ import { GameStatus } from "@/types/GameStatus";
 import { GameState } from "../GameState";
 import { CharacterData, rollDamageDice } from "@/types/Character";
 import { Quest } from "@/types/RoomInteractions";
+import { EnemyMove } from "@/types/EnemyMove";
 
 export const handleCombatCompletion = (
   enemies: Enemy[],
@@ -158,4 +159,42 @@ export function calcDamage(
     return Math.max(1, totalDamage - defense);
   }
   return 0;
+}
+
+export function getDefaultEnemyMove(): EnemyMove {
+  return {
+    name: "Basic Attack",
+    description: "A standard attack",
+    cooldown: 0,
+    weight: 10,
+    effect: { type: 'damage', target: 'single' },
+  };
+}
+
+export function getEnemyMaxHealth(enemy: Enemy): number {
+  return enemy.maxHealth ?? enemy.health;
+}
+
+export function pickEnemyMove(enemy: Enemy, _state?: GameState): EnemyMove {
+  void _state;
+  const moves = enemy.moves ?? [];
+
+  if (moves.length === 0) {
+    return getDefaultEnemyMove();
+  }
+
+  const totalWeight = moves.reduce((sum, m) => sum + m.weight, 0);
+  if (totalWeight <= 0) {
+    return moves[0];
+  }
+
+  let roll = Math.random() * totalWeight;
+  for (const move of moves) {
+    roll -= move.weight;
+    if (roll <= 0) {
+      return move;
+    }
+  }
+
+  return moves[moves.length - 1];
 }

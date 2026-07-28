@@ -27,6 +27,7 @@ import {
   getWeaponDamage,
   handleCombatCompletion,
   isEnemy,
+  pickEnemyMove,
   safeNextIndex,
   scheduleEnemyTurn,
 } from "./utils/CombatUtils";
@@ -196,40 +197,82 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     if (!currentEnemy) return;
 
-    // Pick a random living party member to attack
+    const move = pickEnemyMove(currentEnemy, state);
+
     const livingMembers = state.party.filter((member) => member.hp > 0);
     if (livingMembers.length === 0) return;
 
-    const target =
-      livingMembers[Math.floor(Math.random() * livingMembers.length)];
-
     set((state) => {
-      const damage = calcDamage(
-        target.abilities.def.score,
-        currentEnemy.dex,
-        currentEnemy.strength,
-      );
-      const newHealth = Math.max(0, target.hp - damage);
+      const effect = move.effect;
       let combatOrder = state.combatOrder;
+      let updatedParty = state.party;
+      let logMessage = '';
 
-      const updatedParty = state.party.map((member) => {
-        if (member.name === target.name) {
-          return { ...member, hp: newHealth, alive: newHealth > 0 };
+      switch (effect.type) {
+        case 'damage': {
+          let targets: typeof livingMembers;
+
+          if (effect.target === 'all') {
+            targets = livingMembers;
+          } else if (effect.target === 'random') {
+            targets = [livingMembers[Math.floor(Math.random() * livingMembers.length)]];
+          } else {
+            targets = [livingMembers[Math.floor(Math.random() * livingMembers.length)]];
+          }
+
+          const totalLogParts: string[] = [];
+
+          for (const target of targets) {
+            const damage = calcDamage(
+              target.abilities.def.score,
+              currentEnemy.strength,
+              currentEnemy.dex,
+            );
+            const newHealth = Math.max(0, target.hp - damage);
+
+            updatedParty = updatedParty.map((member) => {
+              if (member.name === target.name) {
+                return { ...member, hp: newHealth, alive: newHealth > 0 };
+              }
+              return member;
+            });
+
+            if (newHealth <= 0) {
+              totalLogParts.push(`${target.name} has been defeated!`);
+              combatOrder = combatOrder.filter((x) => x.name !== target.name);
+            } else {
+              totalLogParts.push(`${target.name} takes ${damage} damage (HP: ${newHealth})`);
+            }
+          }
+
+          logMessage = `${currentEnemy.name} uses ${move.name}! ${totalLogParts.join(' ')}`;
+          break;
         }
-        return member;
-      });
 
-      let logMessage = `${currentEnemy.name} attacked ${
-        target.name
-      } for ${damage} damage! ${target.name}'s HP: ${newHealth}`;
+        default: {
+          const target = livingMembers[Math.floor(Math.random() * livingMembers.length)];
+          const damage = calcDamage(
+            target.abilities.def.score,
+            currentEnemy.strength,
+            currentEnemy.dex,
+          );
+          const newHealth = Math.max(0, target.hp - damage);
 
-      if (newHealth <= 0) {
-        logMessage += ` \n ${target.name} has been defeated!`;
+          updatedParty = updatedParty.map((member) => {
+            if (member.name === target.name) {
+              return { ...member, hp: newHealth, alive: newHealth > 0 };
+            }
+            return member;
+          });
 
-        combatOrder = combatOrder.filter((x) => {
-          const shouldKeep = x.name !== target.name;
-          return shouldKeep;
-        });
+          logMessage = `${currentEnemy.name} uses ${move.name}! ${target.name} takes ${damage} damage (HP: ${newHealth})`;
+
+          if (newHealth <= 0) {
+            logMessage = `${currentEnemy.name} uses ${move.name}! ${target.name} has been defeated!`;
+            combatOrder = combatOrder.filter((x) => x.name !== target.name);
+          }
+          break;
+        }
       }
 
       const isPartyDefeated = updatedParty.every(

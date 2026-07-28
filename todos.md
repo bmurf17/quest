@@ -1,10 +1,6 @@
 Database 
     NPC inventory
 Spells using stats
-Char Creation
-    Enter the Char's name
-    Char is a template
-    Assign the skills
 Equipment
 Orbements- non equipment that effects stats??
 Admin
@@ -26,8 +22,8 @@ Sound effects
         Heal
 Crit hits
 Achievements 
-Quests
 Make the battle order scrollable
 Can use spells outside of combat 
 Heal Dead Party Members
-Saving
+Mobile doesn't suck
+Have equiment actually do something
