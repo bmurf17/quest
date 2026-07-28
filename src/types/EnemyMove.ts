@@ -5,7 +5,7 @@ export type EnemyMoveEffect =
   | { type: 'heal'; healDice?: DamageDice; target: 'self' | 'all_allies' | 'lowest_hp_ally' }
   | { type: 'buff'; stat: 'strength' | 'defense' | 'dex'; amount: number; duration: number; target: 'self' | 'all_allies' }
   | { type: 'debuff'; stat: 'defense' | 'strength' | 'dex'; amount: number; duration: number; target: 'single' }
-  | { type: 'spawn'; enemyTemplateId: number; count: number };
+  | { type: 'spawn'; spawnIndex: number; count: number };
 
 export type EnemyMove = {
   name: string;
@@ -13,4 +13,11 @@ export type EnemyMove = {
   cooldown: number;
   weight: number;
   effect: EnemyMoveEffect;
+};
+
+export type ActiveBuff = {
+  stat: string;
+  amount: number;
+  remainingTurns: number;
+  source: string;
 };

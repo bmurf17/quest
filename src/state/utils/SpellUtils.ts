@@ -1,7 +1,7 @@
 import { Enemy } from "@/types/Enemy";
 import { Spell } from "@/types/Spell";
 import { CharacterData } from "@/types/Character";
-import { isEnemy, handleCombatCompletion } from "./CombatUtils";
+import { getEffectiveBuffAmount, isEnemy, handleCombatCompletion } from "./CombatUtils";
 import { GameStatus } from "@/types/GameStatus";
 
 export type SpellHandlerResult = {
@@ -46,10 +46,15 @@ export function handleSpell(
         const currentAttacker = state.combatOrder[
           state.activeFighterIndex
         ] as CharacterData;
-        const currentIntelligence = currentAttacker.abilities.int.score;
-        const currentWisdom = currentAttacker.abilities.wis.score;
+        const activeBuffs: Map<string, any[]> = state.activeBuffs ?? new Map();
+        let currentIntelligence = currentAttacker.abilities.int.score;
+        let currentWisdom = currentAttacker.abilities.wis.score;
+        currentIntelligence += getEffectiveBuffAmount(activeBuffs, currentAttacker.name, 'intelligence');
+        currentWisdom += getEffectiveBuffAmount(activeBuffs, currentAttacker.name, 'wisdom');
+        const effectiveDef = enemy.defense +
+          getEffectiveBuffAmount(activeBuffs, enemy.name, 'defense');
         const damage = calcDamageFn(
-          enemy.defense,
+          effectiveDef,
           currentWisdom,
           currentIntelligence,
         );

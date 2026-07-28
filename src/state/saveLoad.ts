@@ -4,6 +4,7 @@ import type { CharacterData } from "@/types/Character";
 import type { Consumable, Item } from "@/types/Item";
 import type { DialogueNode, Quest } from "@/types/RoomInteractions";
 import type { Spell } from "@/types/Spell";
+import type { ActiveBuff } from "@/types/EnemyMove";
 import { useGameStore } from "./GameState";
 
 export interface SaveData {
@@ -41,6 +42,8 @@ export interface SaveData {
   dialogueTrees: [number, any][];
   activeCutsceneId: string | null;
   cutsceneSceneIndex: number;
+  enemyCooldowns: [number, [string, number][]][];
+  activeBuffs: [string, ActiveBuff[]][];
 }
 
 const SAVE_PREFIX = "quest_save_";
@@ -118,6 +121,16 @@ export function saveToSlot(slotName: string): void {
     dialogueTrees.push([id, node]);
   });
 
+  const enemyCooldowns: [number, [string, number][]][] = [];
+  state.enemyCooldowns.forEach((moveCds, enemyId) => {
+    enemyCooldowns.push([enemyId, [...moveCds.entries()]]);
+  });
+
+  const activeBuffs: [string, ActiveBuff[]][] = [];
+  state.activeBuffs.forEach((buffs, name) => {
+    activeBuffs.push([name, buffs]);
+  });
+
   const data: SaveData = {
     version: 1,
     timestamp: Date.now(),
@@ -153,6 +166,8 @@ export function saveToSlot(slotName: string): void {
     dialogueTrees,
     activeCutsceneId: state.activeCutscene?.id ?? null,
     cutsceneSceneIndex: state.cutsceneSceneIndex,
+    enemyCooldowns,
+    activeBuffs,
   };
 
   localStorage.setItem(SAVE_PREFIX + slotName, JSON.stringify(data));

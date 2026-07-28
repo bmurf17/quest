@@ -3,7 +3,7 @@ import { GameStatus } from "@/types/GameStatus";
 import { GameState } from "../GameState";
 import { CharacterData, rollDamageDice } from "@/types/Character";
 import { Quest } from "@/types/RoomInteractions";
-import { EnemyMove } from "@/types/EnemyMove";
+import { ActiveBuff, EnemyMove } from "@/types/EnemyMove";
 
 export const handleCombatCompletion = (
   enemies: Enemy[],
@@ -175,26 +175,105 @@ export function getEnemyMaxHealth(enemy: Enemy): number {
   return enemy.maxHealth ?? enemy.health;
 }
 
-export function pickEnemyMove(enemy: Enemy, _state?: GameState): EnemyMove {
-  void _state;
-  const moves = enemy.moves ?? [];
-
-  if (moves.length === 0) {
+export function pickEnemyMove(
+  enemy: Enemy,
+  cooldowns?: Map<string, number>,
+): EnemyMove {
+  const allMoves = enemy.moves ?? [];
+  if (allMoves.length === 0) {
     return getDefaultEnemyMove();
   }
 
-  const totalWeight = moves.reduce((sum, m) => sum + m.weight, 0);
+  const available = cooldowns
+    ? allMoves.filter((m) => (cooldowns.get(m.name) ?? 0) === 0)
+    : allMoves;
+
+  if (available.length === 0) {
+    return getDefaultEnemyMove();
+  }
+
+  const totalWeight = available.reduce((sum, m) => sum + m.weight, 0);
   if (totalWeight <= 0) {
-    return moves[0];
+    return available[0];
   }
 
   let roll = Math.random() * totalWeight;
-  for (const move of moves) {
+  for (const move of available) {
     roll -= move.weight;
     if (roll <= 0) {
       return move;
     }
   }
 
-  return moves[moves.length - 1];
+  return available[available.length - 1];
+}
+
+export function getEffectiveBuffAmount(
+  activeBuffs: Map<string, ActiveBuff[]>,
+  fighterName: string,
+  stat: string,
+): number {
+  const buffs = activeBuffs.get(fighterName);
+  if (!buffs) return 0;
+  return buffs
+    .filter((b) => b.stat === stat)
+    .reduce((sum, b) => sum + b.amount, 0);
+}
+
+export function addBuff(
+  activeBuffs: Map<string, ActiveBuff[]>,
+  targetName: string,
+  buff: ActiveBuff,
+): Map<string, ActiveBuff[]> {
+  const updated = new Map(activeBuffs);
+  const existing = updated.get(targetName) ?? [];
+  updated.set(targetName, [...existing, buff]);
+  return updated;
+}
+
+export function tickBuffs(
+  activeBuffs: Map<string, ActiveBuff[]>,
+): Map<string, ActiveBuff[]> {
+  const updated = new Map<string, ActiveBuff[]>();
+  for (const [name, buffs] of activeBuffs) {
+    const remaining = buffs
+      .map((b) => ({ ...b, remainingTurns: b.remainingTurns - 1 }))
+      .filter((b) => b.remainingTurns > 0);
+    if (remaining.length > 0) {
+      updated.set(name, remaining);
+    }
+  }
+  return updated;
+}
+
+export function tickCooldowns(
+  cooldowns: Map<number, Map<string, number>>,
+  enemyId: number,
+): Map<number, Map<string, number>> {
+  const updated = new Map(cooldowns);
+  const enemyCds = updated.get(enemyId);
+  if (!enemyCds) return updated;
+
+  const ticked = new Map<string, number>();
+  for (const [moveName, cd] of enemyCds) {
+    if (cd > 0) {
+      ticked.set(moveName, cd - 1);
+    }
+  }
+  updated.set(enemyId, ticked);
+  return updated;
+}
+
+export function setCooldown(
+  cooldowns: Map<number, Map<string, number>>,
+  enemyId: number,
+  moveName: string,
+  cooldown: number,
+): Map<number, Map<string, number>> {
+  if (cooldown <= 0) return cooldowns;
+  const updated = new Map(cooldowns);
+  const enemyCds = new Map(updated.get(enemyId) ?? []);
+  enemyCds.set(moveName, cooldown);
+  updated.set(enemyId, enemyCds);
+  return updated;
 }

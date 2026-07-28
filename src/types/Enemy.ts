@@ -15,4 +15,5 @@ export type Enemy = {
   phase?: number;
   phaseThresholds?: number[];
   spawnOnDefeat?: number[];
+  spawns?: Enemy[];
 };

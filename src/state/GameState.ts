@@ -2,6 +2,7 @@ import { getDialogueForNPC } from "@/queries/DialogueQueries";
 import { CharacterData, CharacterEquipment } from "@/types/Character";
 import { Directions } from "@/types/Directions";
 import { Enemy } from "@/types/Enemy";
+import { ActiveBuff } from "@/types/EnemyMove";
 import { GameStatus } from "@/types/GameStatus";
 import { Consumable, EquippableItem, healthPotion, Item } from "@/types/Item";
 import { Room, Section, startRoom } from "@/types/Room";
@@ -22,14 +23,20 @@ import { create } from "zustand";
 import type { SaveData } from "./saveLoad";
 import { denormalizeNeighbors } from "./saveLoad";
 import {
+  addBuff,
   calcDamage,
   finalizeAttackState,
+  getEffectiveBuffAmount,
+  getEnemyMaxHealth,
   getWeaponDamage,
   handleCombatCompletion,
   isEnemy,
   pickEnemyMove,
   safeNextIndex,
   scheduleEnemyTurn,
+  setCooldown,
+  tickBuffs,
+  tickCooldowns,
 } from "./utils/CombatUtils";
 import { handleSpell } from "./utils/SpellUtils";
 import { TavernConfig, DEFAULT_TAVERN_CONFIG } from "@/types/Tavern";
@@ -44,6 +51,8 @@ export interface GameState {
   rooms: Room[];
   combatOrder: (CharacterData | Enemy)[];
   activeFighterIndex: number;
+  enemyCooldowns: Map<number, Map<string, number>>;
+  activeBuffs: Map<string, ActiveBuff[]>;
   inventory: Item[];
   addToLog: (log: string) => void;
   attack: (enemy: Enemy) => void;
@@ -138,6 +147,8 @@ export const useGameStore = create<GameState>((set, get) => ({
   rooms: [],
   combatOrder: [],
   activeFighterIndex: 0,
+  enemyCooldowns: new Map<number, Map<string, number>>(),
+  activeBuffs: new Map<string, ActiveBuff[]>(),
   dialogueIndex: 0,
   inventory: [healthPotion],
   lastHitEnemyId: null,
@@ -197,7 +208,8 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     if (!currentEnemy) return;
 
-    const move = pickEnemyMove(currentEnemy, state);
+    const enemyCooldowns = state.enemyCooldowns.get(currentEnemy.id);
+    const move = pickEnemyMove(currentEnemy, enemyCooldowns);
 
     const livingMembers = state.party.filter((member) => member.hp > 0);
     if (livingMembers.length === 0) return;
@@ -206,16 +218,19 @@ export const useGameStore = create<GameState>((set, get) => ({
       const effect = move.effect;
       let combatOrder = state.combatOrder;
       let updatedParty = state.party;
+      let updatedEnemies = (
+        state.roomInstances.get(state.room.id) || state.room
+      ).enemies.map((e) => ({ ...e }));
       let logMessage = '';
+      let newCooldowns = tickCooldowns(state.enemyCooldowns, currentEnemy.id);
+      let newBuffs = tickBuffs(state.activeBuffs);
 
       switch (effect.type) {
         case 'damage': {
-          let targets: typeof livingMembers;
+          let targets: CharacterData[];
 
           if (effect.target === 'all') {
             targets = livingMembers;
-          } else if (effect.target === 'random') {
-            targets = [livingMembers[Math.floor(Math.random() * livingMembers.length)]];
           } else {
             targets = [livingMembers[Math.floor(Math.random() * livingMembers.length)]];
           }
@@ -223,10 +238,17 @@ export const useGameStore = create<GameState>((set, get) => ({
           const totalLogParts: string[] = [];
 
           for (const target of targets) {
+            const effectiveDef = target.abilities.def.score +
+              getEffectiveBuffAmount(newBuffs, target.name, 'defense');
+            const effectiveStr = currentEnemy.strength +
+              getEffectiveBuffAmount(newBuffs, currentEnemy.name, 'strength');
+            const effectiveDex = currentEnemy.dex +
+              getEffectiveBuffAmount(newBuffs, currentEnemy.name, 'dex');
+
             const damage = calcDamage(
-              target.abilities.def.score,
-              currentEnemy.strength,
-              currentEnemy.dex,
+              effectiveDef,
+              effectiveStr,
+              effectiveDex,
             );
             const newHealth = Math.max(0, target.hp - damage);
 
@@ -246,6 +268,97 @@ export const useGameStore = create<GameState>((set, get) => ({
           }
 
           logMessage = `${currentEnemy.name} uses ${move.name}! ${totalLogParts.join(' ')}`;
+          break;
+        }
+
+        case 'heal': {
+          const allies = updatedEnemies;
+          let targets: Enemy[] = [];
+
+          if (effect.target === 'self') {
+            targets = [currentEnemy];
+          } else if (effect.target === 'all_allies') {
+            targets = allies;
+          } else if (effect.target === 'lowest_hp_ally') {
+            const sorted = [...allies].sort(
+              (a, b) => (a.health / getEnemyMaxHealth(a)) - (b.health / getEnemyMaxHealth(b)),
+            );
+            targets = sorted.length > 0 ? [sorted[0]] : [];
+          }
+
+          const healAmount = 15;
+
+          for (const target of targets) {
+            const maxHp = getEnemyMaxHealth(target);
+            const newHealth = Math.min(maxHp, target.health + healAmount);
+            updatedEnemies = updatedEnemies.map((e) =>
+              e.id === target.id ? { ...e, health: newHealth } : e,
+            );
+          }
+
+          const targetNames = targets.map((t) => t.name).join(', ');
+          logMessage = `${currentEnemy.name} uses ${move.name}! ${targetNames} healed for ${healAmount}.`;
+          break;
+        }
+
+        case 'buff': {
+          const targets: Enemy[] =
+            effect.target === 'self'
+              ? [currentEnemy]
+              : updatedEnemies;
+
+          for (const target of targets) {
+            newBuffs = addBuff(newBuffs, target.name, {
+              stat: effect.stat,
+              amount: effect.amount,
+              remainingTurns: effect.duration,
+              source: currentEnemy.name,
+            });
+          }
+
+          const targetNames = targets.map((t) => t.name).join(', ');
+          logMessage = `${currentEnemy.name} uses ${move.name}! ${effect.stat.toUpperCase()} +${effect.amount} for ${effect.duration} turns on ${targetNames}.`;
+          break;
+        }
+
+        case 'debuff': {
+          const partyTarget = livingMembers[Math.floor(Math.random() * livingMembers.length)];
+          if (partyTarget) {
+            newBuffs = addBuff(newBuffs, partyTarget.name, {
+              stat: effect.stat,
+              amount: -effect.amount,
+              remainingTurns: effect.duration,
+              source: currentEnemy.name,
+            });
+            logMessage = `${currentEnemy.name} uses ${move.name}! ${partyTarget.name}'s ${effect.stat.toUpperCase()} reduced by ${effect.amount} for ${effect.duration} turns.`;
+          }
+          break;
+        }
+
+        case 'spawn': {
+          const spawnedEnemies: Enemy[] = [];
+          const spawnTemplates = currentEnemy.spawns ?? [];
+
+          for (let i = 0; i < effect.count; i++) {
+            const template = spawnTemplates[effect.spawnIndex];
+            if (template) {
+              const maxHp = template.maxHealth ?? template.health;
+              const spawned: Enemy = {
+                ...template,
+                health: maxHp,
+                id: -(Date.now() + i + Math.floor(Math.random() * 1000)),
+              };
+              spawnedEnemies.push(spawned);
+            }
+          }
+
+          if (spawnedEnemies.length > 0) {
+            updatedEnemies = [...updatedEnemies, ...spawnedEnemies];
+            combatOrder = [...combatOrder, ...spawnedEnemies];
+          }
+
+          const names = spawnedEnemies.map((e) => e.name).join(', ');
+          logMessage = `${currentEnemy.name} uses ${move.name}! ${names} appear!`;
           break;
         }
 
@@ -275,6 +388,12 @@ export const useGameStore = create<GameState>((set, get) => ({
         }
       }
 
+      newCooldowns = setCooldown(newCooldowns, currentEnemy.id, move.name, move.cooldown);
+
+      const currentRoomInstance =
+        state.roomInstances.get(state.room.id) || state.room;
+      const updatedRoom = { ...currentRoomInstance, enemies: updatedEnemies };
+
       const isPartyDefeated = updatedParty.every(
         (member) => member.hp <= 0 || !member.alive,
       );
@@ -290,6 +409,8 @@ export const useGameStore = create<GameState>((set, get) => ({
           activeFighterIndex: 0,
           combatOrder: [],
           gameStatus: GameStatus.GameOver,
+          enemyCooldowns: newCooldowns,
+          activeBuffs: newBuffs,
         };
       }
 
@@ -303,6 +424,10 @@ export const useGameStore = create<GameState>((set, get) => ({
         activityLog: [...state.activityLog, logMessage],
         activeFighterIndex: nextIndex,
         combatOrder: combatOrder,
+        enemyCooldowns: newCooldowns,
+        activeBuffs: newBuffs,
+        room: updatedRoom,
+        roomInstances: new Map(state.roomInstances).set(state.room.id, updatedRoom),
       };
     });
 
@@ -314,18 +439,24 @@ export const useGameStore = create<GameState>((set, get) => ({
       const currentAttacker = state.combatOrder[state.activeFighterIndex];
       const attackerName = currentAttacker?.name || "Unknown";
 
-      const currentDex =
+      let currentDex =
         "abilities" in currentAttacker
           ? currentAttacker.abilities.dex.score
           : currentAttacker.dex;
-      const currentStr =
+      let currentStr =
         "abilities" in currentAttacker
           ? currentAttacker.abilities.str.score
           : currentAttacker.strength;
 
+      currentDex += getEffectiveBuffAmount(state.activeBuffs, currentAttacker.name, 'dex');
+      currentStr += getEffectiveBuffAmount(state.activeBuffs, currentAttacker.name, 'strength');
+
+      const effectiveDef = enemy.defense +
+        getEffectiveBuffAmount(state.activeBuffs, enemy.name, 'defense');
+
       const weaponDmg = getWeaponDamage(currentAttacker);
       const damage = calcDamage(
-        enemy.defense,
+        effectiveDef,
         currentStr,
         currentDex,
         weaponDmg,
@@ -733,6 +864,12 @@ export const useGameStore = create<GameState>((set, get) => ({
         dialogueIndex: 0,
         activeDialogue: null,
         currentDialogueNodeId: null,
+        enemyCooldowns: status === GameStatus.Combat
+          ? new Map<number, Map<string, number>>()
+          : state.enemyCooldowns,
+        activeBuffs: status === GameStatus.Combat
+          ? new Map<string, ActiveBuff[]>()
+          : state.activeBuffs,
       };
     }),
 
@@ -803,6 +940,8 @@ export const useGameStore = create<GameState>((set, get) => ({
 
       return {
         combatOrder: combatOrder,
+        enemyCooldowns: new Map<number, Map<string, number>>(),
+        activeBuffs: new Map<string, ActiveBuff[]>(),
       };
     }),
 
@@ -1286,6 +1425,8 @@ export const useGameStore = create<GameState>((set, get) => ({
           ...state.activityLog,
           `You begin exploring ${state.availableSections.find((s) => s.id === sectionId)?.name ?? "an unknown area"}...`,
         ],
+        enemyCooldowns: new Map<number, Map<string, number>>(),
+        activeBuffs: new Map<string, ActiveBuff[]>(),
       };
     }),
 
@@ -1410,6 +1551,20 @@ export const useGameStore = create<GameState>((set, get) => ({
           roomLookup,
         );
 
+    const enemyCooldowns = new Map<number, Map<string, number>>();
+    if (data.enemyCooldowns) {
+      for (const [enemyId, entries] of data.enemyCooldowns) {
+        enemyCooldowns.set(enemyId, new Map(entries));
+      }
+    }
+
+    const activeBuffs = new Map<string, ActiveBuff[]>();
+    if (data.activeBuffs) {
+      for (const [name, buffs] of data.activeBuffs) {
+        activeBuffs.set(name, buffs);
+      }
+    }
+
     set({
       party: data.party,
       activityLog: data.activityLog,
@@ -1444,6 +1599,8 @@ export const useGameStore = create<GameState>((set, get) => ({
         ? state.cutscenes.get(data.activeCutsceneId) ?? null
         : null,
       cutsceneSceneIndex: data.cutsceneSceneIndex ?? 0,
+      enemyCooldowns,
+      activeBuffs,
     });
   },
 }));
