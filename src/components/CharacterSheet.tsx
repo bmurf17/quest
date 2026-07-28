@@ -10,6 +10,8 @@ import { CharacterData, CharacterEquipment, formatDamageDice } from "@/types/Cha
 import { useGameStore } from "@/state/GameState";
 import { EquippableItem, EquipmentSlot } from "@/types/Item";
 import { colors, fonts } from "../theme";
+import SkillTreeView from "./SkillTreeView";
+import { getSkillTree } from "@/data/skillTrees";
 
 function StatBar({ value, max, color }: { value: number; max: number; color: string }) {
   const pct = Math.min(100, (value / max) * 100);
@@ -149,7 +151,7 @@ export default function CharacterSheet({
   onOpenChange?: (open: boolean) => void;
   characterData: CharacterData;
 }) {
-  const [activeTab, setActiveTab] = useState<"stats" | "equipment">("stats");
+  const [activeTab, setActiveTab] = useState<"stats" | "equipment" | "skills">("stats");
   const inventory = useGameStore((s) => s.inventory);
   const equipItem = useGameStore((s) => s.equipItem);
   const unequipItem = useGameStore((s) => s.unequipItem);
@@ -157,7 +159,7 @@ export default function CharacterSheet({
     (item): item is EquippableItem => item.type === "equipment",
   );
 
-  const tabStyle = (tab: "stats" | "equipment") =>
+  const tabStyle = (tab: "stats" | "equipment" | "skills") =>
     ({
       background:
         activeTab === tab ? "rgba(180,140,80,0.15)" : "transparent",
@@ -234,6 +236,9 @@ export default function CharacterSheet({
           </button>
           <button onClick={() => setActiveTab("equipment")} style={tabStyle("equipment")}>
             Equipment
+          </button>
+          <button onClick={() => setActiveTab("skills")} style={tabStyle("skills")}>
+            Skills
           </button>
         </div>
 
@@ -527,6 +532,13 @@ export default function CharacterSheet({
                   </div>
                 )}
               </>
+            )}
+
+            {activeTab === "skills" && (
+              <SkillTreeView
+                tree={getSkillTree(characterData.class) ?? { className: characterData.class, nodes: [] }}
+                level={characterData.level}
+              />
             )}
           </div>
         </ScrollArea>
