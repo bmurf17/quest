@@ -296,7 +296,7 @@ export default function ActionMenu() {
       >
         {inCombat && !isFighterEnemy && currentFighter && (
           <div>
-            {currentFighter.equipment.weapon && (
+            {currentFighter.equipment?.weapon && (
               <>
                 <SectionLabel>Weapons</SectionLabel>
                 <div
