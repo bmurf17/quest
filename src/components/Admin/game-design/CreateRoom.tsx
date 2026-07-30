@@ -1166,8 +1166,8 @@ export default function ManageRooms() {
               exp_gain: enemy.expGain,
               type: enemy.type,
               max_health: enemy.maxHealth ?? null,
-              phase_thresholds: enemy.phaseThresholds.length > 0 ? JSON.stringify(enemy.phaseThresholds) : null,
-              moves: enemy.moves.length > 0 ? JSON.stringify(enemy.moves) : null,
+              phase_thresholds: enemy.phaseThresholds.length > 0 ? enemy.phaseThresholds : null,
+              moves: enemy.moves.length > 0 ? enemy.moves : null,
             })
             .select()
             .single();

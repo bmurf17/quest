@@ -67,9 +67,9 @@ export async function getAllRooms(): Promise<Room[]> {
     expGain: e.exp_gain ?? 10,
     type: e.type ?? 'enemy',
     phase: e.type === 'boss' ? 1 : undefined,
-    phaseThresholds: e.phase_thresholds ?? undefined,
-    moves: e.moves ?? undefined,
-    spawns: e.spawns ?? undefined,
+    phaseThresholds: Array.isArray(e.phase_thresholds) ? e.phase_thresholds : undefined,
+    moves: Array.isArray(e.moves) ? e.moves : undefined,
+    spawns: Array.isArray(e.spawns) ? e.spawns : undefined,
   });
 
   const enemiesByRoom = new Map<number, Enemy[]>();
@@ -351,8 +351,8 @@ export async function getEnemyById(enemyId: number): Promise<Enemy | null> {
     expGain: data.exp_gain,
     type: data.type,
     phase: data.type === 'boss' ? 1 : undefined,
-    phaseThresholds: data.phase_thresholds ?? undefined,
-    moves: data.moves ?? undefined,
-    spawns: data.spawns ?? undefined,
+    phaseThresholds: Array.isArray(data.phase_thresholds) ? data.phase_thresholds : undefined,
+    moves: Array.isArray(data.moves) ? data.moves : undefined,
+    spawns: Array.isArray(data.spawns) ? data.spawns : undefined,
   } as Enemy;
 }

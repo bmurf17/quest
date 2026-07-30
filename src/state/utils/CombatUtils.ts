@@ -179,7 +179,8 @@ export function pickEnemyMove(
   enemy: Enemy,
   cooldowns?: Map<string, number>,
 ): EnemyMove {
-  const allMoves = enemy.moves ?? [];
+  const rawMoves = enemy.moves;
+  const allMoves = Array.isArray(rawMoves) ? rawMoves : [];
   if (allMoves.length === 0) {
     return getDefaultEnemyMove();
   }

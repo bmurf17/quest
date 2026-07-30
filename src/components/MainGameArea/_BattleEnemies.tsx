@@ -73,6 +73,10 @@ function BattleEnemiesComponent() {
     return 'bg-red-500';
   };
 
+  if(currentRoom.enemies ) {
+    console.log("Enemies in room:", currentRoom.enemies.map(e => ({id: e.id, name: e.name, health: e.health, maxHealth: getEnemyMaxHealth(e), moves: e.moves})));
+  }
+
   return (
     <>
       {currentRoom ? (
