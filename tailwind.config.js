@@ -44,7 +44,31 @@ export default {
       animation: {
         flash: "flash 0.6s ease-in-out",
       },
-      colors: {},
+      colors: {
+        gold: {
+          DEFAULT: "#D4AF37",
+          muted: "#C9A84C",
+          dark: "rgb(180 140 80)",
+        },
+        text: {
+          DEFAULT: "#E8DCC8",
+          muted: "#A8916A",
+        },
+        muted: "#9CA3AF",
+        success: "#34D399",
+        danger: "#EF4444",
+        warning: "#F2A444",
+        info: "#0099DB",
+        surface: {
+          DEFAULT: "#1A1A2E",
+          alt: "#2B2033",
+        },
+        subtle: "rgba(255,255,255,0.07)",
+      },
+      fontFamily: {
+        display: ["Cinzel", "Georgia", "serif"],
+        body: ["Lato", "sans-serif"],
+      },
     },
   },
   plugins: [
