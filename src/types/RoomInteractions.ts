@@ -66,6 +66,7 @@ export interface Quest {
   id: number;
   name: string;
   description: string;
+  npcName?: string;
   type: QuestType;
   objectives: string[];
   rewards: Item[];

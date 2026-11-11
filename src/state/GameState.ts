@@ -1570,7 +1570,11 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     const currentRoom = roomInstances.get(data.currentRoomId)
       || denormalizeNeighbors(
-          { ...state.rooms.find((r) => r.id === data.currentRoomId), neighboringRooms: [] },
+          {
+            ...(state.rooms.find((r) => r.id === data.currentRoomId) ??
+              state.room),
+            neighboringRooms: [],
+          },
           roomLookup,
         );
 

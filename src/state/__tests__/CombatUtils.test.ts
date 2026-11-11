@@ -1,20 +1,33 @@
 import { describe, it, expect } from 'vitest';
 import { finalizeAttackState } from '../utils/CombatUtils';
+import type { GameState } from '../GameState';
 import { Enemy } from '@/types/Enemy';
 import { startRoom } from '@/types/Room';
 import { Quest } from '@/types/RoomInteractions';
 import { manaPotion } from '@/types/Item';
+import { GameStatus } from '@/types/GameStatus';
 
 describe('CombatUtils finalizeAttackState', () => {
   it('updates roomInstances map using room id keys', () => {
-    const fakeState: any = {
+    const goblin: Enemy = {
+      id: 1,
+      name: 'Gob',
+      health: 10,
+      strength: 5,
+      dex: 5,
+      defense: 5,
+      img: '',
+      expGain: 10,
+    };
+
+    const fakeState = {
       room: startRoom,
-      roomInstances: new Map<number, any>([
-        [startRoom.id, { ...startRoom, enemies: [{ id: 'e1', name: 'Gob', health: 10 } as any] }],
+      roomInstances: new Map([
+        [startRoom.id, { ...startRoom, enemies: [goblin] }],
       ]),
       activityLog: [],
       lastDefeatedCounter: 0,
-    };
+    } as unknown as GameState;
 
     const updatedEnemies: Enemy[] = [];
 
@@ -33,7 +46,7 @@ describe('CombatUtils finalizeAttackState', () => {
       fakeState,
       updatedEnemies,
       // newStatus
-      0 as any,
+      GameStatus.Exploring,
       // nextIndex
       0,
       // combatOrder

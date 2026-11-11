@@ -127,9 +127,9 @@ export default function Inventory({
                     <div style={{ fontSize: 14, fontWeight: 700, color: colors.text, fontFamily: fonts.display, letterSpacing: "0.02em", marginBottom: 3 }}>
                       {item.name}
                     </div>
-                    {(item as any).description && (
+                    {item.description && (
                       <div style={{ fontSize: 12, color: "#7A6A52", lineHeight: 1.4 }}>
-                        {(item as any).description}
+                        {item.description}
                       </div>
                     )}
                   </div>

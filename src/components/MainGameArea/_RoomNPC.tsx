@@ -1,5 +1,5 @@
 import { GameState, useGameStore } from "@/state/GameState";
-import { DialogueNode } from "@/types/RoomInteractions";
+import { DialogueNode, NPC } from "@/types/RoomInteractions";
 import { useEffect, useRef } from "react";
 
 export default function RoomNPC() {
@@ -77,7 +77,7 @@ function DialogueTreeView({
   activeDialogue, 
   selectDialogueChoice 
 }: { 
-  npc: any; 
+  npc: NPC; 
   activeDialogue: DialogueNode | null; 
   selectDialogueChoice: (choiceId: string) => void;
 }) {

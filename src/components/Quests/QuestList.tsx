@@ -43,11 +43,11 @@ export default function QuestList({
         {selectedQuest ? (
           <>
             <QuestPanelHeader
-              title={`${(selectedQuest as any).npcName ?? selectedQuest.name}'s Quest`}
+              title={`${selectedQuest.npcName ?? selectedQuest.name}'s Quest`}
               onBack={() => setSelectedQuest(null)}
             />
             <QuestDescription
-              npcsName={(selectedQuest as any).npcName ?? selectedQuest.name}
+              npcsName={selectedQuest.npcName ?? selectedQuest.name}
               quest={selectedQuest}
               onAccepted={() => {
                 setSelectedQuest(null);
@@ -137,7 +137,7 @@ export default function QuestList({
                         >
                           {quest.name}
                         </div>
-                        {(quest as any).description && (
+                        {quest.description && (
                           <div
                             style={{
                               fontSize: 12,
@@ -145,7 +145,7 @@ export default function QuestList({
                               lineHeight: 1.4,
                             }}
                           >
-                            {(quest as any).description}
+                            {quest.description}
                           </div>
                         )}
                       </div>

@@ -1,5 +1,6 @@
 import { getEnemyMaxHealth } from "@/state/utils/CombatUtils";
 import { GameState, useGameStore } from "@/state/GameState";
+import { Enemy } from "@/types/Enemy";
 import { useEffect, useState, memo } from "react";
 import { useSound } from "@/hooks/useSound";
 
@@ -40,7 +41,7 @@ function BattleEnemiesComponent() {
     }
   }, [lastDefeatedEnemyId, lastDefeatedCounter, playDefeatSound]);
 
-  const handleEnemyClick = (enemy: any) => {
+  const handleEnemyClick = (enemy: Enemy) => {
     if (isTargeting) {
       if (targetingSpell) {
         castSpell(targetingSpell, enemy);

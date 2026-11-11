@@ -102,7 +102,7 @@ function ConnectorLayer({ room, x, y, visitedRooms, depth = 0 }: ConnectorLayerP
 
   return (
     <>
-      {room.neighboringRooms?.map(([direction, neighbor]: any, i: number) => {
+      {room.neighboringRooms?.map(([direction, neighbor], i: number) => {
         if (newVisited.has(neighbor.name)) return null;
         const offset = getDirectionOffset(direction);
         const nx = x + offset.x;
@@ -204,7 +204,7 @@ const RoomNode = React.memo(({ room, x, y, visitedRooms, depth = 0, onRoomClick,
       </div>
 
       {depth < MAX_DEPTH &&
-        room.neighboringRooms?.map(([direction, neighbor]: any, i: number) => {
+        room.neighboringRooms?.map(([direction, neighbor], i: number) => {
           if (newVisited.has(neighbor.name)) return null;
           const offset = getDirectionOffset(direction);
           return (

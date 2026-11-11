@@ -2,10 +2,19 @@ import type { Room, Section } from "@/types/Room";
 import type { Directions } from "@/types/Directions";
 import type { CharacterData } from "@/types/Character";
 import type { Consumable, Item } from "@/types/Item";
+import type { Enemy } from "@/types/Enemy";
 import type { DialogueNode, Quest } from "@/types/RoomInteractions";
 import type { Spell } from "@/types/Spell";
 import type { ActiveBuff } from "@/types/EnemyMove";
 import { useGameStore } from "./GameState";
+
+/**
+ * A room as it is written to storage: neighbor references are room IDs rather
+ * than nested room objects, which avoids cycles when serializing to JSON.
+ */
+export type SerializedRoom = Omit<Room, "neighboringRooms"> & {
+  neighboringRooms: [Directions, number][];
+};
 
 export interface SaveData {
   version: number;
@@ -22,9 +31,9 @@ export interface SaveData {
   beatenSections: number[];
   availableSections: Section[];
   currentRoomId: number;
-  roomInstances: [number, any][];
+  roomInstances: [number, SerializedRoom][];
   gameStatus: number;
-  combatOrder: any[];
+  combatOrder: (CharacterData | Enemy)[];
   activeFighterIndex: number;
   activeDialogue: DialogueNode | null;
   currentDialogueNodeId: string | null;
@@ -39,7 +48,7 @@ export interface SaveData {
   isLevelingUp: boolean;
   levelingUpChars: CharacterData[];
   currentLevelingCharIndex: number;
-  dialogueTrees: [number, any][];
+  dialogueTrees: [number, DialogueNode][];
   activeCutsceneId: string | null;
   cutsceneSceneIndex: number;
   enemyCooldowns: [number, [string, number][]][];
@@ -74,7 +83,7 @@ export function deleteSave(slotName: string): void {
   localStorage.removeItem(SAVE_PREFIX + slotName);
 }
 
-export function normalizeNeighbors(room: Room): any {
+export function normalizeNeighbors(room: Room): SerializedRoom {
   return {
     ...room,
     neighboringRooms: room.neighboringRooms.map(
@@ -84,7 +93,7 @@ export function normalizeNeighbors(room: Room): any {
 }
 
 export function denormalizeNeighbors(
-  room: any,
+  room: SerializedRoom,
   roomLookup: Map<number, Room>,
 ): Room {
   return {
@@ -111,12 +120,12 @@ export function denormalizeNeighbors(
 export function saveToSlot(slotName: string): void {
   const state = useGameStore.getState();
 
-  const roomInstances: [number, any][] = [];
+  const roomInstances: [number, SerializedRoom][] = [];
   state.roomInstances.forEach((room: Room, id: number) => {
     roomInstances.push([id, normalizeNeighbors(room)]);
   });
 
-  const dialogueTrees: [number, any][] = [];
+  const dialogueTrees: [number, DialogueNode][] = [];
   state.dialogueTrees.forEach((node: DialogueNode, id: number) => {
     dialogueTrees.push([id, node]);
   });

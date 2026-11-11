@@ -50,22 +50,25 @@ Renamed the action to `consumeItem` across `GameState`, components, and tests. `
 
 All six `react-hooks/exhaustive-deps` warnings are gone; `tsc -b` and `vitest run` pass.
 
-### 3. Eliminate `any` (65 lint errors)
+### 3. Eliminate `any` (65 lint errors) — ✅ Done
 
 Highest-impact spots:
 
-- [ ] `src/state/saveLoad.ts` — `roomInstances: [number, any][]`, `combatOrder: any[]`, `dialogueTrees: [number, any][]`, `normalizeNeighbors(): any`, `denormalizeNeighbors(room: any)`
-- [ ] `src/queries/RoomQueries.ts:58,95,113,116,134,160,173,177` — DB row mapping is untyped; `rooms!` non-null assertion at line 106
-- [ ] `src/components/Admin/game-design/CreateRoom.tsx` — 19 `any`s
-- [ ] `src/components/Quests/QuestList.tsx`, `QuestOffer.tsx` — quest/objective types
-- [ ] `src/state/utils/SpellUtils.ts` — `state: any`, `completion: any`
-- [ ] Tests: `CombatUtils.test.ts`, `GameState.helpers.test.ts`
+- [x] `src/state/saveLoad.ts` — `roomInstances: [number, SerializedRoom][]`, `combatOrder: (CharacterData | Enemy)[]`, `dialogueTrees: [number, DialogueNode][]`, typed `normalizeNeighbors`/`denormalizeNeighbors`
+- [x] `src/queries/RoomQueries.ts:58,95,113,116,134,160,173,177` — added `Db*` row types + typed mappers (`mapDbEnemy`, `mapDbItem`, `mapDbQuest`); removed `rooms!` non-null assertion
+- [x] `src/components/Admin/game-design/CreateRoom.tsx` — 19 `any`s replaced with generic field setters and discriminated `EnemyMoveEffect` construction
+- [x] `src/components/Quests/QuestList.tsx`, `QuestOffer.tsx` — quest/objective types (`npcName` added to `Quest`, `description` to `BaseItem`)
+- [x] `src/state/utils/SpellUtils.ts` — typed `SpellState`, `earlyCompletion` from `ReturnType<typeof handleCombatCompletion>`
+- [x] Tests: `CombatUtils.test.ts`, `GameState.helpers.test.ts`
+- [x] Remaining `any`s in components (`_BattleOrder`, `_BattleEnemies`, `_MapNav`, `_RoomNPC`, `RoomMap`, `CharacterContext`, `Inventory`)
 
 Recommended approach:
 
 - [ ] Generate Supabase DB types (`supabase gen types typescript`) and type the client as `SupabaseClient<Database>`
-- [ ] Add explicit row types + mappers for DB → domain objects (`Room`, `Enemy`, `Item`, `Quest`)
-- [ ] Replace non-null assertions with guards or explicit thrown errors
+- [x] Add explicit row types + mappers for DB → domain objects (`Room`, `Enemy`, `Item`, `Quest`)
+- [x] Replace non-null assertions with guards or explicit thrown errors
+
+`npx eslint .` now reports **0 errors / 3 warnings** (the pre-existing `react-refresh/only-export-components` warnings).
 
 ### 4. Harden save/load
 

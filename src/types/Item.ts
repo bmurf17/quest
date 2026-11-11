@@ -23,6 +23,7 @@ export type BaseItem = {
   value: number;
   img: string
   cost: number;
+  description?: string;
 };
 
 export type Consumable = BaseItem & {

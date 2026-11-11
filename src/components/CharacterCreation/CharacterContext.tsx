@@ -21,7 +21,10 @@ interface Character {
 
 interface CharacterContextType {
   character: Character;
-  updateCharacter: (field: string, value: any) => void;
+  updateCharacter: <K extends keyof Character>(
+    field: K,
+    value: Character[K],
+  ) => void;
 }
 
 export const CharacterContext = createContext<CharacterContextType | undefined>(
@@ -48,7 +51,10 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     },
   });
 
-  const updateCharacter = (field: string, value: any) => {
+  const updateCharacter = <K extends keyof Character>(
+    field: K,
+    value: Character[K],
+  ) => {
     setCharacter((prev) => ({ ...prev, [field]: value }));
   };
 

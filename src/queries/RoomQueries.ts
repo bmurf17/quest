@@ -1,9 +1,210 @@
 import { Directions } from "@/types/Directions";
 import { Enemy } from "@/types/Enemy";
 import { Room, Section } from "@/types/Room";
-import { RoomInteraction } from "@/types/RoomInteractions";
+import { NPCType, Quest, QuestType, RoomInteraction } from "@/types/RoomInteractions";
+import { EquippableItem, EquipmentSlot, Item } from "@/types/Item";
 import { supabase } from "@/lib/supabase";
 export { supabase };
+
+/** Shape of a row from the `enemies` table. */
+interface DbEnemy {
+  id: number;
+  name: string;
+  health: number;
+  max_health: number | null;
+  strength: number;
+  dex: number;
+  defense: number;
+  img: string;
+  exp_gain: number | null;
+  type: "enemy" | "boss" | null;
+  phase_thresholds: number[] | null;
+  moves: Enemy["moves"] | null;
+  spawns: Enemy["spawns"] | null;
+}
+
+/** Shape of a row from the `items` table. */
+interface DbItem {
+  name: string;
+  value: number;
+  img: string;
+  type: "consumable" | "equipment";
+  effect: string | null;
+  hp_change: number | null;
+  mana_change: number | null;
+  target: "single" | "all" | null;
+  stack_size: number | null;
+  slot: EquipmentSlot | null;
+  cost: number;
+  stats: { attack?: number; defense?: number } | null;
+  action: EquippableItem["action"] | null;
+}
+
+interface DbQuestObjective {
+  objective: string;
+}
+
+interface DbQuestReward {
+  item: DbItem | null;
+}
+
+interface DbExploreRoom {
+  id: number;
+  name: string;
+  section_id: number;
+}
+
+interface DbQuest {
+  id: number;
+  name: string;
+  description: string;
+  quest_type: string;
+  fetch_item: DbItem | null;
+  defeat_enemy_id: number | null;
+  explore_room: DbExploreRoom | null;
+  explore_room_id: number | null;
+  objectives: DbQuestObjective[] | null;
+  rewards: DbQuestReward[] | null;
+}
+
+interface DbNpc {
+  id: number;
+  name: string;
+  dialogue: string[];
+  discovery_message: string | null;
+  npc_type: string;
+  img: string;
+  quest: DbQuest | null;
+}
+
+interface DbChest {
+  id: number;
+  item_id: string;
+  quantity: number;
+  is_locked: boolean;
+  is_open: boolean;
+  discovery_message: string | null;
+  item: DbItem | null;
+}
+
+interface DbCamp {
+  heal_amount: number;
+  restores_mana: boolean;
+  cost: number | null;
+  discovery_message: string | null;
+}
+
+interface DbTransition {
+  destination: "next_dungeon" | "sanctuary";
+  discovery_message: string | null;
+  sanctuary_available: boolean | null;
+}
+
+interface DbRoomInteraction {
+  room_id: number;
+  interaction_type: string;
+  discovery_message: string | null;
+  npcs: DbNpc | null;
+  chests: DbChest | null;
+  camps: DbCamp | null;
+  transitions: DbTransition | null;
+}
+
+const mapDbItem = (it: DbItem | null | undefined): Item | null => {
+  if (!it) return null;
+
+  const base = {
+    name: it.name,
+    value: it.value,
+    img: it.img,
+    cost: it.cost,
+  };
+
+  if (it.type === "consumable") {
+    return {
+      ...base,
+      type: "consumable",
+      effect: it.effect ?? "",
+      hpChange: it.hp_change ?? 0,
+      manaChange: it.mana_change ?? 0,
+      target: it.target ?? "single",
+      stackSize: it.stack_size ?? undefined,
+    };
+  }
+
+  return {
+    ...base,
+    type: "equipment",
+    slot: it.slot as EquipmentSlot,
+    stats: it.stats ?? {},
+    action: it.action ?? undefined,
+  };
+};
+
+const mapDbEnemy = (e: DbEnemy): Enemy => ({
+  id: e.id,
+  name: e.name,
+  health: e.health,
+  maxHealth: e.max_health ?? undefined,
+  strength: e.strength,
+  dex: e.dex,
+  defense: e.defense,
+  img: e.img,
+  expGain: e.exp_gain ?? 10,
+  type: e.type ?? "enemy",
+  phase: e.type === "boss" ? 1 : undefined,
+  phaseThresholds: Array.isArray(e.phase_thresholds)
+    ? e.phase_thresholds
+    : undefined,
+  moves: Array.isArray(e.moves) ? e.moves : undefined,
+  spawns: Array.isArray(e.spawns) ? e.spawns : undefined,
+});
+
+const mapQuestType = async (q: DbQuest): Promise<QuestType> => {
+  switch (q.quest_type) {
+    case "fetch":
+      return {
+        type: "fetch",
+        item: mapDbItem(q.fetch_item) as Item,
+      };
+    case "defeat":
+      return {
+        type: "defeat",
+        enemy: (await getEnemyById(q.defeat_enemy_id ?? 0)) as Enemy,
+      };
+    case "explore":
+      return {
+        type: "explore",
+        requireRoom: q.explore_room
+          ? {
+              id: q.explore_room.id,
+              name: q.explore_room.name,
+              sectionId: q.explore_room.section_id,
+              enemies: [],
+              neighboringRooms: [],
+              interaction: null,
+            }
+          : ({ id: q.explore_room_id ?? 0 } as Room),
+      };
+    default:
+      return { type: "fetch", item: null as unknown as Item };
+  }
+};
+
+const mapDbQuest = async (q: DbQuest): Promise<Quest> => ({
+  id: q.id,
+  name: q.name,
+  description: q.description,
+  type: await mapQuestType(q),
+  objectives: q.objectives ? q.objectives.map((o) => o.objective) : [],
+  rewards: q.rewards
+    ? q.rewards
+        .map((r) => mapDbItem(r.item))
+        .filter((item): item is Item => item !== null)
+    : [],
+  accepted: false,
+  completed: false,
+});
 
 export async function getAllRooms(): Promise<Room[]> {
   const { data: rooms, error: roomsError } = await supabase
@@ -55,30 +256,15 @@ export async function getAllRooms(): Promise<Room[]> {
       }),
   ]);
 
-  const mapDbEnemy = (e: any): Enemy => ({
-    id: e.id,
-    name: e.name,
-    health: e.health,
-    maxHealth: e.max_health ?? undefined,
-    strength: e.strength,
-    dex: e.dex,
-    defense: e.defense,
-    img: e.img,
-    expGain: e.exp_gain ?? 10,
-    type: e.type ?? 'enemy',
-    phase: e.type === 'boss' ? 1 : undefined,
-    phaseThresholds: Array.isArray(e.phase_thresholds) ? e.phase_thresholds : undefined,
-    moves: Array.isArray(e.moves) ? e.moves : undefined,
-    spawns: Array.isArray(e.spawns) ? e.spawns : undefined,
-  });
-
   const enemiesByRoom = new Map<number, Enemy[]>();
   enemiesData?.forEach((re) => {
     if (!enemiesByRoom.has(re.room_id)) {
       enemiesByRoom.set(re.room_id, []);
     }
     if (re.enemies) {
-      enemiesByRoom.get(re.room_id)!.push(mapDbEnemy(re.enemies));
+      enemiesByRoom.get(re.room_id)!.push(
+        mapDbEnemy(re.enemies as unknown as DbEnemy),
+      );
     }
   });
 
@@ -92,9 +278,9 @@ export async function getAllRooms(): Promise<Room[]> {
       .push([nr.direction as Directions, nr.neighbor_room_id]);
   });
 
-  const interactionsByRoom = new Map<number, any>();
+  const interactionsByRoom = new Map<number, DbRoomInteraction>();
   interactionsData?.forEach((ri) => {
-    interactionsByRoom.set(ri.room_id, ri);
+    interactionsByRoom.set(ri.room_id, ri as unknown as DbRoomInteraction);
   });
 
   type RoomWithNeighborIds = Omit<Room, "neighboringRooms"> & {
@@ -102,152 +288,83 @@ export async function getAllRooms(): Promise<Room[]> {
     neighboringRooms: [Directions, number][];
   };
 
+  const roomsData = rooms ?? [];
+
   const roomObjects: RoomWithNeighborIds[] = await Promise.all(
-    rooms!.map(async (room) => {
+    roomsData.map(async (room) => {
       let interaction: RoomInteraction | null = null;
       const interactionData = interactionsByRoom.get(room.id);
 
       if (interactionData) {
         switch (interactionData.interaction_type) {
           case "NPC": {
-            let mappedQuest: any | undefined = undefined;
-            if (interactionData.npcs.quest) {
-              const q = interactionData.npcs.quest;
-              const mapItem = (it: any) =>
-                it
-                  ? {
-                      name: it.name,
-                      value: it.value,
-                      img: it.img,
-                      type: it.type,
-                      effect: it.effect,
-                      hpChange: it.hp_change,
-                      manaChange: it.mana_change,
-                      stackSize: it.stack_size,
-                      slot: it.slot,
-                      cost: it.cost,
-                      stats: it.stats,
-                      action: it.action,
-                    }
-                  : null;
+            const npc = interactionData.npcs;
+            if (!npc) break;
 
-              let questTypeObj: any;
-              switch (q.quest_type) {
-                case "fetch":
-                  questTypeObj = {
-                    type: "fetch",
-                    item: mapItem(q.fetch_item),
-                  };
-                  break;
-                case "defeat":
-                  questTypeObj = {
-                    type: "defeat",
-                    enemy: await getEnemyById(q.defeat_enemy_id),
-                  };
-                  break;
-                case "explore":
-                  questTypeObj = {
-                    type: "explore",
-                    requireRoom: q.explore_room
-                      ? {
-                          id: q.explore_room.id,
-                          name: q.explore_room.name,
-                          sectionId: q.explore_room.section_id,
-                          enemies: [],
-                          neighboringRooms: [],
-                          interaction: null,
-                        }
-                      : ({ id: q.explore_room_id } as any),
-                  };
-                  break;
-                default:
-                  questTypeObj = { type: "fetch", item: null };
-              }
-
-              mappedQuest = {
-                id: q.id,
-                name: q.name,
-                description: q.description,
-                type: questTypeObj,
-                objectives: q.objectives
-                  ? q.objectives.map((o: any) => o.objective)
-                  : [],
-                rewards: q.rewards
-                  ? q.rewards
-                      .map((r: any) => (r.item ? mapItem(r.item) : null))
-                      .filter(Boolean)
-                  : [],
-                accepted: false,
-                completed: false,
-              };
-            }
+            const mappedQuest = npc.quest
+              ? await mapDbQuest(npc.quest)
+              : undefined;
 
             interaction = {
               type: "NPC",
               npc: {
-                id: interactionData.npcs.id,
-                name: interactionData.npcs.name,
-                dialogue: interactionData.npcs.dialogue,
-                discoveryMessage: interactionData.npcs.discovery_message,
-                NPCType: interactionData.npcs.npc_type,
-                img: interactionData.npcs.img,
+                id: npc.id,
+                name: npc.name,
+                dialogue: npc.dialogue,
+                discoveryMessage: npc.discovery_message ?? undefined,
+                NPCType: npc.npc_type as NPCType,
+                img: npc.img,
                 quest: mappedQuest,
               },
             };
             break;
           }
-          case "chest":
+          case "chest": {
+            const chest = interactionData.chests;
+            if (!chest) break;
             interaction = {
               type: "chest",
               chest: {
-                id: interactionData.chests.id,
-                itemId: interactionData.chests.item_id,
-                quantity: interactionData.chests.quantity,
-                isLocked: interactionData.chests.is_locked,
-                isOpen: interactionData.chests.is_open,
-                discoveryMessage: interactionData.chests.discovery_message,
-                item: interactionData.chests.item
-                  ? {
-                      name: interactionData.chests.item.name,
-                      value: interactionData.chests.item.value,
-                      img: interactionData.chests.item.img,
-                      type: interactionData.chests.item.type,
-                      effect: interactionData.chests.item.effect,
-                      hpChange: interactionData.chests.item.hp_change,
-                      manaChange: interactionData.chests.item.mana_change,
-                      stackSize: interactionData.chests.item.stack_size,
-                      slot: interactionData.chests.item.slot,
-                      cost: interactionData.chests.item.cost,
-                      stats: interactionData.chests.item.stats,
-                      action: interactionData.chests.item.action,
-                    }
-                  : null,
+                id: chest.id,
+                itemId: chest.item_id,
+                quantity: chest.quantity,
+                isLocked: chest.is_locked,
+                isOpen: chest.is_open,
+                discoveryMessage: chest.discovery_message,
+                item: mapDbItem(chest.item),
               },
             };
             break;
-          case "camp":
+          }
+          case "camp": {
+            const camp = interactionData.camps;
+            if (!camp) break;
             interaction = {
               type: "camp",
               camp: {
-                healAmount: interactionData.camps.heal_amount,
-                restoresMana: interactionData.camps.restores_mana,
-                cost: interactionData.camps.cost,
-                discoveryMessage: interactionData.camps.discovery_message,
+                healAmount: camp.heal_amount,
+                restoresMana: camp.restores_mana,
+                cost: camp.cost ?? undefined,
+                discoveryMessage: camp.discovery_message ?? undefined,
               },
             };
             break;
-          case "transition":
+          }
+          case "transition": {
+            const transition = interactionData.transitions;
+            if (!transition) break;
             interaction = {
               type: "transition",
               transition: {
-                destination: interactionData.transitions.destination,
+                destination: transition.destination,
                 discoveryMessage:
-                  interactionData.transitions.discovery_message ?? undefined,
+                  transition.discovery_message ?? undefined,
                 sanctuaryAvailable:
-                  interactionData.transitions.sanctuary_available ?? undefined,
+                  transition.sanctuary_available ?? false,
               },
             };
             break;
+          }
           case "cutscene":
             interaction = {
               type: "cutscene",
@@ -296,9 +413,13 @@ export async function getAllRooms(): Promise<Room[]> {
   });
 
   roomObjects.forEach((roomObj, index) => {
-    finalRooms[index].neighboringRooms = roomObj.neighboringRooms.map(
-      ([direction, roomId]) => [direction, roomMap.get(roomId)!],
-    ) as [Directions, Room][];
+    finalRooms[index].neighboringRooms = roomObj.neighboringRooms.flatMap(
+      ([direction, roomId]) => {
+        const neighbor = roomMap.get(roomId);
+        if (!neighbor) return [];
+        return [[direction, neighbor] as [Directions, Room]];
+      },
+    );
   });
 
   return finalRooms;
@@ -339,20 +460,5 @@ export async function getEnemyById(enemyId: number): Promise<Enemy | null> {
   if (error) throw error;
   if (!data) return null;
 
-  return {
-    id: data.id,
-    name: data.name,
-    health: data.health,
-    maxHealth: data.max_health ?? undefined,
-    strength: data.strength,
-    dex: data.dex,
-    defense: data.defense,
-    img: data.img,
-    expGain: data.exp_gain,
-    type: data.type,
-    phase: data.type === 'boss' ? 1 : undefined,
-    phaseThresholds: Array.isArray(data.phase_thresholds) ? data.phase_thresholds : undefined,
-    moves: Array.isArray(data.moves) ? data.moves : undefined,
-    spawns: Array.isArray(data.spawns) ? data.spawns : undefined,
-  } as Enemy;
+  return mapDbEnemy(data as DbEnemy);
 }

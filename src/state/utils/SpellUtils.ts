@@ -1,8 +1,10 @@
 import { Enemy } from "@/types/Enemy";
 import { Spell } from "@/types/Spell";
 import { CharacterData } from "@/types/Character";
-import { getEffectiveBuffAmount, isEnemy, handleCombatCompletion } from "./CombatUtils";
+import { ActiveBuff } from "@/types/EnemyMove";
 import { GameStatus } from "@/types/GameStatus";
+import { Room } from "@/types/Room";
+import { getEffectiveBuffAmount, isEnemy, handleCombatCompletion } from "./CombatUtils";
 
 export type SpellHandlerResult = {
   updatedParty: CharacterData[];
@@ -12,16 +14,27 @@ export type SpellHandlerResult = {
   newAccumulatedExp: number;
   gameStatus: GameStatus;
   earlyCompletion?: {
-    completion: any;
+    completion: ReturnType<typeof handleCombatCompletion>;
   };
+};
+
+export type SpellState = {
+  party: CharacterData[];
+  room: Room;
+  roomInstances: Map<number, Room>;
+  combatOrder: (CharacterData | Enemy)[];
+  activeFighterIndex: number;
+  accumulatedExp: number;
+  gameStatus: GameStatus;
+  activeBuffs?: Map<string, ActiveBuff[]>;
 };
 
 // calcDamageFn is injected to avoid a circular runtime import on GameState
 export function handleSpell(
   spell: Spell,
   target: Enemy | CharacterData | undefined,
-  state: any,
-  logBuilder: { add: (s: string) => any; build?: () => string[] },
+  state: SpellState,
+  logBuilder: { add: (s: string) => unknown; build?: () => string[] },
   calcDamageFn: (
     defense: number,
     strength: number,
@@ -46,7 +59,8 @@ export function handleSpell(
         const currentAttacker = state.combatOrder[
           state.activeFighterIndex
         ] as CharacterData;
-        const activeBuffs: Map<string, any[]> = state.activeBuffs ?? new Map();
+        const activeBuffs: Map<string, ActiveBuff[]> =
+          state.activeBuffs ?? new Map();
         let currentIntelligence = currentAttacker.abilities.int.score;
         let currentWisdom = currentAttacker.abilities.wis.score;
         currentIntelligence += getEffectiveBuffAmount(activeBuffs, currentAttacker.name, 'intelligence');

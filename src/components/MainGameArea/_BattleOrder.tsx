@@ -1,4 +1,7 @@
 import { GameState, useGameStore } from "@/state/GameState";
+import { isEnemy } from "@/state/utils/CombatUtils";
+import { CharacterData } from "@/types/Character";
+import { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
 import { memo, useEffect, useLayoutEffect, useRef } from "react";
 import mushroom from "/images/Mushroom.png";
@@ -21,7 +24,10 @@ function BattleOrderComponent() {
   const nodeMapRef = useRef(new Map<string, HTMLElement>());
   const prevRectsRef = useRef(new Map<string, DOMRect>());
 
-  const keyFor = (c: any, i: number) => (c && c.id) || c.name || `idx-${i}`;
+  const keyFor = (c: CharacterData | Enemy | undefined, i: number) =>
+    String(
+      (c && "id" in c ? c.id : undefined) ?? c?.name ?? `idx-${i}`,
+    );
 
   useLayoutEffect(() => {
     const nodeMap = nodeMapRef.current;
@@ -90,11 +96,11 @@ function BattleOrderComponent() {
                   }}
                   style={{ willChange: "transform" }}
                 >
-                  {'img' in characterOrEnemy ? (
+                  {isEnemy(characterOrEnemy) ? (
                     <div className="relative">
-                      {(characterOrEnemy as any).type === 'boss' && (
+                      {characterOrEnemy.type === 'boss' && (
                         <div className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-yellow-400 z-10">
-                          P{(characterOrEnemy as any).phase ?? 1}
+                          P{characterOrEnemy.phase ?? 1}
                         </div>
                       )}
                       <img
@@ -111,7 +117,7 @@ function BattleOrderComponent() {
                   ) : (
                     <img
                       src={mushroom}
-                      alt={(characterOrEnemy as any) + ""}
+                      alt={characterOrEnemy.name}
                       style={{
                         width: "64px",
                         height: "64x",

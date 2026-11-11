@@ -33,7 +33,9 @@ function getRoomColor(room: Room): string {
   return interactionColor.none;
 }
 
-function dirToOffset(dir: any): { dx: number; dy: number } | null {
+function dirToOffset(
+  dir: Directions | string | number,
+): { dx: number; dy: number } | null {
   if (dir === Directions.North || dir === "North" || dir === 0)
     return { dx: 0, dy: -1 };
   if (dir === Directions.West || dir === "West" || dir === 1)

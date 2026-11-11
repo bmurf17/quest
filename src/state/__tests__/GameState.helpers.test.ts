@@ -1,5 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { calcDamage, safeNextIndex, isEnemy } from '../utils/CombatUtils';
+import type { CharacterData } from '@/types/Character';
+import type { Enemy } from '@/types/Enemy';
 
 describe('GameState helpers', () => {
   it('safeNextIndex returns 0 when length is 0', () => {
@@ -21,9 +23,9 @@ describe('GameState helpers', () => {
   });
 
   it('isEnemy identifies an enemy-like object', () => {
-    const maybeEnemy: any = { id: 1, health: 10, name: 'Bad Guy' };
+    const maybeEnemy = { id: 1, health: 10, name: 'Bad Guy' } as Enemy;
     expect(isEnemy(maybeEnemy)).toBe(true);
     expect(isEnemy(undefined)).toBe(false);
-    expect(isEnemy({ name: 'Not enemy' } as any)).toBe(false);
+    expect(isEnemy({ name: 'Not enemy' } as CharacterData)).toBe(false);
   });
 });

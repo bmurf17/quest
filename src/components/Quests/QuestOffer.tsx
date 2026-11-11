@@ -30,10 +30,10 @@ export default function QuestOffer({
       >
         <>
           <QuestPanelHeader
-            title={`${(quest as any).npcName ?? quest.name}'s Quest`}
+            title={`${quest.npcName ?? quest.name}'s Quest`}
           />
           <QuestDescription
-            npcsName={(quest as any).npcName ?? quest.name}
+            npcsName={quest.npcName ?? quest.name}
             quest={quest}
             onAccepted={() => {
               onOpenChange?.(false);

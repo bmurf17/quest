@@ -463,15 +463,35 @@ function MoveForm({
   onChange: (move: MoveEntry) => void;
   onRemove: () => void;
 }) {
-  const updateMove = (field: string, value: any) => {
+  const updateMove = <K extends keyof MoveEntry>(
+    field: K,
+    value: MoveEntry[K],
+  ) => {
     onChange({ ...move, [field]: value });
   };
 
-  const updateEffect = (field: string, value: any) => {
-    onChange({ ...move, effect: { ...(move.effect as any), [field]: value } });
+  type EffectDraft = {
+    type: EnemyMoveEffect["type"];
+    target?: string;
+    stat?: string;
+    amount?: number;
+    duration?: number;
+    spawnIndex?: number;
+    count?: number;
+    damageDice?: string;
+    healDice?: string;
   };
 
-  const effectType = (move.effect as any).type;
+  const effectDraft = move.effect as unknown as EffectDraft;
+
+  const updateEffect = (field: string, value: unknown) => {
+    onChange({
+      ...move,
+      effect: { ...effectDraft, [field]: value } as unknown as EnemyMoveEffect,
+    });
+  };
+
+  const effectType = effectDraft.type;
 
   return (
     <div
@@ -529,14 +549,38 @@ function MoveForm({
           <Label htmlFor={`moveEffectType-${index}`}>Effect Type</Label>
           <StyledSelect id={`moveEffectType-${index}`} value={effectType}
             onChange={(e) => {
-              const newType = e.target.value;
-              const base: any = { type: newType };
-              if (newType === 'damage') { base.target = 'single'; }
-              else if (newType === 'heal') { base.target = 'self'; }
-              else if (newType === 'buff') { base.stat = 'strength'; base.amount = 2; base.duration = 3; base.target = 'self'; }
-              else if (newType === 'debuff') { base.stat = 'defense'; base.amount = 2; base.duration = 3; }
-              else if (newType === 'spawn') { base.spawnIndex = 0; base.count = 1; }
-              updateMove("effect", base);
+              const newType = e.target.value as EnemyMoveEffect["type"];
+              let effect: EnemyMoveEffect;
+              switch (newType) {
+                case "damage":
+                  effect = { type: "damage", target: "single" };
+                  break;
+                case "heal":
+                  effect = { type: "heal", target: "self" };
+                  break;
+                case "buff":
+                  effect = {
+                    type: "buff",
+                    stat: "strength",
+                    amount: 2,
+                    duration: 3,
+                    target: "self",
+                  };
+                  break;
+                case "debuff":
+                  effect = {
+                    type: "debuff",
+                    stat: "defense",
+                    amount: 2,
+                    duration: 3,
+                    target: "single",
+                  };
+                  break;
+                case "spawn":
+                  effect = { type: "spawn", spawnIndex: 0, count: 1 };
+                  break;
+              }
+              updateMove("effect", effect);
             }}
           >
             <option value="damage">Damage</option>
@@ -550,7 +594,7 @@ function MoveForm({
           <>
             <div>
               <Label htmlFor={`moveTarget-${index}`}>Target</Label>
-              <StyledSelect id={`moveTarget-${index}`} value={(move.effect as any).target}
+              <StyledSelect id={`moveTarget-${index}`} value={effectDraft.target}
                 onChange={(e) => updateEffect("target", e.target.value)}>
                 <option value="single">Single</option>
                 <option value="all">All</option>
@@ -559,7 +603,7 @@ function MoveForm({
             </div>
             <div>
               <Label htmlFor={`moveDice-${index}`}>Damage Dice</Label>
-              <StyledInput id={`moveDice-${index}`} placeholder="e.g. 1d8+2" value={(move.effect as any).damageDice ?? ''}
+              <StyledInput id={`moveDice-${index}`} placeholder="e.g. 1d8+2" value={effectDraft.damageDice ?? ''}
                 onChange={(e) => updateEffect("damageDice", e.target.value || undefined)} />
             </div>
           </>
@@ -568,7 +612,7 @@ function MoveForm({
           <>
             <div>
               <Label htmlFor={`healTarget-${index}`}>Target</Label>
-              <StyledSelect id={`healTarget-${index}`} value={(move.effect as any).target}
+              <StyledSelect id={`healTarget-${index}`} value={effectDraft.target}
                 onChange={(e) => updateEffect("target", e.target.value)}>
                 <option value="self">Self</option>
                 <option value="all_allies">All Allies</option>
@@ -577,7 +621,7 @@ function MoveForm({
             </div>
             <div>
               <Label htmlFor={`healDice-${index}`}>Heal Dice</Label>
-              <StyledInput id={`healDice-${index}`} placeholder="e.g. 2d6" value={(move.effect as any).healDice ?? ''}
+              <StyledInput id={`healDice-${index}`} placeholder="e.g. 2d6" value={effectDraft.healDice ?? ''}
                 onChange={(e) => updateEffect("healDice", e.target.value || undefined)} />
             </div>
           </>
@@ -586,7 +630,7 @@ function MoveForm({
           <>
             <div>
               <Label htmlFor={`buffStat-${index}`}>Stat</Label>
-              <StyledSelect id={`buffStat-${index}`} value={(move.effect as any).stat}
+              <StyledSelect id={`buffStat-${index}`} value={effectDraft.stat}
                 onChange={(e) => updateEffect("stat", e.target.value)}>
                 <option value="strength">Strength</option>
                 <option value="defense">Defense</option>
@@ -595,7 +639,7 @@ function MoveForm({
             </div>
             <div>
               <Label htmlFor={`buffTarget-${index}`}>Target</Label>
-              <StyledSelect id={`buffTarget-${index}`} value={(move.effect as any).target}
+              <StyledSelect id={`buffTarget-${index}`} value={effectDraft.target}
                 onChange={(e) => updateEffect("target", e.target.value)}>
                 <option value="self">Self</option>
                 <option value="all_allies">All Allies</option>
@@ -603,12 +647,12 @@ function MoveForm({
             </div>
             <div>
               <Label htmlFor={`buffAmount-${index}`}>Amount</Label>
-              <StyledInput id={`buffAmount-${index}`} type="number" value={(move.effect as any).amount}
+              <StyledInput id={`buffAmount-${index}`} type="number" value={effectDraft.amount}
                 onChange={(e) => updateEffect("amount", parseInt(e.target.value) || 0)} />
             </div>
             <div>
               <Label htmlFor={`buffDuration-${index}`}>Duration (turns)</Label>
-              <StyledInput id={`buffDuration-${index}`} type="number" value={(move.effect as any).duration}
+              <StyledInput id={`buffDuration-${index}`} type="number" value={effectDraft.duration}
                 onChange={(e) => updateEffect("duration", parseInt(e.target.value) || 1)} />
             </div>
           </>
@@ -617,7 +661,7 @@ function MoveForm({
           <>
             <div>
               <Label htmlFor={`debuffStat-${index}`}>Stat</Label>
-              <StyledSelect id={`debuffStat-${index}`} value={(move.effect as any).stat}
+              <StyledSelect id={`debuffStat-${index}`} value={effectDraft.stat}
                 onChange={(e) => updateEffect("stat", e.target.value)}>
                 <option value="strength">Strength</option>
                 <option value="defense">Defense</option>
@@ -626,12 +670,12 @@ function MoveForm({
             </div>
             <div>
               <Label htmlFor={`debuffAmount-${index}`}>Amount</Label>
-              <StyledInput id={`debuffAmount-${index}`} type="number" value={(move.effect as any).amount}
+              <StyledInput id={`debuffAmount-${index}`} type="number" value={effectDraft.amount}
                 onChange={(e) => updateEffect("amount", parseInt(e.target.value) || 0)} />
             </div>
             <div>
               <Label htmlFor={`debuffDuration-${index}`}>Duration (turns)</Label>
-              <StyledInput id={`debuffDuration-${index}`} type="number" value={(move.effect as any).duration}
+              <StyledInput id={`debuffDuration-${index}`} type="number" value={effectDraft.duration}
                 onChange={(e) => updateEffect("duration", parseInt(e.target.value) || 1)} />
             </div>
           </>
@@ -640,12 +684,12 @@ function MoveForm({
           <>
             <div>
               <Label htmlFor={`spawnIndex-${index}`}>Spawn Template Index</Label>
-              <StyledInput id={`spawnIndex-${index}`} type="number" value={(move.effect as any).spawnIndex}
+              <StyledInput id={`spawnIndex-${index}`} type="number" value={effectDraft.spawnIndex}
                 onChange={(e) => updateEffect("spawnIndex", parseInt(e.target.value) || 0)} />
             </div>
             <div>
               <Label htmlFor={`spawnCount-${index}`}>Count</Label>
-              <StyledInput id={`spawnCount-${index}`} type="number" value={(move.effect as any).count}
+              <StyledInput id={`spawnCount-${index}`} type="number" value={effectDraft.count}
                 onChange={(e) => updateEffect("count", parseInt(e.target.value) || 1)} />
             </div>
           </>
@@ -664,7 +708,11 @@ function CombatForm({
   enemies: EnemyEntry[];
   onChange: (enemies: EnemyEntry[]) => void;
 }) {
-  const updateEnemy = (index: number, field: keyof EnemyEntry, value: any) => {
+  const updateEnemy = <K extends keyof EnemyEntry>(
+    index: number,
+    field: K,
+    value: EnemyEntry[K],
+  ) => {
     const updated = enemies.map((e, i) =>
       i === index ? { ...e, [field]: value } : e
     );

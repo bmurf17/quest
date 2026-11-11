@@ -57,7 +57,7 @@ export const finalizeAttackState = (
   updatedEnemies: Enemy[],
   newStatus: GameStatus,
   nextIndex: number,
-  combatOrder: any[],
+  combatOrder: (CharacterData | Enemy)[],
   logMessage: string,
   hitEnemyId: string,
   lastHitCounter: number,
@@ -128,7 +128,15 @@ export function safeNextIndex(currentIndex: number, length: number): number {
   return (currentIndex + 1) % length;
 }
 
-export function scheduleEnemyTurn(getState: () => any, delay = 500) {
+export type EnemyTurnState = Pick<
+  GameState,
+  "gameStatus" | "isCurrentFighterEnemy" | "performEnemyTurn" | "isLevelingUp"
+>;
+
+export function scheduleEnemyTurn(
+  getState: () => EnemyTurnState,
+  delay = 500,
+) {
   setTimeout(() => {
     const {
       gameStatus,
