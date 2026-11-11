@@ -8,7 +8,6 @@ import {
   getPartyState,
   isGameOver,
   isInCombat,
-  isExploring,
   takeScreenshot,
 } from "../game-helpers";
 import { RunResult, ScenarioConfig } from "./types";

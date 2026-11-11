@@ -240,9 +240,12 @@ export default function ActionMenu() {
 
     if (spell.effect.type === "damage") {
       if (spell.effect.target === "single") {
-        room.enemies.length === 1
-          ? castSpell(spell, room.enemies[0])
-          : (setTargeting(true), setTargetingSpell(spell));
+        if (room.enemies.length === 1) {
+          castSpell(spell, room.enemies[0]);
+        } else {
+          setTargeting(true);
+          setTargetingSpell(spell);
+        }
       } else if (spell.effect.target === "all") {
         castSpell(spell);
       }

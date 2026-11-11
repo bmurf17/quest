@@ -52,7 +52,7 @@ function App() {
     };
 
     loadRooms();
-  }, [setRooms, loadSections, startSection, loadCutscenes]);
+  }, [setRooms, loadSections, startSection, preloadDialogueTrees, loadCutscenes]);
   return (
     <Router>
       <div className="flex flex-col h-screen bg-gray-900 text-white">

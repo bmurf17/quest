@@ -59,8 +59,10 @@ function BattleOrderComponent() {
   }, [state.combatOrder.length, state.activeFighterIndex]);
 
   useEffect(() => {
+    const nodeMap = nodeMapRef.current;
+
     return () => {
-      nodeMapRef.current.forEach((el) => {
+      nodeMap.forEach((el) => {
         if (el) {
           el.style.transform = "";
           el.style.transition = "";

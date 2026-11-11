@@ -37,7 +37,7 @@ export function handleSpell(
   let nextIndex =
     (state.activeFighterIndex + 1) % Math.max(1, combatOrder.length);
   let newAccumulatedExp = state.accumulatedExp;
-  let gameStatus: GameStatus = state.gameStatus;
+  const gameStatus: GameStatus = state.gameStatus;
 
   switch (spell.effect.type) {
     case "damage":
@@ -153,7 +153,7 @@ export function handleSpell(
     case "heal":
       if (spell.effect.target === "single" && target && "hp" in target) {
         const character = target as CharacterData;
-        let newCombatOrder = [...state.combatOrder];
+        const newCombatOrder = [...state.combatOrder];
 
         updatedParty = updatedParty.map((member) => {
           if (member.name === character.name) {
@@ -178,7 +178,7 @@ export function handleSpell(
         });
         combatOrder = newCombatOrder;
       } else if (spell.effect.target === "party") {
-        let newCombatOrder = [...state.combatOrder];
+        const newCombatOrder = [...state.combatOrder];
         updatedParty = updatedParty.map((member) => {
           const wasDead = !member.alive || member.hp <= 0;
           const newHp = Math.min(member.maxHp, member.hp + spell.effect.amount);

@@ -19,20 +19,20 @@ export default function Inventory({
   inventory: Item[];
 }) {
   const party = useGameStore((state) => state.party);
-  const useConsumable = useGameStore((state) => state.useConsumable);
+  const consumeItem = useGameStore((state) => state.consumeItem);
   const setTargeting = useGameStore((state) => state.setTargeting);
   const setTargetingConsumable = useGameStore((state) => state.setTargetingConsumable);
 
   const handleUseItem = (item: Item) => {
     const consumable = item as Consumable;
     if (consumable.target === 'all') {
-      useConsumable(consumable);
+      consumeItem(consumable);
       return;
     }
 
     const livingParty = party.filter((m) => m.alive && m.hp > 0);
     if (livingParty.length <= 1) {
-      useConsumable(consumable, livingParty[0] || party[0]);
+      consumeItem(consumable, livingParty[0] || party[0]);
       return;
     }
 

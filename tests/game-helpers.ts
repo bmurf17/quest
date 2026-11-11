@@ -140,7 +140,6 @@ export async function attackEnemy(
   logger: GameLogger,
   targetName?: string,
 ): Promise<boolean> {
-  const actionMenu = page.locator("div").filter({ hasText: /^Actions$/ }).first();
   const weaponSlot = page.locator('img[title*="Hit:"]').first();
   const count = await weaponSlot.count();
   if (count === 0) {
@@ -287,7 +286,6 @@ export async function speakToNPC(page: Page, logger: GameLogger): Promise<boolea
     return true;
   }
 
-  const dialogueChoices = page.locator("button").filter({ hasText: /^[A-Z]/ });
   const dialoguePanel = page.locator("div").filter({ has: page.locator("p") }).first();
   const choices = dialoguePanel.locator("button");
   if ((await choices.count()) > 0) {

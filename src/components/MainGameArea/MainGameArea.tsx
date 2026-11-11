@@ -35,11 +35,16 @@ export default function MainGameArea() {
     }
   }, [party.length, navigate]);
 
+  const cutsceneId =
+    room.interaction?.type === "cutscene"
+      ? room.interaction.cutscene.cutsceneId
+      : null;
+
   useEffect(() => {
-    if (room.interaction?.type === "cutscene") {
-      playCutscene(room.interaction.cutscene.cutsceneId);
+    if (cutsceneId) {
+      playCutscene(cutsceneId);
     }
-  }, [room.id, playCutscene]);
+  }, [room.id, cutsceneId, playCutscene]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {

@@ -19,7 +19,7 @@ export default function Party({ party }: Props) {
   const targetingSpell = useGameStore((state) => state.targetingSpell);
   const targetingConsumable = useGameStore((state) => state.targetingConsumable);
   const castSpell = useGameStore((state) => state.castSpell);
-  const useConsumable = useGameStore((state) => state.useConsumable);
+  const consumeItem = useGameStore((state) => state.consumeItem);
   const setTargeting = useGameStore((state) => state.setTargeting);
   const setTargetingSpell = useGameStore((state) => state.setTargetingSpell);
   const setTargetingConsumable = useGameStore((state) => state.setTargetingConsumable);
@@ -39,7 +39,7 @@ export default function Party({ party }: Props) {
       setTargeting(false);
       setTargetingSpell(null);
     } else if (isTargetingConsumable) {
-      useConsumable(targetingConsumable, character);
+      consumeItem(targetingConsumable, character);
       setTargeting(false);
       setTargetingConsumable(null);
     } else {

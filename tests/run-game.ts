@@ -148,6 +148,7 @@ async function startDevServer(): Promise<void> {
       return;
     }
   } catch {
+    // Dev server is not already running; start one below.
   }
 
   process.stdout.write("  Starting Vite dev server...\n");

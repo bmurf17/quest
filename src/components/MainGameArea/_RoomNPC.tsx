@@ -26,7 +26,7 @@ export default function RoomNPC() {
     } else {
       startDialogue(interaction.npc);
     }
-  }, [npcId, dialogueTrees]);
+  }, [interaction, npcId, dialogueTrees, startDialogue]);
 
   if (!currentRoom || interaction?.type !== "NPC") {
     return null;

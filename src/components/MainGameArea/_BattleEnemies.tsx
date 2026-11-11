@@ -32,13 +32,13 @@ function BattleEnemiesComponent() {
 
       return () => clearTimeout(timer);
     }
-  }, [lastHitEnemyId, lastHitCounter]); 
+  }, [lastHitEnemyId, lastHitCounter, playHitSound]);
 
   useEffect(() => {
     if (lastDefeatedEnemyId) {
       playDefeatSound();
     }
-  }, [lastDefeatedEnemyId, lastDefeatedCounter]);
+  }, [lastDefeatedEnemyId, lastDefeatedCounter, playDefeatSound]);
 
   const handleEnemyClick = (enemy: any) => {
     if (isTargeting) {
@@ -72,10 +72,6 @@ function BattleEnemiesComponent() {
     if (pct > 0.3) return 'bg-yellow-500';
     return 'bg-red-500';
   };
-
-  if(currentRoom.enemies ) {
-    console.log("Enemies in room:", currentRoom.enemies.map(e => ({id: e.id, name: e.name, health: e.health, maxHealth: getEnemyMaxHealth(e), moves: e.moves})));
-  }
 
   return (
     <>

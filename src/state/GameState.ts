@@ -70,7 +70,7 @@ export interface GameState {
   enterCombat: () => void;
   isCurrentFighterEnemy: () => boolean;
   performEnemyTurn: () => void;
-  useConsumable: (item: Consumable, target?: CharacterData) => void;
+  consumeItem: (item: Consumable, target?: CharacterData) => void;
   buyItem: (item: Item) => void;
   equipItem: (characterName: string, itemName: string) => void;
   unequipItem: (characterName: string, slot: keyof CharacterEquipment) => void;
@@ -968,10 +968,10 @@ export const useGameStore = create<GameState>((set, get) => ({
       };
     }),
 
-  useConsumable: (item: Consumable, target?: CharacterData) => {
+  consumeItem: (item: Consumable, target?: CharacterData) => {
     set((state) => {
       const logBuilder = new ActivityLogBuilder().add(`${item.effect}`);
-      let newCombatOrder = [...state.combatOrder];
+      const newCombatOrder = [...state.combatOrder];
 
       const updatedParty = state.party.map((member) => {
         if (target && member.name !== target.name) return member;
