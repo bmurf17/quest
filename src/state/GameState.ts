@@ -40,6 +40,7 @@ import {
   tickCooldowns,
 } from "./utils/CombatUtils";
 import { handleSpell } from "./utils/SpellUtils";
+import { ActivityLogBuilder } from "./utils/ActivityLogUtils";
 import { TavernConfig, DEFAULT_TAVERN_CONFIG } from "@/types/Tavern";
 import { generateTavernCandidates } from "./utils/TavernUtils";
 
@@ -1626,25 +1627,3 @@ export const useGameStore = create<GameState>((set, get) => ({
     });
   },
 }));
-
-
-
-class ActivityLogBuilder {
-  private messages: string[] = [];
-
-  add(message: string): this {
-    this.messages.push(message);
-    return this;
-  }
-
-  addIf(condition: boolean, message: string): this {
-    if (condition) {
-      this.messages.push(message);
-    }
-    return this;
-  }
-
-  build(): string[] {
-    return [...this.messages];
-  }
-}
