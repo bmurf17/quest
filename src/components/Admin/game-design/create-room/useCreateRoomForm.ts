@@ -3,6 +3,7 @@ import mushroom from "/images/Mushroom.png";
 import blord from "/images/Blord.png";
 import { supabase } from "@/queries/RoomQueries";
 import { useGameStore } from "@/state/GameState";
+import { logger } from "@/lib/logger";
 import { Directions } from "@/types/Directions";
 import type { Room } from "@/types/Room";
 import { startRoom } from "@/data/fixtures/rooms";
@@ -312,7 +313,7 @@ export function useCreateRoomForm() {
         "error",
         err instanceof Error ? err.message : "An unknown error occurred",
       );
-      console.error("Error creating room:", err);
+      logger.error("Error creating room:", err);
     } finally {
       setIsSubmitting(false);
       submittingRef.current = false;

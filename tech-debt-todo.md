@@ -188,15 +188,25 @@ sections live in `components/action-menu/`.
 - [x] **Strategy documented** in `docs/conventions.md` § Styling: Tailwind utilities + theme tokens first, global component classes for selectors/keyframes, module-level `CSSProperties` for static objects, inline `style` only for runtime-computed values. No CSS modules or CSS-in-JS.
 - [x] `tsc -b`, `vitest run` (58 tests), `eslint` (0 errors / 3 pre-existing fast-refresh warnings), and `vite build` all pass.
 
-### 13. Improve resilience and UX
+### 13. Improve resilience and UX — ✅ Done
 
-- [ ] Add a top-level React `ErrorBoundary` around the lazy `Suspense` routes (`App.tsx`)
-- [ ] `App.tsx:50` only `console.error`s a failed room load — show a retry/error state instead of a blank game
-- [ ] `src/lib/supabase.ts` casts missing env vars to `string`; fail fast with a clear message if `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` are absent
-- [ ] Add `.env.example` and document required variables
-- [ ] Remove/merge the duplicate `src/.env` and root `.env` (both currently gitignored, but two sources are confusing)
-- [ ] `useSound` logs playback failures only to console; surface or silence intentionally
-- [ ] Replace debug logging with a `logger` gated by `VITE_DEBUG_MODE`
+- [x] Add a top-level React `ErrorBoundary` around the lazy `Suspense` routes (`App.tsx`)
+- [x] `App.tsx:50` only `console.error`s a failed room load — show a retry/error state instead of a blank game
+- [x] `src/lib/supabase.ts` casts missing env vars to `string`; fail fast with a clear message if `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` are absent
+- [x] Add `.env.example` and document required variables
+- [x] Remove/merge the duplicate `src/.env` and root `.env` (both currently gitignored, but two sources are confusing)
+- [x] `useSound` logs playback failures only to console; surface or silence intentionally
+- [x] Replace debug logging with a `logger` gated by `VITE_DEBUG_MODE`
+
+`ErrorBoundary` (`src/components/ErrorBoundary.tsx`) wraps the lazy routes with a
+reload action. `App.tsx` tracks load failures, cancels stale requests, and shows
+a `Retry` panel instead of a blank game. `src/lib/supabase.ts` now throws a
+descriptive error if either Supabase variable is missing. Logging goes through
+`src/lib/logger.ts`: `debug`/`info` are gated by `VITE_DEBUG_MODE`, while
+`warn`/`error` always emit. `useSound` deliberately downgrades autoplay
+failures to debug output. Vite reads env vars from the root `.env` only, so
+`src/.env` was merged into it and removed; `.env.example` plus the README now
+document every variable.
 
 ### 14. Accessibility
 

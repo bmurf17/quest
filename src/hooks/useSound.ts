@@ -1,4 +1,5 @@
 import { useRef, useEffect, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 
 export function useSound(url: string, volume: number = 0.5) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -18,7 +19,9 @@ export function useSound(url: string, volume: number = 0.5) {
   const play = useCallback(() => {
     if (audioRef.current) {
       audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(err => console.log('Audio play failed:', err));
+      // Autoplay can legitimately be blocked by the browser; keep this quiet
+      // in normal builds and only surface it while debugging.
+      audioRef.current.play().catch(err => logger.debug('Audio play failed:', err));
     }
   }, []);
 

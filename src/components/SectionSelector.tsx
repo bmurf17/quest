@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useGameStore } from "@/state/GameState";
+import { logger } from "@/lib/logger";
 import { colors, fonts } from "@/theme";
 import type { CSSProperties } from "react";
 
@@ -30,7 +31,7 @@ export default function SectionSelector({
       startSection(sectionId, rooms);
       onOpenChange(false);
     } catch (err) {
-      console.error("Failed to load section:", err);
+      logger.error("Failed to load section:", err);
     }
   };
 

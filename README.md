@@ -1,52 +1,44 @@
-# React + TypeScript + Vite
+# Quest
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React + TypeScript + Vite dungeon-crawler, backed by Supabase.
+
+## Setup
+
+Requires Node.js and pnpm.
+
+```bash
+pnpm install
+cp .env.example .env
+# Fill in VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
+pnpm dev
+```
+
+### Environment variables
+
+The app reads these from the root `.env` file (Vite's default env directory):
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `VITE_SUPABASE_URL` | yes | Supabase project URL. The app fails fast at startup if this is missing. |
+| `VITE_SUPABASE_ANON_KEY` | yes | Supabase anonymous/public API key. |
+| `VITE_DEBUG_MODE` | no | Set to `true` to emit `logger.debug`/`logger.info` output. Defaults to silent. |
+
+See [.env.example](.env.example) for a template. Do not commit `.env`; it is
+gitignored.
+
+## Scripts
+
+```bash
+pnpm dev            # start Vite
+pnpm build          # type-check and build for production
+pnpm preview        # preview the production build
+pnpm lint           # ESLint
+pnpm test           # Vitest (watch mode)
+pnpm test:coverage  # Vitest with coverage floors
+pnpm e2e            # Playwright smoke tests
+```
+
+## Docs
 
 See [docs/conventions.md](docs/conventions.md) for the project's import, component layout, deep-import, and styling conventions.
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
-
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
