@@ -70,28 +70,40 @@ Recommended approach:
 
 `npx eslint .` now reports **0 errors / 3 warnings** (the pre-existing `react-refresh/only-export-components` warnings).
 
-### 4. Harden save/load
+### 4. Harden save/load — ✅ Done
 
-- [ ] `version: 1` is written but never read — add migration/upgrade handling
-- [ ] `getSaveData` does `JSON.parse(raw) as SaveData` with no validation — validate the schema (e.g. Zod) and reject/repair bad imports
-- [ ] `importSaveFromJson` trusts any parsed object before writing to localStorage
-- [ ] `denormalizeNeighbors` silently creates `"Unknown"` stub rooms for missing IDs (buries data bugs). Log/throw, or surface as a load error
-- [ ] `loadGame` does a large manual field copy; derive it from a shared save-shape helper so new state fields can't be forgotten
-- [ ] Only `DevPanel` can save/load today; confirm that is intentional before building on it
+- [x] `version` is now read and migrated. `SAVE_VERSION = 2`; `saveSchema.ts` runs ordered migrations from v0/v1 and rejects future versions.
+- [x] `getSaveData` parses with a Zod schema (`saveSchema.ts`). Invalid saves throw a `SaveDataError` with a field path; legacy saves are repaired with defaults by migrations.
+- [x] `importSaveFromJson` validates and migrates the parsed file before writing to localStorage, and surfaces the validation message in `DevPanel`.
+- [x] `denormalizeNeighbors` throws on missing room IDs instead of creating `"Unknown"` stubs. `loadGame` now links rooms in two passes so forward neighbor references resolve to the real (canonical) room objects.
+- [x] `SaveData` direct fields live in `DIRECT_SAVE_FIELDS` (`saveLoad.ts`); a compile-time completeness check forces new fields to be classified, and both `saveToSlot` and `loadGame` use `pickDirectSaveFields`.
+- [x] Confirmed `DevPanel` is intentionally the only save/load surface for now (dev tooling); there is no in-game save menu yet.
+- [x] Added `saveSchema.test.ts` and `saveTransforms.test.ts` covering migrations, version rejection, invalid input, and dangling neighbor references. `tsc -b`, `vitest run` (15 tests), and `eslint` pass.
 
-### 5. Split the `GameState` god store
+### 5. Split the `GameState` god store — ✅ Done
 
-`src/state/GameState.ts` is **1,628 lines** and owns combat, dialogue, inventory, movement, cutscenes, tavern, quests, sections, leveling, and save loading.
+`src/state/GameState.ts` is now a **28-line composition root**; the store is built from focused slices while keeping the public `useGameStore` API (and the `GameState` type) unchanged.
 
-Suggested slices:
+Slices in `src/state/slices/`:
 
-- [ ] `useCombatStore` — attack, enterCombat, enemy turns, buffs, cooldowns, spells
-- [ ] `useDialogueStore` — active dialogue, choices, outcomes, flags, disposition
-- [ ] `useInventoryStore` — items, gold, consumables, equip/unequip, shop
-- [ ] `useWorldStore` — rooms, movement, sections, cutscenes
-- [ ] `usePartyStore` — party, leveling, tavern recruits, quests/activity log
+- [x] `combatSlice` — attack, enterCombat, enemy turns, buffs, cooldowns, spells/targeting
+- [x] `dialogueSlice` — active dialogue, choices, outcomes, flags, disposition
+- [x] `inventorySlice` — items, gold, consumables, equip/unequip, shop
+- [x] `worldSlice` — rooms, movement, chests, sections, cutscenes
+- [x] `partySlice` — party, leveling, tavern recruits, quests, town
+- [x] `activitySlice` — activity log
+- [x] `saveSlice` — `loadGame`
+- [x] `slices/types.ts` — the combined `GameState` interface and `GameSlice` helper
 
-Also extract the very long actions into pure helpers (several already exist in `state/utils/`, but `useConsumable`, `castSpell`, `move`, `attack`, and `loadGame` remain large inline closures).
+Slices are composed into one zustand store rather than five independent stores: combat, dialogue, inventory, and world actions read and write each other's state (e.g. an attack updates party, room, quests, and leveling), so separate stores would have required cross-store subscriptions and duplicated state. The split improves file size and reviewability without changing behaviour.
+
+Long actions extracted into pure helpers under `state/utils/`:
+
+- [x] `InventoryUtils.applyConsumable` / `equipItemInState` / `unequipItemInState`
+- [x] `EnemyTurnUtils.resolveEnemyTurn` (the enemy-move switch)
+- [x] `AttackUtils.resolveAttack`
+- [x] `WorldUtils.resolveMove` / `getCurrentRoomInstance` / `getRoomInstanceKey`
+- [x] `saveTransforms.hydrateRoomInstances` (the two-pass room linking used by `loadGame`)
 
 ### 6. Fix test coverage
 

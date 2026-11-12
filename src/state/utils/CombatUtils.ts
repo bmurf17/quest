@@ -52,8 +52,13 @@ export const handleCombatCompletion = (
   };
 };
 
+export type AttackFinalizeState = Pick<
+  GameState,
+  "activityLog" | "roomInstances" | "room" | "lastDefeatedCounter" | "quests"
+>;
+
 export const finalizeAttackState = (
-  state: GameState,
+  state: AttackFinalizeState,
   updatedEnemies: Enemy[],
   newStatus: GameStatus,
   nextIndex: number,

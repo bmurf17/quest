@@ -1,20 +1,24 @@
 import type { Room, Section } from "@/types/Room";
-import type { Directions } from "@/types/Directions";
 import type { CharacterData } from "@/types/Character";
 import type { Consumable, Item } from "@/types/Item";
 import type { Enemy } from "@/types/Enemy";
 import type { DialogueNode, Quest } from "@/types/RoomInteractions";
 import type { Spell } from "@/types/Spell";
 import type { ActiveBuff } from "@/types/EnemyMove";
+import type { GameStatus } from "@/types/GameStatus";
 import { useGameStore } from "./GameState";
+import type { GameState } from "./GameState";
+import { normalizeNeighbors, type SerializedRoom } from "./saveTransforms";
+import {
+  parseSaveData,
+  SaveDataError,
+  SAVE_VERSION,
+} from "./saveSchema";
 
-/**
- * A room as it is written to storage: neighbor references are room IDs rather
- * than nested room objects, which avoids cycles when serializing to JSON.
- */
-export type SerializedRoom = Omit<Room, "neighboringRooms"> & {
-  neighboringRooms: [Directions, number][];
-};
+export type { SerializedRoom };
+export { normalizeNeighbors } from "./saveTransforms";
+export { denormalizeNeighbors } from "./saveTransforms";
+export { SaveDataError, SAVE_VERSION } from "./saveSchema";
 
 export interface SaveData {
   version: number;
@@ -32,7 +36,7 @@ export interface SaveData {
   availableSections: Section[];
   currentRoomId: number;
   roomInstances: [number, SerializedRoom][];
-  gameStatus: number;
+  gameStatus: GameStatus;
   combatOrder: (CharacterData | Enemy)[];
   activeFighterIndex: number;
   activeDialogue: DialogueNode | null;
@@ -55,71 +59,83 @@ export interface SaveData {
   activeBuffs: [string, ActiveBuff[]][];
 }
 
-const SAVE_PREFIX = "quest_save_";
+/**
+ * Save fields that are copied verbatim between the store and a save file.
+ * Keeping the list in one place prevents `saveToSlot` and `loadGame` from
+ * drifting apart when state fields are added.
+ */
+export const DIRECT_SAVE_FIELDS = [
+  "party",
+  "activityLog",
+  "inventory",
+  "goldPieces",
+  "accumulatedExp",
+  "quests",
+  "conversationFlags",
+  "currentSection",
+  "beatenSections",
+  "availableSections",
+  "gameStatus",
+  "combatOrder",
+  "activeFighterIndex",
+  "activeDialogue",
+  "currentDialogueNodeId",
+  "dialogueIndex",
+  "lastHitEnemyId",
+  "lastHitCounter",
+  "lastDefeatedEnemyId",
+  "lastDefeatedCounter",
+  "isTargeting",
+  "targetingSpell",
+  "targetingConsumable",
+  "isLevelingUp",
+  "levelingUpChars",
+  "currentLevelingCharIndex",
+  "cutsceneSceneIndex",
+] as const;
 
-export function getSaveKeys(): string[] {
-  const keys: string[] = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key?.startsWith(SAVE_PREFIX)) {
-      keys.push(key.slice(SAVE_PREFIX.length));
-    }
+export type DirectSaveField = (typeof DIRECT_SAVE_FIELDS)[number];
+
+/** Fields that need normalization or are metadata rather than raw state. */
+export const SPECIAL_SAVE_FIELDS = [
+  "version",
+  "timestamp",
+  "label",
+  "currentRoomId",
+  "roomInstances",
+  "dialogueTrees",
+  "activeCutsceneId",
+  "enemyCooldowns",
+  "activeBuffs",
+] as const;
+
+type SpecialSaveField = (typeof SPECIAL_SAVE_FIELDS)[number];
+
+// Compile-time completeness check: adding a field to SaveData without listing
+// it here (or handling it specially) is a type error.
+type MissingSaveFields = Exclude<
+  keyof SaveData,
+  DirectSaveField | SpecialSaveField
+>;
+const _saveShapeIsComplete: MissingSaveFields extends never ? true : never = true;
+void _saveShapeIsComplete;
+
+/**
+ * Copy the directly-serialized fields from either a `SaveData` object or the
+ * game store. Used by both save and load so the two stay in sync.
+ */
+export function pickDirectSaveFields<
+  T extends Pick<SaveData, DirectSaveField>,
+>(source: T): Pick<SaveData, DirectSaveField> {
+  const result = {} as Pick<SaveData, DirectSaveField>;
+  const writable = result as Record<DirectSaveField, unknown>;
+  for (const field of DIRECT_SAVE_FIELDS) {
+    writable[field] = source[field];
   }
-  return keys;
+  return result;
 }
 
-export function getSaveLabel(slotName: string): string | null {
-  try {
-    const raw = localStorage.getItem(SAVE_PREFIX + slotName);
-    if (!raw) return null;
-    const data: SaveData = JSON.parse(raw);
-    return data.label || slotName;
-  } catch {
-    return null;
-  }
-}
-
-export function deleteSave(slotName: string): void {
-  localStorage.removeItem(SAVE_PREFIX + slotName);
-}
-
-export function normalizeNeighbors(room: Room): SerializedRoom {
-  return {
-    ...room,
-    neighboringRooms: room.neighboringRooms.map(
-      ([dir, neighborRoom]: [Directions, Room]) => [dir, neighborRoom.id],
-    ),
-  };
-}
-
-export function denormalizeNeighbors(
-  room: SerializedRoom,
-  roomLookup: Map<number, Room>,
-): Room {
-  return {
-    ...room,
-    neighboringRooms: room.neighboringRooms.map(
-      ([dir, neighborId]: [Directions, number]) => {
-        const found = roomLookup.get(neighborId);
-        if (found) return [dir, found];
-        const stub: Room = {
-          id: neighborId,
-          name: "Unknown",
-          sectionId: 0,
-          enemies: [],
-          neighboringRooms: [],
-          interaction: null,
-        };
-        roomLookup.set(neighborId, stub);
-        return [dir, stub];
-      },
-    ),
-  };
-}
-
-export function saveToSlot(slotName: string): void {
-  const state = useGameStore.getState();
-
+export function buildSaveData(state: GameState, slotName: string): SaveData {
   const roomInstances: [number, SerializedRoom][] = [];
   state.roomInstances.forEach((room: Room, id: number) => {
     roomInstances.push([id, normalizeNeighbors(room)]);
@@ -140,53 +156,71 @@ export function saveToSlot(slotName: string): void {
     activeBuffs.push([name, buffs]);
   });
 
-  const data: SaveData = {
-    version: 1,
+  return {
+    version: SAVE_VERSION,
     timestamp: Date.now(),
     label: slotName,
-    party: state.party,
-    activityLog: state.activityLog,
-    inventory: state.inventory,
-    goldPieces: state.goldPieces,
-    accumulatedExp: state.accumulatedExp,
-    quests: state.quests,
-    conversationFlags: state.conversationFlags,
-    currentSection: state.currentSection,
-    beatenSections: state.beatenSections,
-    availableSections: state.availableSections,
     currentRoomId: state.room.id,
     roomInstances,
-    gameStatus: state.gameStatus,
-    combatOrder: state.combatOrder,
-    activeFighterIndex: state.activeFighterIndex,
-    activeDialogue: state.activeDialogue,
-    currentDialogueNodeId: state.currentDialogueNodeId,
-    dialogueIndex: state.dialogueIndex,
-    lastHitEnemyId: state.lastHitEnemyId,
-    lastHitCounter: state.lastHitCounter,
-    lastDefeatedEnemyId: state.lastDefeatedEnemyId,
-    lastDefeatedCounter: state.lastDefeatedCounter,
-    isTargeting: state.isTargeting,
-    targetingSpell: state.targetingSpell,
-    targetingConsumable: state.targetingConsumable,
-    isLevelingUp: state.isLevelingUp,
-    levelingUpChars: state.levelingUpChars,
-    currentLevelingCharIndex: state.currentLevelingCharIndex,
     dialogueTrees,
     activeCutsceneId: state.activeCutscene?.id ?? null,
-    cutsceneSceneIndex: state.cutsceneSceneIndex,
     enemyCooldowns,
     activeBuffs,
+    ...pickDirectSaveFields(state),
   };
+}
 
+const SAVE_PREFIX = "quest_save_";
+
+export function getSaveKeys(): string[] {
+  const keys: string[] = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key?.startsWith(SAVE_PREFIX)) {
+      keys.push(key.slice(SAVE_PREFIX.length));
+    }
+  }
+  return keys;
+}
+
+export function getSaveLabel(slotName: string): string | null {
+  const data = peekSaveData(slotName);
+  return data ? data.label || slotName : null;
+}
+
+export function deleteSave(slotName: string): void {
+  localStorage.removeItem(SAVE_PREFIX + slotName);
+}
+
+export function saveToSlot(slotName: string): void {
+  const data = buildSaveData(useGameStore.getState(), slotName);
   localStorage.setItem(SAVE_PREFIX + slotName, JSON.stringify(data));
 }
 
+/**
+ * Read and validate a save. Returns `null` when the slot does not exist, and
+ * throws {@link SaveDataError} when the stored data is corrupt or unsupported.
+ */
 export function getSaveData(slotName: string): SaveData | null {
+  const raw = localStorage.getItem(SAVE_PREFIX + slotName);
+  if (!raw) return null;
+
+  let parsed: unknown;
   try {
-    const raw = localStorage.getItem(SAVE_PREFIX + slotName);
-    if (!raw) return null;
-    return JSON.parse(raw) as SaveData;
+    parsed = JSON.parse(raw);
+  } catch {
+    throw new SaveDataError(`Save "${slotName}" is not valid JSON`);
+  }
+  return parseSaveData(parsed);
+}
+
+/**
+ * Like {@link getSaveData}, but swallows errors. Use this for save-slot
+ * listings where a corrupt slot should not break the whole UI.
+ */
+export function peekSaveData(slotName: string): SaveData | null {
+  try {
+    return getSaveData(slotName);
   } catch {
     return null;
   }
@@ -211,12 +245,26 @@ export function importSaveFromJson(file: File): Promise<string | null> {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        const data = JSON.parse(e.target?.result as string) as SaveData;
+        let parsed: unknown;
+        try {
+          parsed = JSON.parse(String(e.target?.result));
+        } catch {
+          throw new SaveDataError("Save file is not valid JSON");
+        }
+        // Validate and migrate before touching localStorage.
+        const data = parseSaveData(parsed);
         const slotName = data.label || `imported_${Date.now()}`;
-        localStorage.setItem(SAVE_PREFIX + slotName, JSON.stringify(data));
+        localStorage.setItem(
+          SAVE_PREFIX + slotName,
+          JSON.stringify({ ...data, label: slotName }),
+        );
         resolve(slotName);
-      } catch {
-        reject(new Error("Invalid save file"));
+      } catch (error) {
+        reject(
+          error instanceof SaveDataError
+            ? error
+            : new Error("Invalid save file"),
+        );
       }
     };
     reader.onerror = () => reject(new Error("Failed to read file"));

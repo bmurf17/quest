@@ -7,8 +7,10 @@ import {
   getSaveLabel,
   deleteSave,
   getSaveData,
+  peekSaveData,
   exportSaveAsJson,
   importSaveFromJson,
+  SaveDataError,
 } from "../state/saveLoad";
 
 const btnBase: React.CSSProperties = {
@@ -55,13 +57,19 @@ export default function DevPanel() {
 
   const handleLoad = useCallback(
     (slot: string) => {
-      const data = getSaveData(slot);
-      if (!data) {
-        flash("Save not found");
-        return;
+      try {
+        const data = getSaveData(slot);
+        if (!data) {
+          flash("Save not found");
+          return;
+        }
+        loadGame(data);
+        flash(`Loaded: ${slot}`);
+      } catch (error) {
+        flash(
+          error instanceof SaveDataError ? error.message : "Failed to load save",
+        );
       }
-      loadGame(data);
-      flash(`Loaded: ${slot}`);
     },
     [loadGame, flash],
   );
@@ -91,7 +99,13 @@ export default function DevPanel() {
           refresh();
           flash(`Imported: ${slot}`);
         })
-        .catch(() => flash("Import failed"));
+        .catch((error) => {
+          flash(
+            error instanceof SaveDataError
+              ? error.message
+              : "Import failed",
+          );
+        });
       e.target.value = "";
     },
     [refresh, flash],
@@ -214,7 +228,7 @@ export default function DevPanel() {
         )}
         {saves.map((slot) => {
           const label = getSaveLabel(slot);
-          const data = getSaveData(slot);
+          const data = peekSaveData(slot);
           return (
             <div
               key={slot}
