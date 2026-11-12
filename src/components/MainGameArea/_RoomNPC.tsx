@@ -1,5 +1,6 @@
-import { GameState, useGameStore } from "@/state/GameState";
-import { DialogueNode, NPC } from "@/types/RoomInteractions";
+import type { GameState} from "@/state/GameState";
+import { useGameStore } from "@/state/GameState";
+import type { DialogueNode, NPC } from "@/types/RoomInteractions";
 import { useEffect, useRef } from "react";
 
 export default function RoomNPC() {

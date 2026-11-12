@@ -1,5 +1,5 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Quest } from "@/types/RoomInteractions";
+import type { Quest } from "@/types/RoomInteractions";
 import { colors, fonts } from "@/theme";
 import { useGameStore } from "@/state/GameState";
 import { QuestSectionBox, QuestSectionLabel } from "./_QuestPanelParts";

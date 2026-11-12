@@ -1,6 +1,6 @@
-import { EnemyMoveEffect } from "@/types/EnemyMove";
+import type { EnemyMoveEffect } from "@/types/EnemyMove";
 import { fonts } from "@/theme";
-import { MoveEntry } from "./formTypes";
+import type { MoveEntry } from "./formTypes";
 import { Label, StyledInput, StyledSelect } from "./primitives";
 
 export function MoveForm({

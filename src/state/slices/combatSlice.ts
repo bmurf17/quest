@@ -10,11 +10,11 @@ import {
   isEnemy,
   safeNextIndex,
   scheduleEnemyTurn,
-} from "../utils/CombatUtils";
-import { resolveAttack } from "../utils/AttackUtils";
-import { resolveEnemyTurn } from "../utils/EnemyTurnUtils";
-import { handleSpell } from "../utils/SpellUtils";
-import { ActivityLogBuilder } from "../utils/ActivityLogUtils";
+} from "@/state/utils/CombatUtils";
+import { resolveAttack } from "@/state/utils/AttackUtils";
+import { resolveEnemyTurn } from "@/state/utils/EnemyTurnUtils";
+import { handleSpell } from "@/state/utils/SpellUtils";
+import { ActivityLogBuilder } from "@/state/utils/ActivityLogUtils";
 import type { GameState, GameSlice } from "./types";
 
 export type CombatSlice = Pick<

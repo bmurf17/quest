@@ -3,7 +3,7 @@ import type { Quest } from "@/types/RoomInteractions";
 import { GameStatus } from "@/types/GameStatus";
 import { DEFAULT_TAVERN_CONFIG } from "@/data/tavern";
 import type { TavernConfig } from "@/types/Tavern";
-import { generateTavernCandidates } from "../utils/TavernUtils";
+import { generateTavernCandidates } from "@/state/utils/TavernUtils";
 import type { GameState, GameSlice } from "./types";
 
 export type PartySlice = Pick<

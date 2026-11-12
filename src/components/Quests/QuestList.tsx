@@ -5,7 +5,7 @@ import {
 } from "@/components/ui/dialog";
 import { colors, fonts } from "@/theme";
 import { useGameStore } from "@/state/GameState";
-import { Quest } from "@/types/RoomInteractions";
+import type { Quest } from "@/types/RoomInteractions";
 import QuestDescription from "./_QuestDescription";
 import { QuestPanelHeader } from "./_QuestPanelParts";
 import { ScrollArea } from "@radix-ui/react-scroll-area";

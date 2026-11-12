@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useGameStore } from "@/state/GameState";
-import { CharacterData } from "@/types/Character";
+import type { CharacterData } from "@/types/Character";
 import { colors, fonts } from "@/theme";
 import { TavernCharacterCard } from "./tavern/TavernCharacterCard";
 import { CharacterDetailDialog } from "./tavern/CharacterDetailDialog";

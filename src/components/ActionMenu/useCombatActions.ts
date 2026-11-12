@@ -1,6 +1,6 @@
 import { useGameStore } from "@/state/GameState";
-import { CharacterData } from "@/types/Character";
-import { Spell } from "@/types/Spell";
+import type { CharacterData } from "@/types/Character";
+import type { Spell } from "@/types/Spell";
 
 export function useCombatActions() {
   const attack = useGameStore((state) => state.attack);

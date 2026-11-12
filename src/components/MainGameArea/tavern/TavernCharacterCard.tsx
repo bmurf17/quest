@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { CharacterData } from "@/types/Character";
+import type { CharacterData } from "@/types/Character";
 import { colors, fonts } from "@/theme";
-import { StatBar } from "@/components/Shared/StatBar";
+import { StatBar } from "@/components/shared/StatBar";
 import { TavernAbilityTooltip } from "./TavernAbilityTooltip";
 
 export function TavernCharacterCard({

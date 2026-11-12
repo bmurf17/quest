@@ -1,6 +1,6 @@
 import { supabase } from "@/queries/RoomQueries";
 import { useGameStore } from "@/state/GameState";
-import { Section } from "@/types/Room";
+import type { Section } from "@/types/Room";
 import { useEffect, useState } from "react";
 import { colors, fonts } from "@/theme";
 

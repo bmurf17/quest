@@ -8,7 +8,7 @@ import {
   handleCombatCompletion,
   safeNextIndex,
 } from "./CombatUtils";
-import type { GameState } from "../slices/types";
+import type { GameState } from "@/state/slices/types";
 
 export type AttackState = Pick<
   GameState,

@@ -4,7 +4,7 @@ import { GameStatus } from "@/types/GameStatus";
 import type { Room } from "@/types/Room";
 import { getDiscoveryMessage } from "@/lib/roomInteractions";
 import { ActivityLogBuilder } from "./ActivityLogUtils";
-import type { GameState } from "../slices/types";
+import type { GameState } from "@/state/slices/types";
 
 export type MoveState = Pick<
   GameState,

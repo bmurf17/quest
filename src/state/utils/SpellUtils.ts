@@ -1,9 +1,9 @@
-import { Enemy } from "@/types/Enemy";
-import { Spell } from "@/types/Spell";
-import { CharacterData } from "@/types/Character";
-import { ActiveBuff } from "@/types/EnemyMove";
-import { GameStatus } from "@/types/GameStatus";
-import { Room } from "@/types/Room";
+import type { Enemy } from "@/types/Enemy";
+import type { Spell } from "@/types/Spell";
+import type { CharacterData } from "@/types/Character";
+import type { ActiveBuff } from "@/types/EnemyMove";
+import type { GameStatus } from "@/types/GameStatus";
+import type { Room } from "@/types/Room";
 import { getEffectiveBuffAmount, isEnemy, handleCombatCompletion } from "./CombatUtils";
 
 export type SpellHandlerResult = {

@@ -1,9 +1,10 @@
 import { chromium } from "@playwright/test";
 import { parseArgs } from "node:util";
-import { spawn, ChildProcess } from "node:child_process";
+import type { ChildProcess } from "node:child_process";
+import { spawn } from "node:child_process";
 import { runDungeonCrawl } from "./scenarios/dungeon-crawl";
 import { runCombatSim } from "./scenarios/combat-sim";
-import { RunResult, ScenarioConfig } from "./scenarios/types";
+import type { RunResult, ScenarioConfig } from "./scenarios/types";
 
 const { values } = parseArgs({
   options: {

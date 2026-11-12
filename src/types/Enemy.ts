@@ -1,4 +1,4 @@
-import { EnemyMove } from "./EnemyMove";
+import type { EnemyMove } from "./EnemyMove";
 
 export type Enemy = {
   id: number;

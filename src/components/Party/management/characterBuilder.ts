@@ -1,16 +1,17 @@
-import {
+import type {
   CharacterData,
 } from "@/types/Character";
-import { Spell } from "@/types/Spell";
+import type { Spell } from "@/types/Spell";
 import { MAX_SCORE, POINT_BUDGET } from "@/consts/constants";
 import {
   abilityModifier,
   totalAbilityPointsSpent,
 } from "@/lib/character";
+import type {
+  useCharacter} from "@/components/CharacterCreation/CharacterContext";
 import {
-  useCharacter,
   type Character,
-} from "../../CharacterCreation/CharacterContext";
+} from "@/components/CharacterCreation/CharacterContext";
 
 import warriorImg from "@/assets/warrior.png";
 import rogueImg from "@/assets/rogue.png";

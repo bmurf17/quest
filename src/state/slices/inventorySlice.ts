@@ -3,12 +3,12 @@ import {
   healthPotion,
 } from "@/data/items";
 import type { Consumable, Item } from "@/types/Item";
-import { scheduleEnemyTurn } from "../utils/CombatUtils";
+import { scheduleEnemyTurn } from "@/state/utils/CombatUtils";
 import {
   applyConsumable,
   equipItemInState,
   unequipItemInState,
-} from "../utils/InventoryUtils";
+} from "@/state/utils/InventoryUtils";
 import type { GameState, GameSlice } from "./types";
 
 export type InventorySlice = Pick<

@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { finalizeAttackState } from '../utils/CombatUtils';
-import type { GameState } from '../GameState';
-import { Enemy } from '@/types/Enemy';
+import { finalizeAttackState } from "@/state/utils/CombatUtils";
+import type { GameState } from "@/state/GameState";
+import type { Enemy } from '@/types/Enemy';
 import { startRoom } from '@/data/fixtures/rooms';
-import { Quest } from '@/types/RoomInteractions';
+import type { Quest } from '@/types/RoomInteractions';
 import { manaPotion } from '@/data/items';
 import { GameStatus } from '@/types/GameStatus';
 

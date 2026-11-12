@@ -1,7 +1,8 @@
-import { GameState, useGameStore } from "@/state/GameState";
+import type { GameState} from "@/state/GameState";
+import { useGameStore } from "@/state/GameState";
 import { isEnemy } from "@/state/utils/CombatUtils";
-import { CharacterData } from "@/types/Character";
-import { Enemy } from "@/types/Enemy";
+import type { CharacterData } from "@/types/Character";
+import type { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
 import { memo, useEffect, useLayoutEffect, useRef } from "react";
 import mushroom from "/images/Mushroom.png";

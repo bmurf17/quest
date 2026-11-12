@@ -1,6 +1,7 @@
 import { fonts } from "@/theme";
 import { icons } from "./icons";
-import { INTERACTION_TYPES, InteractionType, interactionColors } from "./interactionTypes";
+import type { InteractionType} from "./interactionTypes";
+import { INTERACTION_TYPES, interactionColors } from "./interactionTypes";
 
 export function InteractionTabs({
   value,

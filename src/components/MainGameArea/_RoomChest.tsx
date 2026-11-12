@@ -1,7 +1,8 @@
-import { GameState, useGameStore } from "@/state/GameState";
-import closedChest from "../../assets/closed-chest.png";
-import openChest from "../../assets/open-chest.png";
-import emptyChest from "../../assets/empty-chest.png"
+import type { GameState} from "@/state/GameState";
+import { useGameStore } from "@/state/GameState";
+import closedChest from "@/assets/closed-chest.png";
+import openChest from "@/assets/open-chest.png";
+import emptyChest from "@/assets/empty-chest.png"
 
 export default function RoomChest() {
   const state = useGameStore((state: GameState) => state);

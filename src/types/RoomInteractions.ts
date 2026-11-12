@@ -1,6 +1,6 @@
-import { Item } from "./Item";
-import { Room } from "./Room";
-import { Enemy } from "./Enemy";
+import type { Item } from "./Item";
+import type { Room } from "./Room";
+import type { Enemy } from "./Enemy";
 
 export enum NPCType {
   MERCHANT = "merchant",

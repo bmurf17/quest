@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-import { colors, fonts } from "../theme";
+import { colors, fonts } from "@/theme";
 
 interface Props {
   activityLog: string[];

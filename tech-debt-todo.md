@@ -173,12 +173,12 @@ sections live in `components/action-menu/`.
 - [x] Folded `src/components/MainGameArea/Key Issues` into the appendix below, then deleted the stray file.
 - [x] Art policy: app-bundled art lives in `src/assets/` with **kebab-case** filenames (renamed from `PascalCase`); `public/images/` is reserved for paths referenced at runtime from Supabase rows, so those filenames stay unchanged to avoid breaking existing data. New art should go to `src/assets/` unless it must be addressed by a stored URL.
 
-### 11. Normalize imports and file conventions
+### 11. Normalize imports and file conventions — ✅ Done
 
-- [ ] Mix of `@/...` and long relative paths (`../../types/Character`, `../../../assets/...`). Enforce the `@/` alias via ESLint `no-restricted-imports` or `import/no-relative-parent-imports`
-- [ ] Inconsistent component layout: flat files (`Party.tsx`, `Shop.tsx`), subfolders (`Party/`, `Admin/`), and the `_` prefix convention (`_BattleOrder.tsx`) that is not documented. Rename to a consistent convention and document it
-- [ ] No barrel exports; either add `index.ts` per feature or explicitly document deep-import policy. (Avoid barrels in hot paths if bundle splitting matters)
-- [ ] `CharacterData` is imported as a value in several files even when used only as a type. Use `import type`
+- [x] Converted every parent-relative import (`../`, `../../`, `../../../`) in `src/` to the `@/` alias and enforced it with `no-restricted-imports` in `eslint.config.js`. Sibling `./` imports remain allowed; `tests/` is exempt because `@/` maps to `src/`.
+- [x] Consolidated the layout: `action-menu/` + `ActionMenu.tsx` became `ActionMenu/ActionMenu.tsx` (with its supporting files), `Party.tsx` moved to `Party/Party.tsx`, and `Shared/` became lowercase `shared/`. The convention (PascalCase feature folders, flat single-file components, lowercase internal folders, `_` private partials) is documented in `docs/conventions.md` and linked from `README.md`.
+- [x] Documented the deep-import policy in `docs/conventions.md`: no barrels; import modules directly to keep dependencies explicit and preserve tree-shaking/bundle splitting.
+- [x] Added `@typescript-eslint/consistent-type-imports` and auto-fixed type-only imports across the tree (including `CharacterData`, `GameState`, `Item`, and other type-only imports).
 
 ### 12. Consolidate styling
 

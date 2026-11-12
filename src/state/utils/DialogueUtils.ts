@@ -1,4 +1,4 @@
-import { CharacterData } from "@/types/Character";
+import type { CharacterData } from "@/types/Character";
 
 export function partyHasAnimalHandling(party: CharacterData[]): boolean {
   return party.some(member => 

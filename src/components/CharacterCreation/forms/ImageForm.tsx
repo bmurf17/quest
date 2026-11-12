@@ -1,13 +1,13 @@
-import { useCharacter } from "../CharacterContext";
+import { useCharacter } from "@/components/CharacterCreation/CharacterContext";
 import { colors, fonts } from "@/theme";
-import warriorImg from "../../../assets/warrior.png";
-import rogueImg from "../../../assets/rogue.png";
-import rogue1Img from "../../../assets/rogue-1.png";
-import clericImg from "../../../assets/cleric.png";
-import wizardImg from "../../../assets/wizard.png";
-import bardImg from "../../../assets/bard.png";
-import barbarianImg from "../../../assets/barbarian.png";
-import assassinImg from "../../../assets/assassin.png";
+import warriorImg from "@/assets/warrior.png";
+import rogueImg from "@/assets/rogue.png";
+import rogue1Img from "@/assets/rogue-1.png";
+import clericImg from "@/assets/cleric.png";
+import wizardImg from "@/assets/wizard.png";
+import bardImg from "@/assets/bard.png";
+import barbarianImg from "@/assets/barbarian.png";
+import assassinImg from "@/assets/assassin.png";
 
 const IMAGES = [
   { key: "warrior", src: warriorImg, label: "Warrior" },

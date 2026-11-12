@@ -15,7 +15,7 @@ import {
   tickBuffs,
   tickCooldowns,
 } from "./CombatUtils";
-import type { GameState } from "../slices/types";
+import type { GameState } from "@/state/slices/types";
 
 export type EnemyTurnState = Pick<
   GameState,

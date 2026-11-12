@@ -1,20 +1,20 @@
 import { useGameStore } from "@/state/GameState";
-import { Camp, Chest, NPC, Quest } from "@/types/RoomInteractions";
-import { CharacterData } from "@/types/Character";
+import type { Camp, Chest, NPC, Quest } from "@/types/RoomInteractions";
+import type { CharacterData } from "@/types/Character";
 import { useState } from "react";
-import Inventory from "./Inventory";
-import Shop from "./Shop";
-import SectionSelector from "./SectionSelector";
+import Inventory from "@/components/Inventory";
+import Shop from "@/components/Shop";
+import SectionSelector from "@/components/SectionSelector";
 import { manaPotion } from "@/data/items";
 import { GameStatus } from "@/types/GameStatus";
-import QuestList from "./Quests/QuestList";
-import QuestOffer from "./Quests/QuestOffer";
-import { ActionBtn } from "./action-menu/ActionBtn";
-import { CombatActions } from "./action-menu/CombatActions";
-import { DialogueActions } from "./action-menu/DialogueActions";
-import { ChestActions } from "./action-menu/ChestActions";
-import { CampActions } from "./action-menu/CampActions";
-import { TownActions } from "./action-menu/TownActions";
+import QuestList from "@/components/Quests/QuestList";
+import QuestOffer from "@/components/Quests/QuestOffer";
+import { ActionBtn } from "./ActionBtn";
+import { CombatActions } from "./CombatActions";
+import { DialogueActions } from "./DialogueActions";
+import { ChestActions } from "./ChestActions";
+import { CampActions } from "./CampActions";
+import { TownActions } from "./TownActions";
 
 export default function ActionMenu() {
   const party = useGameStore((state) => state.party);

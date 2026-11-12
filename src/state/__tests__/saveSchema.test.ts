@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseSaveData, SaveDataError, SAVE_VERSION } from "../saveSchema";
+import { parseSaveData, SaveDataError, SAVE_VERSION } from "@/state/saveSchema";
 
 function minimalSave(): Record<string, unknown> {
   return {

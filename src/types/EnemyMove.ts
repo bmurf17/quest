@@ -1,4 +1,4 @@
-import { DamageDice } from "./Item";
+import type { DamageDice } from "./Item";
 
 export type EnemyMoveEffect =
   | { type: 'damage'; damageDice?: DamageDice; target: 'single' | 'all' | 'random' }

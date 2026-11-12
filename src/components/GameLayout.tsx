@@ -1,6 +1,6 @@
-import { useGameStore } from "../state/GameState";
-import Party from "./Party";
-import ActionMenu from "./ActionMenu";
+import { useGameStore } from "@/state/GameState";
+import Party from "@/components/Party/Party";
+import ActionMenu from "@/components/ActionMenu/ActionMenu";
 import MainGameArea from "./MainGameArea/MainGameArea";
 import ActivityLog from "./ActivityLog";
 

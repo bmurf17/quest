@@ -1,4 +1,4 @@
-import { CharacterData } from "@/types/Character";
+import type { CharacterData } from "@/types/Character";
 import { colors, fonts } from "@/theme";
 
 export function TavernAbilityTooltip({

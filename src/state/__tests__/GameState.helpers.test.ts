@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { calcDamage, safeNextIndex, isEnemy } from '../utils/CombatUtils';
+import { calcDamage, safeNextIndex, isEnemy } from "@/state/utils/CombatUtils";
 import type { CharacterData } from '@/types/Character';
 import type { Enemy } from '@/types/Enemy';
 

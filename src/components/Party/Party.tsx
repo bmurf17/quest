@@ -1,7 +1,7 @@
 import { useState } from "react";
-import type { CharacterData } from "../types/Character";
+import type { CharacterData } from "@/types/Character";
 import { tempRanger } from "@/data/fixtures/characters";
-import CharacterSheet from "./CharacterSheet";
+import CharacterSheet from "@/components/CharacterSheet";
 import { useGameStore } from "@/state/GameState";
 
 interface Props {
@@ -9,8 +9,8 @@ interface Props {
 }
 
 
-import { colors, fonts } from "../theme";
-import { StatBar } from "./Shared/StatBar";
+import { colors, fonts } from "@/theme";
+import { StatBar } from "@/components/shared/StatBar";
 
 export default function Party({ party }: Props) {
   const [selectedCharacter, setSelectedCharacter] = useState<CharacterData>(tempRanger);

@@ -1,5 +1,6 @@
-import { GameState, useGameStore } from "@/state/GameState";
-import campfire from "../../assets/campfire.png"
+import type { GameState} from "@/state/GameState";
+import { useGameStore } from "@/state/GameState";
+import campfire from "@/assets/campfire.png"
 
 export default function RoomCamp() {
   const state = useGameStore((state: GameState) => state);

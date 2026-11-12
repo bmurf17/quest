@@ -7,7 +7,7 @@ import {
   NPCType,
 } from "@/types/RoomInteractions";
 import type { Room } from "@/types/Room";
-import { useGameStore } from "../GameState";
+import { useGameStore } from "@/state/GameState";
 
 vi.mock("@/lib/supabase", () => ({
   supabase: {},

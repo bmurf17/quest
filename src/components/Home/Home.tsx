@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-import { colors, fonts } from "../../theme";
+import { colors, fonts } from "@/theme";
 
 export default function Home() {
   return (

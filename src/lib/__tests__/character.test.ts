@@ -6,7 +6,7 @@ import {
   remainingAbilityPoints,
   totalAbilityPointsSpent,
   type AbilityScores,
-} from "../character";
+} from "@/lib/character";
 
 const scores = (value: number): AbilityScores => ({
   strength: value,

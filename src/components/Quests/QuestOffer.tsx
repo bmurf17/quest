@@ -1,6 +1,6 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { colors, fonts } from "@/theme";
-import { Quest } from "@/types/RoomInteractions";
+import type { Quest } from "@/types/RoomInteractions";
 import QuestDescription from "./_QuestDescription";
 import { QuestPanelHeader } from "./_QuestPanelParts";
 

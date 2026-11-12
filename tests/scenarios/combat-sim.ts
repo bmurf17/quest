@@ -1,4 +1,4 @@
-import { Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
 import {
   GameLogger,
   createParty,
@@ -10,7 +10,7 @@ import {
   isInCombat,
   takeScreenshot,
 } from "../game-helpers";
-import { RunResult, ScenarioConfig } from "./types";
+import type { RunResult, ScenarioConfig } from "./types";
 
 export async function runCombatSim(
   page: Page,

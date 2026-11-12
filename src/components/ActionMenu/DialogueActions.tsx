@@ -1,6 +1,7 @@
 import { useGameStore } from "@/state/GameState";
-import { CharacterData } from "@/types/Character";
-import { NPC, NPCType } from "@/types/RoomInteractions";
+import type { CharacterData } from "@/types/Character";
+import type { NPC} from "@/types/RoomInteractions";
+import { NPCType } from "@/types/RoomInteractions";
 import { partyHasAnimalHandling } from "@/state/utils/DialogueUtils";
 import { ActionBtn } from "./ActionBtn";
 import { SectionLabel } from "./SectionLabel";

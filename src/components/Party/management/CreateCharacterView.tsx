@@ -1,7 +1,7 @@
-import { CharacterData } from "@/types/Character";
+import type { CharacterData } from "@/types/Character";
 import { colors, fonts } from "@/theme";
-import { useCharacter } from "../../CharacterCreation/CharacterContext";
-import { CharacterBuilderView } from "../../CharacterCreation/CharacterBuilder";
+import { useCharacter } from "@/components/CharacterCreation/CharacterContext";
+import { CharacterBuilderView } from "@/components/CharacterCreation/CharacterBuilder";
 import { buildCharacter, canCreateCharacter } from "./characterBuilder";
 
 function EmptyPartyPanel() {

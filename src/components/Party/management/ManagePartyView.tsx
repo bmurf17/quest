@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { CharacterData } from "@/types/Character";
+import type { CharacterData } from "@/types/Character";
 import { colors, fonts } from "@/theme";
-import { StatBar } from "../../Shared/StatBar";
-import { CharacterDetailPanel } from "../shared/CharacterDetailPanel";
-import { PartyRosterPanel } from "../shared/PartyRosterPanel";
+import { StatBar } from "@/components/shared/StatBar";
+import { CharacterDetailPanel } from "@/components/Party/shared/CharacterDetailPanel";
+import { PartyRosterPanel } from "@/components/Party/shared/PartyRosterPanel";
 
 export function ManagePartyView({
   party,

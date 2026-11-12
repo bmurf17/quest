@@ -6,7 +6,7 @@ import {
   type DbEnemy,
   type DbItem,
   type DbQuest,
-} from "../RoomQueries";
+} from "@/queries/RoomQueries";
 
 vi.mock("@/lib/supabase", () => ({
   supabase: {},

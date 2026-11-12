@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { CharacterData } from "@/types/Character";
-import { useGameStore, GameState } from "@/state/GameState";
+import type { CharacterData } from "@/types/Character";
+import type { GameState } from "@/state/GameState";
+import { useGameStore } from "@/state/GameState";
 import { colors, fonts } from "@/theme";
-import { CharacterProvider } from "../CharacterCreation/CharacterContext";
+import { CharacterProvider } from "@/components/CharacterCreation/CharacterContext";
 import { CreateCharacterView } from "./management/CreateCharacterView";
 import { ManagePartyView } from "./management/ManagePartyView";
 

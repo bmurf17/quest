@@ -1,6 +1,6 @@
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
-import { ClassSkillTree, SkillNode } from "@/types/SkillTree";
-import { colors, fonts } from "../theme";
+import type { ClassSkillTree, SkillNode } from "@/types/SkillTree";
+import { colors, fonts } from "@/theme";
 
 type Edge = {
   x1: number; y1: number;

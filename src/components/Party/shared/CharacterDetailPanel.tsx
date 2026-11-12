@@ -1,8 +1,8 @@
 import type { CharacterData } from "@/types/Character";
 import { formatDamageDice } from "@/lib/dice";
-import { EquippableItem } from "@/types/Item";
+import type { EquippableItem } from "@/types/Item";
 import { colors, fonts } from "@/theme";
-import { StatBar } from "../../Shared/StatBar";
+import { StatBar } from "@/components/shared/StatBar";
 import { SectionHeader } from "./SectionHeader";
 
 export function CharacterDetailPanel({

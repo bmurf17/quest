@@ -1,4 +1,4 @@
-import { CharacterData } from "@/types/Character";
+import type { CharacterData } from "@/types/Character";
 import { useGameStore } from "@/state/GameState";
 import { colors, fonts } from "@/theme";
 import { Link } from "react-router-dom";

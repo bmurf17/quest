@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import { colors, fonts } from "../theme";
-import { useGameStore } from "../state/GameState";
+import { colors, fonts } from "@/theme";
+import { useGameStore } from "@/state/GameState";
 import {
   saveToSlot,
   getSaveKeys,
@@ -11,7 +11,7 @@ import {
   exportSaveAsJson,
   importSaveFromJson,
   SaveDataError,
-} from "../state/saveLoad";
+} from "@/state/saveLoad";
 
 const btnBase: React.CSSProperties = {
   padding: "4px 10px",

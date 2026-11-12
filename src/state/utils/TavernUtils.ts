@@ -1,7 +1,7 @@
-import { CharacterData } from "@/types/Character";
-import { EquippableItem } from "@/types/Item";
-import { TavernConfig } from "@/types/Tavern";
-import { Spell } from "@/types/Spell";
+import type { CharacterData } from "@/types/Character";
+import type { EquippableItem } from "@/types/Item";
+import type { TavernConfig } from "@/types/Tavern";
+import type { Spell } from "@/types/Spell";
 import { abilityModifier } from "@/lib/character";
 
 import warriorImg from "@/assets/warrior.png";

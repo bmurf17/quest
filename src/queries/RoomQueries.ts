@@ -1,8 +1,8 @@
 import { Directions } from "@/types/Directions";
-import { Enemy } from "@/types/Enemy";
-import { Room, Section } from "@/types/Room";
-import { NPCType, Quest, QuestType, RoomInteraction } from "@/types/RoomInteractions";
-import { EquippableItem, EquipmentSlot, Item } from "@/types/Item";
+import type { Enemy } from "@/types/Enemy";
+import type { Room, Section } from "@/types/Room";
+import type { NPCType, Quest, QuestType, RoomInteraction } from "@/types/RoomInteractions";
+import type { EquippableItem, EquipmentSlot, Item } from "@/types/Item";
 import { supabase } from "@/lib/supabase";
 import { unwrapQuery } from "./queryHelpers";
 export { supabase };

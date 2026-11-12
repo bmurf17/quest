@@ -1,6 +1,7 @@
 import { getEnemyMaxHealth } from "@/state/utils/CombatUtils";
-import { GameState, useGameStore } from "@/state/GameState";
-import { Enemy } from "@/types/Enemy";
+import type { GameState} from "@/state/GameState";
+import { useGameStore } from "@/state/GameState";
+import type { Enemy } from "@/types/Enemy";
 import { useEffect, useState, memo } from "react";
 import { useSound } from "@/hooks/useSound";
 

@@ -1,4 +1,4 @@
-import { EnemyMoveEffect } from "@/types/EnemyMove";
+import type { EnemyMoveEffect } from "@/types/EnemyMove";
 
 export interface MoveEntry {
   name: string;

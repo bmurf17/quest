@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useGameStore } from "@/state/GameState";
-import { Item } from "@/types/Item";
+import type { Item } from "@/types/Item";
 
 export default function Shop({
   isOpen = false,

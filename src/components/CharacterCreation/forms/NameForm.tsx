@@ -1,4 +1,4 @@
-import { useCharacter } from "../CharacterContext";
+import { useCharacter } from "@/components/CharacterCreation/CharacterContext";
 import { colors, fonts } from "@/theme";
 
 export default function NameForm() {

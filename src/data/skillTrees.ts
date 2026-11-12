@@ -1,4 +1,4 @@
-import { ClassSkillTree } from "@/types/SkillTree";
+import type { ClassSkillTree } from "@/types/SkillTree";
 
 const warriorTree: ClassSkillTree = {
   className: "Warrior",

@@ -1,6 +1,6 @@
 import { useGameStore } from "@/state/GameState";
 import { Directions } from "@/types/Directions";
-import { Room } from "@/types/Room";
+import type { Room } from "@/types/Room";
 import React, { useState, useRef, useEffect } from "react";
 import { colors, fonts } from "@/theme";
 

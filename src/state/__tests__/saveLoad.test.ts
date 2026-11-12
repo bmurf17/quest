@@ -7,8 +7,8 @@ import type { ActiveBuff } from "@/types/EnemyMove";
 import { GameStatus } from "@/types/GameStatus";
 import type { Room } from "@/types/Room";
 import type { DialogueNode } from "@/types/RoomInteractions";
-import { useGameStore } from "../GameState";
-import { parseSaveData, SAVE_VERSION } from "../saveSchema";
+import { useGameStore } from "@/state/GameState";
+import { parseSaveData, SAVE_VERSION } from "@/state/saveSchema";
 import {
   buildSaveData,
   deleteSave,
@@ -19,7 +19,7 @@ import {
   peekSaveData,
   saveToSlot,
   SaveDataError,
-} from "../saveLoad";
+} from "@/state/saveLoad";
 
 vi.mock("@/lib/supabase", () => ({
   supabase: {},

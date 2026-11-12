@@ -4,12 +4,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { CharacterData } from "@/types/Character";
+import type { CharacterData } from "@/types/Character";
 import { useState, memo } from "react";
 import { Plus, Minus } from "lucide-react";
 import { useGameStore } from "@/state/GameState";
 import { colors, fonts } from "@/theme";
-import { StatBar } from "@/components/Shared/StatBar";
+import { StatBar } from "@/components/shared/StatBar";
 
 function SectionHeader({ children }: { children: React.ReactNode }) {
   return (

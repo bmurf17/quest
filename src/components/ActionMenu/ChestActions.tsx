@@ -1,4 +1,4 @@
-import { Chest } from "@/types/RoomInteractions";
+import type { Chest } from "@/types/RoomInteractions";
 import { ActionBtn } from "./ActionBtn";
 import { SectionLabel } from "./SectionLabel";
 

@@ -1,5 +1,6 @@
 import { fonts } from "@/theme";
-import { EnemyEntry, MoveEntry, defaultEnemy, defaultMove } from "./formTypes";
+import type { EnemyEntry, MoveEntry} from "./formTypes";
+import { defaultEnemy, defaultMove } from "./formTypes";
 import { FieldGroup, StyledInput, StyledSelect } from "./primitives";
 import { MoveForm } from "./MoveForm";
 

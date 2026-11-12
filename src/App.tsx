@@ -1,21 +1,21 @@
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { lazy, Suspense } from "react";
-import GameLayout from "./components/GameLayout";
-import NavBar from "./components/NavBar";
-import Home from "./components/Home/Home";
-import { PartySelection } from "./components/Party/PartySelection";
+import GameLayout from "@/components/GameLayout";
+import NavBar from "@/components/NavBar";
+import Home from "@/components/Home/Home";
+import { PartySelection } from "@/components/Party/PartySelection";
 import { tempCleric, tempRanger, tempWarrior, tempWizard, tempAssassin, tempBarbarian, tempBard } from "@/data/fixtures/characters";
 import { useEffect } from "react";
-import { getAllRooms, getSections } from "./queries/RoomQueries";
-import { useGameStore } from "./state/GameState";
-import ManageRooms from "./components/Admin/game-design/CreateRoom";
-import RoomMap from "./components/Admin/game-design/RoomMap";
-import ManageSections from "./components/Admin/game-design/ManageSections";
-import ManageDialogues from "./components/Admin/game-design/ManageDialogues";
-import { PartyManagement } from "./components/Party/PartyManagement";
+import { getAllRooms, getSections } from "@/queries/RoomQueries";
+import { useGameStore } from "@/state/GameState";
+import ManageRooms from "@/components/Admin/game-design/CreateRoom";
+import RoomMap from "@/components/Admin/game-design/RoomMap";
+import ManageSections from "@/components/Admin/game-design/ManageSections";
+import ManageDialogues from "@/components/Admin/game-design/ManageDialogues";
+import { PartyManagement } from "@/components/Party/PartyManagement";
 
-const CharacterCreation = lazy(() => import("./components/CharacterCreation/CharacterCreation"));
-const Admin = lazy(() => import("./components/Admin/GameDesign"));
+const CharacterCreation = lazy(() => import("@/components/CharacterCreation/CharacterCreation"));
+const Admin = lazy(() => import("@/components/Admin/GameDesign"));
 
 function LoadingSpinner() {
   return (

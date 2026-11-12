@@ -18,7 +18,7 @@ import type {
 } from "@/types/RoomInteractions";
 import type { Spell } from "@/types/Spell";
 import type { TavernConfig } from "@/types/Tavern";
-import type { SaveData } from "../saveLoad";
+import type { SaveData } from "@/state/saveLoad";
 
 /**
  * The complete game store. Each slice in this folder owns a subset of these

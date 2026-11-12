@@ -6,7 +6,7 @@ import { GameStatus } from "@/types/GameStatus";
 import type { Consumable, Item } from "@/types/Item";
 import { healthPotion } from "@/data/items";
 import type { Room } from "@/types/Room";
-import { useGameStore } from "../GameState";
+import { useGameStore } from "@/state/GameState";
 
 vi.mock("@/lib/supabase", () => ({
   supabase: {},

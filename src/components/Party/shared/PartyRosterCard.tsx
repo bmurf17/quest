@@ -1,6 +1,6 @@
-import { CharacterData } from "@/types/Character";
+import type { CharacterData } from "@/types/Character";
 import { colors, fonts } from "@/theme";
-import { StatBar } from "../../Shared/StatBar";
+import { StatBar } from "@/components/shared/StatBar";
 
 export function PartyRosterCard({
   member,

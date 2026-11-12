@@ -7,8 +7,8 @@ import { Directions } from "@/types/Directions";
 import type { Room } from "@/types/Room";
 import { startRoom } from "@/data/fixtures/rooms";
 import { NPCType } from "@/types/RoomInteractions";
-import { EnemyEntry } from "./formTypes";
-import { InteractionType } from "./interactionTypes";
+import type { EnemyEntry } from "./formTypes";
+import type { InteractionType } from "./interactionTypes";
 
 const directionToDbEnum = (direction: Directions): string => {
   const map: { [key in Directions]: string } = {

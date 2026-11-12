@@ -6,8 +6,8 @@ import {
   hydrateRoomInstances,
   normalizeNeighbors,
   type SerializedRoom,
-} from "../saveTransforms";
-import { SaveDataError } from "../saveSchema";
+} from "@/state/saveTransforms";
+import { SaveDataError } from "@/state/saveSchema";
 
 function room(id: number, name: string): Room {
   return {

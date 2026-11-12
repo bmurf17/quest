@@ -11,8 +11,8 @@ import {
   applyConsumable,
   equipItemInState,
   unequipItemInState,
-} from "../utils/InventoryUtils";
-import { resolveMove } from "../utils/WorldUtils";
+} from "@/state/utils/InventoryUtils";
+import { resolveMove } from "@/state/utils/WorldUtils";
 
 function character(overrides: Partial<CharacterData> = {}): CharacterData {
   return {

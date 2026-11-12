@@ -1,8 +1,9 @@
-import { useGameStore, GameState } from "@/state/GameState";
+import type { GameState } from "@/state/GameState";
+import { useGameStore } from "@/state/GameState";
 import { Directions } from "@/types/Directions";
 import { GameStatus } from "@/types/GameStatus";
-import { Room } from "@/types/Room";
-import { Transition } from "@/types/RoomInteractions";
+import type { Room } from "@/types/Room";
+import type { Transition } from "@/types/RoomInteractions";
 import {
   ChevronDown,
   ChevronLeft,

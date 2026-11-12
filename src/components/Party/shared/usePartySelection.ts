@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CharacterData } from "@/types/Character";
+import type { CharacterData } from "@/types/Character";
 import { useGameStore } from "@/state/GameState";
 
 const MAX_PARTY_SIZE = 6;

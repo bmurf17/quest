@@ -7,7 +7,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useGameStore } from "@/state/GameState";
 import { colors, fonts } from "@/theme";
-import { Consumable, Item } from "@/types/Item";
+import type { Consumable, Item } from "@/types/Item";
 
 export default function Inventory({
   isOpen = false,

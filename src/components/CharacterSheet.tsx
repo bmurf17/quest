@@ -9,11 +9,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import type { CharacterData, CharacterEquipment } from "@/types/Character";
 import { formatDamageDice } from "@/lib/dice";
 import { useGameStore } from "@/state/GameState";
-import { EquippableItem, EquipmentSlot } from "@/types/Item";
-import { colors, fonts } from "../theme";
+import type { EquippableItem, EquipmentSlot } from "@/types/Item";
+import { colors, fonts } from "@/theme";
 import SkillTreeView from "./SkillTreeView";
 import { getSkillTree } from "@/data/skillTrees";
-import { StatBar } from "./Shared/StatBar";
+import { StatBar } from "@/components/shared/StatBar";
 
 function SectionHeader({ children }: { children: React.ReactNode }) {
   return (

@@ -10,7 +10,7 @@ import { ChestForm } from "./ChestForm";
 import { CampForm } from "./CampForm";
 import { TransitionForm } from "./TransitionForm";
 import { defaultEnemy } from "./formTypes";
-import { useCreateRoomForm } from "./useCreateRoomForm";
+import type { useCreateRoomForm } from "./useCreateRoomForm";
 
 type CreateRoomFormState = ReturnType<typeof useCreateRoomForm>;
 

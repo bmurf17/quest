@@ -1,10 +1,10 @@
-import { Enemy } from "@/types/Enemy";
+import type { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
-import { GameState } from "../GameState";
+import type { GameState } from "@/state/GameState";
 import type { CharacterData } from "@/types/Character";
 import { rollDamageDice } from "@/lib/dice";
-import { Quest } from "@/types/RoomInteractions";
-import { ActiveBuff, EnemyMove } from "@/types/EnemyMove";
+import type { Quest } from "@/types/RoomInteractions";
+import type { ActiveBuff, EnemyMove } from "@/types/EnemyMove";
 
 export const handleCombatCompletion = (
   enemies: Enemy[],
