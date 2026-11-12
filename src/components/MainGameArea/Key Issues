@@ -1,8 +1,0 @@
-Key Issues
- 1. Monolithic GameState.ts (1650 lines) — The zustand store handles everything: combat, dialogue, inventory, movement, cutscenes, tavern, quests, sections, and leveling. Needs slicing into separate stores (e.g., useCombatStore, useInventoryStore, useDialogueStore).
- 2. Inconsistent component organization — Mix of flat files (Party.tsx, Shop.tsx), subdirectories (MainGameArea/, Admin/), and an underscore prefix convention (_BattleOrder.tsx, _RoomNPC.tsx) that isn't applied consistently.
- 4. any types in saveLoad.ts — SaveData.roomInstances: [number, any][] and combatOrder: any[] defeat type safety.
- 5. Types file doing too much — Character.ts mixes type definitions, concrete character instances (tempCleric, etc.), and utility functions. Types, data, and logic should each be in their own file.
- 6. Dead/duplicate code — vite-project/ nested directory looks like an abandoned scaffold. Firebase config files (firebase.json, .firebase/) exist alongside Supabase usage.
- 7. No barrel exports — No index.ts files, forcing deep import paths.
-10. Stub room fallback — denormalizeNeighbors silently creates stub rooms when lookups fail, burying bugs.
