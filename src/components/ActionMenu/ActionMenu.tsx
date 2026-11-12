@@ -1,5 +1,5 @@
 import { useGameStore } from "@/state/GameState";
-import type { Camp, Chest, NPC, Quest } from "@/types/RoomInteractions";
+import type { NPC, Quest } from "@/types/RoomInteractions";
 import type { CharacterData } from "@/types/Character";
 import { useState } from "react";
 import Inventory from "@/components/Inventory";
@@ -40,15 +40,9 @@ export default function ActionMenu() {
   const currentFighter = combatOrder[index] as CharacterData;
   const inCombat = room && room.enemies.length > 0;
   const npc =
-    room?.interaction?.type === "NPC"
-      ? (room.interaction as { type: "NPC"; npc: NPC }).npc
-      : null;
-  const chest =
-    room?.interaction?.type === "chest"
-      ? (room.interaction.chest as Chest)
-      : null;
-  const camp =
-    room?.interaction?.type === "camp" ? (room.interaction.camp as Camp) : null;
+    room?.interaction?.type === "NPC" ? (room.interaction as { type: "NPC"; npc: NPC }).npc : null;
+  const chest = room?.interaction?.type === "chest" ? room.interaction.chest : null;
+  const camp = room?.interaction?.type === "camp" ? room.interaction.camp : null;
 
   const tempQuest: Quest = {
     id: 0,
@@ -60,15 +54,11 @@ export default function ActionMenu() {
     accepted: false,
     completed: false,
   };
-  const isQuestAlreadyAccepted = npc?.quest
-    ? quests.some((q) => q.id === npc.quest?.id)
-    : false;
+  const isQuestAlreadyAccepted = npc?.quest ? quests.some((q) => q.id === npc.quest?.id) : false;
 
   return (
     <>
-      <div
-        style={actionMenuStyle}
-      >
+      <div style={actionMenuStyle}>
         {inCombat && !isFighterEnemy && currentFighter && (
           <CombatActions fighter={currentFighter} />
         )}
@@ -82,13 +72,7 @@ export default function ActionMenu() {
           />
         )}
 
-        {chest && (
-          <ChestActions
-            chest={chest}
-            onUpdate={updateChest}
-            onTakeAll={takeFromChest}
-          />
-        )}
+        {chest && <ChestActions chest={chest} onUpdate={updateChest} onTakeAll={takeFromChest} />}
 
         {camp && <CampActions camp={camp} onRest={rest} />}
 
@@ -100,9 +84,7 @@ export default function ActionMenu() {
           />
         )}
 
-        <div
-          style={actionMenuStyle2}
-        >
+        <div style={actionMenuStyle2}>
           <div style={{ height: 1, background: "rgba(180,140,80,0.1)" }} />
           <ActionBtn onClick={() => setIsInventoryModalOpen(true)} fullWidth>
             <svg
@@ -153,20 +135,13 @@ export default function ActionMenu() {
         inventory={[manaPotion]}
         ownersName={npc?.name ?? "Shopkeeper"}
       />
-      <SectionSelector
-        isOpen={isSectionSelectorOpen}
-        onOpenChange={setIsSectionSelectorOpen}
-      />
+      <SectionSelector isOpen={isSectionSelectorOpen} onOpenChange={setIsSectionSelectorOpen} />
       <QuestList isOpen={isQuestListOpen} onOpenChange={setIsQuestListOpen} />
 
       <QuestOffer
         isOpen={isQuestDescriptionOpen}
         onOpenChange={setIsQuestDescriptionOpen}
-        quest={
-          npc?.quest
-            ? { ...npc.quest, accepted: isQuestAlreadyAccepted }
-            : tempQuest
-        }
+        quest={npc?.quest ? { ...npc.quest, accepted: isQuestAlreadyAccepted } : tempQuest}
       />
     </>
   );

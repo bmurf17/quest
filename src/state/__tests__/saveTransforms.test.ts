@@ -55,12 +55,12 @@ describe("save room transforms", () => {
       neighboringRooms: [[Directions.North, 999]],
     };
 
-    expect(() =>
-      denormalizeNeighbors(serialized, new Map([[1, room(1, "Start Room")]])),
-    ).toThrow(SaveDataError);
-    expect(() =>
-      denormalizeNeighbors(serialized, new Map([[1, room(1, "Start Room")]])),
-    ).toThrow(/missing neighboring room 999/);
+    expect(() => denormalizeNeighbors(serialized, new Map([[1, room(1, "Start Room")]]))).toThrow(
+      SaveDataError,
+    );
+    expect(() => denormalizeNeighbors(serialized, new Map([[1, room(1, "Start Room")]]))).toThrow(
+      /missing neighboring room 999/,
+    );
   });
 
   it("hydrates forward neighbor references in two passes", () => {
@@ -94,8 +94,6 @@ describe("save room transforms", () => {
       ],
     ];
 
-    expect(() => hydrateRoomInstances(serialized, new Map())).toThrow(
-      SaveDataError,
-    );
+    expect(() => hydrateRoomInstances(serialized, new Map())).toThrow(SaveDataError);
   });
 });

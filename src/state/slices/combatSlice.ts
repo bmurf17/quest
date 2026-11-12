@@ -76,10 +76,7 @@ export const createCombatSlice: GameSlice<CombatSlice> = (set, get) => ({
 
   enterCombat: () =>
     set((state) => {
-      const room =
-        state.room !== null && state.room !== undefined
-          ? state.room
-          : startRoom;
+      const room = state.room !== null && state.room !== undefined ? state.room : startRoom;
 
       return {
         combatOrder: [...state.party, ...room.enemies],
@@ -90,32 +87,20 @@ export const createCombatSlice: GameSlice<CombatSlice> = (set, get) => ({
 
   castSpell: (spell: Spell, target?: Enemy | CharacterData) =>
     set((state) => {
-      const currentCaster = state.combatOrder[
-        state.activeFighterIndex
-      ] as CharacterData;
+      const currentCaster = state.combatOrder[state.activeFighterIndex] as CharacterData;
 
       if (currentCaster.mp < spell.manaCost) {
         return {
-          activityLog: [
-            ...state.activityLog,
-            `Not enough mana to cast ${spell.name}!`,
-          ],
+          activityLog: [...state.activityLog, `Not enough mana to cast ${spell.name}!`],
         };
       }
 
-      const logBuilder = new ActivityLogBuilder().add(
-        `${currentCaster.name} casts ${spell.name}!`,
-      );
+      const logBuilder = new ActivityLogBuilder().add(`${currentCaster.name} casts ${spell.name}!`);
 
       let updatedParty = state.party;
-      let updatedEnemies = (
-        state.roomInstances.get(state.room.id) || state.room
-      ).enemies;
+      let updatedEnemies = (state.roomInstances.get(state.room.id) || state.room).enemies;
       let combatOrder = state.combatOrder;
-      let nextIndex = safeNextIndex(
-        state.activeFighterIndex,
-        state.combatOrder.length,
-      );
+      let nextIndex = safeNextIndex(state.activeFighterIndex, state.combatOrder.length);
       let newAccumulatedExp = state.accumulatedExp;
       let gameStatus = state.gameStatus;
 
@@ -126,13 +111,7 @@ export const createCombatSlice: GameSlice<CombatSlice> = (set, get) => ({
         return member;
       });
 
-      const result = handleSpell(
-        spell,
-        target,
-        state,
-        logBuilder,
-        calcDamage,
-      );
+      const result = handleSpell(spell, target, state, logBuilder, calcDamage);
       if (result.earlyCompletion) {
         const completion = result.earlyCompletion.completion;
 
@@ -140,8 +119,7 @@ export const createCombatSlice: GameSlice<CombatSlice> = (set, get) => ({
         updatedParty = completion.updatedParty;
         gameStatus = completion.status;
 
-        const currentRoomInstance =
-          state.roomInstances.get(state.room.id) || state.room;
+        const currentRoomInstance = state.roomInstances.get(state.room.id) || state.room;
         const updatedRoom = {
           ...currentRoomInstance,
           enemies: result.updatedEnemies,
@@ -164,16 +142,12 @@ export const createCombatSlice: GameSlice<CombatSlice> = (set, get) => ({
           gameStatus: gameStatus,
           room: updatedRoom,
           roomInstances: newRoomInstances,
-          accumulatedExp:
-            gameStatus === GameStatus.Exploring
-              ? 0
-              : result.newAccumulatedExp,
+          accumulatedExp: gameStatus === GameStatus.Exploring ? 0 : result.newAccumulatedExp,
           isTargeting: false,
           targetingSpell: null,
           levelingUpChars: completion.levelingUpChars || [],
           isLevelingUp: (completion.levelingUpChars || []).length > 0,
-          currentLevelingCharIndex:
-            (completion.levelingUpChars || []).length > 0 ? 0 : -1,
+          currentLevelingCharIndex: (completion.levelingUpChars || []).length > 0 ? 0 : -1,
         };
       }
 
@@ -184,16 +158,12 @@ export const createCombatSlice: GameSlice<CombatSlice> = (set, get) => ({
       newAccumulatedExp = result.newAccumulatedExp;
       gameStatus = result.gameStatus;
 
-      const currentRoomInstance =
-        state.roomInstances.get(state.room.id) || state.room;
+      const currentRoomInstance = state.roomInstances.get(state.room.id) || state.room;
       const updatedRoom = { ...currentRoomInstance, enemies: updatedEnemies };
       const newRoomInstances = new Map(state.roomInstances);
       newRoomInstances.set(state.room.id, updatedRoom);
 
-      if (
-        updatedEnemies.length === 0 &&
-        state.gameStatus === GameStatus.Combat
-      ) {
+      if (updatedEnemies.length === 0 && state.gameStatus === GameStatus.Combat) {
         const completion = handleCombatCompletion(
           updatedEnemies,
           nextIndex,
@@ -209,8 +179,7 @@ export const createCombatSlice: GameSlice<CombatSlice> = (set, get) => ({
           gameStatus: completion.status,
           room: updatedRoom,
           roomInstances: newRoomInstances,
-          accumulatedExp:
-            completion.status === GameStatus.Exploring ? 0 : newAccumulatedExp,
+          accumulatedExp: completion.status === GameStatus.Exploring ? 0 : newAccumulatedExp,
           isTargeting: false,
           targetingSpell: null,
         };

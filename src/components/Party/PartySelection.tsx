@@ -23,29 +23,17 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
 
   return (
     <>
-
-      <div
-        style={partySelectionStyle}
-      >
-        <div
-          style={partySelectionStyle2}
-        >
+      <div style={partySelectionStyle}>
+        <div style={partySelectionStyle2}>
           <div
             style={{
               padding: "20px 18px 14px",
               borderBottom: "1px solid rgba(180,140,80,0.1)",
             }}
           >
-            <h2
-              style={partySelectionStyle3}
-            >
-              Choose Class
-            </h2>
+            <h2 style={partySelectionStyle3}>Choose Class</h2>
           </div>
-          <div
-            className="scrollbar-thin"
-            style={partySelectionStyle4}
-          >
+          <div className="scrollbar-thin" style={partySelectionStyle4}>
             {availableCharacters.map((character, i) => {
               const active = selectedCharacter?.class === character.class;
               const inParty = party.some((m) => m.class === character.class);
@@ -63,9 +51,7 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                     padding: "10px 11px",
                     borderRadius: 7,
                     border: `1px solid ${active ? "rgba(212,175,55,0.4)" : "transparent"}`,
-                    background: active
-                      ? "rgba(212,175,55,0.09)"
-                      : "transparent",
+                    background: active ? "rgba(212,175,55,0.09)" : "transparent",
                     cursor: "pointer",
                     transition: "background 0.12s, border-color 0.12s",
                     font: "inherit",
@@ -73,14 +59,8 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                     width: "100%",
                   }}
                 >
-                  <div
-                    style={partySelectionStyle5}
-                  >
-                    <img
-                      src={character.img}
-                      alt={character.name}
-                      style={partySelectionStyle6}
-                    />
+                  <div style={partySelectionStyle5}>
+                    <img src={character.img} alt={character.name} style={partySelectionStyle6} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div
@@ -97,24 +77,12 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                     >
                       {character.name}
                     </div>
-                    <StatBar
-                      value={character.hp}
-                      max={character.maxHp}
-                      color={colors.danger}
-                    />
+                    <StatBar value={character.hp} max={character.maxHp} color={colors.danger} />
                     <div style={{ marginTop: 4 }}>
-                      <StatBar
-                        value={character.mp}
-                        max={character.maxMp}
-                        color="#6366F1"
-                      />
+                      <StatBar value={character.mp} max={character.maxMp} color="#6366F1" />
                     </div>
                   </div>
-                  {inParty && (
-                    <div
-                      style={partySelectionStyle7}
-                    />
-                  )}
+                  {inParty && <div style={partySelectionStyle7} />}
                 </button>
               );
             })}
@@ -147,31 +115,24 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                       border: "1px solid rgba(255,255,255,0.06)",
                     }
                   : {
-                      background:
-                        `linear-gradient(135deg, #B4965A 0%, ${colors.gold} 50%, #B4965A 100%)`,
+                      background: `linear-gradient(135deg, #B4965A 0%, ${colors.gold} 50%, #B4965A 100%)`,
                       color: "#0d0b07",
                     }),
               }}
               onMouseEnter={(e) => {
-                if (!isPartyFull && !isInParty)
-                  e.currentTarget.style.filter = "brightness(1.08)";
+                if (!isPartyFull && !isInParty) e.currentTarget.style.filter = "brightness(1.08)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.filter = "none";
               }}
               onMouseDown={(e) => {
-                if (!isPartyFull && !isInParty)
-                  e.currentTarget.style.transform = "scale(0.99)";
+                if (!isPartyFull && !isInParty) e.currentTarget.style.transform = "scale(0.99)";
               }}
               onMouseUp={(e) => {
                 e.currentTarget.style.transform = "scale(1)";
               }}
             >
-              {isPartyFull
-                ? "Party Full"
-                : isInParty
-                  ? "Already in Party"
-                  : "⊕  Add to Party"}
+              {isPartyFull ? "Party Full" : isInParty ? "Already in Party" : "⊕  Add to Party"}
             </button>
           }
         />

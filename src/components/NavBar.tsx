@@ -20,8 +20,19 @@ export default function NavBar() {
       <nav className="flex items-center justify-between px-5 h-[52px] bg-[rgba(10,9,6,0.95)] border-b border-gold-dark/20 backdrop-blur-sm shrink-0 relative z-[100]">
         <Link to="/" className="no-underline flex items-center gap-2">
           <div className="w-6 h-6 bg-gold-muted/15 border border-gold-dark/20 rounded flex items-center justify-center">
-            <svg viewBox="0 0 24 24" fill="none" stroke={colors.gold} strokeWidth={1.5} width={14} height={14}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke={colors.gold}
+              strokeWidth={1.5}
+              width={14}
+              height={14}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"
+              />
             </svg>
           </div>
           <span className="text-sm font-bold text-gold-muted font-display tracking-[0.08em]">
@@ -37,7 +48,8 @@ export default function NavBar() {
 
         <div className="flex gap-1 items-center">
           {navItems.map((item, i) => {
-            const active = location.pathname === item.path ||
+            const active =
+              location.pathname === item.path ||
               (item.path !== "/" && location.pathname.startsWith(item.path));
             return (
               <Link

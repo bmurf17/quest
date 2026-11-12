@@ -1,5 +1,5 @@
 import { fonts } from "@/theme";
-import type { EnemyEntry, MoveEntry} from "./formTypes";
+import type { EnemyEntry, MoveEntry } from "./formTypes";
 import { defaultEnemy, defaultMove } from "./formTypes";
 import { FieldGroup, StyledInput, StyledSelect } from "./primitives";
 import { MoveForm } from "./MoveForm";
@@ -19,9 +19,7 @@ export function CombatForm({
     field: K,
     value: EnemyEntry[K],
   ) => {
-    const updated = enemies.map((e, i) =>
-      i === index ? { ...e, [field]: value } : e,
-    );
+    const updated = enemies.map((e, i) => (i === index ? { ...e, [field]: value } : e));
     onChange(updated);
   };
 
@@ -62,10 +60,8 @@ export function CombatForm({
           key={index}
           style={{
             position: "relative",
-            marginBottom:
-              enemies.length > 1 && index < enemies.length - 1 ? 20 : 4,
-            paddingBottom:
-              enemies.length > 1 && index < enemies.length - 1 ? 20 : 0,
+            marginBottom: enemies.length > 1 && index < enemies.length - 1 ? 20 : 4,
+            paddingBottom: enemies.length > 1 && index < enemies.length - 1 ? 20 : 0,
             borderBottom:
               enemies.length > 1 && index < enemies.length - 1
                 ? "1px solid rgba(180,140,80,0.15)"
@@ -73,26 +69,14 @@ export function CombatForm({
           }}
         >
           {enemies.length > 1 && (
-            <div
-              style={combatFormStyle}
-            >
-              <span
-                style={combatFormStyle2}
-              >
-                Enemy {index + 1}
-              </span>
-              <button
-                type="button"
-                onClick={() => removeEnemy(index)}
-                style={combatFormStyle3}
-              >
+            <div style={combatFormStyle}>
+              <span style={combatFormStyle2}>Enemy {index + 1}</span>
+              <button type="button" onClick={() => removeEnemy(index)} style={combatFormStyle3}>
                 Remove
               </button>
             </div>
           )}
-          <div
-            style={combatFormStyle4}
-          >
+          <div style={combatFormStyle4}>
             <div style={{ gridColumn: "1 / -1" }}>
               <FieldGroup id={`enemyName-${index}`} label="Enemy Name">
                 <StyledInput
@@ -108,9 +92,7 @@ export function CombatForm({
                 id={`health-${index}`}
                 type="number"
                 value={enemy.health}
-                onChange={(e) =>
-                  updateEnemy(index, "health", parseInt(e.target.value) || 0)
-                }
+                onChange={(e) => updateEnemy(index, "health", parseInt(e.target.value) || 0)}
               />
             </FieldGroup>
             <FieldGroup id={`enemyImg-${index}`} label="Enemy Sprite">
@@ -127,17 +109,13 @@ export function CombatForm({
               </StyledSelect>
             </FieldGroup>
           </div>
-          <div
-            style={combatFormStyle5}
-          >
+          <div style={combatFormStyle5}>
             <FieldGroup id={`strength-${index}`} label="Strength">
               <StyledInput
                 id={`strength-${index}`}
                 type="number"
                 value={enemy.strength}
-                onChange={(e) =>
-                  updateEnemy(index, "strength", parseInt(e.target.value) || 0)
-                }
+                onChange={(e) => updateEnemy(index, "strength", parseInt(e.target.value) || 0)}
               />
             </FieldGroup>
             <FieldGroup id={`dex-${index}`} label="Dexterity">
@@ -145,9 +123,7 @@ export function CombatForm({
                 id={`dex-${index}`}
                 type="number"
                 value={enemy.dex}
-                onChange={(e) =>
-                  updateEnemy(index, "dex", parseInt(e.target.value) || 0)
-                }
+                onChange={(e) => updateEnemy(index, "dex", parseInt(e.target.value) || 0)}
               />
             </FieldGroup>
             <FieldGroup id={`defense-${index}`} label="Defense">
@@ -155,24 +131,18 @@ export function CombatForm({
                 id={`defense-${index}`}
                 type="number"
                 value={enemy.defense}
-                onChange={(e) =>
-                  updateEnemy(index, "defense", parseInt(e.target.value) || 0)
-                }
+                onChange={(e) => updateEnemy(index, "defense", parseInt(e.target.value) || 0)}
               />
             </FieldGroup>
           </div>
 
-          <div
-            style={combatFormStyle6}
-          >
+          <div style={combatFormStyle6}>
             <FieldGroup id={`expGain-${index}`} label="Exp Gain">
               <StyledInput
                 id={`expGain-${index}`}
                 type="number"
                 value={enemy.expGain}
-                onChange={(e) =>
-                  updateEnemy(index, "expGain", parseInt(e.target.value) || 0)
-                }
+                onChange={(e) => updateEnemy(index, "expGain", parseInt(e.target.value) || 0)}
               />
             </FieldGroup>
             <FieldGroup id={`maxHealth-${index}`} label="Max Health (optional)">
@@ -194,13 +164,7 @@ export function CombatForm({
               <StyledSelect
                 id={`type-${index}`}
                 value={enemy.type}
-                onChange={(e) =>
-                  updateEnemy(
-                    index,
-                    "type",
-                    e.target.value as "enemy" | "boss",
-                  )
-                }
+                onChange={(e) => updateEnemy(index, "type", e.target.value as "enemy" | "boss")}
               >
                 <option value="enemy">Enemy</option>
                 <option value="boss">Boss</option>
@@ -210,10 +174,7 @@ export function CombatForm({
 
           {enemy.type === "boss" && (
             <div style={{ marginTop: 8 }}>
-              <FieldGroup
-                id={`phaseThresholds-${index}`}
-                label="Phase Thresholds (% , separated)"
-              >
+              <FieldGroup id={`phaseThresholds-${index}`} label="Phase Thresholds (% , separated)">
                 <StyledInput
                   id={`phaseThresholds-${index}`}
                   placeholder="e.g. 70, 40"
@@ -231,19 +192,9 @@ export function CombatForm({
           )}
 
           <div style={{ marginTop: 16 }}>
-            <div
-              style={combatFormStyle7}
-            >
-              <span
-                style={combatFormStyle8}
-              >
-                Moves ({enemy.moves.length})
-              </span>
-              <button
-                type="button"
-                onClick={() => addMove(index)}
-                style={combatFormStyle9}
-              >
+            <div style={combatFormStyle7}>
+              <span style={combatFormStyle8}>Moves ({enemy.moves.length})</span>
+              <button type="button" onClick={() => addMove(index)} style={combatFormStyle9}>
                 + Add Move
               </button>
             </div>
@@ -257,20 +208,12 @@ export function CombatForm({
               />
             ))}
             {enemy.moves.length === 0 && (
-              <p
-                style={combatFormStyle10}
-              >
-                No custom moves. Enemy will use a basic attack.
-              </p>
+              <p style={combatFormStyle10}>No custom moves. Enemy will use a basic attack.</p>
             )}
           </div>
         </div>
       ))}
-      <button
-        type="button"
-        onClick={addEnemy}
-        style={combatFormStyle11}
-      >
+      <button type="button" onClick={addEnemy} style={combatFormStyle11}>
         + Add Enemy
       </button>
     </>
@@ -301,11 +244,15 @@ const combatFormStyle3: CSSProperties = {
   padding: "3px 10px",
   fontFamily: fonts.display,
 };
-const combatFormStyle4: CSSProperties = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 };
-  const combatFormStyle5: CSSProperties = {
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr 1fr",
-                gap: 12,
+const combatFormStyle4: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr",
+  gap: 12,
+};
+const combatFormStyle5: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr 1fr",
+  gap: 12,
 };
 const combatFormStyle6: CSSProperties = {
   display: "grid",

@@ -12,10 +12,7 @@ import {
 } from "../game-helpers";
 import type { RunResult, ScenarioConfig } from "./types";
 
-export async function runCombatSim(
-  page: Page,
-  config: ScenarioConfig,
-): Promise<RunResult> {
+export async function runCombatSim(page: Page, config: ScenarioConfig): Promise<RunResult> {
   const logger = new GameLogger(config.verbose);
   let combatsWon = 0;
   let combatsLost = 0;

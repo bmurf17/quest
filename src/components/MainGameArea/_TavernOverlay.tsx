@@ -9,35 +9,21 @@ import type { CSSProperties } from "react";
 export default function TavernOverlay() {
   const tavernCandidates = useGameStore((state) => state.tavernCandidates);
   const closeTavern = useGameStore((state) => state.closeTavern);
-  const addTavernCharacterToParty = useGameStore(
-    (state) => state.addTavernCharacterToParty,
-  );
+  const addTavernCharacterToParty = useGameStore((state) => state.addTavernCharacterToParty);
   const party = useGameStore((state) => state.party);
-  const hasRecruitedFromTavern = useGameStore(
-    (state) => state.hasRecruitedFromTavern,
-  );
+  const hasRecruitedFromTavern = useGameStore((state) => state.hasRecruitedFromTavern);
   const isTavernOpen = useGameStore((state) => state.isTavernOpen);
 
-  const [selectedCharacter, setSelectedCharacter] =
-    useState<CharacterData | null>(null);
+  const [selectedCharacter, setSelectedCharacter] = useState<CharacterData | null>(null);
 
-  const isInParty = (char: CharacterData) =>
-    party.some((m) => m.name === char.name);
+  const isInParty = (char: CharacterData) => party.some((m) => m.name === char.name);
 
   return isTavernOpen ? (
     <>
-      <div
-        style={tavernOverlayStyle}
-      >
+      <div style={tavernOverlayStyle}>
         <div style={{ textAlign: "center" }}>
-          <div
-            style={tavernOverlayStyle2}
-          >
-            ═══ The Tavern ═══
-          </div>
-          <div
-            style={tavernOverlayStyle3}
-          >
+          <div style={tavernOverlayStyle2}>═══ The Tavern ═══</div>
+          <div style={tavernOverlayStyle3}>
             {hasRecruitedFromTavern
               ? "Your new companion awaits — you can recruit again on your next visit."
               : "You spot a few familiar faces looking for adventure..."}
@@ -45,9 +31,7 @@ export default function TavernOverlay() {
         </div>
 
         {hasRecruitedFromTavern && (
-          <div
-            style={tavernOverlayStyle4}
-          >
+          <div style={tavernOverlayStyle4}>
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -66,9 +50,7 @@ export default function TavernOverlay() {
           </div>
         )}
 
-        <div
-          style={tavernOverlayStyle5}
-        >
+        <div style={tavernOverlayStyle5}>
           {tavernCandidates.map((character, i) => (
             <TavernCharacterCard
               key={character.name + i}

@@ -18,17 +18,11 @@ export function CharacterDetailPanel({
   footer?: React.ReactNode;
 }) {
   return (
-    <div
-      style={characterDetailPanelStyle}
-    >
+    <div style={characterDetailPanelStyle}>
       {character ? (
         <div style={{ padding: "28px 28px 48px" }}>
-          <div
-            style={characterDetailPanelStyle2}
-          >
-            <div
-              style={characterDetailPanelStyle3}
-            >
+          <div style={characterDetailPanelStyle2}>
+            <div style={characterDetailPanelStyle3}>
               <img
                 src={character.img || "/placeholder.svg"}
                 alt={character.name}
@@ -36,30 +30,15 @@ export function CharacterDetailPanel({
               />
             </div>
             <div style={{ flex: 1 }}>
-              <h3
-                style={characterDetailPanelStyle5}
-              >
-                {character.name}
-              </h3>
-              <div
-                style={characterDetailPanelStyle6}
-              >
-                {[
-                  character.race,
-                  character.class,
-                  `Level ${character.level}`,
-                ].map((tag) => (
-                  <span
-                    key={tag}
-                    style={characterDetailPanelStyle7}
-                  >
+              <h3 style={characterDetailPanelStyle5}>{character.name}</h3>
+              <div style={characterDetailPanelStyle6}>
+                {[character.race, character.class, `Level ${character.level}`].map((tag) => (
+                  <span key={tag} style={characterDetailPanelStyle7}>
                     {tag}
                   </span>
                 ))}
               </div>
-              <div
-                style={characterDetailPanelStyle8}
-              >
+              <div style={characterDetailPanelStyle8}>
                 {[
                   {
                     label: "HP",
@@ -75,9 +54,7 @@ export function CharacterDetailPanel({
                   },
                 ].map(({ label, value, max, color }) => (
                   <div key={label}>
-                    <div
-                      style={characterDetailPanelStyle9}
-                    >
+                    <div style={characterDetailPanelStyle9}>
                       <span
                         style={{
                           fontSize: 11,
@@ -101,42 +78,22 @@ export function CharacterDetailPanel({
             </div>
           </div>
 
-          <div
-            style={characterDetailPanelStyle10}
-          >
+          <div style={characterDetailPanelStyle10}>
             <div>
               <SectionHeader>Ability Scores</SectionHeader>
-              <div
-                style={characterDetailPanelStyle11}
-              >
+              <div style={characterDetailPanelStyle11}>
                 {Object.entries(character.abilities).map(([key, ability]) => (
-                  <div
-                    key={key}
-                    style={characterDetailPanelStyle12}
-                  >
-                    <div
-                      style={characterDetailPanelStyle13}
-                    >
-                      <span
-                        style={characterDetailPanelStyle14}
-                      >
-                        {ability.score}
-                      </span>
+                  <div key={key} style={characterDetailPanelStyle12}>
+                    <div style={characterDetailPanelStyle13}>
+                      <span style={characterDetailPanelStyle14}>{ability.score}</span>
                     </div>
                     <div>
-                      <div
-                        style={characterDetailPanelStyle15}
-                      >
-                        {key}
-                      </div>
+                      <div style={characterDetailPanelStyle15}>{key}</div>
                       {showAbilityModifiers && (
                         <div
                           style={{
                             fontSize: 13,
-                            color:
-                              ability.modifier >= 0
-                                ? colors.success
-                                : colors.danger,
+                            color: ability.modifier >= 0 ? colors.success : colors.danger,
                             marginTop: 1,
                           }}
                         >
@@ -155,9 +112,7 @@ export function CharacterDetailPanel({
                 Object.values(character.equipment).some((v) => v !== null) && (
                   <>
                     <SectionHeader>Equipment</SectionHeader>
-                    <div
-                      style={characterDetailPanelStyle16}
-                    >
+                    <div style={characterDetailPanelStyle16}>
                       {[
                         character.equipment.helmet,
                         character.equipment.armor,
@@ -169,14 +124,8 @@ export function CharacterDetailPanel({
                       ]
                         .filter((i): i is EquippableItem => i !== null)
                         .map((item, idx) => (
-                          <div
-                            key={idx}
-                            className="gear-card"
-                            style={characterDetailPanelStyle17}
-                          >
-                            <div
-                              style={characterDetailPanelStyle18}
-                            >
+                          <div key={idx} className="gear-card" style={characterDetailPanelStyle17}>
+                            <div style={characterDetailPanelStyle18}>
                               <img
                                 src={item.img || "/placeholder.svg"}
                                 alt={item.name}
@@ -184,19 +133,9 @@ export function CharacterDetailPanel({
                               />
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
-                              <div
-                                style={characterDetailPanelStyle20}
-                              >
-                                {item.name}
-                              </div>
-                              <div
-                                style={characterDetailPanelStyle21}
-                              >
-                                {item.action?.type}
-                              </div>
-                              <div
-                                style={characterDetailPanelStyle22}
-                              >
+                              <div style={characterDetailPanelStyle20}>{item.name}</div>
+                              <div style={characterDetailPanelStyle21}>{item.action?.type}</div>
+                              <div style={characterDetailPanelStyle22}>
                                 {item.action && (
                                   <>
                                     <span
@@ -213,8 +152,7 @@ export function CharacterDetailPanel({
                                         color: "#6B5E48",
                                       }}
                                     >
-                                      Dmg:{" "}
-                                      {formatDamageDice(item.action.damage)}
+                                      Dmg: {formatDamageDice(item.action.damage)}
                                     </span>
                                   </>
                                 )}
@@ -229,18 +167,10 @@ export function CharacterDetailPanel({
               {character.spells?.length > 0 && (
                 <>
                   <SectionHeader>Skills</SectionHeader>
-                  <div
-                    style={characterDetailPanelStyle23}
-                  >
+                  <div style={characterDetailPanelStyle23}>
                     {character.spells.map((spell, idx) => (
-                      <div
-                        key={idx}
-                        className="gear-card"
-                        style={characterDetailPanelStyle24}
-                      >
-                        <div
-                          style={characterDetailPanelStyle25}
-                        >
+                      <div key={idx} className="gear-card" style={characterDetailPanelStyle24}>
+                        <div style={characterDetailPanelStyle25}>
                           <img
                             src={spell.image || "/placeholder.svg"}
                             alt={spell.name}
@@ -248,25 +178,11 @@ export function CharacterDetailPanel({
                           />
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div
-                            style={characterDetailPanelStyle27}
-                          >
-                            {spell.name}
-                          </div>
-                          <div
-                            style={characterDetailPanelStyle28}
-                          >
-                            {spell.manaCost} MP
-                          </div>
-                          <div
-                            style={characterDetailPanelStyle29}
-                          >
-                            <span style={{ fontSize: 11, color: "#6B5E48" }}>
-                              Hit: 6
-                            </span>
-                            <span style={{ fontSize: 11, color: "#6B5E48" }}>
-                              Dmg: 8
-                            </span>
+                          <div style={characterDetailPanelStyle27}>{spell.name}</div>
+                          <div style={characterDetailPanelStyle28}>{spell.manaCost} MP</div>
+                          <div style={characterDetailPanelStyle29}>
+                            <span style={{ fontSize: 11, color: "#6B5E48" }}>Hit: 6</span>
+                            <span style={{ fontSize: 11, color: "#6B5E48" }}>Dmg: 8</span>
                           </div>
                         </div>
                       </div>
@@ -280,11 +196,7 @@ export function CharacterDetailPanel({
           </div>
         </div>
       ) : (
-        <div
-          style={characterDetailPanelStyle30}
-        >
-          {emptyMessage}
-        </div>
+        <div style={characterDetailPanelStyle30}>{emptyMessage}</div>
       )}
     </div>
   );
@@ -414,8 +326,7 @@ const characterDetailPanelStyle17: CSSProperties = {
   border: "1px solid rgba(180,140,80,0.12)",
   borderRadius: 7,
   padding: "10px 12px",
-  transition:
-    "border-color 0.12s, background 0.12s",
+  transition: "border-color 0.12s, background 0.12s",
 };
 const characterDetailPanelStyle18: CSSProperties = {
   width: 72,
@@ -461,8 +372,7 @@ const characterDetailPanelStyle24: CSSProperties = {
   border: "1px solid rgba(180,140,80,0.12)",
   borderRadius: 7,
   padding: "10px 12px",
-  transition:
-    "border-color 0.12s, background 0.12s",
+  transition: "border-color 0.12s, background 0.12s",
 };
 const characterDetailPanelStyle25: CSSProperties = {
   width: 72,

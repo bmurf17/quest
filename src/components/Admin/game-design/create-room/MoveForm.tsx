@@ -15,10 +15,7 @@ export function MoveForm({
   onChange: (move: MoveEntry) => void;
   onRemove: () => void;
 }) {
-  const updateMove = <K extends keyof MoveEntry>(
-    field: K,
-    value: MoveEntry[K],
-  ) => {
+  const updateMove = <K extends keyof MoveEntry>(field: K, value: MoveEntry[K]) => {
     onChange({ ...move, [field]: value });
   };
 
@@ -46,22 +43,10 @@ export function MoveForm({
   const effectType = effectDraft.type;
 
   return (
-    <div
-      style={moveFormStyle}
-    >
-      <div
-        style={moveFormStyle2}
-      >
-        <span
-          style={moveFormStyle3}
-        >
-          Move {index + 1}
-        </span>
-        <button
-          type="button"
-          onClick={onRemove}
-          style={moveFormStyle4}
-        >
+    <div style={moveFormStyle}>
+      <div style={moveFormStyle2}>
+        <span style={moveFormStyle3}>Move {index + 1}</span>
+        <button type="button" onClick={onRemove} style={moveFormStyle4}>
           Remove
         </button>
       </div>
@@ -90,9 +75,7 @@ export function MoveForm({
             id={`moveCooldown-${index}`}
             type="number"
             value={move.cooldown}
-            onChange={(e) =>
-              updateMove("cooldown", parseInt(e.target.value) || 0)
-            }
+            onChange={(e) => updateMove("cooldown", parseInt(e.target.value) || 0)}
           />
         </div>
         <div>
@@ -112,10 +95,7 @@ export function MoveForm({
             placeholder="e.g. 2"
             value={move.phase ?? ""}
             onChange={(e) =>
-              updateMove(
-                "phase",
-                e.target.value ? parseInt(e.target.value) : undefined,
-              )
+              updateMove("phase", e.target.value ? parseInt(e.target.value) : undefined)
             }
           />
         </div>
@@ -186,9 +166,7 @@ export function MoveForm({
                 id={`moveDice-${index}`}
                 placeholder="e.g. 1d8+2"
                 value={effectDraft.damageDice ?? ""}
-                onChange={(e) =>
-                  updateEffect("damageDice", e.target.value || undefined)
-                }
+                onChange={(e) => updateEffect("damageDice", e.target.value || undefined)}
               />
             </div>
           </>
@@ -213,9 +191,7 @@ export function MoveForm({
                 id={`healDice-${index}`}
                 placeholder="e.g. 2d6"
                 value={effectDraft.healDice ?? ""}
-                onChange={(e) =>
-                  updateEffect("healDice", e.target.value || undefined)
-                }
+                onChange={(e) => updateEffect("healDice", e.target.value || undefined)}
               />
             </div>
           </>
@@ -251,9 +227,7 @@ export function MoveForm({
                 id={`buffAmount-${index}`}
                 type="number"
                 value={effectDraft.amount}
-                onChange={(e) =>
-                  updateEffect("amount", parseInt(e.target.value) || 0)
-                }
+                onChange={(e) => updateEffect("amount", parseInt(e.target.value) || 0)}
               />
             </div>
             <div>
@@ -262,9 +236,7 @@ export function MoveForm({
                 id={`buffDuration-${index}`}
                 type="number"
                 value={effectDraft.duration}
-                onChange={(e) =>
-                  updateEffect("duration", parseInt(e.target.value) || 1)
-                }
+                onChange={(e) => updateEffect("duration", parseInt(e.target.value) || 1)}
               />
             </div>
           </>
@@ -289,22 +261,16 @@ export function MoveForm({
                 id={`debuffAmount-${index}`}
                 type="number"
                 value={effectDraft.amount}
-                onChange={(e) =>
-                  updateEffect("amount", parseInt(e.target.value) || 0)
-                }
+                onChange={(e) => updateEffect("amount", parseInt(e.target.value) || 0)}
               />
             </div>
             <div>
-              <Label htmlFor={`debuffDuration-${index}`}>
-                Duration (turns)
-              </Label>
+              <Label htmlFor={`debuffDuration-${index}`}>Duration (turns)</Label>
               <StyledInput
                 id={`debuffDuration-${index}`}
                 type="number"
                 value={effectDraft.duration}
-                onChange={(e) =>
-                  updateEffect("duration", parseInt(e.target.value) || 1)
-                }
+                onChange={(e) => updateEffect("duration", parseInt(e.target.value) || 1)}
               />
             </div>
           </>
@@ -312,16 +278,12 @@ export function MoveForm({
         {effectType === "spawn" && (
           <>
             <div>
-              <Label htmlFor={`spawnIndex-${index}`}>
-                Spawn Template Index
-              </Label>
+              <Label htmlFor={`spawnIndex-${index}`}>Spawn Template Index</Label>
               <StyledInput
                 id={`spawnIndex-${index}`}
                 type="number"
                 value={effectDraft.spawnIndex}
-                onChange={(e) =>
-                  updateEffect("spawnIndex", parseInt(e.target.value) || 0)
-                }
+                onChange={(e) => updateEffect("spawnIndex", parseInt(e.target.value) || 0)}
               />
             </div>
             <div>
@@ -330,9 +292,7 @@ export function MoveForm({
                 id={`spawnCount-${index}`}
                 type="number"
                 value={effectDraft.count}
-                onChange={(e) =>
-                  updateEffect("count", parseInt(e.target.value) || 1)
-                }
+                onChange={(e) => updateEffect("count", parseInt(e.target.value) || 1)}
               />
             </div>
           </>

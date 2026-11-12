@@ -3,9 +3,7 @@ import type { CSSProperties } from "react";
 
 export function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div
-      style={sectionLabelStyle}
-    >
+    <div style={sectionLabelStyle}>
       <span
         style={{
           fontSize: 9,
@@ -23,4 +21,9 @@ export function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 // Static style objects hoisted out of the render path.
-const sectionLabelStyle: CSSProperties = { display: "flex", alignItems: "center", gap: 8, marginBottom: 6 };
+const sectionLabelStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 8,
+  marginBottom: 6,
+};

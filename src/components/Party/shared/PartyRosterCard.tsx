@@ -11,85 +11,46 @@ export function PartyRosterCard({
   onRemove: () => void;
 }) {
   return (
-    <div
-      style={partyRosterCardStyle}
-    >
-      <div
-        style={partyRosterCardStyle2}
-      >
+    <div style={partyRosterCardStyle}>
+      <div style={partyRosterCardStyle2}>
         <div>
-          <div
-            style={partyRosterCardStyle3}
-          >
-            {member.name}
-          </div>
+          <div style={partyRosterCardStyle3}>{member.name}</div>
           <div style={partyRosterCardStyle4}>
             {member.class} · Lv {member.level}
           </div>
         </div>
-        <button
-          className="remove-btn"
-          onClick={onRemove}
-          style={partyRosterCardStyle5}
-        >
+        <button className="remove-btn" onClick={onRemove} style={partyRosterCardStyle5}>
           Remove
         </button>
       </div>
-      <div
-        style={partyRosterCardStyle6}
-      >
+      <div style={partyRosterCardStyle6}>
         <img
           src={member.img || "/placeholder.svg"}
           alt={member.name}
           style={partyRosterCardStyle7}
         />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div
-            style={partyRosterCardStyle8}
-          >
-            <span
-              style={partyRosterCardStyle9}
-            >
-              HP
-            </span>
+          <div style={partyRosterCardStyle8}>
+            <span style={partyRosterCardStyle9}>HP</span>
             <span style={{ fontSize: 12, color: colors.textMuted }}>
               {member.hp}/{member.maxHp}
             </span>
           </div>
           <StatBar value={member.hp} max={member.maxHp} color={colors.danger} />
-          <div
-            style={partyRosterCardStyle10}
-          >
-            <span
-              style={partyRosterCardStyle11}
-            >
-              MP
-            </span>
+          <div style={partyRosterCardStyle10}>
+            <span style={partyRosterCardStyle11}>MP</span>
             <span style={{ fontSize: 12, color: colors.textMuted }}>
               {member.mp}/{member.maxMp}
             </span>
           </div>
           <StatBar value={member.mp} max={member.maxMp} color="#6366F1" />
-          <div
-            style={partyRosterCardStyle12}
-          >
+          <div style={partyRosterCardStyle12}>
             {Object.entries(member.abilities)
               .slice(0, 4)
               .map(([key, ability]) => (
-                <div
-                  key={key}
-                  style={partyRosterCardStyle13}
-                >
-                  <div
-                    style={partyRosterCardStyle14}
-                  >
-                    {key}
-                  </div>
-                  <div
-                    style={partyRosterCardStyle15}
-                  >
-                    {ability.score}
-                  </div>
+                <div key={key} style={partyRosterCardStyle13}>
+                  <div style={partyRosterCardStyle14}>{key}</div>
+                  <div style={partyRosterCardStyle15}>{ability.score}</div>
                 </div>
               ))}
           </div>
@@ -119,16 +80,16 @@ const partyRosterCardStyle3: CSSProperties = {
   fontFamily: fonts.display,
 };
 const partyRosterCardStyle4: CSSProperties = { fontSize: 11, color: "#7A6A52", marginTop: 1 };
-  const partyRosterCardStyle5: CSSProperties = {
-              background: "rgba(220,38,38,0.1)",
-              border: "1px solid rgba(220,38,38,0.2)",
-              borderRadius: 4,
-              color: "#FCA5A5",
-              fontSize: 11,
-              padding: "4px 10px",
-              cursor: "pointer",
-              transition: "background 0.12s",
-              fontFamily: fonts.body,
+const partyRosterCardStyle5: CSSProperties = {
+  background: "rgba(220,38,38,0.1)",
+  border: "1px solid rgba(220,38,38,0.2)",
+  borderRadius: 4,
+  color: "#FCA5A5",
+  fontSize: 11,
+  padding: "4px 10px",
+  cursor: "pointer",
+  transition: "background 0.12s",
+  fontFamily: fonts.body,
 };
 const partyRosterCardStyle6: CSSProperties = {
   padding: "12px",

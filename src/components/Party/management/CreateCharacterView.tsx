@@ -7,33 +7,20 @@ import type { CSSProperties } from "react";
 
 function EmptyPartyPanel() {
   return (
-    <div
-      style={emptyPartyPanelStyle}
-    >
+    <div style={emptyPartyPanelStyle}>
       <div
         style={{
           padding: "20px 18px 14px",
           borderBottom: `1px solid ${colors.goldBorder}`,
         }}
       >
-        <h2
-          style={emptyPartyPanelStyle2}
-        >
-          Your Party
-        </h2>
+        <h2 style={emptyPartyPanelStyle2}>Your Party</h2>
       </div>
-      <div
-        style={emptyPartyPanelStyle3}
-      >
+      <div style={emptyPartyPanelStyle3}>
         <div>
-          <p
-            style={emptyPartyPanelStyle4}
-          >
-            No party members yet
-          </p>
+          <p style={emptyPartyPanelStyle4}>No party members yet</p>
           <p style={emptyPartyPanelStyle5}>
-            Build your character on the left, then click Create Character to
-            start your adventure
+            Build your character on the left, then click Create Character to start your adventure
           </p>
         </div>
       </div>
@@ -41,11 +28,7 @@ function EmptyPartyPanel() {
   );
 }
 
-export function CreateCharacterView({
-  onCreate,
-}: {
-  onCreate: (char: CharacterData) => void;
-}) {
+export function CreateCharacterView({ onCreate }: { onCreate: (char: CharacterData) => void }) {
   const { character } = useCharacter();
   const canCreate = canCreateCharacter(character);
 
@@ -75,8 +58,7 @@ export function CreateCharacterView({
             transition: "filter 0.15s, transform 0.1s",
             ...(canCreate
               ? {
-                  background:
-                    `linear-gradient(135deg, #B4965A 0%, ${colors.gold} 50%, #B4965A 100%)`,
+                  background: `linear-gradient(135deg, #B4965A 0%, ${colors.gold} 50%, #B4965A 100%)`,
                   color: "#0d0b07",
                   border: "none",
                 }
@@ -99,9 +81,7 @@ export function CreateCharacterView({
             e.currentTarget.style.transform = "scale(1)";
           }}
         >
-          {canCreate
-            ? "⊕  Create Character & Start Party"
-            : "Finish all steps"}
+          {canCreate ? "⊕  Create Character & Start Party" : "Finish all steps"}
         </button>
       }
     />

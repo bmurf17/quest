@@ -40,49 +40,21 @@ export function TavernCharacterCard({
         }
       }}
     >
-      <div
-        style={tavernCharacterCardStyle2}
-      >
-        <img
-          src={character.img}
-          alt={character.name}
-          style={tavernCharacterCardStyle3}
-        />
+      <div style={tavernCharacterCardStyle2}>
+        <img src={character.img} alt={character.name} style={tavernCharacterCardStyle3} />
       </div>
 
       <div style={tavernCharacterCardStyle4}>
-        <div
-          style={tavernCharacterCardStyle5}
-        >
-          {character.name}
-        </div>
-        <div
-          style={tavernCharacterCardStyle6}
-        >
-          <span
-            style={tavernCharacterCardStyle7}
-          >
-            {character.class}
-          </span>
-          <span
-            style={tavernCharacterCardStyle8}
-          >
-            Lv{character.level}
-          </span>
+        <div style={tavernCharacterCardStyle5}>{character.name}</div>
+        <div style={tavernCharacterCardStyle6}>
+          <span style={tavernCharacterCardStyle7}>{character.class}</span>
+          <span style={tavernCharacterCardStyle8}>Lv{character.level}</span>
         </div>
 
         <div style={{ marginBottom: 4 }}>
-          <div
-            style={tavernCharacterCardStyle9}
-          >
-            <span
-              style={tavernCharacterCardStyle10}
-            >
-              HP
-            </span>
-            <span
-              style={tavernCharacterCardStyle11}
-            >
+          <div style={tavernCharacterCardStyle9}>
+            <span style={tavernCharacterCardStyle10}>HP</span>
+            <span style={tavernCharacterCardStyle11}>
               {character.hp}/{character.maxHp}
             </span>
           </div>
@@ -97,17 +69,9 @@ export function TavernCharacterCard({
           />
         </div>
         <div>
-          <div
-            style={tavernCharacterCardStyle9}
-          >
-            <span
-              style={tavernCharacterCardStyle12}
-            >
-              MP
-            </span>
-            <span
-              style={tavernCharacterCardStyle11}
-            >
+          <div style={tavernCharacterCardStyle9}>
+            <span style={tavernCharacterCardStyle12}>MP</span>
+            <span style={tavernCharacterCardStyle11}>
               {character.mp}/{character.maxMp}
             </span>
           </div>
@@ -167,16 +131,20 @@ const tavernCharacterCardStyle3: CSSProperties = {
   imageRendering: "pixelated",
   filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.8))",
 };
-const tavernCharacterCardStyle4: CSSProperties = { padding: "12px 14px", width: "100%", textAlign: "center" };
-  const tavernCharacterCardStyle5: CSSProperties = {
-              fontSize: 14,
-              fontWeight: 700,
-              color: colors.text,
-              fontFamily: fonts.display,
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              marginBottom: 4,
+const tavernCharacterCardStyle4: CSSProperties = {
+  padding: "12px 14px",
+  width: "100%",
+  textAlign: "center",
+};
+const tavernCharacterCardStyle5: CSSProperties = {
+  fontSize: 14,
+  fontWeight: 700,
+  color: colors.text,
+  fontFamily: fonts.display,
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  marginBottom: 4,
 };
 const tavernCharacterCardStyle6: CSSProperties = {
   display: "flex",

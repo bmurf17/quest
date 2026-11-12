@@ -1,4 +1,4 @@
-import type { GameState} from "@/state/GameState";
+import type { GameState } from "@/state/GameState";
 import { useGameStore } from "@/state/GameState";
 import { isEnemy } from "@/state/utils/CombatUtils";
 import type { CharacterData } from "@/types/Character";
@@ -13,7 +13,7 @@ function BattleOrderComponent() {
 
   const activeIndex = state.activeFighterIndex;
   const raw = state.combatOrder || [];
-  const displayOrder = [] as { item: typeof raw[number]; originalIndex: number }[];
+  const displayOrder = [] as { item: (typeof raw)[number]; originalIndex: number }[];
   const n = raw.length;
   if (n > 0) {
     for (let offset = n - 1; offset >= 1; offset--) {
@@ -27,9 +27,7 @@ function BattleOrderComponent() {
   const prevRectsRef = useRef(new Map<string, DOMRect>());
 
   const keyFor = (c: CharacterData | Enemy | undefined, i: number) =>
-    String(
-      (c && "id" in c ? c.id : undefined) ?? c?.name ?? `idx-${i}`,
-    );
+    String((c && "id" in c ? c.id : undefined) ?? c?.name ?? `idx-${i}`);
 
   useLayoutEffect(() => {
     const nodeMap = nodeMapRef.current;
@@ -100,7 +98,7 @@ function BattleOrderComponent() {
                 >
                   {isEnemy(characterOrEnemy) ? (
                     <div className="relative">
-                      {characterOrEnemy.type === 'boss' && (
+                      {characterOrEnemy.type === "boss" && (
                         <div className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-yellow-400 z-10">
                           P{characterOrEnemy.phase ?? 1}
                         </div>

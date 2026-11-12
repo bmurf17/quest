@@ -5,43 +5,22 @@ import type { CSSProperties } from "react";
 export default function CutsceneOverlay() {
   const activeCutscene = useGameStore((state) => state.activeCutscene);
   const cutsceneSceneIndex = useGameStore((state) => state.cutsceneSceneIndex);
-  const advanceCutsceneScene = useGameStore(
-    (state) => state.advanceCutsceneScene,
-  );
+  const advanceCutsceneScene = useGameStore((state) => state.advanceCutsceneScene);
 
   if (!activeCutscene) return null;
 
   const scene = activeCutscene.scenes[cutsceneSceneIndex];
   const isLastScene = cutsceneSceneIndex >= activeCutscene.scenes.length - 1;
   const hasNextCutscene = !!activeCutscene.nextCutsceneId;
-  const buttonLabel = isLastScene
-    ? hasNextCutscene
-      ? "Continue"
-      : "Return"
-    : "Continue";
+  const buttonLabel = isLastScene ? (hasNextCutscene ? "Continue" : "Return") : "Continue";
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="Cutscene"
-      style={cutsceneOverlayStyle}
-    >
-      <div
-        style={cutsceneOverlayStyle2}
-      >
-        <div
-          style={cutsceneOverlayStyle3}
-        >
-          {scene.text}
-        </div>
+    <div role="dialog" aria-modal="true" aria-label="Cutscene" style={cutsceneOverlayStyle}>
+      <div style={cutsceneOverlayStyle2}>
+        <div style={cutsceneOverlayStyle3}>{scene.text}</div>
 
-        <div
-          style={cutsceneOverlayStyle4}
-        >
-          <div
-            style={cutsceneOverlayStyle5}
-          >
+        <div style={cutsceneOverlayStyle4}>
+          <div style={cutsceneOverlayStyle5}>
             {cutsceneSceneIndex + 1} / {activeCutscene.scenes.length}
           </div>
 
@@ -70,8 +49,7 @@ const cutsceneOverlayStyle: CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   zIndex: 50,
-  background:
-    "radial-gradient(ellipse at center, rgba(10,8,6,0.85) 0%, rgba(5,4,3,0.95) 100%)",
+  background: "radial-gradient(ellipse at center, rgba(10,8,6,0.85) 0%, rgba(5,4,3,0.95) 100%)",
   padding: "64px",
 };
 const cutsceneOverlayStyle2: CSSProperties = {

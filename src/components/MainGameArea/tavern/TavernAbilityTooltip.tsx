@@ -2,28 +2,13 @@ import type { CharacterData } from "@/types/Character";
 import { colors, fonts } from "@/theme";
 import type { CSSProperties } from "react";
 
-export function TavernAbilityTooltip({
-  character,
-}: {
-  character: CharacterData;
-}) {
+export function TavernAbilityTooltip({ character }: { character: CharacterData }) {
   return (
-    <div
-      style={tavernAbilityTooltipStyle}
-    >
+    <div style={tavernAbilityTooltipStyle}>
       {Object.entries(character.abilities).map(([key, ability]) => (
-        <div
-          key={key}
-          style={tavernAbilityTooltipStyle2}
-        >
-          <span
-            style={tavernAbilityTooltipStyle3}
-          >
-            {key}
-          </span>
-          <span
-            style={tavernAbilityTooltipStyle4}
-          >
+        <div key={key} style={tavernAbilityTooltipStyle2}>
+          <span style={tavernAbilityTooltipStyle3}>{key}</span>
+          <span style={tavernAbilityTooltipStyle4}>
             {ability.score}
             <span
               style={{

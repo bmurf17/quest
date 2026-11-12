@@ -33,7 +33,7 @@ export function CreateRoomForm({ form }: { form: CreateRoomFormState }) {
   } = form;
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={(event) => void handleSubmit(event)}>
       <Divider label="Room Identity" />
 
       <FieldGroup id="section" label="Section">
@@ -42,9 +42,7 @@ export function CreateRoomForm({ form }: { form: CreateRoomFormState }) {
           name="section"
           value={selectedSectionId ?? ""}
           onChange={(e) => {
-            setSelectedSectionId(
-              e.target.value ? Number(e.target.value) : null,
-            );
+            setSelectedSectionId(e.target.value ? Number(e.target.value) : null);
             setNeighboringRoom(startRoom);
           }}
         >
@@ -57,27 +55,18 @@ export function CreateRoomForm({ form }: { form: CreateRoomFormState }) {
       </FieldGroup>
 
       <FieldGroup id="name" label="Room Name">
-        <StyledInput
-          id="name"
-          name="name"
-          placeholder="e.g. The Whispering Crypt"
-          required
-        />
+        <StyledInput id="name" name="name" placeholder="e.g. The Whispering Crypt" required />
       </FieldGroup>
 
       <Divider label="Connections" />
 
-      <div
-        style={createRoomFormStyle}
-      >
+      <div style={createRoomFormStyle}>
         <FieldGroup id="neighboringRooms" label="Connect to room">
           <StyledSelect
             id="neighboringRooms"
             name="neighboringRooms"
             onChange={(e) => {
-              const selected = sectionRooms.find(
-                (r) => r.name === e.target.value,
-              );
+              const selected = sectionRooms.find((r) => r.name === e.target.value);
               if (selected) setNeighboringRoom(selected);
             }}
           >
@@ -127,11 +116,7 @@ export function CreateRoomForm({ form }: { form: CreateRoomFormState }) {
         >
           {interaction === "NPC" && <NPCForm />}
           {interaction === "Combat" && (
-            <CombatForm
-              enemyImgs={enemyImgs}
-              enemies={enemies}
-              onChange={setEnemies}
-            />
+            <CombatForm enemyImgs={enemyImgs} enemies={enemies} onChange={setEnemies} />
           )}
           {interaction === "Chest" && <ChestForm />}
           {interaction === "Camp" && <CampForm />}
@@ -139,9 +124,7 @@ export function CreateRoomForm({ form }: { form: CreateRoomFormState }) {
         </div>
       )}
 
-      <div
-        style={createRoomFormStyle2}
-      >
+      <div style={createRoomFormStyle2}>
         <button
           type="submit"
           disabled={isSubmitting}
@@ -165,8 +148,7 @@ export function CreateRoomForm({ form }: { form: CreateRoomFormState }) {
             opacity: isSubmitting ? 0.6 : 1,
           }}
           onMouseDown={(e) => {
-            if (!isSubmitting)
-              e.currentTarget.style.transform = "scale(0.98)";
+            if (!isSubmitting) e.currentTarget.style.transform = "scale(0.98)";
           }}
           onMouseUp={(e) => {
             e.currentTarget.style.transform = "scale(1)";
@@ -175,9 +157,7 @@ export function CreateRoomForm({ form }: { form: CreateRoomFormState }) {
             e.currentTarget.style.transform = "scale(1)";
           }}
         >
-          <span style={{ color: isSubmitting ? colors.muted : "#0d0b07" }}>
-            {icons.door}
-          </span>
+          <span style={{ color: isSubmitting ? colors.muted : "#0d0b07" }}>{icons.door}</span>
           {isSubmitting ? "Forging…" : "Forge Room"}
         </button>
       </div>

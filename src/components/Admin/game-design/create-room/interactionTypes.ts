@@ -1,11 +1,4 @@
-export const INTERACTION_TYPES = [
-  "NPC",
-  "Chest",
-  "Camp",
-  "Combat",
-  "Transition",
-  "None",
-] as const;
+export const INTERACTION_TYPES = ["NPC", "Chest", "Camp", "Combat", "Transition", "None"] as const;
 
 export type InteractionType = (typeof INTERACTION_TYPES)[number];
 

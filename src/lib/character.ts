@@ -22,10 +22,7 @@ export function abilityModifier(score: number): number {
 }
 
 export function totalAbilityPointsSpent(abilities: AbilityScores): number {
-  return ABILITY_KEYS.reduce(
-    (sum, key) => sum + (abilities[key] - ABILITY_BASE),
-    0,
-  );
+  return ABILITY_KEYS.reduce((sum, key) => sum + (abilities[key] - ABILITY_BASE), 0);
 }
 
 export function remainingAbilityPoints(abilities: AbilityScores): number {

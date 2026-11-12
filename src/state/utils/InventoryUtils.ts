@@ -59,10 +59,7 @@ export function applyConsumable(
   const itemIndex = state.inventory.findIndex((i) => i.name === item.name);
   const updatedInventory =
     itemIndex !== -1
-      ? [
-          ...state.inventory.slice(0, itemIndex),
-          ...state.inventory.slice(itemIndex + 1),
-        ]
+      ? [...state.inventory.slice(0, itemIndex), ...state.inventory.slice(itemIndex + 1)]
       : state.inventory;
 
   const nextFighterIndex =
@@ -106,9 +103,7 @@ export function equipItemInState(
   characterName: string,
   itemName: string,
 ): EquipmentResult | null {
-  const itemIndex = state.inventory.findIndex(
-    (i) => i.name === itemName && i.type === "equipment",
-  );
+  const itemIndex = state.inventory.findIndex((i) => i.name === itemName && i.type === "equipment");
   if (itemIndex === -1) return null;
   const item = state.inventory[itemIndex] as EquippableItem;
 
@@ -151,9 +146,7 @@ export function unequipItemInState(
   if (!item) return null;
 
   const updatedParty = state.party.map((c) =>
-    c.name === characterName
-      ? { ...c, equipment: { ...c.equipment, [slot]: null } }
-      : c,
+    c.name === characterName ? { ...c, equipment: { ...c.equipment, [slot]: null } } : c,
   );
 
   return {

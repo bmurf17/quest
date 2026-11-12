@@ -1,5 +1,5 @@
 import { getEnemyMaxHealth } from "@/state/utils/CombatUtils";
-import type { GameState} from "@/state/GameState";
+import type { GameState } from "@/state/GameState";
 import { useGameStore } from "@/state/GameState";
 import type { Enemy } from "@/types/Enemy";
 import { useEffect, useState, memo } from "react";
@@ -19,14 +19,14 @@ function BattleEnemiesComponent() {
   const lastDefeatedEnemyId = useGameStore((state) => state.lastDefeatedEnemyId);
   const lastDefeatedCounter = useGameStore((state) => state.lastDefeatedCounter);
   const [flashingEnemyId, setFlashingEnemyId] = useState<string | null>(null);
-  
-  const playHitSound = useSound('/sounds/hit.mp3', 0.5);
-  const playDefeatSound = useSound('/sounds/monster_defeat.mp3', 0.5);
+
+  const playHitSound = useSound("/sounds/hit.mp3", 0.5);
+  const playDefeatSound = useSound("/sounds/monster_defeat.mp3", 0.5);
 
   useEffect(() => {
     if (lastHitEnemyId) {
       playHitSound();
-      
+
       setFlashingEnemyId(lastHitEnemyId);
       const timer = setTimeout(() => {
         setFlashingEnemyId(null);
@@ -70,9 +70,9 @@ function BattleEnemiesComponent() {
 
   const getEnemyHealthColor = (hp: number, maxHp: number) => {
     const pct = hp / maxHp;
-    if (pct > 0.6) return 'bg-green-500';
-    if (pct > 0.3) return 'bg-yellow-500';
-    return 'bg-red-500';
+    if (pct > 0.6) return "bg-green-500";
+    if (pct > 0.3) return "bg-yellow-500";
+    return "bg-red-500";
   };
 
   return (
@@ -81,7 +81,7 @@ function BattleEnemiesComponent() {
         <div className="flex gap-4 items-start">
           {currentRoom.enemies.map((enemy) => {
             const isFlashing = flashingEnemyId === enemy.id.toString();
-            const isBoss = enemy.type === 'boss';
+            const isBoss = enemy.type === "boss";
             const maxHp = getEnemyMaxHealth(enemy);
             const hpPct = enemy.health / maxHp;
             const imgSize = isBoss ? 160 : 128;
@@ -123,7 +123,9 @@ function BattleEnemiesComponent() {
                 <div className="mt-2 w-32">
                   <div className="flex justify-between text-xs text-white mb-0.5">
                     <span className="font-bold truncate max-w-[80px]">{enemy.name}</span>
-                    <span>{Math.ceil(enemy.health)}/{maxHp}</span>
+                    <span>
+                      {Math.ceil(enemy.health)}/{maxHp}
+                    </span>
                   </div>
                   <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
                     <div
@@ -140,9 +142,11 @@ function BattleEnemiesComponent() {
         <> </>
       )}
       {isTargeting && currentRoom && currentRoom.enemies.length > 1 && (
-        <div className={`mt-4 text-sm font-bold bg-black bg-opacity-70 rounded-lg px-4 py-2 ${
-          targetingSpell ? 'text-purple-400' : 'text-yellow-400'
-        }`}>
+        <div
+          className={`mt-4 text-sm font-bold bg-black bg-opacity-70 rounded-lg px-4 py-2 ${
+            targetingSpell ? "text-purple-400" : "text-yellow-400"
+          }`}
+        >
           {getTargetingMessage()}
         </div>
       )}

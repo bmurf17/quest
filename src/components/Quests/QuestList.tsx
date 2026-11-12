@@ -1,8 +1,5 @@
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { colors, fonts } from "@/theme";
 import { useGameStore } from "@/state/GameState";
 import type { Quest } from "@/types/RoomInteractions";
@@ -28,10 +25,7 @@ export default function QuestList({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent
-        className="gap-0 p-0"
-        style={questListStyle}
-      >
+      <DialogContent className="gap-0 p-0" style={questListStyle}>
         {selectedQuest ? (
           <>
             <QuestPanelHeader
@@ -52,21 +46,11 @@ export default function QuestList({
           <>
             <QuestPanelHeader title="Quest Journal" />
             <ScrollArea style={{ height: "60vh" }}>
-              <div
-                style={questListStyle2}
-              >
+              <div style={questListStyle2}>
                 {quests.length === 0 ? (
                   <div style={{ textAlign: "center", padding: "48px 16px" }}>
-                    <div
-                      style={questListStyle3}
-                    >
-                      ◇
-                    </div>
-                    <p
-                      style={questListStyle4}
-                    >
-                      You have no active quests
-                    </p>
+                    <div style={questListStyle3}>◇</div>
+                    <p style={questListStyle4}>You have no active quests</p>
                   </div>
                 ) : (
                   quests.map((quest) => (
@@ -81,17 +65,13 @@ export default function QuestList({
                         textAlign: "left",
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.background =
-                          "rgba(180,140,80,0.08)";
-                        e.currentTarget.style.borderColor =
-                          "rgba(212,175,55,0.35)";
+                        e.currentTarget.style.background = "rgba(180,140,80,0.08)";
+                        e.currentTarget.style.borderColor = "rgba(212,175,55,0.35)";
                         e.currentTarget.style.transform = "translateX(2px)";
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.background =
-                          "rgba(255,255,255,0.025)";
-                        e.currentTarget.style.borderColor =
-                          "rgba(180,140,80,0.14)";
+                        e.currentTarget.style.background = "rgba(255,255,255,0.025)";
+                        e.currentTarget.style.borderColor = "rgba(180,140,80,0.14)";
                         e.currentTarget.style.transform = "translateX(0)";
                       }}
                       onMouseDown={(e) => {
@@ -102,25 +82,13 @@ export default function QuestList({
                       }}
                     >
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div
-                          style={questListStyle6}
-                        >
-                          {quest.name}
-                        </div>
+                        <div style={questListStyle6}>{quest.name}</div>
                         {quest.description && (
-                          <div
-                            style={questListStyle7}
-                          >
-                            {quest.description}
-                          </div>
+                          <div style={questListStyle7}>{quest.description}</div>
                         )}
                       </div>
 
-                      <div
-                        style={questListStyle8}
-                      >
-                        View
-                      </div>
+                      <div style={questListStyle8}>View</div>
                     </button>
                   ))
                 )}
@@ -151,11 +119,11 @@ const questListStyle2: CSSProperties = {
   gap: 6,
 };
 const questListStyle3: CSSProperties = { fontSize: 28, opacity: 0.15, marginBottom: 10 };
-  const questListStyle4: CSSProperties = {
-                          margin: 0,
-                          color: colors.muted,
-                          fontSize: 13,
-                          fontFamily: fonts.display,
+const questListStyle4: CSSProperties = {
+  margin: 0,
+  color: colors.muted,
+  fontSize: 13,
+  fontFamily: fonts.display,
 };
 const questListStyle5: CSSProperties = {
   display: "flex",
@@ -166,8 +134,7 @@ const questListStyle5: CSSProperties = {
   border: "1px solid rgba(180,140,80,0.14)",
   borderRadius: 7,
   cursor: "pointer",
-  transition:
-    "background 0.15s, border-color 0.15s, transform 0.1s",
+  transition: "background 0.15s, border-color 0.15s, transform 0.1s",
 };
 const questListStyle6: CSSProperties = {
   fontSize: 14,

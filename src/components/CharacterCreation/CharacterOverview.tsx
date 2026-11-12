@@ -4,14 +4,8 @@ import type { CSSProperties } from "react";
 
 function SectionHeader({ children }: { children: React.ReactNode }) {
   return (
-    <div
-      style={sectionHeaderStyle}
-    >
-      <span
-        style={sectionHeaderStyle2}
-      >
-        {children}
-      </span>
+    <div style={sectionHeaderStyle}>
+      <span style={sectionHeaderStyle2}>{children}</span>
       <div style={sectionHeaderStyle3} />
     </div>
   );
@@ -19,14 +13,8 @@ function SectionHeader({ children }: { children: React.ReactNode }) {
 
 function StatLine({ label, value }: { label: string; value: string }) {
   return (
-    <div
-      style={statLineStyle}
-    >
-      <span
-        style={statLineStyle2}
-      >
-        {label}
-      </span>
+    <div style={statLineStyle}>
+      <span style={statLineStyle2}>{label}</span>
       <span
         style={{
           fontSize: 12,
@@ -53,24 +41,11 @@ export default function CharacterOverview() {
 
       <div style={{ marginTop: 14 }}>
         <SectionHeader>Abilities</SectionHeader>
-        <div
-          style={characterOverviewStyle}
-        >
+        <div style={characterOverviewStyle}>
           {Object.entries(character.abilities).map(([key, val]) => (
-            <div
-              key={key}
-              style={characterOverviewStyle2}
-            >
-              <div
-                style={characterOverviewStyle3}
-              >
-                {key.slice(0, 3)}
-              </div>
-              <div
-                style={characterOverviewStyle4}
-              >
-                {val}
-              </div>
+            <div key={key} style={characterOverviewStyle2}>
+              <div style={characterOverviewStyle3}>{key.slice(0, 3)}</div>
+              <div style={characterOverviewStyle4}>{val}</div>
             </div>
           ))}
         </div>
@@ -96,12 +71,12 @@ const sectionHeaderStyle2: CSSProperties = {
   whiteSpace: "nowrap",
 };
 const sectionHeaderStyle3: CSSProperties = { flex: 1, height: 1, background: colors.goldBorder };
-  const statLineStyle: CSSProperties = {
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "5px 0",
-          borderBottom: "1px solid rgba(255,255,255,0.04)",
+const statLineStyle: CSSProperties = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  padding: "5px 0",
+  borderBottom: "1px solid rgba(255,255,255,0.04)",
 };
 const statLineStyle2: CSSProperties = {
   fontSize: 10,

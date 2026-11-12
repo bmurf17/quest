@@ -19,22 +19,19 @@ export default {
             filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.5)) brightness(1)",
           },
           "15%": {
-            filter:
-              "drop-shadow(0 0 20px rgba(255,0,0,1)) brightness(2) saturate(0)",
+            filter: "drop-shadow(0 0 20px rgba(255,0,0,1)) brightness(2) saturate(0)",
           },
           "30%": {
             filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.5)) brightness(1)",
           },
           "45%": {
-            filter:
-              "drop-shadow(0 0 20px rgba(255,0,0,1)) brightness(2) saturate(0)",
+            filter: "drop-shadow(0 0 20px rgba(255,0,0,1)) brightness(2) saturate(0)",
           },
           "60%": {
             filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.5)) brightness(1)",
           },
           "75%": {
-            filter:
-              "drop-shadow(0 0 15px rgba(255,0,0,0.8)) brightness(1.5) saturate(0)",
+            filter: "drop-shadow(0 0 15px rgba(255,0,0,0.8)) brightness(1.5) saturate(0)",
           },
           "100%": {
             filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.5)) brightness(1)",

@@ -6,13 +6,13 @@ export enum NPCType {
   MERCHANT = "merchant",
   QUEST_GIVER = "quest_giver",
   GENERIC = "generic",
-  ANIMAL = "animal"
+  ANIMAL = "animal",
 }
 
 export enum NPCDisposition {
   NEUTRAL = "neutral",
   FRIENDLY = "friendly",
-  HOSTILE = "hostile"
+  HOSTILE = "hostile",
 }
 
 export enum DialogueOutcomeType {
@@ -23,7 +23,7 @@ export enum DialogueOutcomeType {
   NPC_HOSTILE = "npc_hostile",
   NPC_FRIENDLY = "npc_friendly",
   NPC_LEAVE = "npc_leave",
-  END_CONVERSATION = "end_conversation"
+  END_CONVERSATION = "end_conversation",
 }
 
 export interface SkillCondition {
@@ -60,7 +60,7 @@ export interface DialogueNode {
 export type QuestType =
   | { type: "fetch"; item: Item }
   | { type: "defeat"; enemy: Enemy }
-  | { type: "explore"; requireRoom: Room }
+  | { type: "explore"; requireRoom: Room };
 
 export interface Quest {
   id: number;
@@ -93,8 +93,8 @@ export interface Chest {
   isLocked: boolean;
   isOpen: boolean;
   discoveryMessage: string | null;
-  item: Item | null; 
-};
+  item: Item | null;
+}
 
 export interface Camp {
   healAmount: number;
@@ -107,7 +107,7 @@ export type TransitionDestination = "next_dungeon" | "sanctuary";
 
 export interface Transition {
   destination: TransitionDestination;
-  sanctuaryAvailable: boolean; 
+  sanctuaryAvailable: boolean;
   discoveryMessage?: string;
 }
 

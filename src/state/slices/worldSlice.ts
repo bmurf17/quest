@@ -6,11 +6,7 @@ import { startRoom } from "@/data/fixtures/rooms";
 import type { Cutscene } from "@/types/Cutscene";
 import type { Camp, Chest } from "@/types/RoomInteractions";
 import { ActivityLogBuilder } from "@/state/utils/ActivityLogUtils";
-import {
-  getCurrentRoomInstance,
-  getRoomInstanceKey,
-  resolveMove,
-} from "@/state/utils/WorldUtils";
+import { getCurrentRoomInstance, getRoomInstanceKey, resolveMove } from "@/state/utils/WorldUtils";
 import type { GameState, GameSlice } from "./types";
 
 export type WorldSlice = Pick<
@@ -45,10 +41,7 @@ export type WorldSlice = Pick<
 export const createWorldSlice: GameSlice<WorldSlice> = (set, get) => ({
   room: startRoom,
   roomInstances: new Map<number, Room>([
-    [
-      startRoom.id,
-      { ...startRoom, enemies: startRoom.enemies.map((e) => ({ ...e })) },
-    ],
+    [startRoom.id, { ...startRoom, enemies: startRoom.enemies.map((e) => ({ ...e })) }],
   ]),
   rooms: [],
   gameStatus: GameStatus.Exploring,
@@ -102,9 +95,7 @@ export const createWorldSlice: GameSlice<WorldSlice> = (set, get) => ({
   updateChest: (chest: Chest) =>
     set((state) => {
       const currentRoomInstance = getCurrentRoomInstance(state);
-      const logBuilder = new ActivityLogBuilder().add(
-        "You have opened the chest!",
-      );
+      const logBuilder = new ActivityLogBuilder().add("You have opened the chest!");
       const updatedRoom: Room = {
         ...currentRoomInstance,
         interaction: { type: "chest", chest },
@@ -126,9 +117,7 @@ export const createWorldSlice: GameSlice<WorldSlice> = (set, get) => ({
   takeFromChest: (chest: Chest) =>
     set((state) => {
       const currentRoomInstance = getCurrentRoomInstance(state);
-      const logBuilder = new ActivityLogBuilder().add(
-        "You take from the chest!",
-      );
+      const logBuilder = new ActivityLogBuilder().add("You take from the chest!");
       const updatedRoom: Room = {
         ...currentRoomInstance,
         interaction: { type: "chest", chest: { ...chest } },
@@ -171,10 +160,7 @@ export const createWorldSlice: GameSlice<WorldSlice> = (set, get) => ({
         room: roomInstance,
         roomInstances: new Map([[firstRoom.id, roomInstance]]),
         gameStatus: GameStatus.Exploring,
-        combatOrder:
-          firstRoom.enemies.length > 0
-            ? [...state.party, ...firstRoom.enemies]
-            : [],
+        combatOrder: firstRoom.enemies.length > 0 ? [...state.party, ...firstRoom.enemies] : [],
         activityLog: [
           ...state.activityLog,
           `You begin exploring ${state.availableSections.find((s) => s.id === sectionId)?.name ?? "an unknown area"}...`,
@@ -190,15 +176,11 @@ export const createWorldSlice: GameSlice<WorldSlice> = (set, get) => ({
       if (state.beatenSections.includes(state.currentSection)) return state;
 
       const sectionName =
-        state.availableSections.find((s) => s.id === state.currentSection)
-          ?.name ?? "the area";
+        state.availableSections.find((s) => s.id === state.currentSection)?.name ?? "the area";
 
       return {
         beatenSections: [...state.beatenSections, state.currentSection],
-        activityLog: [
-          ...state.activityLog,
-          `You have completed ${sectionName}!`,
-        ],
+        activityLog: [...state.activityLog, `You have completed ${sectionName}!`],
       };
     }),
 
@@ -224,10 +206,7 @@ export const createWorldSlice: GameSlice<WorldSlice> = (set, get) => ({
       return {
         activeCutscene: cutscene,
         cutsceneSceneIndex: 0,
-        activityLog: [
-          ...state.activityLog,
-          "A vision begins to unfold before your eyes...",
-        ],
+        activityLog: [...state.activityLog, "A vision begins to unfold before your eyes..."],
       };
     }),
 
@@ -239,9 +218,7 @@ export const createWorldSlice: GameSlice<WorldSlice> = (set, get) => ({
         return { cutsceneSceneIndex: nextIndex };
       }
       if (state.activeCutscene.nextCutsceneId) {
-        const nextCutscene = state.cutscenes.get(
-          state.activeCutscene.nextCutsceneId,
-        );
+        const nextCutscene = state.cutscenes.get(state.activeCutscene.nextCutsceneId);
         if (nextCutscene) {
           return {
             activeCutscene: nextCutscene,

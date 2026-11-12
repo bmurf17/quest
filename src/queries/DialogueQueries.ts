@@ -149,12 +149,6 @@ export async function getNPCDisposition(npcId: number): Promise<string> {
   return data[0].disposition || "neutral";
 }
 
-export async function setNPCDisposition(
-  npcId: number,
-  disposition: string
-): Promise<void> {
-  await supabase
-    .from("npcs")
-    .update({ disposition })
-    .eq("id", npcId);
+export async function setNPCDisposition(npcId: number, disposition: string): Promise<void> {
+  await supabase.from("npcs").update({ disposition }).eq("id", npcId);
 }

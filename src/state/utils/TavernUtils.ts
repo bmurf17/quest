@@ -59,10 +59,32 @@ const ALL_CLASSES = [
 ] as const;
 
 const FIRST_NAMES = [
-  "Aria", "Borin", "Cedric", "Dorna", "Elara", "Finn", "Greta",
-  "Havel", "Iris", "Jorin", "Kara", "Liam", "Mira", "Nash",
-  "Oriana", "Pip", "Quinn", "Riva", "Soren", "Tara", "Ulric",
-  "Vex", "Willow", "Xander", "Yara", "Zane",
+  "Aria",
+  "Borin",
+  "Cedric",
+  "Dorna",
+  "Elara",
+  "Finn",
+  "Greta",
+  "Havel",
+  "Iris",
+  "Jorin",
+  "Kara",
+  "Liam",
+  "Mira",
+  "Nash",
+  "Oriana",
+  "Pip",
+  "Quinn",
+  "Riva",
+  "Soren",
+  "Tara",
+  "Ulric",
+  "Vex",
+  "Willow",
+  "Xander",
+  "Yara",
+  "Zane",
 ];
 
 const RACES = ["Human", "Elf", "Dwarf", "Halfling", "Gnome", "Half-Orc", "Tiefling"];
@@ -95,8 +117,16 @@ function pick<T>(arr: readonly T[]): T {
 function generateName(): string {
   const first = pick(FIRST_NAMES);
   const last = pick([
-    "Shadow", "Ironheart", "Swiftarrow", "Battleborn", "Silvermoon",
-    "Deepforge", "Stormwind", "Firebrand", "Nightwhisper", "Goldleaf",
+    "Shadow",
+    "Ironheart",
+    "Swiftarrow",
+    "Battleborn",
+    "Silvermoon",
+    "Deepforge",
+    "Stormwind",
+    "Firebrand",
+    "Nightwhisper",
+    "Goldleaf",
   ]);
   return `${first} ${last}`;
 }
@@ -158,20 +188,66 @@ function generateLevel(config: TavernConfig): number {
 }
 
 function classItem(cls: string): EquippableItem {
-  const base = { type: 'equipment' as const, slot: 'weapon' as const, value: 2, cost: 3, stats: {} as { attack?: number; defense?: number } };
+  const base = {
+    type: "equipment" as const,
+    slot: "weapon" as const,
+    value: 2,
+    cost: 3,
+    stats: {} as { attack?: number; defense?: number },
+  };
   switch (cls) {
     case "warrior":
     case "barbarian":
-      return { ...base, name: "Spear", img: spearImg, action: { name: "Spear", hitDC: "+6", damage: { numDice: 1, dieSize: 8, bonus: 2 }, type: "Melee Weapon" as const } };
+      return {
+        ...base,
+        name: "Spear",
+        img: spearImg,
+        action: {
+          name: "Spear",
+          hitDC: "+6",
+          damage: { numDice: 1, dieSize: 8, bonus: 2 },
+          type: "Melee Weapon" as const,
+        },
+      };
     case "ranger":
     case "assassin":
-      return { ...base, name: "Longbow", img: bowImg, action: { name: "Longbow", hitDC: "+6", damage: { numDice: 1, dieSize: 8, bonus: 2 }, type: "Ranged Weapon" as const } };
+      return {
+        ...base,
+        name: "Longbow",
+        img: bowImg,
+        action: {
+          name: "Longbow",
+          hitDC: "+6",
+          damage: { numDice: 1, dieSize: 8, bonus: 2 },
+          type: "Ranged Weapon" as const,
+        },
+      };
     case "cleric":
     case "wizard":
     case "bard":
-      return { ...base, name: "Staff", img: staffImg, action: { name: "Staff", hitDC: "+4", damage: { numDice: 1, dieSize: 6, bonus: 2 }, type: "Ranged Weapon" as const } };
+      return {
+        ...base,
+        name: "Staff",
+        img: staffImg,
+        action: {
+          name: "Staff",
+          hitDC: "+4",
+          damage: { numDice: 1, dieSize: 6, bonus: 2 },
+          type: "Ranged Weapon" as const,
+        },
+      };
     default:
-      return { ...base, name: "Shortsword", img: swordImg, action: { name: "Shortsword", hitDC: "+4", damage: { numDice: 1, dieSize: 6, bonus: 2 }, type: "Melee Weapon" as const } };
+      return {
+        ...base,
+        name: "Shortsword",
+        img: swordImg,
+        action: {
+          name: "Shortsword",
+          hitDC: "+4",
+          damage: { numDice: 1, dieSize: 6, bonus: 2 },
+          type: "Melee Weapon" as const,
+        },
+      };
   }
 }
 
@@ -203,11 +279,21 @@ export function generateTavernCharacter(config: TavernConfig): CharacterData {
       { name: "Deception", ability: "CHA", modifier: "-1" },
     ],
     equipment: {
-      helmet: null, armor: null, weapon: classItem(cls),
-      shield: null, accessory1: null, accessory2: null, boots: null,
+      helmet: null,
+      armor: null,
+      weapon: classItem(cls),
+      shield: null,
+      accessory1: null,
+      accessory2: null,
+      boots: null,
     },
     savingThrows: {
-      str: "+2", dex: "+4", con: "0", int: "+1", wis: "+1", cha: "-1",
+      str: "+2",
+      dex: "+4",
+      con: "0",
+      int: "+1",
+      wis: "+1",
+      cha: "-1",
     },
     spells: defaultSpells,
     type: "character",

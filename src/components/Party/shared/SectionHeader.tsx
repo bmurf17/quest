@@ -17,11 +17,7 @@ export function SectionHeader({
         margin,
       }}
     >
-      <span
-        style={sectionHeaderStyle}
-      >
-        {children}
-      </span>
+      <span style={sectionHeaderStyle}>{children}</span>
       <div style={sectionHeaderStyle2} />
     </div>
   );

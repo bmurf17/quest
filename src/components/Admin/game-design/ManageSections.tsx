@@ -36,15 +36,8 @@ function Toast({
         maxWidth: 360,
       }}
     >
-      <div style={toastStyle}>
-        {message}
-      </div>
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label="Dismiss notification"
-        style={toastStyle2}
-      >
+      <div style={toastStyle}>{message}</div>
+      <button type="button" onClick={onClose} aria-label="Dismiss notification" style={toastStyle2}>
         ×
       </button>
     </div>
@@ -112,9 +105,7 @@ export default function ManageSections() {
 
       if (error) throw error;
 
-      const updated = sections.map((s) =>
-        s.id === id ? { ...s, name: editName.trim() } : s,
-      );
+      const updated = sections.map((s) => (s.id === id ? { ...s, name: editName.trim() } : s));
       setSections(updated);
       loadSections(updated);
       setEditingId(null);
@@ -127,7 +118,10 @@ export default function ManageSections() {
   };
 
   const handleDelete = async (id: number, name: string) => {
-    if (!window.confirm(`Delete section "${name}"? Rooms in this section will lose their assignment.`)) return;
+    if (
+      !window.confirm(`Delete section "${name}"? Rooms in this section will lose their assignment.`)
+    )
+      return;
 
     setIsSubmitting(true);
     try {
@@ -148,29 +142,16 @@ export default function ManageSections() {
 
   return (
     <>
-      <main
-        style={manageSectionsStyle}
-      >
+      <main style={manageSectionsStyle}>
         <div style={{ maxWidth: 640, margin: "0 auto" }}>
-          <a
-            href="/admin"
-            style={manageSectionsStyle2}
-          >
+          <a href="/admin" style={manageSectionsStyle2}>
             ← Back to Admin
           </a>
 
-          <h1
-            style={manageSectionsStyle3}
-          >
-            Sections
-          </h1>
-          <p style={manageSectionsStyle4}>
-            Create and manage exploration sections
-          </p>
+          <h1 style={manageSectionsStyle3}>Sections</h1>
+          <p style={manageSectionsStyle4}>Create and manage exploration sections</p>
 
-          <div
-            style={manageSectionsStyle5}
-          >
+          <div style={manageSectionsStyle5}>
             {sections.map((section) => {
               const isEditing = editingId === section.id;
               return (
@@ -187,11 +168,7 @@ export default function ManageSections() {
                     transition: "border-color 0.15s",
                   }}
                 >
-                  <div
-                    style={manageSectionsStyle6}
-                  >
-                    {section.id}
-                  </div>
+                  <div style={manageSectionsStyle6}>{section.id}</div>
 
                   {isEditing ? (
                     <div style={manageSectionsStyle7}>
@@ -199,33 +176,26 @@ export default function ManageSections() {
                         value={editName}
                         onChange={(e) => setEditName(e.target.value)}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter") handleUpdate(section.id);
+                          if (e.key === "Enter") void handleUpdate(section.id);
                           if (e.key === "Escape") setEditingId(null);
                         }}
                         style={manageSectionsStyle8}
                         autoFocus
                       />
                       <button
-                        onClick={() => handleUpdate(section.id)}
+                        onClick={() => void handleUpdate(section.id)}
                         disabled={isSubmitting || !editName.trim()}
                         style={manageSectionsStyle9}
                       >
                         Save
                       </button>
-                      <button
-                        onClick={() => setEditingId(null)}
-                        style={manageSectionsStyle10}
-                      >
+                      <button onClick={() => setEditingId(null)} style={manageSectionsStyle10}>
                         Cancel
                       </button>
                     </div>
                   ) : (
                     <>
-                      <span
-                        style={manageSectionsStyle11}
-                      >
-                        {section.name}
-                      </span>
+                      <span style={manageSectionsStyle11}>{section.name}</span>
                       <button
                         onClick={() => {
                           setEditingId(section.id);
@@ -236,7 +206,7 @@ export default function ManageSections() {
                         Edit
                       </button>
                       <button
-                        onClick={() => handleDelete(section.id, section.name)}
+                        onClick={() => void handleDelete(section.id, section.name)}
                         disabled={isSubmitting}
                         style={manageSectionsStyle13}
                       >
@@ -249,24 +219,14 @@ export default function ManageSections() {
             })}
 
             {sections.length === 0 && (
-              <div
-                style={manageSectionsStyle14}
-              >
-                No sections yet. Create one below.
-              </div>
+              <div style={manageSectionsStyle14}>No sections yet. Create one below.</div>
             )}
           </div>
 
-          <div
-            style={manageSectionsStyle15}
-          >
-            <div
-              style={manageSectionsStyle16}
-            >
-              Create Section
-            </div>
+          <div style={manageSectionsStyle15}>
+            <div style={manageSectionsStyle16}>Create Section</div>
 
-            <form onSubmit={handleCreate} style={{ display: "flex", gap: 10 }}>
+            <form onSubmit={(e) => void handleCreate(e)} style={{ display: "flex", gap: 10 }}>
               <input
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
@@ -298,28 +258,26 @@ export default function ManageSections() {
         </div>
       </main>
 
-      {toast && (
-        <Toast
-          type={toast.type}
-          message={toast.message}
-          onClose={() => setToast(null)}
-        />
-      )}
+      {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
     </>
   );
 }
 
 // Static style objects hoisted out of the render path.
-const toastStyle: CSSProperties = { flex: 1, fontFamily: "'Crimson Text', Georgia, serif", lineHeight: 1.5 };
-  const toastStyle2: CSSProperties = {
-            background: "none",
-            border: "none",
-            color: "inherit",
-            cursor: "pointer",
-            padding: 0,
-            fontSize: 18,
-            lineHeight: 1,
-            opacity: 0.7,
+const toastStyle: CSSProperties = {
+  flex: 1,
+  fontFamily: "'Crimson Text', Georgia, serif",
+  lineHeight: 1.5,
+};
+const toastStyle2: CSSProperties = {
+  background: "none",
+  border: "none",
+  color: "inherit",
+  cursor: "pointer",
+  padding: 0,
+  fontSize: 18,
+  lineHeight: 1,
+  opacity: 0.7,
 };
 const manageSectionsStyle: CSSProperties = {
   minHeight: "100vh",
@@ -347,12 +305,17 @@ const manageSectionsStyle3: CSSProperties = {
   fontFamily: fonts.display,
   letterSpacing: "0.06em",
 };
-const manageSectionsStyle4: CSSProperties = { margin: 0, marginBottom: 32, fontSize: 14, color: colors.muted };
-  const manageSectionsStyle5: CSSProperties = {
-                display: "flex",
-                flexDirection: "column",
-                gap: 16,
-                marginBottom: 40,
+const manageSectionsStyle4: CSSProperties = {
+  margin: 0,
+  marginBottom: 32,
+  fontSize: 14,
+  color: colors.muted,
+};
+const manageSectionsStyle5: CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 16,
+  marginBottom: 40,
 };
 const manageSectionsStyle6: CSSProperties = {
   width: 28,
@@ -369,16 +332,16 @@ const manageSectionsStyle6: CSSProperties = {
   fontWeight: 700,
 };
 const manageSectionsStyle7: CSSProperties = { flex: 1, display: "flex", gap: 8 };
-  const manageSectionsStyle8: CSSProperties = {
-                            flex: 1,
-                            padding: "6px 10px",
-                            background: "rgba(0,0,0,0.3)",
-                            border: `1px solid ${colors.goldBorder}`,
-                            borderRadius: 4,
-                            color: colors.text,
-                            fontSize: 14,
-                            fontFamily: fonts.body,
-                            outline: "none",
+const manageSectionsStyle8: CSSProperties = {
+  flex: 1,
+  padding: "6px 10px",
+  background: "rgba(0,0,0,0.3)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 4,
+  color: colors.text,
+  fontSize: 14,
+  fontFamily: fonts.body,
+  outline: "none",
 };
 const manageSectionsStyle9: CSSProperties = {
   padding: "6px 12px",

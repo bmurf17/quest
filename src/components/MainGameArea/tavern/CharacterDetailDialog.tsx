@@ -3,25 +3,14 @@ import { formatDamageDice } from "@/lib/dice";
 import type { EquippableItem } from "@/types/Item";
 import { useGameStore } from "@/state/GameState";
 import { colors, fonts } from "@/theme";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { CSSProperties } from "react";
 
 function SectionHeader({ children }: { children: React.ReactNode }) {
   return (
-    <div
-      style={sectionHeaderStyle}
-    >
-      <span
-        style={sectionHeaderStyle2}
-      >
-        {children}
-      </span>
+    <div style={sectionHeaderStyle}>
+      <span style={sectionHeaderStyle2}>{children}</span>
       <div style={sectionHeaderStyle3} />
     </div>
   );
@@ -48,9 +37,7 @@ export function CharacterDetailDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent
-        style={characterDetailDialogStyle}
-      >
+      <DialogContent style={characterDetailDialogStyle}>
         <DialogHeader
           style={{
             padding: "20px 24px 16px",
@@ -58,31 +45,14 @@ export function CharacterDetailDialog({
           }}
         >
           <div style={characterDetailDialogStyle2}>
-            <div
-              style={characterDetailDialogStyle3}
-            >
-              <img
-                src={character.img}
-                alt={character.name}
-                style={characterDetailDialogStyle4}
-              />
+            <div style={characterDetailDialogStyle3}>
+              <img src={character.img} alt={character.name} style={characterDetailDialogStyle4} />
             </div>
             <div style={{ flex: 1 }}>
-              <DialogTitle
-                style={characterDetailDialogStyle5}
-              >
-                {character.name}
-              </DialogTitle>
+              <DialogTitle style={characterDetailDialogStyle5}>{character.name}</DialogTitle>
               <div style={{ display: "flex", gap: 6 }}>
-                {[
-                  character.race,
-                  character.class,
-                  `Level ${character.level}`,
-                ].map((tag) => (
-                  <span
-                    key={tag}
-                    style={characterDetailDialogStyle6}
-                  >
+                {[character.race, character.class, `Level ${character.level}`].map((tag) => (
+                  <span key={tag} style={characterDetailDialogStyle6}>
                     {tag}
                   </span>
                 ))}
@@ -94,29 +64,15 @@ export function CharacterDetailDialog({
         <ScrollArea style={{ maxHeight: "60vh" }}>
           <div style={{ padding: "4px 24px 28px" }}>
             <SectionHeader>Ability Scores</SectionHeader>
-            <div
-              style={characterDetailDialogStyle7}
-            >
+            <div style={characterDetailDialogStyle7}>
               {Object.entries(character.abilities).map(([key, ability]) => (
-                <div
-                  key={key}
-                  style={characterDetailDialogStyle8}
-                >
-                  <div
-                    style={characterDetailDialogStyle9}
-                  >
-                    {key}
-                  </div>
-                  <div
-                    style={characterDetailDialogStyle10}
-                  >
-                    {ability.score}
-                  </div>
+                <div key={key} style={characterDetailDialogStyle8}>
+                  <div style={characterDetailDialogStyle9}>{key}</div>
+                  <div style={characterDetailDialogStyle10}>{ability.score}</div>
                   <div
                     style={{
                       fontSize: 12,
-                      color:
-                        ability.modifier >= 0 ? colors.success : colors.danger,
+                      color: ability.modifier >= 0 ? colors.success : colors.danger,
                       marginTop: 3,
                     }}
                   >
@@ -127,24 +83,16 @@ export function CharacterDetailDialog({
               ))}
             </div>
 
-            {Object.values(character.equipment).filter(
-              (i): i is EquippableItem => i !== null,
-            ).length > 0 && (
+            {Object.values(character.equipment).filter((i): i is EquippableItem => i !== null)
+              .length > 0 && (
               <>
                 <SectionHeader>Equipment</SectionHeader>
-                <div
-                  style={characterDetailDialogStyle11}
-                >
+                <div style={characterDetailDialogStyle11}>
                   {Object.values(character.equipment)
                     .filter((i): i is EquippableItem => i !== null)
                     .map((item) => (
-                      <div
-                        key={item.name}
-                        style={characterDetailDialogStyle12}
-                      >
-                        <div
-                          style={characterDetailDialogStyle13}
-                        >
+                      <div key={item.name} style={characterDetailDialogStyle12}>
+                        <div style={characterDetailDialogStyle13}>
                           <img
                             src={item.img}
                             alt={item.name}
@@ -152,37 +100,20 @@ export function CharacterDetailDialog({
                           />
                         </div>
                         <div style={{ flex: 1 }}>
-                          <div
-                            style={characterDetailDialogStyle15}
-                          >
-                            {item.name}
-                          </div>
+                          <div style={characterDetailDialogStyle15}>{item.name}</div>
                           <div style={{ fontSize: 12, color: colors.textMuted }}>
                             {item.action?.type}
                           </div>
                         </div>
                         {item.action && (
-                          <div
-                            style={characterDetailDialogStyle16}
-                          >
+                          <div style={characterDetailDialogStyle16}>
                             {[
                               ["Hit", item.action.hitDC],
                               ["Dmg", formatDamageDice(item.action.damage)],
                             ].map(([label, val]) => (
-                              <div
-                                key={label as string}
-                                style={{ textAlign: "center" }}
-                              >
-                                <div
-                                  style={characterDetailDialogStyle17}
-                                >
-                                  {label}
-                                </div>
-                                <div
-                                  style={characterDetailDialogStyle18}
-                                >
-                                  {val as string}
-                                </div>
+                              <div key={label} style={{ textAlign: "center" }}>
+                                <div style={characterDetailDialogStyle17}>{label}</div>
+                                <div style={characterDetailDialogStyle18}>{val}</div>
                               </div>
                             ))}
                           </div>
@@ -195,9 +126,7 @@ export function CharacterDetailDialog({
           </div>
         </ScrollArea>
 
-        <div
-          style={characterDetailDialogStyle19}
-        >
+        <div style={characterDetailDialogStyle19}>
           <button
             onClick={() => onOpenChange(false)}
             style={characterDetailDialogStyle20}
@@ -275,28 +204,32 @@ const sectionHeaderStyle2: CSSProperties = {
   whiteSpace: "nowrap",
 };
 const sectionHeaderStyle3: CSSProperties = { flex: 1, height: 1, background: colors.goldBorder };
-  const characterDetailDialogStyle: CSSProperties = {
-            maxWidth: 640,
-            background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 100%)",
-            border: `1px solid ${colors.goldBorder}`,
-            borderRadius: 12,
-            padding: 0,
-            overflow: "hidden",
-            fontFamily: fonts.body,
-            color: colors.text,
+const characterDetailDialogStyle: CSSProperties = {
+  maxWidth: 640,
+  background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 100%)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 12,
+  padding: 0,
+  overflow: "hidden",
+  fontFamily: fonts.body,
+  color: colors.text,
 };
-const characterDetailDialogStyle2: CSSProperties = { display: "flex", alignItems: "center", gap: 16 };
-  const characterDetailDialogStyle3: CSSProperties = {
-                  width: 64,
-                  height: 64,
-                  flexShrink: 0,
-                  background: "rgba(0,0,0,0.5)",
-                  border: "1px solid rgba(180,140,80,0.2)",
-                  borderRadius: 8,
-                  overflow: "hidden",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
+const characterDetailDialogStyle2: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 16,
+};
+const characterDetailDialogStyle3: CSSProperties = {
+  width: 64,
+  height: 64,
+  flexShrink: 0,
+  background: "rgba(0,0,0,0.5)",
+  border: "1px solid rgba(180,140,80,0.2)",
+  borderRadius: 8,
+  overflow: "hidden",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
 };
 const characterDetailDialogStyle4: CSSProperties = {
   width: 56,
@@ -387,13 +320,13 @@ const characterDetailDialogStyle15: CSSProperties = {
   marginBottom: 3,
 };
 const characterDetailDialogStyle16: CSSProperties = { display: "flex", gap: 16, flexShrink: 0 };
-  const characterDetailDialogStyle17: CSSProperties = {
-                                      fontSize: 9,
-                                      color: colors.textMuted,
-                                      fontFamily: fonts.display,
-                                      letterSpacing: "0.08em",
-                                      textTransform: "uppercase",
-                                      marginBottom: 2,
+const characterDetailDialogStyle17: CSSProperties = {
+  fontSize: 9,
+  color: colors.textMuted,
+  fontFamily: fonts.display,
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+  marginBottom: 2,
 };
 const characterDetailDialogStyle18: CSSProperties = {
   fontSize: 14,

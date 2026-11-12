@@ -10,14 +10,10 @@ type Assert<T extends true> = T;
 // These fail `tsc -b` if a hand-written DB row type grows a column that the
 // generated schema contract does not know about.
 type EnemyColumnsExist = Assert<
-  keyof DbEnemy extends keyof Database["public"]["Tables"]["enemies"]["Row"]
-    ? true
-    : false
+  keyof DbEnemy extends keyof Database["public"]["Tables"]["enemies"]["Row"] ? true : false
 >;
 type ItemColumnsExist = Assert<
-  keyof DbItem extends keyof Database["public"]["Tables"]["items"]["Row"]
-    ? true
-    : false
+  keyof DbItem extends keyof Database["public"]["Tables"]["items"]["Row"] ? true : false
 >;
 
 const srcDir = fileURLToPath(new URL("../..", import.meta.url));
@@ -33,9 +29,7 @@ function walk(dir: string): string[] {
 
 function tablesInGeneratedTypes(): Set<string> {
   const source = readFileSync(generatedTypesPath, "utf8");
-  return new Set(
-    [...source.matchAll(/^ {6}([a-z_]+): \{$/gm)].map((match) => match[1]),
-  );
+  return new Set([...source.matchAll(/^ {6}([a-z_]+): \{$/gm)].map((match) => match[1]));
 }
 
 function tablesQueriedByApp(): Map<string, string[]> {
@@ -64,9 +58,7 @@ describe("database schema contract", () => {
 
   it("has unique, ordered migration prefixes", () => {
     const migrationsDir = join(srcDir, "../supabase/migrations");
-    const files = readdirSync(migrationsDir).filter((file) =>
-      file.endsWith(".sql"),
-    );
+    const files = readdirSync(migrationsDir).filter((file) => file.endsWith(".sql"));
     const prefixes = files.map((file) => file.split("_")[0]);
 
     expect(new Set(prefixes).size).toBe(prefixes.length);
@@ -75,4 +67,4 @@ describe("database schema contract", () => {
 });
 
 // Keep the type helpers referenced so unused-type lint rules stay quiet.
-export type DatabaseContractChecks = EnemyColumnsExist | ItemColumnsExist;
+export type DatabaseContractChecks = [EnemyColumnsExist, ItemColumnsExist];

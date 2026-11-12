@@ -10,19 +10,11 @@ export default function ClassForm() {
   return (
     <>
       <div>
-        <div
-          style={classFormStyle}
-        >
-          <span
-            style={classFormStyle2}
-          >
-            Choose Your Class
-          </span>
+        <div style={classFormStyle}>
+          <span style={classFormStyle2}>Choose Your Class</span>
           <div style={classFormStyle3} />
         </div>
-        <div
-          style={classFormStyle4}
-        >
+        <div style={classFormStyle4}>
           {CLASSES.map((cls) => {
             const active = character.class === cls.toLowerCase();
             return (
@@ -42,9 +34,7 @@ export default function ClassForm() {
                   padding: "12px 14px",
                   borderRadius: 7,
                   border: `1px solid ${active ? "rgba(212,175,55,0.4)" : "rgba(180,140,80,0.12)"}`,
-                  background: active
-                    ? "rgba(212,175,55,0.09)"
-                    : "rgba(255,255,255,0.03)",
+                  background: active ? "rgba(212,175,55,0.09)" : "rgba(255,255,255,0.03)",
                   cursor: "pointer",
                   transition: "background 0.12s, border-color 0.12s",
                 }}
@@ -63,11 +53,7 @@ export default function ClassForm() {
                     transition: "all 0.12s",
                   }}
                 >
-                  {active && (
-                    <div
-                      style={classFormStyle5}
-                    />
-                  )}
+                  {active && <div style={classFormStyle5} />}
                 </div>
                 <span
                   style={{
@@ -105,10 +91,10 @@ const classFormStyle2: CSSProperties = {
   whiteSpace: "nowrap",
 };
 const classFormStyle3: CSSProperties = { flex: 1, height: 1, background: colors.goldBorder };
-  const classFormStyle4: CSSProperties = {
-              display: "flex",
-              flexDirection: "column",
-              gap: 6,
+const classFormStyle4: CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 6,
 };
 const classFormStyle5: CSSProperties = {
   width: 6,

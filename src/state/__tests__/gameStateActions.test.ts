@@ -93,12 +93,7 @@ describe("combat turn order", () => {
     useGameStore.getState().enterCombat();
 
     const state = useGameStore.getState();
-    expect(state.combatOrder.map((f) => f.name)).toEqual([
-      "Warrior",
-      "Cleric",
-      "Goblin",
-      "Orc",
-    ]);
+    expect(state.combatOrder.map((f) => f.name)).toEqual(["Warrior", "Cleric", "Goblin", "Orc"]);
     expect(state.activeFighterIndex).toBe(0);
     expect(state.isCurrentFighterEnemy()).toBe(false);
 

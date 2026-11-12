@@ -4,13 +4,7 @@ import { useGameStore } from "@/state/GameState";
 import { Directions } from "@/types/Directions";
 import { GameStatus } from "@/types/GameStatus";
 import type { Room } from "@/types/Room";
-import type { Transition } from "@/types/RoomInteractions";
-import {
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  ChevronUp,
-} from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from "lucide-react";
 import type { CSSProperties } from "react";
 
 const CELL = 12;
@@ -30,23 +24,16 @@ const interactionColor: Record<string, string> = {
 };
 
 function getRoomColor(room: Room): string {
-  if (room.interaction)
-    return interactionColor[room.interaction.type] ?? interactionColor.none;
+  if (room.interaction) return interactionColor[room.interaction.type] ?? interactionColor.none;
   if (room.enemies?.length > 0) return interactionColor.Combat;
   return interactionColor.none;
 }
 
-function dirToOffset(
-  dir: Directions | string | number,
-): { dx: number; dy: number } | null {
-  if (dir === Directions.North || dir === "North" || dir === 0)
-    return { dx: 0, dy: -1 };
-  if (dir === Directions.West || dir === "West" || dir === 1)
-    return { dx: -1, dy: 0 };
-  if (dir === Directions.South || dir === "South" || dir === 2)
-    return { dx: 0, dy: 1 };
-  if (dir === Directions.East || dir === "East" || dir === 3)
-    return { dx: 1, dy: 0 };
+function dirToOffset(dir: Directions | string | number): { dx: number; dy: number } | null {
+  if (dir === Directions.North || dir === "North" || dir === 0) return { dx: 0, dy: -1 };
+  if (dir === Directions.West || dir === "West" || dir === 1) return { dx: -1, dy: 0 };
+  if (dir === Directions.South || dir === "South" || dir === 2) return { dx: 0, dy: 1 };
+  if (dir === Directions.East || dir === "East" || dir === 3) return { dx: 1, dy: 0 };
   return null;
 }
 
@@ -70,9 +57,7 @@ function buildLayout(
     if (visited.has(neighbor.name)) continue;
     const off = dirToOffset(dir);
     if (!off) continue;
-    result.push(
-      ...buildLayout(neighbor, gx + off.dx, gy + off.dy, visited, depth + 1),
-    );
+    result.push(...buildLayout(neighbor, gx + off.dx, gy + off.dy, visited, depth + 1));
   }
   return result;
 }
@@ -102,21 +87,16 @@ function MiniMap({ currentRoom }: { currentRoom: Room }) {
         flexShrink: 0,
       }}
     >
-      <div
-        style={miniMapStyle}
-      />
+      <div style={miniMapStyle} />
 
-      <svg
-        style={miniMapStyle2}
-      >
+      <svg style={miniMapStyle2}>
         {visible.map(({ room, gx, gy }) =>
           (room.neighboringRooms ?? []).map(([dir], i) => {
             const off = dirToOffset(dir);
             if (!off) return null;
             const ngx = gx + off.dx;
             const ngy = gy + off.dy;
-            if (Math.abs(ngx) > VIEW_RADIUS || Math.abs(ngy) > VIEW_RADIUS)
-              return null;
+            if (Math.abs(ngx) > VIEW_RADIUS || Math.abs(ngy) > VIEW_RADIUS) return null;
             return (
               <line
                 key={`${room.name}-${i}`}
@@ -146,9 +126,7 @@ function MiniMap({ currentRoom }: { currentRoom: Room }) {
               height: CELL,
               borderRadius: 2,
               background: isCurrent ? color : `${color}55`,
-              border: isCurrent
-                ? `1px solid ${color}`
-                : "1px solid rgba(180,140,80,0.2)",
+              border: isCurrent ? `1px solid ${color}` : "1px solid rgba(180,140,80,0.2)",
               boxShadow: isCurrent ? `0 0 6px ${color}` : "none",
               transition: "all 0.2s",
             }}
@@ -176,18 +154,14 @@ export default function MapNav() {
   const state = useGameStore((state: GameState) => state);
 
   const room = state.room;
-  const transition = room?.interaction?.type === "transition" ? room.interaction.transition as Transition : null;
+  const transition = room?.interaction?.type === "transition" ? room.interaction.transition : null;
   return (
     <>
       {state.gameStatus === GameStatus.Exploring ? (
         <div className="absolute bottom-4 left-4 text-white">
           <div style={mapNavStyle}>
             <div style={mapNavStyle2}>
-              <span
-                style={mapNavStyle3}
-              >
-                Map
-              </span>
+              <span style={mapNavStyle3}>Map</span>
               <MiniMap currentRoom={state.room} />
             </div>
 
@@ -197,11 +171,7 @@ export default function MapNav() {
                 onClick={() => state.move(Directions.North)}
                 aria-label="Move north"
                 className="p-3 bg-gray-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 active:scale-95 disabled:hover:bg-gray-700 disabled:bg-gray-700"
-                disabled={
-                  !state.room.neighboringRooms.some(
-                    ([dir]) => dir === Directions.North,
-                  )
-                }
+                disabled={!state.room.neighboringRooms.some(([dir]) => dir === Directions.North)}
               >
                 <ChevronUp size={24} />
               </button>
@@ -212,11 +182,7 @@ export default function MapNav() {
                   onClick={() => state.move(Directions.West)}
                   aria-label="Move west"
                   className="p-3 bg-gray-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 active:scale-95 disabled:hover:bg-gray-700 disabled:bg-gray-700"
-                  disabled={
-                    !state.room.neighboringRooms.some(
-                      ([dir]) => dir === Directions.West,
-                    )
-                  }
+                  disabled={!state.room.neighboringRooms.some(([dir]) => dir === Directions.West)}
                 >
                   <ChevronLeft size={24} />
                 </button>
@@ -226,11 +192,7 @@ export default function MapNav() {
                   onClick={() => state.move(Directions.East)}
                   aria-label="Move east"
                   className="p-3 bg-gray-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 active:scale-95 disabled:hover:bg-gray-700 disabled:bg-gray-700"
-                  disabled={
-                    !state.room.neighboringRooms.some(
-                      ([dir]) => dir === Directions.East,
-                    )
-                  }
+                  disabled={!state.room.neighboringRooms.some(([dir]) => dir === Directions.East)}
                 >
                   <ChevronRight size={24} />
                 </button>
@@ -241,11 +203,7 @@ export default function MapNav() {
                 onClick={() => state.move(Directions.South)}
                 aria-label="Move south"
                 className="p-3 bg-gray-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 active:scale-95 disabled:hover:bg-gray-700 disabled:bg-gray-700"
-                disabled={
-                  !state.room.neighboringRooms.some(
-                    ([dir]) => dir === Directions.South,
-                  )
-                }
+                disabled={!state.room.neighboringRooms.some(([dir]) => dir === Directions.South)}
               >
                 <ChevronDown size={24} />
               </button>
@@ -274,8 +232,7 @@ export default function MapNav() {
 const miniMapStyle: CSSProperties = {
   position: "absolute",
   inset: 0,
-  backgroundImage:
-    "radial-gradient(circle, rgba(180,140,80,0.2) 1px, transparent 1px)",
+  backgroundImage: "radial-gradient(circle, rgba(180,140,80,0.2) 1px, transparent 1px)",
   backgroundSize: "6px 6px",
 };
 const miniMapStyle2: CSSProperties = {
@@ -286,12 +243,12 @@ const miniMapStyle2: CSSProperties = {
   pointerEvents: "none",
 };
 const mapNavStyle: CSSProperties = { display: "flex", alignItems: "flex-end", gap: 10 };
-  const mapNavStyle2: CSSProperties = { display: "flex", flexDirection: "column", gap: 4 };
-  const mapNavStyle3: CSSProperties = {
-                    fontSize: 8,
-                    color: "rgba(180,140,80,0.6)",
-                    fontFamily: "'Cinzel', Georgia, serif",
-                    letterSpacing: "0.12em",
-                    textTransform: "uppercase",
-                    textAlign: "center",
+const mapNavStyle2: CSSProperties = { display: "flex", flexDirection: "column", gap: 4 };
+const mapNavStyle3: CSSProperties = {
+  fontSize: 8,
+  color: "rgba(180,140,80,0.6)",
+  fontFamily: "'Cinzel', Georgia, serif",
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
+  textAlign: "center",
 };

@@ -4,7 +4,15 @@ import GameLayout from "@/components/GameLayout";
 import NavBar from "@/components/NavBar";
 import Home from "@/components/Home/Home";
 import { PartySelection } from "@/components/Party/PartySelection";
-import { tempCleric, tempRanger, tempWarrior, tempWizard, tempAssassin, tempBarbarian, tempBard } from "@/data/fixtures/characters";
+import {
+  tempCleric,
+  tempRanger,
+  tempWarrior,
+  tempWizard,
+  tempAssassin,
+  tempBarbarian,
+  tempBard,
+} from "@/data/fixtures/characters";
 import { getAllRooms, getSections } from "@/queries/RoomQueries";
 import { useGameStore } from "@/state/GameState";
 import ManageRooms from "@/components/Admin/game-design/CreateRoom";
@@ -14,6 +22,7 @@ import ManageDialogues from "@/components/Admin/game-design/ManageDialogues";
 import { PartyManagement } from "@/components/Party/PartyManagement";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { logger } from "@/lib/logger";
+import type { Cutscene } from "@/types/Cutscene";
 
 const CharacterCreation = lazy(() => import("@/components/CharacterCreation/CharacterCreation"));
 const Admin = lazy(() => import("@/components/Admin/GameDesign"));
@@ -26,22 +35,12 @@ function LoadingSpinner() {
   );
 }
 
-function GameLoadError({
-  message,
-  onRetry,
-}: {
-  message: string;
-  onRetry: () => void;
-}) {
+function GameLoadError({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
     <div className="flex flex-1 items-center justify-center p-6">
       <div className="w-full max-w-md space-y-4 rounded-xl border border-gold-dark/30 bg-[#14110a] p-6 text-center">
-        <h2 className="font-display text-xl text-gold">
-          The realm could not be loaded
-        </h2>
-        <p className="text-sm text-text-muted">
-          {message}
-        </p>
+        <h2 className="font-display text-xl text-gold">The realm could not be loaded</h2>
+        <p className="text-sm text-text-muted">{message}</p>
         <p className="text-xs text-muted">
           Check your connection and Supabase configuration, then try again.
         </p>
@@ -58,11 +57,11 @@ function GameLoadError({
 }
 
 function App() {
-  const setRooms = useGameStore(state => state.setRooms);
-  const loadSections = useGameStore(state => state.loadSections);
-  const startSection = useGameStore(state => state.startSection);
-  const preloadDialogueTrees = useGameStore(state => state.preloadDialogueTrees);
-  const loadCutscenes = useGameStore(state => state.loadCutscenes);
+  const setRooms = useGameStore((state) => state.setRooms);
+  const loadSections = useGameStore((state) => state.loadSections);
+  const startSection = useGameStore((state) => state.startSection);
+  const preloadDialogueTrees = useGameStore((state) => state.preloadDialogueTrees);
+  const loadCutscenes = useGameStore((state) => state.loadCutscenes);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [loadAttempt, setLoadAttempt] = useState(0);
 
@@ -85,7 +84,7 @@ function App() {
             `Failed to load cutscenes (${cutsceneRes.status} ${cutsceneRes.statusText})`,
           );
         }
-        const cutsceneData = await cutsceneRes.json();
+        const cutsceneData = (await cutsceneRes.json()) as Cutscene[];
         if (cancelled) return;
 
         loadCutscenes(cutsceneData);
@@ -103,7 +102,7 @@ function App() {
       }
     };
 
-    loadGameData();
+    void loadGameData();
 
     return () => {
       cancelled = true;
@@ -112,7 +111,7 @@ function App() {
 
   const handleRetry = useCallback(() => {
     setLoadError(null);
-    setLoadAttempt(attempt => attempt + 1);
+    setLoadAttempt((attempt) => attempt + 1);
   }, []);
 
   return (
@@ -127,7 +126,22 @@ function App() {
               <Routes>
                 <Route path={"/"} element={<Home />} />
                 <Route path={"/game"} element={<GameLayout />} />
-                <Route path={"/party-selection"} element={<PartySelection availableCharacters={[tempRanger, tempWarrior, tempCleric, tempWizard, tempAssassin, tempBarbarian, tempBard]} />} />
+                <Route
+                  path={"/party-selection"}
+                  element={
+                    <PartySelection
+                      availableCharacters={[
+                        tempRanger,
+                        tempWarrior,
+                        tempCleric,
+                        tempWizard,
+                        tempAssassin,
+                        tempBarbarian,
+                        tempBard,
+                      ]}
+                    />
+                  }
+                />
                 <Route path={"/party"} element={<PartyManagement />} />
                 <Route path={"/create"} element={<CharacterCreation />} />
                 <Route path={"/admin/game-design/rooms"} element={<ManageRooms />} />

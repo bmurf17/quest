@@ -14,15 +14,10 @@ export interface Character {
 
 interface CharacterContextType {
   character: Character;
-  updateCharacter: <K extends keyof Character>(
-    field: K,
-    value: Character[K],
-  ) => void;
+  updateCharacter: <K extends keyof Character>(field: K, value: Character[K]) => void;
 }
 
-export const CharacterContext = createContext<CharacterContextType | undefined>(
-  undefined
-);
+export const CharacterContext = createContext<CharacterContextType | undefined>(undefined);
 
 export function CharacterProvider({ children }: { children: ReactNode }) {
   const [character, setCharacter] = useState<Character>({
@@ -44,10 +39,7 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     },
   });
 
-  const updateCharacter = <K extends keyof Character>(
-    field: K,
-    value: Character[K],
-  ) => {
+  const updateCharacter = <K extends keyof Character>(field: K, value: Character[K]) => {
     setCharacter((prev) => ({ ...prev, [field]: value }));
   };
 

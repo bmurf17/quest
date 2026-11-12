@@ -4,20 +4,14 @@ import type { CSSProperties } from "react";
 
 export default function CharacterCreation() {
   return (
-    <div
-      style={characterCreationStyle}
-    >
+    <div style={characterCreationStyle}>
       <div
         style={{
           padding: "20px 28px 0",
           borderBottom: "1px solid rgba(180,140,80,0.1)",
         }}
       >
-        <h1
-          style={characterCreationStyle2}
-        >
-          Character Builder
-        </h1>
+        <h1 style={characterCreationStyle2}>Character Builder</h1>
       </div>
       <CharacterBuilder />
     </div>

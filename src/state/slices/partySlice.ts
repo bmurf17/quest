@@ -54,9 +54,7 @@ export const createPartySlice: GameSlice<PartySlice> = (set, get) => ({
   applyLevelUp: (updatedChar: CharacterData) => {
     const state = get();
     set({
-      party: state.party.map((char) =>
-        char.name === updatedChar.name ? updatedChar : char,
-      ),
+      party: state.party.map((char) => (char.name === updatedChar.name ? updatedChar : char)),
     });
     state.nextLevelingChar();
   },
@@ -89,23 +87,14 @@ export const createPartySlice: GameSlice<PartySlice> = (set, get) => ({
 
   acceptQuest: (quest: Quest) =>
     set((state) => ({
-      activityLog: [
-        ...state.activityLog,
-        `You have accepted the quest: ${quest.name}`,
-      ],
-      quests: [
-        ...state.quests,
-        { ...quest, accepted: true, completed: false },
-      ],
+      activityLog: [...state.activityLog, `You have accepted the quest: ${quest.name}`],
+      quests: [...state.quests, { ...quest, accepted: true, completed: false }],
     })),
 
   openTavern: () =>
     set((state) => ({
       isTavernOpen: true,
-      activityLog: [
-        ...state.activityLog,
-        "You step into the tavern and look around...",
-      ],
+      activityLog: [...state.activityLog, "You step into the tavern and look around..."],
     })),
 
   closeTavern: () =>
@@ -129,9 +118,7 @@ export const createPartySlice: GameSlice<PartySlice> = (set, get) => ({
           activityLog: [...state.activityLog, "Your party is already full!"],
         };
       }
-      const updatedCandidates = state.tavernCandidates.filter(
-        (c) => c.name !== char.name,
-      );
+      const updatedCandidates = state.tavernCandidates.filter((c) => c.name !== char.name);
       return {
         party: [...state.party, char],
         hasRecruitedFromTavern: true,
@@ -157,17 +144,10 @@ export const createPartySlice: GameSlice<PartySlice> = (set, get) => ({
         tavernCandidates: candidates,
       };
 
-      if (
-        state.currentSection !== null &&
-        !state.beatenSections.includes(state.currentSection)
-      ) {
+      if (state.currentSection !== null && !state.beatenSections.includes(state.currentSection)) {
         const sectionName =
-          state.availableSections.find((s) => s.id === state.currentSection)
-            ?.name ?? "the area";
-        updates.beatenSections = [
-          ...state.beatenSections,
-          state.currentSection,
-        ];
+          state.availableSections.find((s) => s.id === state.currentSection)?.name ?? "the area";
+        updates.beatenSections = [...state.beatenSections, state.currentSection];
         updates.activityLog = [
           ...state.activityLog,
           `You return to town. ${sectionName} has been completed!`,
@@ -198,10 +178,7 @@ export const createPartySlice: GameSlice<PartySlice> = (set, get) => ({
 
       return {
         party: updatedParty,
-        activityLog: [
-          ...state.activityLog,
-          "You rest at the inn. Your party is fully restored!",
-        ],
+        activityLog: [...state.activityLog, "You rest at the inn. Your party is fully restored!"],
       };
     }),
 });

@@ -16,11 +16,7 @@ export function ChestActions({
     <div style={chestActionsStyle}>
       <SectionLabel>Chest</SectionLabel>
       {!chest.isOpen ? (
-        <ActionBtn
-          variant="success"
-          onClick={() => onUpdate({ ...chest, isOpen: true })}
-          fullWidth
-        >
+        <ActionBtn variant="success" onClick={() => onUpdate({ ...chest, isOpen: true })} fullWidth>
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -38,11 +34,7 @@ export function ChestActions({
           Open Chest
         </ActionBtn>
       ) : chest.quantity === 0 ? (
-        <ActionBtn
-          variant="muted"
-          onClick={() => onUpdate({ ...chest, isOpen: false })}
-          fullWidth
-        >
+        <ActionBtn variant="muted" onClick={() => onUpdate({ ...chest, isOpen: false })} fullWidth>
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -60,16 +52,9 @@ export function ChestActions({
           Close (Empty)
         </ActionBtn>
       ) : (
-        <div
-          style={chestActionsStyle2}
-        >
-          <ActionBtn onClick={() => onUpdate({ ...chest, isOpen: false })}>
-            Close
-          </ActionBtn>
-          <ActionBtn
-            variant="success"
-            onClick={() => onTakeAll({ ...chest, quantity: 0 })}
-          >
+        <div style={chestActionsStyle2}>
+          <ActionBtn onClick={() => onUpdate({ ...chest, isOpen: false })}>Close</ActionBtn>
+          <ActionBtn variant="success" onClick={() => onTakeAll({ ...chest, quantity: 0 })}>
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -94,8 +79,8 @@ export function ChestActions({
 
 // Static style objects hoisted out of the render path.
 const chestActionsStyle: CSSProperties = { display: "flex", flexDirection: "column", gap: 6 };
-  const chestActionsStyle2: CSSProperties = {
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 6,
+const chestActionsStyle2: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr",
+  gap: 6,
 };

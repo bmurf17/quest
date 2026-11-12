@@ -28,13 +28,7 @@ export type Consumable = BaseItem & {
   stackSize?: number;
 };
 
-export type EquipmentSlot =
-  | "helmet"
-  | "armor"
-  | "weapon"
-  | "shield"
-  | "accessory"
-  | "boots";
+export type EquipmentSlot = "helmet" | "armor" | "weapon" | "shield" | "accessory" | "boots";
 
 export type EquippableItem = BaseItem & {
   type: "equipment";

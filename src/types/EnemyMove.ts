@@ -1,11 +1,23 @@
 import type { DamageDice } from "./Item";
 
 export type EnemyMoveEffect =
-  | { type: 'damage'; damageDice?: DamageDice; target: 'single' | 'all' | 'random' }
-  | { type: 'heal'; healDice?: DamageDice; target: 'self' | 'all_allies' | 'lowest_hp_ally' }
-  | { type: 'buff'; stat: 'strength' | 'defense' | 'dex'; amount: number; duration: number; target: 'self' | 'all_allies' }
-  | { type: 'debuff'; stat: 'defense' | 'strength' | 'dex'; amount: number; duration: number; target: 'single' }
-  | { type: 'spawn'; spawnIndex: number; count: number };
+  | { type: "damage"; damageDice?: DamageDice; target: "single" | "all" | "random" }
+  | { type: "heal"; healDice?: DamageDice; target: "self" | "all_allies" | "lowest_hp_ally" }
+  | {
+      type: "buff";
+      stat: "strength" | "defense" | "dex";
+      amount: number;
+      duration: number;
+      target: "self" | "all_allies";
+    }
+  | {
+      type: "debuff";
+      stat: "defense" | "strength" | "dex";
+      amount: number;
+      duration: number;
+      target: "single";
+    }
+  | { type: "spawn"; spawnIndex: number; count: number };
 
 export type EnemyMove = {
   name: string;

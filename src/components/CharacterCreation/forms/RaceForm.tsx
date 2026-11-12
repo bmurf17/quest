@@ -10,19 +10,11 @@ export default function RaceForm() {
   return (
     <>
       <div>
-        <div
-          style={raceFormStyle}
-        >
-          <span
-            style={raceFormStyle2}
-          >
-            Choose Your Race
-          </span>
+        <div style={raceFormStyle}>
+          <span style={raceFormStyle2}>Choose Your Race</span>
           <div style={raceFormStyle3} />
         </div>
-        <div
-          style={raceFormStyle4}
-        >
+        <div style={raceFormStyle4}>
           {RACES.map((race) => {
             const active = character.race === race.toLowerCase();
             return (
@@ -42,9 +34,7 @@ export default function RaceForm() {
                   padding: "12px 14px",
                   borderRadius: 7,
                   border: `1px solid ${active ? "rgba(212,175,55,0.4)" : "rgba(180,140,80,0.12)"}`,
-                  background: active
-                    ? "rgba(212,175,55,0.09)"
-                    : "rgba(255,255,255,0.03)",
+                  background: active ? "rgba(212,175,55,0.09)" : "rgba(255,255,255,0.03)",
                   cursor: "pointer",
                   transition: "background 0.12s, border-color 0.12s",
                 }}
@@ -63,11 +53,7 @@ export default function RaceForm() {
                     transition: "all 0.12s",
                   }}
                 >
-                  {active && (
-                    <div
-                      style={raceFormStyle5}
-                    />
-                  )}
+                  {active && <div style={raceFormStyle5} />}
                 </div>
                 <span
                   style={{
@@ -105,10 +91,10 @@ const raceFormStyle2: CSSProperties = {
   whiteSpace: "nowrap",
 };
 const raceFormStyle3: CSSProperties = { flex: 1, height: 1, background: colors.goldBorder };
-  const raceFormStyle4: CSSProperties = {
-              display: "flex",
-              flexDirection: "column",
-              gap: 6,
+const raceFormStyle4: CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 6,
 };
 const raceFormStyle5: CSSProperties = {
   width: 6,

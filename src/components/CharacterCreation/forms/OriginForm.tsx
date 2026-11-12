@@ -10,19 +10,11 @@ export default function OriginForm() {
   return (
     <>
       <div>
-        <div
-          style={originFormStyle}
-        >
-          <span
-            style={originFormStyle2}
-          >
-            Choose Your Origin
-          </span>
+        <div style={originFormStyle}>
+          <span style={originFormStyle2}>Choose Your Origin</span>
           <div style={originFormStyle3} />
         </div>
-        <div
-          style={originFormStyle4}
-        >
+        <div style={originFormStyle4}>
           {ORIGINS.map((origin) => {
             const active = character.origin === origin.toLowerCase().replace(" ", "-");
             return (
@@ -30,9 +22,7 @@ export default function OriginForm() {
                 type="button"
                 key={origin}
                 className="origin-card"
-                onClick={() =>
-                  updateCharacter("origin", origin.toLowerCase().replace(" ", "-"))
-                }
+                onClick={() => updateCharacter("origin", origin.toLowerCase().replace(" ", "-"))}
                 aria-pressed={active}
                 style={{
                   font: "inherit",
@@ -44,9 +34,7 @@ export default function OriginForm() {
                   padding: "12px 14px",
                   borderRadius: 7,
                   border: `1px solid ${active ? "rgba(212,175,55,0.4)" : "rgba(180,140,80,0.12)"}`,
-                  background: active
-                    ? "rgba(212,175,55,0.09)"
-                    : "rgba(255,255,255,0.03)",
+                  background: active ? "rgba(212,175,55,0.09)" : "rgba(255,255,255,0.03)",
                   cursor: "pointer",
                   transition: "background 0.12s, border-color 0.12s",
                 }}
@@ -65,11 +53,7 @@ export default function OriginForm() {
                     transition: "all 0.12s",
                   }}
                 >
-                  {active && (
-                    <div
-                      style={originFormStyle5}
-                    />
-                  )}
+                  {active && <div style={originFormStyle5} />}
                 </div>
                 <span
                   style={{
@@ -107,10 +91,10 @@ const originFormStyle2: CSSProperties = {
   whiteSpace: "nowrap",
 };
 const originFormStyle3: CSSProperties = { flex: 1, height: 1, background: colors.goldBorder };
-  const originFormStyle4: CSSProperties = {
-              display: "flex",
-              flexDirection: "column",
-              gap: 6,
+const originFormStyle4: CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 6,
 };
 const originFormStyle5: CSSProperties = {
   width: 6,

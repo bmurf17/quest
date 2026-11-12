@@ -50,19 +50,22 @@ Examples:
   process.exit(0);
 }
 
+const stringValue = (value: string | boolean | undefined, fallback: string): string =>
+  typeof value === "string" ? value : fallback;
+
 const config: ScenarioConfig = {
-  party: (values.party ?? "Warrior,Cleric,Wizard")
+  party: stringValue(values.party, "Warrior,Cleric,Wizard")
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean),
-  maxTurns: parseInt(values["max-turns"] ?? "200", 10),
+  maxTurns: parseInt(stringValue(values["max-turns"], "200"), 10),
   verbose: !values.quiet,
-  screenshotDir: values.screenshot || undefined,
-  timeoutSeconds: parseInt(values.timeout ?? "120", 10),
+  screenshotDir: typeof values.screenshot === "string" ? values.screenshot : undefined,
+  timeoutSeconds: parseInt(stringValue(values.timeout, "120"), 10),
 };
 
-const batchSize = parseInt(values.batch ?? "1", 10);
-const scenario = values.scenario ?? "dungeon";
+const batchSize = parseInt(stringValue(values.batch, "1"), 10);
+const scenario = stringValue(values.scenario, "dungeon");
 
 process.stdout.write("\n");
 process.stdout.write("═══════════════════════════════════════════\n");
@@ -100,8 +103,7 @@ async function runOneGame(index: number): Promise<RunResult> {
   let result: RunResult;
 
   try {
-    const runScenario =
-      scenario === "combat" ? runCombatSim : runDungeonCrawl;
+    const runScenario = scenario === "combat" ? runCombatSim : runDungeonCrawl;
     result = await runScenario(page, config);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
@@ -137,7 +139,6 @@ function formatPartyShort(
     })
     .join(" ");
 }
-
 
 let devServer: ChildProcess | null = null;
 
@@ -221,15 +222,11 @@ async function main(): Promise<void> {
       : "0";
   const avgWins =
     summaries.length > 0
-      ? (
-          summaries.reduce((sum, s) => sum + s.combatsWon, 0) / summaries.length
-        ).toFixed(1)
+      ? (summaries.reduce((sum, s) => sum + s.combatsWon, 0) / summaries.length).toFixed(1)
       : "0";
   const avgLosses =
     summaries.length > 0
-      ? (
-          summaries.reduce((sum, s) => sum + s.combatsLost, 0) / summaries.length
-        ).toFixed(1)
+      ? (summaries.reduce((sum, s) => sum + s.combatsLost, 0) / summaries.length).toFixed(1)
       : "0";
 
   process.stdout.write(`  Games played:      ${batchSize}\n`);
@@ -252,5 +249,11 @@ main().catch((err) => {
   process.exit(2);
 });
 
-process.on("SIGINT", () => { stopDevServer(); process.exit(130); });
-process.on("SIGTERM", () => { stopDevServer(); process.exit(143); });
+process.on("SIGINT", () => {
+  stopDevServer();
+  process.exit(130);
+});
+process.on("SIGTERM", () => {
+  stopDevServer();
+  process.exit(143);
+});

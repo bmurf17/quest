@@ -1,9 +1,4 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useGameStore } from "@/state/GameState";
 import type { Item } from "@/types/Item";
@@ -54,8 +49,7 @@ export default function Shop({
                     style={{
                       imageRendering: "pixelated",
                       opacity: item.cost > goldPieces ? 0.4 : 1,
-                      filter:
-                        item.cost > goldPieces ? "grayscale(100%)" : "none",
+                      filter: item.cost > goldPieces ? "grayscale(100%)" : "none",
                     }}
                   />
                   <div className="flex flex-col">

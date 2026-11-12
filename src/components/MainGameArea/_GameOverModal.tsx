@@ -1,9 +1,4 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useGameStore } from "@/state/GameState";
 import { GameStatus } from "@/types/GameStatus";
 import { colors, fonts } from "@/theme";
@@ -19,43 +14,27 @@ function GameOverModalComponent() {
   if (gameStatus !== GameStatus.GameOver) return null;
 
   const handleRestart = () => {
-    navigate("/party");
+    void navigate("/party");
   };
 
   return (
     <Dialog open={true} onOpenChange={() => {}}>
-      <DialogContent
-        style={gameOverModalComponentStyle}
-      >
+      <DialogContent style={gameOverModalComponentStyle}>
         <DialogHeader
           style={{
             padding: "32px 24px 20px",
             borderBottom: `1px solid ${colors.danger}`,
           }}
         >
-          <div
-            style={gameOverModalComponentStyle2}
-          >
-            <div
-              style={gameOverModalComponentStyle3}
-            >
-              <Skull
-                size={36}
-                color={colors.danger}
-                strokeWidth={1.5}
-              />
+          <div style={gameOverModalComponentStyle2}>
+            <div style={gameOverModalComponentStyle3}>
+              <Skull size={36} color={colors.danger} strokeWidth={1.5} />
             </div>
           </div>
 
-          <DialogTitle
-            style={gameOverModalComponentStyle4}
-          >
-            Game Over
-          </DialogTitle>
+          <DialogTitle style={gameOverModalComponentStyle4}>Game Over</DialogTitle>
 
-          <p
-            style={gameOverModalComponentStyle5}
-          >
+          <p style={gameOverModalComponentStyle5}>
             Your party has fallen in battle.
             <br />
             The adventure ends here...

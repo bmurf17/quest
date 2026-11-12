@@ -67,9 +67,7 @@ export default function DevPanel() {
         loadGame(data);
         flash(`Loaded: ${slot}`);
       } catch (error) {
-        flash(
-          error instanceof SaveDataError ? error.message : "Failed to load save",
-        );
+        flash(error instanceof SaveDataError ? error.message : "Failed to load save");
       }
     },
     [loadGame, flash],
@@ -101,11 +99,7 @@ export default function DevPanel() {
           flash(`Imported: ${slot}`);
         })
         .catch((error) => {
-          flash(
-            error instanceof SaveDataError
-              ? error.message
-              : "Import failed",
-          );
+          flash(error instanceof SaveDataError ? error.message : "Import failed");
         });
       e.target.value = "";
     },
@@ -118,26 +112,12 @@ export default function DevPanel() {
   };
 
   return (
-    <div
-      style={devPanelStyle}
-    >
-      <div
-        style={devPanelStyle2}
-      >
-        <span
-          style={devPanelStyle3}
-        >
-          Dev Panel
-        </span>
+    <div style={devPanelStyle}>
+      <div style={devPanelStyle2}>
+        <span style={devPanelStyle3}>Dev Panel</span>
       </div>
 
-      {message && (
-        <div
-          style={devPanelStyle4}
-        >
-          {message}
-        </div>
-      )}
+      {message && <div style={devPanelStyle4}>{message}</div>}
 
       <div style={devPanelStyle5}>
         <div style={devPanelStyle6}>
@@ -160,42 +140,22 @@ export default function DevPanel() {
             onChange={handleImport}
             style={{ display: "none" }}
           />
-          <button
-            onClick={() => fileRef.current?.click()}
-            style={{ ...btnBase, fontSize: 10 }}
-          >
+          <button onClick={() => fileRef.current?.click()} style={{ ...btnBase, fontSize: 10 }}>
             Import JSON
           </button>
         </div>
       </div>
 
       <div style={devPanelStyle8}>
-        {saves.length === 0 && (
-          <div
-            style={devPanelStyle9}
-          >
-            No saves yet.
-          </div>
-        )}
+        {saves.length === 0 && <div style={devPanelStyle9}>No saves yet.</div>}
         {saves.map((slot) => {
           const label = getSaveLabel(slot);
           const data = peekSaveData(slot);
           return (
-            <div
-              key={slot}
-              style={devPanelStyle10}
-            >
+            <div key={slot} style={devPanelStyle10}>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div
-                  style={devPanelStyle11}
-                >
-                  {label || slot}
-                </div>
-                {data && (
-                  <div style={devPanelStyle12}>
-                    {formatDate(data.timestamp)}
-                  </div>
-                )}
+                <div style={devPanelStyle11}>{label || slot}</div>
+                {data && <div style={devPanelStyle12}>{formatDate(data.timestamp)}</div>}
               </div>
               <div style={devPanelStyle13}>
                 <button
@@ -285,25 +245,29 @@ const devPanelStyle4: CSSProperties = {
   background: "rgba(212,175,55,0.08)",
   borderBottom: `1px solid ${colors.goldBorder}`,
 };
-const devPanelStyle5: CSSProperties = { padding: "10px 12px", borderBottom: `1px solid ${colors.goldBorder}`, flexShrink: 0 };
-  const devPanelStyle6: CSSProperties = { display: "flex", gap: 6, marginBottom: 6 };
-  const devPanelStyle7: CSSProperties = {
-                flex: 1,
-                padding: "4px 8px",
-                fontSize: 11,
-                background: "rgba(255,255,255,0.05)",
-                border: `1px solid ${colors.goldBorder}`,
-                borderRadius: 4,
-                color: colors.text,
-                fontFamily: fonts.body,
-                outline: "none",
+const devPanelStyle5: CSSProperties = {
+  padding: "10px 12px",
+  borderBottom: `1px solid ${colors.goldBorder}`,
+  flexShrink: 0,
+};
+const devPanelStyle6: CSSProperties = { display: "flex", gap: 6, marginBottom: 6 };
+const devPanelStyle7: CSSProperties = {
+  flex: 1,
+  padding: "4px 8px",
+  fontSize: 11,
+  background: "rgba(255,255,255,0.05)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 4,
+  color: colors.text,
+  fontFamily: fonts.body,
+  outline: "none",
 };
 const devPanelStyle8: CSSProperties = { flex: 1, overflowY: "auto", padding: "4px 0" };
-  const devPanelStyle9: CSSProperties = {
-                padding: "20px 12px",
-                textAlign: "center",
-                fontSize: 11,
-                color: colors.textMuted,
+const devPanelStyle9: CSSProperties = {
+  padding: "20px 12px",
+  textAlign: "center",
+  fontSize: 11,
+  color: colors.textMuted,
 };
 const devPanelStyle10: CSSProperties = {
   display: "flex",

@@ -40,10 +40,14 @@
 @keyframes glow-pulse {
   0%,
   100% {
-    box-shadow: 0 0 20px #d4af3733, inset 0 0 20px #d4af370d;
+    box-shadow:
+      0 0 20px #d4af3733,
+      inset 0 0 20px #d4af370d;
   }
   50% {
-    box-shadow: 0 0 40px #d4af3740, inset 0 0 30px #d4af370f;
+    box-shadow:
+      0 0 40px #d4af3740,
+      inset 0 0 30px #d4af370f;
   }
 }
 

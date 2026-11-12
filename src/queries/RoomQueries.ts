@@ -157,9 +157,7 @@ export const mapDbEnemy = (e: DbEnemy): Enemy => ({
   expGain: e.exp_gain ?? 10,
   type: e.type ?? "enemy",
   phase: e.type === "boss" ? 1 : undefined,
-  phaseThresholds: Array.isArray(e.phase_thresholds)
-    ? e.phase_thresholds
-    : undefined,
+  phaseThresholds: Array.isArray(e.phase_thresholds) ? e.phase_thresholds : undefined,
   moves: Array.isArray(e.moves) ? e.moves : undefined,
   spawns: Array.isArray(e.spawns) ? e.spawns : undefined,
 });
@@ -202,24 +200,17 @@ export const mapDbQuest = async (q: DbQuest): Promise<Quest> => ({
   type: await mapQuestType(q),
   objectives: q.objectives ? q.objectives.map((o) => o.objective) : [],
   rewards: q.rewards
-    ? q.rewards
-        .map((r) => mapDbItem(r.item))
-        .filter((item): item is Item => item !== null)
+    ? q.rewards.map((r) => mapDbItem(r.item)).filter((item): item is Item => item !== null)
     : [],
   accepted: false,
   completed: false,
 });
 
 export async function getAllRooms(): Promise<Room[]> {
-  const rooms = unwrapQuery(
-    await supabase.from("rooms").select("*").order("id"),
-  );
+  const rooms = unwrapQuery(await supabase.from("rooms").select("*").order("id"));
 
   const [enemiesData, neighborsData, interactionsData] = await Promise.all([
-    supabase
-      .from("room_enemies")
-      .select("room_id, enemies(*)")
-      .then(unwrapQuery),
+    supabase.from("room_enemies").select("room_id, enemies(*)").then(unwrapQuery),
 
     supabase
       .from("neighboring_rooms")
@@ -254,9 +245,7 @@ export async function getAllRooms(): Promise<Room[]> {
       enemiesByRoom.set(re.room_id, []);
     }
     if (re.enemies) {
-      enemiesByRoom.get(re.room_id)!.push(
-        mapDbEnemy(re.enemies as unknown as DbEnemy),
-      );
+      enemiesByRoom.get(re.room_id)!.push(mapDbEnemy(re.enemies as unknown as DbEnemy));
     }
   });
 
@@ -293,9 +282,7 @@ export async function getAllRooms(): Promise<Room[]> {
             const npc = interactionData.npcs;
             if (!npc) break;
 
-            const mappedQuest = npc.quest
-              ? await mapDbQuest(npc.quest)
-              : undefined;
+            const mappedQuest = npc.quest ? await mapDbQuest(npc.quest) : undefined;
 
             interaction = {
               type: "NPC",
@@ -349,10 +336,8 @@ export async function getAllRooms(): Promise<Room[]> {
               type: "transition",
               transition: {
                 destination: transition.destination,
-                discoveryMessage:
-                  transition.discovery_message ?? undefined,
-                sanctuaryAvailable:
-                  transition.sanctuary_available ?? false,
+                discoveryMessage: transition.discovery_message ?? undefined,
+                sanctuaryAvailable: transition.sanctuary_available ?? false,
               },
             };
             break;
@@ -362,8 +347,7 @@ export async function getAllRooms(): Promise<Room[]> {
               type: "cutscene",
               cutscene: {
                 cutsceneId: "intro",
-                discoveryMessage:
-                  interactionData.discovery_message ?? undefined,
+                discoveryMessage: interactionData.discovery_message ?? undefined,
               },
             };
             break;
@@ -371,13 +355,10 @@ export async function getAllRooms(): Promise<Room[]> {
       }
 
       const neighbors = neighborsByRoom.get(room.id) || [];
-      const neighboringRooms: [Directions, number][] = neighbors.map(
-        ([dirStr, roomId]) => {
-          const direction =
-            Directions[dirStr as unknown as keyof typeof Directions];
-          return [direction, roomId];
-        },
-      );
+      const neighboringRooms: [Directions, number][] = neighbors.map(([dirStr, roomId]) => {
+        const direction = Directions[dirStr as unknown as keyof typeof Directions];
+        return [direction, roomId];
+      });
 
       return {
         id: room.id,
@@ -405,13 +386,11 @@ export async function getAllRooms(): Promise<Room[]> {
   });
 
   roomObjects.forEach((roomObj, index) => {
-    finalRooms[index].neighboringRooms = roomObj.neighboringRooms.flatMap(
-      ([direction, roomId]) => {
-        const neighbor = roomMap.get(roomId);
-        if (!neighbor) return [];
-        return [[direction, neighbor] as [Directions, Room]];
-      },
-    );
+    finalRooms[index].neighboringRooms = roomObj.neighboringRooms.flatMap(([direction, roomId]) => {
+      const neighbor = roomMap.get(roomId);
+      if (!neighbor) return [];
+      return [[direction, neighbor] as [Directions, Room]];
+    });
   });
 
   return finalRooms;
@@ -428,9 +407,7 @@ export async function getRoomByName(name: string): Promise<Room | null> {
 }
 
 export async function getSections(): Promise<Section[]> {
-  const data = unwrapQuery(
-    await supabase.from("sections").select("id, name").order("id"),
-  );
+  const data = unwrapQuery(await supabase.from("sections").select("id, name").order("id"));
 
   return data as Section[];
 }
@@ -441,9 +418,7 @@ export async function getRoomsBySection(sectionId: number): Promise<Room[]> {
 }
 
 export async function getEnemyById(enemyId: number): Promise<Enemy | null> {
-  const data = unwrapQuery(
-    await supabase.from("enemies").select("*").eq("id", enemyId).single(),
-  );
+  const data = unwrapQuery(await supabase.from("enemies").select("*").eq("id", enemyId).single());
 
   if (!data) return null;
 

@@ -3,13 +3,7 @@ import { ActionBtn } from "./ActionBtn";
 import { SectionLabel } from "./SectionLabel";
 import type { CSSProperties } from "react";
 
-export function CampActions({
-  camp,
-  onRest,
-}: {
-  camp: Camp;
-  onRest: (camp: Camp) => void;
-}) {
+export function CampActions({ camp, onRest }: { camp: Camp; onRest: (camp: Camp) => void }) {
   return (
     <div style={campActionsStyle}>
       <SectionLabel>Camp</SectionLabel>

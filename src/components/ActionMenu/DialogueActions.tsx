@@ -1,6 +1,6 @@
 import { useGameStore } from "@/state/GameState";
 import type { CharacterData } from "@/types/Character";
-import type { NPC} from "@/types/RoomInteractions";
+import type { NPC } from "@/types/RoomInteractions";
 import { NPCType } from "@/types/RoomInteractions";
 import { partyHasAnimalHandling } from "@/state/utils/DialogueUtils";
 import { ActionBtn } from "./ActionBtn";
@@ -82,11 +82,7 @@ export function DialogueActions({
         </ActionBtn>
       )}
       {npc.NPCType === NPCType.QUEST_GIVER && (
-        <ActionBtn
-          onClick={onOpenQuestDescription}
-          variant="success"
-          fullWidth
-        >
+        <ActionBtn onClick={onOpenQuestDescription} variant="success" fullWidth>
           <svg
             viewBox="0 0 24 24"
             fill="none"

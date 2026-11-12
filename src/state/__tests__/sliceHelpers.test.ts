@@ -3,7 +3,7 @@ import type { CharacterData } from "@/types/Character";
 import { tempWarrior } from "@/data/fixtures/characters";
 import type { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
-import type { Consumable, EquippableItem } from "@/types/Item";
+import type { Consumable } from "@/types/Item";
 import { healthPotion, shortsword, staffWeapon } from "@/data/items";
 import type { Room } from "@/types/Room";
 import { Directions } from "@/types/Directions";
@@ -138,13 +138,9 @@ describe("equipItemInState", () => {
 describe("unequipItemInState", () => {
   it("moves the equipped item into the inventory", () => {
     const hero = character();
-    hero.equipment.weapon = shortsword as EquippableItem;
+    hero.equipment.weapon = shortsword;
 
-    const result = unequipItemInState(
-      { party: [hero], inventory: [] },
-      tempWarrior.name,
-      "weapon",
-    );
+    const result = unequipItemInState({ party: [hero], inventory: [] }, tempWarrior.name, "weapon");
 
     expect(result!.party[0].equipment.weapon).toBeNull();
     expect(result!.inventory).toContain(shortsword);

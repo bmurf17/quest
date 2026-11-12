@@ -35,65 +35,49 @@ export function handleSpell(
   target: Enemy | CharacterData | undefined,
   state: SpellState,
   logBuilder: { add: (s: string) => unknown; build?: () => string[] },
-  calcDamageFn: (
-    defense: number,
-    strength: number,
-    dex: number,
-    weaponDamage?: number,
-  ) => number,
+  calcDamageFn: (defense: number, strength: number, dex: number, weaponDamage?: number) => number,
 ): SpellHandlerResult {
   let updatedParty: CharacterData[] = state.party;
-  let updatedEnemies: Enemy[] = (
-    state.roomInstances.get(state.room.id) || state.room
-  ).enemies;
+  let updatedEnemies: Enemy[] = (state.roomInstances.get(state.room.id) || state.room).enemies;
   let combatOrder: (CharacterData | Enemy)[] = state.combatOrder;
-  let nextIndex =
-    (state.activeFighterIndex + 1) % Math.max(1, combatOrder.length);
+  let nextIndex = (state.activeFighterIndex + 1) % Math.max(1, combatOrder.length);
   let newAccumulatedExp = state.accumulatedExp;
   const gameStatus: GameStatus = state.gameStatus;
 
   switch (spell.effect.type) {
     case "damage":
       if (spell.effect.target === "single" && target && isEnemy(target)) {
-        const enemy = target as Enemy;
-        const currentAttacker = state.combatOrder[
-          state.activeFighterIndex
-        ] as CharacterData;
+        const enemy = target;
+        const currentAttacker = state.combatOrder[state.activeFighterIndex] as CharacterData;
         const activeBuffs: Map<string, ActiveBuff[]> =
-          state.activeBuffs ?? new Map();
+          state.activeBuffs ?? new Map<string, ActiveBuff[]>();
         let currentIntelligence = currentAttacker.abilities.int.score;
         let currentWisdom = currentAttacker.abilities.wis.score;
-        currentIntelligence += getEffectiveBuffAmount(activeBuffs, currentAttacker.name, 'intelligence');
-        currentWisdom += getEffectiveBuffAmount(activeBuffs, currentAttacker.name, 'wisdom');
-        const effectiveDef = enemy.defense +
-          getEffectiveBuffAmount(activeBuffs, enemy.name, 'defense');
-        const damage = calcDamageFn(
-          effectiveDef,
-          currentWisdom,
-          currentIntelligence,
+        currentIntelligence += getEffectiveBuffAmount(
+          activeBuffs,
+          currentAttacker.name,
+          "intelligence",
         );
+        currentWisdom += getEffectiveBuffAmount(activeBuffs, currentAttacker.name, "wisdom");
+        const effectiveDef =
+          enemy.defense + getEffectiveBuffAmount(activeBuffs, enemy.name, "defense");
+        const damage = calcDamageFn(effectiveDef, currentWisdom, currentIntelligence);
 
         const newHealth = Math.max(0, enemy.health - damage);
 
         if (newHealth <= 0) {
-          const defeatedEnemyIndex = combatOrder.findIndex(
-            (x) => x.name === enemy.name,
-          );
+          const defeatedEnemyIndex = combatOrder.findIndex((x) => x.name === enemy.name);
 
           updatedEnemies = updatedEnemies.filter((e) => e.id !== enemy.id);
           combatOrder = combatOrder.filter((x) => x.name !== enemy.name);
           newAccumulatedExp += enemy.expGain ?? 10;
 
-          logBuilder.add(
-            `${enemy.name} takes ${damage} damage and is defeated!`,
-          );
+          logBuilder.add(`${enemy.name} takes ${damage} damage and is defeated!`);
 
           if (defeatedEnemyIndex <= state.activeFighterIndex) {
-            nextIndex =
-              state.activeFighterIndex % Math.max(1, combatOrder.length);
+            nextIndex = state.activeFighterIndex % Math.max(1, combatOrder.length);
           } else {
-            nextIndex =
-              (state.activeFighterIndex + 1) % Math.max(1, combatOrder.length);
+            nextIndex = (state.activeFighterIndex + 1) % Math.max(1, combatOrder.length);
           }
 
           const completion = handleCombatCompletion(
@@ -142,20 +126,16 @@ export function handleSpell(
           })
           .filter((e) => e.health > 0);
 
-        combatOrder = combatOrder.filter(
-          (x) => !defeatedEnemies.includes(x.name),
-        );
+        combatOrder = combatOrder.filter((x) => !defeatedEnemies.includes(x.name));
         if (defeatedEnemies.length > 0) {
           const defeatedBeforeOrAtCurrent = defeatedIndices.filter(
             (idx) => idx <= state.activeFighterIndex,
           ).length;
 
           if (defeatedBeforeOrAtCurrent > 0) {
-            nextIndex =
-              state.activeFighterIndex % Math.max(1, combatOrder.length);
+            nextIndex = state.activeFighterIndex % Math.max(1, combatOrder.length);
           } else {
-            nextIndex =
-              (state.activeFighterIndex + 1) % Math.max(1, combatOrder.length);
+            nextIndex = (state.activeFighterIndex + 1) % Math.max(1, combatOrder.length);
           }
 
           logBuilder.add(`${defeatedEnemies.join(", ")} defeated!`);
@@ -166,16 +146,13 @@ export function handleSpell(
 
     case "heal":
       if (spell.effect.target === "single" && target && "hp" in target) {
-        const character = target as CharacterData;
+        const character = target;
         const newCombatOrder = [...state.combatOrder];
 
         updatedParty = updatedParty.map((member) => {
           if (member.name === character.name) {
             const wasDead = !member.alive || member.hp <= 0;
-            const newHp = Math.min(
-              member.maxHp,
-              member.hp + spell.effect.amount,
-            );
+            const newHp = Math.min(member.maxHp, member.hp + spell.effect.amount);
 
             if (wasDead && newHp > 0) {
               logBuilder.add(`${member.name} has been revived!`);
@@ -197,11 +174,7 @@ export function handleSpell(
           const wasDead = !member.alive || member.hp <= 0;
           const newHp = Math.min(member.maxHp, member.hp + spell.effect.amount);
 
-          if (
-            wasDead &&
-            newHp > 0 &&
-            !newCombatOrder.find((f) => f.name === member.name)
-          ) {
+          if (wasDead && newHp > 0 && !newCombatOrder.find((f) => f.name === member.name)) {
             newCombatOrder.push({ ...member, hp: newHp, alive: true });
           }
 

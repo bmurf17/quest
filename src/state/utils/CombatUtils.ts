@@ -71,8 +71,7 @@ export const finalizeAttackState = (
   defeatedCount: number = 0,
   quests: Quest[],
 ) => {
-  const currentRoomInstance =
-    state.roomInstances.get(state.room.id) || state.room;
+  const currentRoomInstance = state.roomInstances.get(state.room.id) || state.room;
 
   const updatedRoom = {
     ...currentRoomInstance,
@@ -80,8 +79,7 @@ export const finalizeAttackState = (
   };
 
   const originalTemplateId = [...state.roomInstances.entries()].find(
-    ([templateId, instance]) =>
-      instance === currentRoomInstance || templateId === state.room.id,
+    ([templateId, instance]) => instance === currentRoomInstance || templateId === state.room.id,
   )?.[0];
 
   const newRoomInstances = new Map(state.roomInstances);
@@ -91,10 +89,7 @@ export const finalizeAttackState = (
   const lastDefeatedEnemyId = isDefeated ? hitEnemyId : null;
 
   const updatedQuests = quests.map((quest) => {
-    if (
-      quest.type.type === "defeat" &&
-      quest.type.enemy.id.toString() === lastDefeatedEnemyId
-    ) {
+    if (quest.type.type === "defeat" && quest.type.enemy.id.toString() === lastDefeatedEnemyId) {
       return {
         ...quest,
         status: "completed",
@@ -139,22 +134,10 @@ export type EnemyTurnState = Pick<
   "gameStatus" | "isCurrentFighterEnemy" | "performEnemyTurn" | "isLevelingUp"
 >;
 
-export function scheduleEnemyTurn(
-  getState: () => EnemyTurnState,
-  delay = 500,
-) {
+export function scheduleEnemyTurn(getState: () => EnemyTurnState, delay = 500) {
   setTimeout(() => {
-    const {
-      gameStatus,
-      isCurrentFighterEnemy,
-      performEnemyTurn,
-      isLevelingUp,
-    } = getState();
-    if (
-      gameStatus === GameStatus.Combat &&
-      isCurrentFighterEnemy() &&
-      !isLevelingUp
-    ) {
+    const { gameStatus, isCurrentFighterEnemy, performEnemyTurn, isLevelingUp } = getState();
+    if (gameStatus === GameStatus.Combat && isCurrentFighterEnemy() && !isLevelingUp) {
       performEnemyTurn();
     }
   }, delay);
@@ -181,7 +164,7 @@ export function getDefaultEnemyMove(): EnemyMove {
     description: "A standard attack",
     cooldown: 0,
     weight: 10,
-    effect: { type: 'damage', target: 'single' },
+    effect: { type: "damage", target: "single" },
   };
 }
 
@@ -189,10 +172,7 @@ export function getEnemyMaxHealth(enemy: Enemy): number {
   return enemy.maxHealth ?? enemy.health;
 }
 
-export function pickEnemyMove(
-  enemy: Enemy,
-  cooldowns?: Map<string, number>,
-): EnemyMove {
+export function pickEnemyMove(enemy: Enemy, cooldowns?: Map<string, number>): EnemyMove {
   const rawMoves = enemy.moves;
   const allMoves = Array.isArray(rawMoves) ? rawMoves : [];
   if (allMoves.length === 0) {
@@ -227,9 +207,11 @@ export function pickEnemyMove(
   return available[available.length - 1];
 }
 
-export function checkBossPhaseChange(
-  enemy: Enemy,
-): { phaseChanged: boolean; newPhase: number; oldPhase: number } {
+export function checkBossPhaseChange(enemy: Enemy): {
+  phaseChanged: boolean;
+  newPhase: number;
+  oldPhase: number;
+} {
   if (!enemy.phaseThresholds || enemy.phaseThresholds.length === 0) {
     return { phaseChanged: false, newPhase: 1, oldPhase: 1 };
   }
@@ -261,9 +243,7 @@ export function getEffectiveBuffAmount(
 ): number {
   const buffs = activeBuffs.get(fighterName);
   if (!buffs) return 0;
-  return buffs
-    .filter((b) => b.stat === stat)
-    .reduce((sum, b) => sum + b.amount, 0);
+  return buffs.filter((b) => b.stat === stat).reduce((sum, b) => sum + b.amount, 0);
 }
 
 export function addBuff(
@@ -277,9 +257,7 @@ export function addBuff(
   return updated;
 }
 
-export function tickBuffs(
-  activeBuffs: Map<string, ActiveBuff[]>,
-): Map<string, ActiveBuff[]> {
+export function tickBuffs(activeBuffs: Map<string, ActiveBuff[]>): Map<string, ActiveBuff[]> {
   const updated = new Map<string, ActiveBuff[]>();
   for (const [name, buffs] of activeBuffs) {
     const remaining = buffs

@@ -9,11 +9,7 @@ import type { GameStatus } from "@/types/GameStatus";
 import { useGameStore } from "./GameState";
 import type { GameState } from "./GameState";
 import { normalizeNeighbors, type SerializedRoom } from "./saveTransforms";
-import {
-  parseSaveData,
-  SaveDataError,
-  SAVE_VERSION,
-} from "./saveSchema";
+import { parseSaveData, SaveDataError, SAVE_VERSION } from "./saveSchema";
 
 export type { SerializedRoom };
 export { normalizeNeighbors } from "./saveTransforms";
@@ -113,10 +109,7 @@ type SpecialSaveField = (typeof SPECIAL_SAVE_FIELDS)[number];
 
 // Compile-time completeness check: adding a field to SaveData without listing
 // it here (or handling it specially) is a type error.
-type MissingSaveFields = Exclude<
-  keyof SaveData,
-  DirectSaveField | SpecialSaveField
->;
+type MissingSaveFields = Exclude<keyof SaveData, DirectSaveField | SpecialSaveField>;
 const _saveShapeIsComplete: MissingSaveFields extends never ? true : never = true;
 void _saveShapeIsComplete;
 
@@ -124,9 +117,9 @@ void _saveShapeIsComplete;
  * Copy the directly-serialized fields from either a `SaveData` object or the
  * game store. Used by both save and load so the two stay in sync.
  */
-export function pickDirectSaveFields<
-  T extends Pick<SaveData, DirectSaveField>,
->(source: T): Pick<SaveData, DirectSaveField> {
+export function pickDirectSaveFields<T extends Pick<SaveData, DirectSaveField>>(
+  source: T,
+): Pick<SaveData, DirectSaveField> {
   const result = {} as Pick<SaveData, DirectSaveField>;
   const writable = result as Record<DirectSaveField, unknown>;
   for (const field of DIRECT_SAVE_FIELDS) {
@@ -247,24 +240,19 @@ export function importSaveFromJson(file: File): Promise<string | null> {
       try {
         let parsed: unknown;
         try {
-          parsed = JSON.parse(String(e.target?.result));
+          parsed = JSON.parse(
+            typeof e.target?.result === "string" ? e.target.result : "",
+          ) as unknown;
         } catch {
           throw new SaveDataError("Save file is not valid JSON");
         }
         // Validate and migrate before touching localStorage.
         const data = parseSaveData(parsed);
         const slotName = data.label || `imported_${Date.now()}`;
-        localStorage.setItem(
-          SAVE_PREFIX + slotName,
-          JSON.stringify({ ...data, label: slotName }),
-        );
+        localStorage.setItem(SAVE_PREFIX + slotName, JSON.stringify({ ...data, label: slotName }));
         resolve(slotName);
       } catch (error) {
-        reject(
-          error instanceof SaveDataError
-            ? error
-            : new Error("Invalid save file"),
-        );
+        reject(error instanceof SaveDataError ? error : new Error("Invalid save file"));
       }
     };
     reader.onerror = () => reject(new Error("Failed to read file"));

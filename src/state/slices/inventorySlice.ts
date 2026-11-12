@@ -1,7 +1,5 @@
 import type { CharacterData, CharacterEquipment } from "@/types/Character";
-import {
-  healthPotion,
-} from "@/data/items";
+import { healthPotion } from "@/data/items";
 import type { Consumable, Item } from "@/types/Item";
 import { scheduleEnemyTurn } from "@/state/utils/CombatUtils";
 import {
@@ -28,8 +26,7 @@ export const createInventorySlice: GameSlice<InventorySlice> = (set, get) => ({
   goldPieces: 5,
   targetingConsumable: null,
 
-  setTargetingConsumable: (item: Consumable | null) =>
-    set({ targetingConsumable: item }),
+  setTargetingConsumable: (item: Consumable | null) => set({ targetingConsumable: item }),
 
   consumeItem: (item: Consumable, target?: CharacterData) => {
     const state = get();
@@ -50,10 +47,7 @@ export const createInventorySlice: GameSlice<InventorySlice> = (set, get) => ({
     set((state) => {
       if (item.cost > state.goldPieces) {
         return {
-          activityLog: [
-            ...state.activityLog,
-            `Not enough gold to buy ${item.name}!`,
-          ],
+          activityLog: [...state.activityLog, `Not enough gold to buy ${item.name}!`],
         };
       }
 

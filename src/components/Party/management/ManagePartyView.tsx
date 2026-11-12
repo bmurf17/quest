@@ -15,8 +15,9 @@ export function ManagePartyView({
   setParty: (chars: CharacterData[]) => void;
   updateParty: (chars: CharacterData[]) => void;
 }) {
-  const [selectedCharacter, setSelectedCharacter] =
-    useState<CharacterData | null>(party[0] || null);
+  const [selectedCharacter, setSelectedCharacter] = useState<CharacterData | null>(
+    party[0] || null,
+  );
 
   const handleRemove = (index: number) => {
     const next = party.filter((_, i) => i !== index);
@@ -29,26 +30,16 @@ export function ManagePartyView({
 
   return (
     <>
-
-      <div
-        style={managePartyViewStyle}
-      >
+      <div style={managePartyViewStyle}>
         <div
           style={{
             padding: "20px 18px 14px",
             borderBottom: "1px solid rgba(180,140,80,0.1)",
           }}
         >
-          <h2
-            style={managePartyViewStyle2}
-          >
-            Party Members
-          </h2>
+          <h2 style={managePartyViewStyle2}>Party Members</h2>
         </div>
-        <div
-          className="scrollbar-thin"
-          style={managePartyViewStyle3}
-        >
+        <div className="scrollbar-thin" style={managePartyViewStyle3}>
           {party.map((character, i) => {
             const active = selectedCharacter?.name === character.name;
             return (
@@ -65,9 +56,7 @@ export function ManagePartyView({
                   padding: "10px 11px",
                   borderRadius: 7,
                   border: `1px solid ${active ? "rgba(212,175,55,0.4)" : "transparent"}`,
-                  background: active
-                    ? "rgba(212,175,55,0.09)"
-                    : "transparent",
+                  background: active ? "rgba(212,175,55,0.09)" : "transparent",
                   cursor: "pointer",
                   transition: "background 0.12s, border-color 0.12s",
                   font: "inherit",
@@ -75,14 +64,8 @@ export function ManagePartyView({
                   width: "100%",
                 }}
               >
-                <div
-                  style={managePartyViewStyle4}
-                >
-                  <img
-                    src={character.img}
-                    alt={character.name}
-                    style={managePartyViewStyle5}
-                  />
+                <div style={managePartyViewStyle4}>
+                  <img src={character.img} alt={character.name} style={managePartyViewStyle5} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div
@@ -99,17 +82,9 @@ export function ManagePartyView({
                   >
                     {character.name}
                   </div>
-                  <StatBar
-                    value={character.hp}
-                    max={character.maxHp}
-                    color={colors.danger}
-                  />
+                  <StatBar value={character.hp} max={character.maxHp} color={colors.danger} />
                   <div style={{ marginTop: 4 }}>
-                    <StatBar
-                      value={character.mp}
-                      max={character.maxMp}
-                      color="#6366F1"
-                    />
+                    <StatBar value={character.mp} max={character.maxMp} color="#6366F1" />
                   </div>
                 </div>
               </button>
@@ -124,11 +99,7 @@ export function ManagePartyView({
         emptyMessage="Select a party member to view"
       />
 
-      <PartyRosterPanel
-        party={party}
-        onRemove={handleRemove}
-        emptyTitle="No party members"
-      />
+      <PartyRosterPanel party={party} onRemove={handleRemove} emptyTitle="No party members" />
     </>
   );
 }

@@ -9,26 +9,11 @@ interface Props {
 
 const classifyLog = (log: string): { color: string; prefix: string } => {
   const l = log.toLowerCase();
-  if (
-    l.includes("defeated") ||
-    l.includes("died") ||
-    l.includes("slain") ||
-    l.includes("dead")
-  )
+  if (l.includes("defeated") || l.includes("died") || l.includes("slain") || l.includes("dead"))
     return { color: "#FCA5A5", prefix: "✦" };
-  if (
-    l.includes("damage") ||
-    l.includes("hit") ||
-    l.includes("attack") ||
-    l.includes("strike")
-  )
+  if (l.includes("damage") || l.includes("hit") || l.includes("attack") || l.includes("strike"))
     return { color: "#F87171", prefix: "⚔" };
-  if (
-    l.includes("heal") ||
-    l.includes("restore") ||
-    l.includes("recover") ||
-    l.includes("hp")
-  )
+  if (l.includes("heal") || l.includes("restore") || l.includes("recover") || l.includes("hp"))
     return { color: "#6EE7B7", prefix: "✚" };
   if (
     l.includes("mana") ||
@@ -46,12 +31,7 @@ const classifyLog = (log: string): { color: string; prefix: string } => {
     l.includes("gold")
   )
     return { color: "#FCD34D", prefix: "◈" };
-  if (
-    l.includes("enter") ||
-    l.includes("room") ||
-    l.includes("arrived") ||
-    l.includes("discover")
-  )
+  if (l.includes("enter") || l.includes("room") || l.includes("arrived") || l.includes("discover"))
     return { color: colors.goldMuted, prefix: "▸" };
   if (l.includes("miss") || l.includes("evad") || l.includes("dodge"))
     return { color: colors.muted, prefix: "◌" };
@@ -68,36 +48,15 @@ export default function ActivityLog({ activityLog }: Props) {
 
   return (
     <>
-
-      <div
-        style={activityLogStyle}
-      >
-        <div
-          style={activityLogStyle2}
-        >
-          <span
-            style={activityLogStyle3}
-          >
-            Chronicle
-          </span>
-          <span
-            style={activityLogStyle4}
-          >
-            {activityLog.length} entries
-          </span>
+      <div style={activityLogStyle}>
+        <div style={activityLogStyle2}>
+          <span style={activityLogStyle3}>Chronicle</span>
+          <span style={activityLogStyle4}>{activityLog.length} entries</span>
         </div>
 
-        <div
-          ref={containerRef}
-          className="log-scroll"
-          style={activityLogStyle5}
-        >
+        <div ref={containerRef} className="log-scroll" style={activityLogStyle5}>
           {activityLog.length === 0 ? (
-            <div
-              style={activityLogStyle6}
-            >
-              The chronicle awaits your deeds…
-            </div>
+            <div style={activityLogStyle6}>The chronicle awaits your deeds…</div>
           ) : (
             activityLog.map((log, i) => {
               const { color, prefix } = classifyLog(log);
@@ -112,17 +71,11 @@ export default function ActivityLog({ activityLog }: Props) {
                     gap: 8,
                     padding: "4px 8px",
                     borderRadius: 4,
-                    background: isRecent
-                      ? "rgba(180,140,80,0.06)"
-                      : "transparent",
+                    background: isRecent ? "rgba(180,140,80,0.06)" : "transparent",
                     marginBottom: 1,
                   }}
                 >
-                  <span
-                    style={activityLogStyle7}
-                  >
-                    {i + 1}
-                  </span>
+                  <span style={activityLogStyle7}>{i + 1}</span>
 
                   <span
                     style={{

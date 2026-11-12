@@ -11,75 +11,37 @@ export default function ManageRooms() {
 
   return (
     <>
-
-      <main
-        style={manageRoomsStyle}
-      >
+      <main style={manageRoomsStyle}>
         <div style={{ maxWidth: 760, margin: "0 auto 32px" }}>
-          <div
-            style={manageRoomsStyle2}
-          >
-            <div
-              style={manageRoomsStyle3}
-            />
-            <h1
-              style={manageRoomsStyle4}
-            >
-              World Builder
-            </h1>
-            <div
-              style={manageRoomsStyle5}
-            >
+          <div style={manageRoomsStyle2}>
+            <div style={manageRoomsStyle3} />
+            <h1 style={manageRoomsStyle4}>World Builder</h1>
+            <div style={manageRoomsStyle5}>
               <span style={{ color: colors.gold }}>{icons.compass}</span>
-              <span
-                style={manageRoomsStyle6}
-              >
-                {rooms.length} rooms
-              </span>
+              <span style={manageRoomsStyle6}>{rooms.length} rooms</span>
             </div>
           </div>
-          <p
-            style={manageRoomsStyle7}
-          >
-            Forge new chambers for adventurers to discover
-          </p>
+          <p style={manageRoomsStyle7}>Forge new chambers for adventurers to discover</p>
         </div>
 
-        <div
-          style={manageRoomsStyle8}
-        >
-          <div
-            style={manageRoomsStyle9}
-          />
-          <div
-            style={manageRoomsStyle10}
-          />
-          <div
-            style={manageRoomsStyle11}
-          />
-          <div
-            style={manageRoomsStyle12}
-          />
+        <div style={manageRoomsStyle8}>
+          <div style={manageRoomsStyle9} />
+          <div style={manageRoomsStyle10} />
+          <div style={manageRoomsStyle11} />
+          <div style={manageRoomsStyle12} />
 
           <CreateRoomForm form={form} />
         </div>
       </main>
 
-      {toast && (
-        <Toast
-          type={toast.type}
-          message={toast.message}
-          onClose={() => setToast(null)}
-        />
-      )}
+      {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
     </>
   );
 }
 
 // Static style objects hoisted out of the render path.
 const manageRoomsStyle: CSSProperties = {
-  background:
-    "linear-gradient(160deg, #0d0b07 0%, #1a1209 50%, #0f0e09 100%)",
+  background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 50%, #0f0e09 100%)",
   padding: "32px 24px 64px",
   fontFamily: "'Crimson Text', Georgia, serif",
 };

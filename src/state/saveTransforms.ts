@@ -13,9 +13,10 @@ export type SerializedRoom = Omit<Room, "neighboringRooms"> & {
 export function normalizeNeighbors(room: Room): SerializedRoom {
   return {
     ...room,
-    neighboringRooms: room.neighboringRooms.map(
-      ([dir, neighborRoom]: [Directions, Room]) => [dir, neighborRoom.id],
-    ),
+    neighboringRooms: room.neighboringRooms.map(([dir, neighborRoom]: [Directions, Room]) => [
+      dir,
+      neighborRoom.id,
+    ]),
   };
 }
 
@@ -28,23 +29,18 @@ export function normalizeNeighbors(room: Room): SerializedRoom {
  * find. Callers should populate the lookup with every room (including forward
  * references) before calling this.
  */
-export function denormalizeNeighbors(
-  room: SerializedRoom,
-  roomLookup: Map<number, Room>,
-): Room {
+export function denormalizeNeighbors(room: SerializedRoom, roomLookup: Map<number, Room>): Room {
   return {
     ...room,
-    neighboringRooms: room.neighboringRooms.map(
-      ([dir, neighborId]: [Directions, number]) => {
-        const found = roomLookup.get(neighborId);
-        if (!found) {
-          throw new SaveDataError(
-            `Room "${room.name}" (${room.id}) references missing neighboring room ${neighborId}`,
-          );
-        }
-        return [dir, found];
-      },
-    ),
+    neighboringRooms: room.neighboringRooms.map(([dir, neighborId]: [Directions, number]) => {
+      const found = roomLookup.get(neighborId);
+      if (!found) {
+        throw new SaveDataError(
+          `Room "${room.name}" (${room.id}) references missing neighboring room ${neighborId}`,
+        );
+      }
+      return [dir, found];
+    }),
   };
 }
 
@@ -73,10 +69,7 @@ export function hydrateRoomInstances(
   for (const [id, roomData] of serialized) {
     const room = roomInstances.get(id);
     if (!room) continue;
-    room.neighboringRooms = denormalizeNeighbors(
-      roomData,
-      roomLookup,
-    ).neighboringRooms;
+    room.neighboringRooms = denormalizeNeighbors(roomData, roomLookup).neighboringRooms;
   }
 
   return roomInstances;

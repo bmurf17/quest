@@ -9,12 +9,7 @@ import fireball from "/images/spells/fireball.png";
 import heal from "/images/spells/heal.png";
 import type { CharacterData, CharacterEquipment, Skill } from "@/types/Character";
 import type { Spell } from "@/types/Spell";
-import {
-  longbowWeapon,
-  shortsword,
-  spearWeapon,
-  staffWeapon,
-} from "@/data/items";
+import { longbowWeapon, shortsword, spearWeapon, staffWeapon } from "@/data/items";
 
 const defaultSavingThrows = {
   str: "+2",

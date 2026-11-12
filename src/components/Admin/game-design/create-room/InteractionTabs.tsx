@@ -1,6 +1,6 @@
 import { colors, fonts } from "@/theme";
 import { icons } from "./icons";
-import type { InteractionType} from "./interactionTypes";
+import type { InteractionType } from "./interactionTypes";
 import { INTERACTION_TYPES, interactionColors } from "./interactionTypes";
 import type { CSSProperties } from "react";
 
@@ -27,9 +27,7 @@ export function InteractionTabs({
               gap: 6,
               padding: "7px 14px",
               borderRadius: 6,
-              border: active
-                ? `1px solid ${color}`
-                : "1px solid rgba(255,255,255,0.08)",
+              border: active ? `1px solid ${color}` : "1px solid rgba(255,255,255,0.08)",
               background: active ? `${color}22` : "rgba(0,0,0,0.2)",
               color: active ? color : colors.muted,
               fontSize: 13,
@@ -40,9 +38,7 @@ export function InteractionTabs({
               letterSpacing: "0.03em",
             }}
           >
-            <span style={{ color: active ? color : "#6B7280" }}>
-              {icons[type]}
-            </span>
+            <span style={{ color: active ? color : "#6B7280" }}>{icons[type]}</span>
             {type}
           </button>
         );

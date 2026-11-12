@@ -1,11 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { tempWarrior } from "@/data/fixtures/characters";
 import type { DialogueNode, NPC } from "@/types/RoomInteractions";
-import {
-  DialogueOutcomeType,
-  NPCDisposition,
-  NPCType,
-} from "@/types/RoomInteractions";
+import { DialogueOutcomeType, NPCDisposition, NPCType } from "@/types/RoomInteractions";
 import type { Room } from "@/types/Room";
 import { useGameStore } from "@/state/GameState";
 
@@ -95,10 +91,7 @@ describe("dialogue outcomes", () => {
     const elder = npc();
     seedDialogue(elder, dialogueNode());
 
-    useGameStore.getState().applyOutcome(
-      { type: DialogueOutcomeType.NPC_LEAVE },
-      elder,
-    );
+    useGameStore.getState().applyOutcome({ type: DialogueOutcomeType.NPC_LEAVE }, elder);
 
     const state = useGameStore.getState();
     expect(state.room.interaction).toBeNull();
@@ -111,10 +104,7 @@ describe("dialogue outcomes", () => {
     const elder = npc();
     seedDialogue(elder, dialogueNode());
 
-    useGameStore.getState().applyOutcome(
-      { type: DialogueOutcomeType.END_CONVERSATION },
-      elder,
-    );
+    useGameStore.getState().applyOutcome({ type: DialogueOutcomeType.END_CONVERSATION }, elder);
 
     const state = useGameStore.getState();
     expect(state.activeDialogue).toBeNull();

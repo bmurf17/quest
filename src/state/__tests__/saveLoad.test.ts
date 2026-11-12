@@ -162,9 +162,7 @@ describe("save/load round trip", () => {
 
   it("throws when the saved current room is missing", () => {
     const data = memorySave({ currentRoomId: 99 });
-    expect(() => useGameStore.getState().loadGame(data)).toThrow(
-      /current room 99/,
-    );
+    expect(() => useGameStore.getState().loadGame(data)).toThrow(/current room 99/);
   });
 
   it("accepts legacy saves that predate cooldowns and buffs", () => {

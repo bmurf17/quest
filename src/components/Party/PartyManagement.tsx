@@ -25,9 +25,7 @@ export function PartyManagement() {
   if (localParty.length === 0) {
     return (
       <CharacterProvider>
-        <div
-          style={partyManagementStyle}
-        >
+        <div style={partyManagementStyle}>
           <CreateCharacterView onCreate={handleCreate} />
         </div>
       </CharacterProvider>
@@ -35,14 +33,8 @@ export function PartyManagement() {
   }
 
   return (
-    <div
-      style={partyManagementStyle2}
-    >
-      <ManagePartyView
-        party={localParty}
-        setParty={setLocalParty}
-        updateParty={updateParty}
-      />
+    <div style={partyManagementStyle2}>
+      <ManagePartyView party={localParty} setParty={setLocalParty} updateParty={updateParty} />
     </div>
   );
 }

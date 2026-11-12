@@ -1,0 +1,14 @@
+# Build output and caches
+dist
+coverage
+node_modules
+playwright-report
+test-results
+supabase/.temp
+
+# Generated files
+src/types/database.generated.ts
+pnpm-lock.yaml
+
+# SQL migrations and seeds are hand-formatted
+supabase/**/*.sql

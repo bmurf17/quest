@@ -1,4 +1,4 @@
-import type { GameState} from "@/state/GameState";
+import type { GameState } from "@/state/GameState";
 import { useGameStore } from "@/state/GameState";
 import type { DialogueNode, NPC } from "@/types/RoomInteractions";
 import { useEffect, useRef } from "react";
@@ -21,7 +21,7 @@ export default function RoomNPC() {
     if (!interaction || interaction.type !== "NPC" || !npcId) return;
     if (npcIdRef.current === npcId) return;
     npcIdRef.current = npcId;
-    
+
     const cachedTree = dialogueTrees.get(npcId);
     if (cachedTree) {
       startDialogue(interaction.npc, cachedTree);
@@ -38,7 +38,13 @@ export default function RoomNPC() {
   const hasDialogueTree = activeDialogue !== null;
 
   if (hasDialogueTree) {
-    return <DialogueTreeView npc={npc} activeDialogue={activeDialogue} selectDialogueChoice={selectDialogueChoice} />;
+    return (
+      <DialogueTreeView
+        npc={npc}
+        activeDialogue={activeDialogue}
+        selectDialogueChoice={selectDialogueChoice}
+      />
+    );
   }
 
   const dialogueLines = npc.dialogue;
@@ -48,39 +54,36 @@ export default function RoomNPC() {
   return (
     <div className="flex flex-col items-center animate-in fade-in zoom-in duration-300">
       <div className="relative mb-4 px-4 py-3 bg-slate-900/95 border-2 border-white rounded-lg shadow-xl max-w-[280px] min-h-[60px]">
-        <p className="text-white text-sm font-mono leading-relaxed">
-          {currentLine}
-        </p>
+        <p className="text-white text-sm font-mono leading-relaxed">{currentLine}</p>
 
         {!isEndOfDialogue && (
-           <div className="absolute bottom-1 right-2 text-[10px] text-yellow-400 animate-bounce">
-             ▼
-           </div>
+          <div className="absolute bottom-1 right-2 text-[10px] text-yellow-400 animate-bounce">
+            ▼
+          </div>
         )}
-        
-        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 
+
+        <div
+          className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 
           border-l-[8px] border-l-transparent 
           border-r-[8px] border-r-transparent 
-          border-t-[8px] border-t-white">
-        </div>
+          border-t-[8px] border-t-white"
+        ></div>
       </div>
 
       <div className="relative">
-        <img src={npc.img} alt={npc.name} className="mx-auto"
-          style={roomNPCStyle}
-        />
+        <img src={npc.img} alt={npc.name} className="mx-auto" style={roomNPCStyle} />
       </div>
     </div>
   );
 }
 
-function DialogueTreeView({ 
-  npc, 
-  activeDialogue, 
-  selectDialogueChoice 
-}: { 
-  npc: NPC; 
-  activeDialogue: DialogueNode | null; 
+function DialogueTreeView({
+  npc,
+  activeDialogue,
+  selectDialogueChoice,
+}: {
+  npc: NPC;
+  activeDialogue: DialogueNode | null;
   selectDialogueChoice: (choiceId: string) => void;
 }) {
   if (!activeDialogue) {
@@ -90,15 +93,14 @@ function DialogueTreeView({
   return (
     <div className="flex flex-col items-center animate-in fade-in zoom-in duration-300">
       <div className="relative mb-4 px-4 py-3 bg-slate-900/95 border-2 border-white rounded-lg shadow-xl max-w-[280px] min-h-[60px]">
-        <p className="text-white text-sm font-mono leading-relaxed">
-          {activeDialogue.text}
-        </p>
-        
-        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 
+        <p className="text-white text-sm font-mono leading-relaxed">{activeDialogue.text}</p>
+
+        <div
+          className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 
           border-l-[8px] border-l-transparent 
           border-r-[8px] border-r-transparent 
-          border-t-[8px] border-t-white">
-        </div>
+          border-t-[8px] border-t-white"
+        ></div>
       </div>
 
       {activeDialogue.choices && activeDialogue.choices.length > 0 && (
@@ -123,13 +125,15 @@ function DialogueTreeView({
       )}
 
       <div className="relative">
-        <img src={npc.img} alt={npc.name} className="mx-auto"
-          style={roomNPCStyle}
-        />
+        <img src={npc.img} alt={npc.name} className="mx-auto" style={roomNPCStyle} />
       </div>
     </div>
   );
 }
 
 // Static style objects hoisted out of the render path.
-const roomNPCStyle: CSSProperties = { width: "192px", height: "192px", imageRendering: "pixelated" };
+const roomNPCStyle: CSSProperties = {
+  width: "192px",
+  height: "192px",
+  imageRendering: "pixelated",
+};

@@ -10,7 +10,7 @@ export type Enemy = {
   defense: number;
   img: string;
   expGain: number;
-  type?: 'enemy' | 'boss';
+  type?: "enemy" | "boss";
   moves?: EnemyMove[];
   phase?: number;
   phaseThresholds?: number[];

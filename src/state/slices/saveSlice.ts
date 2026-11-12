@@ -26,8 +26,7 @@ export const createSaveSlice: GameSlice<SaveSlice> = (set, get) => ({
     }
 
     const currentRoom =
-      roomInstances.get(data.currentRoomId) ??
-      state.rooms.find((r) => r.id === data.currentRoomId);
+      roomInstances.get(data.currentRoomId) ?? state.rooms.find((r) => r.id === data.currentRoomId);
     if (!currentRoom) {
       throw new SaveDataError(
         `Save references current room ${data.currentRoomId}, which was not found`,
@@ -56,7 +55,7 @@ export const createSaveSlice: GameSlice<SaveSlice> = (set, get) => ({
       roomInstances,
       dialogueTrees,
       activeCutscene: data.activeCutsceneId
-        ? state.cutscenes.get(data.activeCutsceneId) ?? null
+        ? (state.cutscenes.get(data.activeCutsceneId) ?? null)
         : null,
       enemyCooldowns,
       activeBuffs,

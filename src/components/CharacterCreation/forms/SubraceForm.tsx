@@ -8,8 +8,16 @@ const SUBRACES: Record<string, string[]> = {
   dwarf: ["Hill Dwarf", "Mountain Dwarf"],
   halfling: ["Lightfoot", "Stout"],
   dragonborn: [
-    "Black", "Blue", "Brass", "Bronze", "Copper",
-    "Gold", "Green", "Red", "Silver", "White",
+    "Black",
+    "Blue",
+    "Brass",
+    "Bronze",
+    "Copper",
+    "Gold",
+    "Green",
+    "Red",
+    "Silver",
+    "White",
   ],
 };
 
@@ -19,20 +27,12 @@ export default function SubraceForm() {
   return (
     <>
       <div>
-        <div
-          style={subraceFormStyle}
-        >
-          <span
-            style={subraceFormStyle2}
-          >
-            Choose Your Subrace
-          </span>
+        <div style={subraceFormStyle}>
+          <span style={subraceFormStyle2}>Choose Your Subrace</span>
           <div style={subraceFormStyle3} />
         </div>
         {character.race ? (
-          <div
-            style={subraceFormStyle4}
-          >
+          <div style={subraceFormStyle4}>
             {(SUBRACES[character.race] || []).map((subrace) => {
               const id = subrace.toLowerCase().replace(" ", "-");
               const active = character.subrace === id;
@@ -53,9 +53,7 @@ export default function SubraceForm() {
                     padding: "12px 14px",
                     borderRadius: 7,
                     border: `1px solid ${active ? "rgba(212,175,55,0.4)" : "rgba(180,140,80,0.12)"}`,
-                    background: active
-                      ? "rgba(212,175,55,0.09)"
-                      : "rgba(255,255,255,0.03)",
+                    background: active ? "rgba(212,175,55,0.09)" : "rgba(255,255,255,0.03)",
                     cursor: "pointer",
                     transition: "background 0.12s, border-color 0.12s",
                   }}
@@ -74,11 +72,7 @@ export default function SubraceForm() {
                       transition: "all 0.12s",
                     }}
                   >
-                    {active && (
-                      <div
-                        style={subraceFormStyle5}
-                      />
-                    )}
+                    {active && <div style={subraceFormStyle5} />}
                   </div>
                   <span
                     style={{
@@ -95,11 +89,7 @@ export default function SubraceForm() {
             })}
           </div>
         ) : (
-          <p
-            style={subraceFormStyle6}
-          >
-            Please select a race first.
-          </p>
+          <p style={subraceFormStyle6}>Please select a race first.</p>
         )}
       </div>
     </>
@@ -123,10 +113,10 @@ const subraceFormStyle2: CSSProperties = {
   whiteSpace: "nowrap",
 };
 const subraceFormStyle3: CSSProperties = { flex: 1, height: 1, background: colors.goldBorder };
-  const subraceFormStyle4: CSSProperties = {
-                display: "flex",
-                flexDirection: "column",
-                gap: 6,
+const subraceFormStyle4: CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 6,
 };
 const subraceFormStyle5: CSSProperties = {
   width: 6,

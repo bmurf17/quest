@@ -7,20 +7,11 @@ export function ChestForm() {
       <div style={chestFormStyle}>
         <div style={{ gridColumn: "1 / -1" }}>
           <FieldGroup id="itemId" label="Item ID">
-            <StyledInput
-              id="itemId"
-              name="itemId"
-              placeholder="e.g. item_health_potion"
-            />
+            <StyledInput id="itemId" name="itemId" placeholder="e.g. item_health_potion" />
           </FieldGroup>
         </div>
         <FieldGroup id="quantity" label="Quantity">
-          <StyledInput
-            id="quantity"
-            name="quantity"
-            type="number"
-            defaultValue={1}
-          />
+          <StyledInput id="quantity" name="quantity" type="number" defaultValue={1} />
         </FieldGroup>
         <FieldGroup id="isLocked" label="Lock State">
           <StyledSelect id="isLocked" name="isLocked">

@@ -16,14 +16,9 @@ export default function QuestOffer({
 }) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent
-        className="gap-0 p-0"
-        style={questOfferStyle}
-      >
+      <DialogContent className="gap-0 p-0" style={questOfferStyle}>
         <>
-          <QuestPanelHeader
-            title={`${quest.npcName ?? quest.name}'s Quest`}
-          />
+          <QuestPanelHeader title={`${quest.npcName ?? quest.name}'s Quest`} />
           <QuestDescription
             npcsName={quest.npcName ?? quest.name}
             quest={quest}

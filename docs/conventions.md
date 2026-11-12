@@ -1,5 +1,68 @@
 # Code conventions
 
+## Source layout
+
+```
+src/
+  components/     React UI. Feature folders, shared/, and ui/ primitives.
+  state/          Zustand store, slices, save/load, and state helpers.
+  queries/        Supabase queries plus DB-row -> domain mappers.
+  types/          Types and enums only (no data or logic).
+  lib/            Framework-free logic (character maths, dice, logger).
+  data/           Static game data and demo fixtures.
+  hooks/          Reusable React hooks.
+  styles/         Global component CSS.
+  assets/         App-bundled art, kebab-case filenames.
+  sql-queries/    Reference SQL kept next to the schema it targets.
+```
+
+- `types/` holds declarations only. Put fixtures in `data/` and logic in `lib/`
+  or `state/utils/`.
+- Components never call Supabase directly. Add or extend a module in `queries/`
+  and map rows to domain objects there.
+- Assets referenced at runtime from a Supabase row may stay in `public/images/`
+  under their stored paths. Everything bundled with the app belongs in
+  `src/assets/`.
+
+## State store
+
+`src/state/GameState.ts` is only a composition root: it creates one Zustand
+store from the slices and re-exports `useGameStore` and the `GameState` type.
+Keep it that way.
+
+```
+src/state/
+  GameState.ts       # composition root (public useGameStore API)
+  slices/            # one file per subsystem, plus the combined GameState type
+    types.ts         # GameState interface and GameSlice helper
+    combatSlice.ts
+    dialogueSlice.ts
+    inventorySlice.ts
+    partySlice.ts
+    worldSlice.ts
+    activitySlice.ts
+    saveSlice.ts
+  utils/             # pure helpers used by slices
+  saveLoad.ts        # save/load entry points and SaveData
+  saveSchema.ts      # Zod validation + ordered save migrations
+  saveTransforms.ts  # normalize/hydrate rooms and neighbours
+  __tests__/         # store, save/load, and helper tests
+```
+
+Rules:
+
+- **One store, many slices.** Slices read and write the full `GameState` because
+  the game systems are coupled; do not introduce separate stores or
+  cross-store subscriptions.
+- **Slices own state, not algorithms.** When an action grows past orchestration,
+  move the calculation into `state/utils/` and call it from the slice.
+- **Keep the public API stable.** Renaming a `useGameStore` action means updating
+  every component and test that calls it (for example, `consumeItem` is an
+  action, not a `use*` hook).
+- **Save changes are versioned.** Add a `SAVE_VERSION` migration in
+  `saveSchema.ts`, classify any new direct field in `saveLoad.ts`, and cover the
+  migration in `__tests__/saveSchema.test.ts`.
+
 ## Imports
 
 - Use the `@/` alias for every import that crosses a directory boundary.
@@ -108,4 +171,3 @@ Rules:
 - There are no CSS modules or CSS-in-JS libraries. If a component needs
   scoped, stateful styles, add a named class to the global stylesheet and
   document the class next to the component that owns it.
-

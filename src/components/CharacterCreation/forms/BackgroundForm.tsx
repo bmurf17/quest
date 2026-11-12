@@ -10,19 +10,11 @@ export default function BackgroundForm() {
   return (
     <>
       <div>
-        <div
-          style={backgroundFormStyle}
-        >
-          <span
-            style={backgroundFormStyle2}
-          >
-            Choose Your Background
-          </span>
+        <div style={backgroundFormStyle}>
+          <span style={backgroundFormStyle2}>Choose Your Background</span>
           <div style={backgroundFormStyle3} />
         </div>
-        <div
-          style={backgroundFormStyle4}
-        >
+        <div style={backgroundFormStyle4}>
           {BACKGROUNDS.map((bg) => {
             const active = character.background === bg.toLowerCase().replace(" ", "-");
             return (
@@ -30,9 +22,7 @@ export default function BackgroundForm() {
                 type="button"
                 key={bg}
                 className="bg-card"
-                onClick={() =>
-                  updateCharacter("background", bg.toLowerCase().replace(" ", "-"))
-                }
+                onClick={() => updateCharacter("background", bg.toLowerCase().replace(" ", "-"))}
                 aria-pressed={active}
                 style={{
                   font: "inherit",
@@ -44,9 +34,7 @@ export default function BackgroundForm() {
                   padding: "12px 14px",
                   borderRadius: 7,
                   border: `1px solid ${active ? "rgba(212,175,55,0.4)" : "rgba(180,140,80,0.12)"}`,
-                  background: active
-                    ? "rgba(212,175,55,0.09)"
-                    : "rgba(255,255,255,0.03)",
+                  background: active ? "rgba(212,175,55,0.09)" : "rgba(255,255,255,0.03)",
                   cursor: "pointer",
                   transition: "background 0.12s, border-color 0.12s",
                 }}
@@ -65,11 +53,7 @@ export default function BackgroundForm() {
                     transition: "all 0.12s",
                   }}
                 >
-                  {active && (
-                    <div
-                      style={backgroundFormStyle5}
-                    />
-                  )}
+                  {active && <div style={backgroundFormStyle5} />}
                 </div>
                 <span
                   style={{
@@ -107,10 +91,10 @@ const backgroundFormStyle2: CSSProperties = {
   whiteSpace: "nowrap",
 };
 const backgroundFormStyle3: CSSProperties = { flex: 1, height: 1, background: colors.goldBorder };
-  const backgroundFormStyle4: CSSProperties = {
-              display: "flex",
-              flexDirection: "column",
-              gap: 6,
+const backgroundFormStyle4: CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 6,
 };
 const backgroundFormStyle5: CSSProperties = {
   width: 6,

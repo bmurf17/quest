@@ -67,9 +67,7 @@ export function CharacterBuilderView({
         background: "#111009",
       }}
     >
-      <div
-        style={characterBuilderViewStyle}
-      >
+      <div style={characterBuilderViewStyle}>
         <div
           style={{
             padding: "18px",
@@ -78,9 +76,7 @@ export function CharacterBuilderView({
         >
           <CharacterOverview />
         </div>
-        <div
-          style={characterBuilderViewStyle2}
-        >
+        <div style={characterBuilderViewStyle2}>
           {CHARACTER_TABS.map(({ key, label }) => {
             const active = activeTab === key;
             return (
@@ -95,9 +91,7 @@ export function CharacterBuilderView({
                   padding: "10px 11px",
                   borderRadius: 7,
                   border: `1px solid ${active ? "rgba(212,175,55,0.4)" : "transparent"}`,
-                  background: active
-                    ? "rgba(212,175,55,0.09)"
-                    : "transparent",
+                  background: active ? "rgba(212,175,55,0.09)" : "transparent",
                   cursor: "pointer",
                   transition: "background 0.12s, border-color 0.12s",
                   font: "inherit",
@@ -105,10 +99,8 @@ export function CharacterBuilderView({
                 }}
                 onMouseEnter={(e) => {
                   if (!active) {
-                    e.currentTarget.style.background =
-                      "rgba(212,175,55,0.07)";
-                    e.currentTarget.style.borderColor =
-                      "rgba(212,175,55,0.25)";
+                    e.currentTarget.style.background = "rgba(212,175,55,0.07)";
+                    e.currentTarget.style.borderColor = "rgba(212,175,55,0.25)";
                   }
                 }}
                 onMouseLeave={(e) => {
@@ -123,9 +115,7 @@ export function CharacterBuilderView({
                     width: 6,
                     height: 6,
                     borderRadius: "50%",
-                    background: active
-                      ? colors.gold
-                      : "rgba(180,140,80,0.2)",
+                    background: active ? colors.gold : "rgba(180,140,80,0.2)",
                     flexShrink: 0,
                   }}
                 />

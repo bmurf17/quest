@@ -21,38 +21,29 @@ export default function MainGameArea() {
   const room = useGameStore((state) => state.room);
   const activeCutscene = useGameStore((state) => state.activeCutscene);
   const playCutscene = useGameStore((state) => state.playCutscene);
-  const advanceCutsceneScene = useGameStore(
-    (state) => state.advanceCutsceneScene,
-  );
+  const advanceCutsceneScene = useGameStore((state) => state.advanceCutsceneScene);
 
   const backgroundClass =
-    gameStatus === GameStatus.InTown
-      ? "bg-town-background"
-      : "bg-battle-background";
+    gameStatus === GameStatus.InTown ? "bg-town-background" : "bg-battle-background";
 
   useEffect(() => {
     if (party.length === 0) {
-      navigate("/party");
+      void navigate("/party");
     }
   }, [party.length, navigate]);
 
   const cutsceneId =
-    room.interaction?.type === "cutscene"
-      ? room.interaction.cutscene.cutsceneId
-      : null;
+    room.interaction?.type === "cutscene" ? room.interaction.cutscene.cutsceneId : null;
 
   useEffect(() => {
     if (cutsceneId) {
-      playCutscene(cutsceneId);
+      void playCutscene(cutsceneId);
     }
   }, [room.id, cutsceneId, playCutscene]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (
-        activeCutscene &&
-        (e.key === "Enter" || e.key === " " || e.key === "Escape")
-      ) {
+      if (activeCutscene && (e.key === "Enter" || e.key === " " || e.key === "Escape")) {
         e.preventDefault();
         advanceCutsceneScene();
       }
@@ -83,22 +74,18 @@ export default function MainGameArea() {
       style={mainGameAreaStyle2}
       className={`bg-cover bg-center ${backgroundClass} bg-pixelated`}
     >
-      <div
-        style={mainGameAreaStyle3}
-      >
-          <div style={{ textAlign: "center", pointerEvents: "auto" }}>
-            <BattleEnemies />
-            <RoomChest />
-            <MapNav />
-            <RoomCamp />
-            <BattleOrder />
-             <TavernOverlay />
-          </div>
+      <div style={mainGameAreaStyle3}>
+        <div style={{ textAlign: "center", pointerEvents: "auto" }}>
+          <BattleEnemies />
+          <RoomChest />
+          <MapNav />
+          <RoomCamp />
+          <BattleOrder />
+          <TavernOverlay />
+        </div>
       </div>
 
-      <div
-        style={mainGameAreaStyle4}
-      >
+      <div style={mainGameAreaStyle4}>
         <div style={{ pointerEvents: "auto" }}>
           <RoomNPC />
         </div>

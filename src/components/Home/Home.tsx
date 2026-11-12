@@ -6,49 +6,23 @@ import type { CSSProperties } from "react";
 export default function Home() {
   return (
     <>
+      <div style={homeStyle}>
+        <div style={homeStyle2} />
+        <div style={homeStyle3} />
 
-      <div
-        style={homeStyle}
-      >
-        <div
-          style={homeStyle2}
-        />
-        <div
-          style={homeStyle3}
-        />
-
-        <div
-          style={homeStyle4}
-        >
-          <div
-            className="home-divider"
-            style={homeStyle5}
-          >
-            <div
-              style={homeStyle6}
-            />
-            <div
-              style={homeStyle7}
-            />
-            <div
-              style={homeStyle8}
-            />
+        <div style={homeStyle4}>
+          <div className="home-divider" style={homeStyle5}>
+            <div style={homeStyle6} />
+            <div style={homeStyle7} />
+            <div style={homeStyle8} />
           </div>
 
-          <h1
-            className="home-title"
-            style={homeStyle9}
-          >
+          <h1 className="home-title" style={homeStyle9}>
             Qwest
           </h1>
 
-          <div
-            className="home-divider"
-            style={homeStyle10}
-          >
-            <div
-              style={homeStyle11}
-            />
+          <div className="home-divider" style={homeStyle10}>
+            <div style={homeStyle11} />
             <div style={{ display: "flex", gap: 6 }}>
               {[0, 1, 2].map((i) => (
                 <div
@@ -62,9 +36,7 @@ export default function Home() {
                 />
               ))}
             </div>
-            <div
-              style={homeStyle12}
-            />
+            <div style={homeStyle12} />
           </div>
 
           <div className="home-btn">
@@ -120,8 +92,7 @@ export default function Home() {
 // Static style objects hoisted out of the render path.
 const homeStyle: CSSProperties = {
   minHeight: "100vh",
-  background:
-    "linear-gradient(160deg, #0d0b07 0%, #1a1209 55%, #0f0e09 100%)",
+  background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 55%, #0f0e09 100%)",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
@@ -135,16 +106,14 @@ const homeStyle2: CSSProperties = {
   position: "absolute",
   inset: 0,
   pointerEvents: "none",
-  backgroundImage:
-    "radial-gradient(circle, rgba(180,140,80,0.1) 1px, transparent 1px)",
+  backgroundImage: "radial-gradient(circle, rgba(180,140,80,0.1) 1px, transparent 1px)",
   backgroundSize: "40px 40px",
 };
 const homeStyle3: CSSProperties = {
   position: "absolute",
   inset: 0,
   pointerEvents: "none",
-  background:
-    "radial-gradient(ellipse at center, transparent 30%, rgba(13,11,7,0.85) 100%)",
+  background: "radial-gradient(ellipse at center, transparent 30%, rgba(13,11,7,0.85) 100%)",
 };
 const homeStyle4: CSSProperties = {
   position: "relative",
@@ -164,8 +133,7 @@ const homeStyle5: CSSProperties = {
 const homeStyle6: CSSProperties = {
   width: 48,
   height: 1,
-  background:
-    "linear-gradient(to left, rgba(212,175,55,0.5), transparent)",
+  background: "linear-gradient(to left, rgba(212,175,55,0.5), transparent)",
 };
 const homeStyle7: CSSProperties = {
   width: 6,
@@ -176,8 +144,7 @@ const homeStyle7: CSSProperties = {
 const homeStyle8: CSSProperties = {
   width: 48,
   height: 1,
-  background:
-    "linear-gradient(to right, rgba(212,175,55,0.5), transparent)",
+  background: "linear-gradient(to right, rgba(212,175,55,0.5), transparent)",
 };
 const homeStyle9: CSSProperties = {
   margin: "0 0 12px",
@@ -198,12 +165,10 @@ const homeStyle10: CSSProperties = {
 const homeStyle11: CSSProperties = {
   width: 80,
   height: 1,
-  background:
-    "linear-gradient(to left, rgba(180,140,80,0.3), transparent)",
+  background: "linear-gradient(to left, rgba(180,140,80,0.3), transparent)",
 };
 const homeStyle12: CSSProperties = {
   width: 80,
   height: 1,
-  background:
-    "linear-gradient(to right, rgba(180,140,80,0.3), transparent)",
+  background: "linear-gradient(to right, rgba(180,140,80,0.3), transparent)",
 };

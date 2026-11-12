@@ -2,14 +2,7 @@ import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { colors, fonts } from "@/theme";
 import type { CSSProperties } from "react";
 
-
-export function QuestPanelHeader({
-  title,
-  onBack,
-}: {
-  title: string;
-  onBack?: () => void;
-}) {
+export function QuestPanelHeader({ title, onBack }: { title: string; onBack?: () => void }) {
   return (
     <DialogHeader
       style={{
@@ -18,9 +11,7 @@ export function QuestPanelHeader({
       }}
       className="space-y-0"
     >
-      <div
-        style={questPanelHeaderStyle}
-      >
+      <div style={questPanelHeaderStyle}>
         {onBack && (
           <button
             onClick={onBack}
@@ -36,20 +27,13 @@ export function QuestPanelHeader({
             ←
           </button>
         )}
-        <DialogTitle
-          style={questPanelHeaderStyle3}
-        >
-          {title}
-        </DialogTitle>
+        <DialogTitle style={questPanelHeaderStyle3}>{title}</DialogTitle>
       </div>
     </DialogHeader>
   );
 }
 
-export function QuestSectionBox({
-  children,
-  ...rest
-}: React.HTMLAttributes<HTMLDivElement>) {
+export function QuestSectionBox({ children, ...rest }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       {...rest}
@@ -67,13 +51,7 @@ export function QuestSectionBox({
 }
 
 export function QuestSectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      style={questSectionLabelStyle}
-    >
-      {children}
-    </div>
-  );
+  return <div style={questSectionLabelStyle}>{children}</div>;
 }
 
 // Static style objects hoisted out of the render path.

@@ -22,9 +22,7 @@ export function Toast({
         display: "flex",
         alignItems: "flex-start",
         gap: 10,
-        background: isSuccess
-          ? "rgba(5,150,105,0.15)"
-          : "rgba(220,38,38,0.15)",
+        background: isSuccess ? "rgba(5,150,105,0.15)" : "rgba(220,38,38,0.15)",
         border: `1px solid ${isSuccess ? "rgba(5,150,105,0.5)" : "rgba(220,38,38,0.5)"}`,
         borderRadius: 8,
         padding: "12px 16px",
@@ -34,20 +32,9 @@ export function Toast({
         maxWidth: 360,
       }}
     >
-      <span style={{ marginTop: 1 }}>
-        {isSuccess ? icons.check : icons.alert}
-      </span>
-      <div
-        style={toastStyle}
-      >
-        {message}
-      </div>
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label="Dismiss notification"
-        style={toastStyle2}
-      >
+      <span style={{ marginTop: 1 }}>{isSuccess ? icons.check : icons.alert}</span>
+      <div style={toastStyle}>{message}</div>
+      <button type="button" onClick={onClose} aria-label="Dismiss notification" style={toastStyle2}>
         ×
       </button>
     </div>

@@ -27,19 +27,11 @@ export default function ImageForm() {
   return (
     <>
       <div>
-        <div
-          style={imageFormStyle}
-        >
-          <span
-            style={imageFormStyle2}
-          >
-            Choose Your Portrait
-          </span>
+        <div style={imageFormStyle}>
+          <span style={imageFormStyle2}>Choose Your Portrait</span>
           <div style={imageFormStyle3} />
         </div>
-        <div
-          style={imageFormStyle4}
-        >
+        <div style={imageFormStyle4}>
           {IMAGES.map(({ key, src, label }) => {
             const active = character.image === key;
             return (
@@ -59,9 +51,7 @@ export default function ImageForm() {
                   padding: "14px 10px",
                   borderRadius: 7,
                   border: `1px solid ${active ? "rgba(212,175,55,0.4)" : "rgba(180,140,80,0.12)"}`,
-                  background: active
-                    ? "rgba(212,175,55,0.09)"
-                    : "rgba(255,255,255,0.03)",
+                  background: active ? "rgba(212,175,55,0.09)" : "rgba(255,255,255,0.03)",
                   cursor: "pointer",
                   transition: "background 0.12s, border-color 0.12s",
                 }}
@@ -73,17 +63,11 @@ export default function ImageForm() {
                     background: "rgba(0,0,0,0.4)",
                     borderRadius: 8,
                     overflow: "hidden",
-                    border: active
-                      ? "2px solid rgba(212,175,55,0.6)"
-                      : "2px solid transparent",
+                    border: active ? "2px solid rgba(212,175,55,0.6)" : "2px solid transparent",
                     transition: "border-color 0.12s",
                   }}
                 >
-                  <img
-                    src={src}
-                    alt={label}
-                    style={imageFormStyle5}
-                  />
+                  <img src={src} alt={label} style={imageFormStyle5} />
                 </div>
                 <span
                   style={{
@@ -121,10 +105,10 @@ const imageFormStyle2: CSSProperties = {
   whiteSpace: "nowrap",
 };
 const imageFormStyle3: CSSProperties = { flex: 1, height: 1, background: colors.goldBorder };
-  const imageFormStyle4: CSSProperties = {
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))",
-              gap: 10,
+const imageFormStyle4: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))",
+  gap: 10,
 };
 const imageFormStyle5: CSSProperties = {
   width: 80,

@@ -34,7 +34,7 @@ export default function ManageDialogues() {
   const [editingNode, setEditingNode] = useState<DialogueNode | null>(null);
 
   useEffect(() => {
-    loadNpcs();
+    void loadNpcs();
   }, []);
 
   async function loadNpcs() {
@@ -65,7 +65,10 @@ export default function ManageDialogues() {
         const { data: choiceData } = await supabase
           .from("dialogue_choices")
           .select("*")
-          .in("node_id", nodeData.map((n) => n.id));
+          .in(
+            "node_id",
+            nodeData.map((n) => n.id),
+          );
 
         const choiceMap = new Map<string, DialogueChoice[]>();
         choiceData?.forEach((c) => {
@@ -130,10 +133,7 @@ export default function ManageDialogues() {
   async function updateNodeText(text: string) {
     if (!editingNode) return;
 
-    await supabase
-      .from("dialogue_nodes")
-      .update({ npc_text: text })
-      .eq("id", editingNode.id);
+    await supabase.from("dialogue_nodes").update({ npc_text: text }).eq("id", editingNode.id);
 
     setEditingNode({ ...editingNode, npc_text: text });
     const newNodes = new Map(nodes);
@@ -145,10 +145,7 @@ export default function ManageDialogues() {
     const currentNode = editingNode;
     if (!currentNode) return;
 
-    await supabase
-      .from("dialogue_choices")
-      .update({ choice_text: text })
-      .eq("id", choiceId);
+    await supabase.from("dialogue_choices").update({ choice_text: text }).eq("id", choiceId);
 
     const newChoices = new Map(choices);
     const nodeChoices = newChoices.get(currentNode.id) || [];
@@ -170,20 +167,16 @@ export default function ManageDialogues() {
           <div style={{ flex: 1 }} />
         </div>
 
-        <h1 style={manageDialoguesStyle3}>
-          Dialogue Trees
-        </h1>
+        <h1 style={manageDialoguesStyle3}>Dialogue Trees</h1>
 
         <div style={manageDialoguesStyle4}>
           <div>
             <div style={manageDialoguesStyle5}>
-              <div style={manageDialoguesStyle6}>
-                Select NPC
-              </div>
+              <div style={manageDialoguesStyle6}>Select NPC</div>
               {npcs.map((npc) => (
                 <button
                   key={npc.id}
-                  onClick={() => selectNpc(npc)}
+                  onClick={() => void selectNpc(npc)}
                   style={{
                     width: "100%",
                     padding: "10px 12px",
@@ -202,10 +195,7 @@ export default function ManageDialogues() {
             </div>
 
             {selectedNpc && (
-              <button
-                onClick={createNewDialogue}
-                style={manageDialoguesStyle7}
-              >
+              <button onClick={() => void createNewDialogue()} style={manageDialoguesStyle7}>
                 + Create New Dialogue Tree
               </button>
             )}
@@ -215,25 +205,18 @@ export default function ManageDialogues() {
             {selectedNpc && editingNode && (
               <div style={manageDialoguesStyle8}>
                 <div style={{ marginBottom: 16 }}>
-                  <label style={manageDialoguesStyle9}>
-                    NPC Says
-                  </label>
+                  <label style={manageDialoguesStyle9}>NPC Says</label>
                   <textarea
                     value={editingNode.npc_text}
-                    onChange={(e) => updateNodeText(e.target.value)}
+                    onChange={(e) => void updateNodeText(e.target.value)}
                     style={manageDialoguesStyle10}
                   />
                 </div>
 
                 <div style={{ marginBottom: 16 }}>
                   <div style={manageDialoguesStyle11}>
-                    <label style={manageDialoguesStyle12}>
-                      Player Choices
-                    </label>
-                    <button
-                      onClick={addChoice}
-                      style={manageDialoguesStyle13}
-                    >
+                    <label style={manageDialoguesStyle12}>Player Choices</label>
+                    <button onClick={() => void addChoice()} style={manageDialoguesStyle13}>
                       + Add Choice
                     </button>
                   </div>
@@ -242,7 +225,7 @@ export default function ManageDialogues() {
                     <div key={choice.id} style={manageDialoguesStyle14}>
                       <input
                         value={choice.choice_text}
-                        onChange={(e) => updateChoiceText(choice.id, e.target.value)}
+                        onChange={(e) => void updateChoiceText(choice.id, e.target.value)}
                         style={manageDialoguesStyle15}
                       />
                       {choice.required_skill && (
@@ -255,10 +238,7 @@ export default function ManageDialogues() {
                 </div>
 
                 {editingNode && choices.get(editingNode.id)?.length === 0 && (
-                  <button
-                    onClick={addChoice}
-                    style={manageDialoguesStyle17}
-                  >
+                  <button onClick={() => void addChoice()} style={manageDialoguesStyle17}>
                     + Add a choice for this dialogue
                   </button>
                 )}
@@ -284,25 +264,45 @@ const manageDialoguesStyle: CSSProperties = {
   padding: "24px 32px",
   fontFamily: fonts.body,
 };
-const manageDialoguesStyle2: CSSProperties = { marginBottom: 24, display: "flex", alignItems: "center", gap: 16 };
-  const manageDialoguesStyle3: CSSProperties = { fontSize: 24, fontWeight: 700, color: colors.text, marginBottom: 24 };
-  const manageDialoguesStyle4: CSSProperties = { display: "grid", gridTemplateColumns: "280px 1fr", gap: 24 };
-  const manageDialoguesStyle5: CSSProperties = { 
-                background: "rgba(255,255,255,0.03)", 
-                border: "1px solid rgba(212,175,55,0.2)",
-                borderRadius: 8,
-                padding: 12,
+const manageDialoguesStyle2: CSSProperties = {
+  marginBottom: 24,
+  display: "flex",
+  alignItems: "center",
+  gap: 16,
 };
-const manageDialoguesStyle6: CSSProperties = { fontSize: 12, color: colors.gold, marginBottom: 12, textTransform: "uppercase", letterSpacing: "0.1em" };
-  const manageDialoguesStyle7: CSSProperties = {
-                    width: "100%",
-                    marginTop: 12,
-                    padding: "12px",
-                    background: "transparent",
-                    border: `1px dashed ${colors.gold}55`,
-                    borderRadius: 8,
-                    color: colors.gold,
-                    cursor: "pointer",
+const manageDialoguesStyle3: CSSProperties = {
+  fontSize: 24,
+  fontWeight: 700,
+  color: colors.text,
+  marginBottom: 24,
+};
+const manageDialoguesStyle4: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "280px 1fr",
+  gap: 24,
+};
+const manageDialoguesStyle5: CSSProperties = {
+  background: "rgba(255,255,255,0.03)",
+  border: "1px solid rgba(212,175,55,0.2)",
+  borderRadius: 8,
+  padding: 12,
+};
+const manageDialoguesStyle6: CSSProperties = {
+  fontSize: 12,
+  color: colors.gold,
+  marginBottom: 12,
+  textTransform: "uppercase",
+  letterSpacing: "0.1em",
+};
+const manageDialoguesStyle7: CSSProperties = {
+  width: "100%",
+  marginTop: 12,
+  padding: "12px",
+  background: "transparent",
+  border: `1px dashed ${colors.gold}55`,
+  borderRadius: 8,
+  color: colors.gold,
+  cursor: "pointer",
 };
 const manageDialoguesStyle8: CSSProperties = {
   background: "rgba(255,255,255,0.03)",
@@ -310,48 +310,72 @@ const manageDialoguesStyle8: CSSProperties = {
   borderRadius: 8,
   padding: 20,
 };
-const manageDialoguesStyle9: CSSProperties = { display: "block", fontSize: 11, color: colors.gold, marginBottom: 6, textTransform: "uppercase" };
-  const manageDialoguesStyle10: CSSProperties = {
-                        width: "100%",
-                        minHeight: 80,
-                        padding: 12,
-                        background: "rgba(0,0,0,0.3)",
-                        border: "1px solid rgba(212,175,55,0.3)",
-                        borderRadius: 6,
-                        color: colors.text,
-                        fontSize: 14,
-                        fontFamily: fonts.body,
-                        resize: "vertical",
+const manageDialoguesStyle9: CSSProperties = {
+  display: "block",
+  fontSize: 11,
+  color: colors.gold,
+  marginBottom: 6,
+  textTransform: "uppercase",
 };
-const manageDialoguesStyle11: CSSProperties = { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 };
-  const manageDialoguesStyle12: CSSProperties = { fontSize: 11, color: colors.gold, textTransform: "uppercase" };
-  const manageDialoguesStyle13: CSSProperties = {
-                          padding: "4px 10px",
-                          fontSize: 12,
-                          background: "transparent",
-                          border: `1px solid ${colors.gold}55`,
-                          borderRadius: 4,
-                          color: colors.gold,
-                          cursor: "pointer",
+const manageDialoguesStyle10: CSSProperties = {
+  width: "100%",
+  minHeight: 80,
+  padding: 12,
+  background: "rgba(0,0,0,0.3)",
+  border: "1px solid rgba(212,175,55,0.3)",
+  borderRadius: 6,
+  color: colors.text,
+  fontSize: 14,
+  fontFamily: fonts.body,
+  resize: "vertical",
 };
-const manageDialoguesStyle14: CSSProperties = { marginBottom: 12, padding: 12, background: "rgba(0,0,0,0.2)", borderRadius: 6 };
-  const manageDialoguesStyle15: CSSProperties = {
-                            width: "100%",
-                            padding: "8px 10px",
-                            background: "rgba(0,0,0,0.3)",
-                            border: "1px solid rgba(255,255,255,0.1)",
-                            borderRadius: 4,
-                            color: colors.text,
-                            fontSize: 13,
+const manageDialoguesStyle11: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  marginBottom: 8,
+};
+const manageDialoguesStyle12: CSSProperties = {
+  fontSize: 11,
+  color: colors.gold,
+  textTransform: "uppercase",
+};
+const manageDialoguesStyle13: CSSProperties = {
+  padding: "4px 10px",
+  fontSize: 12,
+  background: "transparent",
+  border: `1px solid ${colors.gold}55`,
+  borderRadius: 4,
+  color: colors.gold,
+  cursor: "pointer",
+};
+const manageDialoguesStyle14: CSSProperties = {
+  marginBottom: 12,
+  padding: 12,
+  background: "rgba(0,0,0,0.2)",
+  borderRadius: 6,
+};
+const manageDialoguesStyle15: CSSProperties = {
+  width: "100%",
+  padding: "8px 10px",
+  background: "rgba(0,0,0,0.3)",
+  border: "1px solid rgba(255,255,255,0.1)",
+  borderRadius: 4,
+  color: colors.text,
+  fontSize: 13,
 };
 const manageDialoguesStyle16: CSSProperties = { marginTop: 8, fontSize: 12, color: "#8B5CF6" };
-  const manageDialoguesStyle17: CSSProperties = {
-                        width: "100%",
-                        padding: "12px",
-                        background: "transparent",
-                        border: `1px dashed ${colors.gold}55`,
-                        borderRadius: 6,
-                        color: colors.muted,
-                        cursor: "pointer",
+const manageDialoguesStyle17: CSSProperties = {
+  width: "100%",
+  padding: "12px",
+  background: "transparent",
+  border: `1px dashed ${colors.gold}55`,
+  borderRadius: 6,
+  color: colors.muted,
+  cursor: "pointer",
 };
-const manageDialoguesStyle18: CSSProperties = { textAlign: "center", padding: 40, color: colors.muted };
+const manageDialoguesStyle18: CSSProperties = {
+  textAlign: "center",
+  padding: 40,
+  color: colors.muted,
+};

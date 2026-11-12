@@ -4,8 +4,10 @@ import { colors, fonts } from "@/theme";
 import type { CSSProperties } from "react";
 
 type Edge = {
-  x1: number; y1: number;
-  x2: number; y2: number;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
 };
 
 const TIER_COLORS = [
@@ -25,8 +27,26 @@ function NodeCircle({ letter, tier }: { letter: string; tier: number }) {
           <stop offset="100%" stopColor={c.glow} stopOpacity={0.05} />
         </radialGradient>
       </defs>
-      <circle cx={22} cy={22} r={20} fill={`url(#grad-${tier})`} stroke={c.border} strokeWidth={1.5} />
-      <text x={22} y={22} textAnchor="middle" dominantBaseline="central" fill={colors.goldMuted} fontFamily={fonts.display} fontSize={17} fontWeight={700}>{letter}</text>
+      <circle
+        cx={22}
+        cy={22}
+        r={20}
+        fill={`url(#grad-${tier})`}
+        stroke={c.border}
+        strokeWidth={1.5}
+      />
+      <text
+        x={22}
+        y={22}
+        textAnchor="middle"
+        dominantBaseline="central"
+        fill={colors.goldMuted}
+        fontFamily={fonts.display}
+        fontSize={17}
+        fontWeight={700}
+      >
+        {letter}
+      </text>
     </svg>
   );
 }
@@ -54,13 +74,16 @@ function SkillNodeCard({ node, tier, level }: { node: SkillNode; tier: number; l
       }}
     >
       <NodeCircle letter={node.name[0]} tier={tier} />
-      <span style={skillNodeCardStyle}>
-        {node.name}
-      </span>
-      <span style={skillNodeCardStyle2}>
-        {node.description}
-      </span>
-      <span style={{ fontSize: 8, color: isAvailable ? colors.muted : colors.textMuted, fontFamily: fonts.display, marginTop: 2 }}>
+      <span style={skillNodeCardStyle}>{node.name}</span>
+      <span style={skillNodeCardStyle2}>{node.description}</span>
+      <span
+        style={{
+          fontSize: 8,
+          color: isAvailable ? colors.muted : colors.textMuted,
+          fontFamily: fonts.display,
+          marginTop: 2,
+        }}
+      >
         Lv.{requiredLevel}
       </span>
     </div>
@@ -73,10 +96,10 @@ export default function SkillTreeView({ tree, level }: { tree: ClassSkillTree; l
   const [svgSize, setSvgSize] = useState({ width: 0, height: 0 });
 
   const { tiers } = useMemo(() => {
-    const maxTier = Math.max(...tree.nodes.map(n => n.tier));
+    const maxTier = Math.max(...tree.nodes.map((n) => n.tier));
     const groups: SkillNode[][] = [];
     for (let t = 0; t <= maxTier; t++) {
-      groups.push(tree.nodes.filter(n => n.tier === t));
+      groups.push(tree.nodes.filter((n) => n.tier === t));
     }
     return { tiers: groups };
   }, [tree]);
@@ -113,25 +136,18 @@ export default function SkillTreeView({ tree, level }: { tree: ClassSkillTree; l
   return (
     <div style={{ padding: "4px 0 12px" }}>
       <div style={{ textAlign: "center", marginBottom: 16 }}>
-        <span style={skillTreeViewStyle}>
-          {tree.className} — Skill Tree
-        </span>
+        <span style={skillTreeViewStyle}>{tree.className} — Skill Tree</span>
       </div>
 
-      <div
-        ref={containerRef}
-        style={skillTreeViewStyle2}
-      >
+      <div ref={containerRef} style={skillTreeViewStyle2}>
         {svgSize.width > 0 && (
-          <svg
-            width={svgSize.width}
-            height={svgSize.height}
-            style={skillTreeViewStyle3}
-          >
+          <svg width={svgSize.width} height={svgSize.height} style={skillTreeViewStyle3}>
             {edges.map((edge, i) => {
               const midY = edge.y1 + (edge.y2 - edge.y1) / 2;
               const d = `M ${edge.x1} ${edge.y1} L ${edge.x1} ${midY} L ${edge.x2} ${midY} L ${edge.x2} ${edge.y2}`;
-              return <path key={i} d={d} stroke="rgba(180,140,80,0.12)" strokeWidth={1.5} fill="none" />;
+              return (
+                <path key={i} d={d} stroke="rgba(180,140,80,0.12)" strokeWidth={1.5} fill="none" />
+              );
             })}
           </svg>
         )}
@@ -147,7 +163,7 @@ export default function SkillTreeView({ tree, level }: { tree: ClassSkillTree; l
               zIndex: 1,
             }}
           >
-            {tierNodes.map(node => (
+            {tierNodes.map((node) => (
               <SkillNodeCard key={node.id} node={node} tier={tierIndex} level={level} />
             ))}
           </div>
@@ -158,8 +174,47 @@ export default function SkillTreeView({ tree, level }: { tree: ClassSkillTree; l
 }
 
 // Static style objects hoisted out of the render path.
-const skillNodeCardStyle: CSSProperties = { fontSize: 11, fontWeight: 700, color: colors.goldMuted, fontFamily: fonts.display, textAlign: "center", lineHeight: 1.2, marginTop: 2 };
-const skillNodeCardStyle2: CSSProperties = { fontSize: 9, color: colors.textMuted, fontFamily: fonts.body, textAlign: "center", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", minHeight: "2.6em" };
-const skillTreeViewStyle: CSSProperties = { fontSize: 13, color: colors.goldMuted, fontFamily: fonts.display, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase" };
-const skillTreeViewStyle2: CSSProperties = { position: "relative", display: "flex", flexDirection: "column", gap: 20, alignItems: "center" };
-const skillTreeViewStyle3: CSSProperties = { position: "absolute", top: 0, left: 0, pointerEvents: "none", zIndex: 0, overflow: "visible" };
+const skillNodeCardStyle: CSSProperties = {
+  fontSize: 11,
+  fontWeight: 700,
+  color: colors.goldMuted,
+  fontFamily: fonts.display,
+  textAlign: "center",
+  lineHeight: 1.2,
+  marginTop: 2,
+};
+const skillNodeCardStyle2: CSSProperties = {
+  fontSize: 9,
+  color: colors.textMuted,
+  fontFamily: fonts.body,
+  textAlign: "center",
+  lineHeight: 1.3,
+  display: "-webkit-box",
+  WebkitLineClamp: 2,
+  WebkitBoxOrient: "vertical",
+  overflow: "hidden",
+  minHeight: "2.6em",
+};
+const skillTreeViewStyle: CSSProperties = {
+  fontSize: 13,
+  color: colors.goldMuted,
+  fontFamily: fonts.display,
+  fontWeight: 700,
+  letterSpacing: "0.15em",
+  textTransform: "uppercase",
+};
+const skillTreeViewStyle2: CSSProperties = {
+  position: "relative",
+  display: "flex",
+  flexDirection: "column",
+  gap: 20,
+  alignItems: "center",
+};
+const skillTreeViewStyle3: CSSProperties = {
+  position: "absolute",
+  top: 0,
+  left: 0,
+  pointerEvents: "none",
+  zIndex: 0,
+  overflow: "visible",
+};

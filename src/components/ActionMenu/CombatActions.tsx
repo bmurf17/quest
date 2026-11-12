@@ -13,9 +13,7 @@ export function CombatActions({ fighter }: { fighter: CharacterData }) {
       {fighter.equipment?.weapon && (
         <>
           <SectionLabel>Weapons</SectionLabel>
-          <div
-            style={combatActionsStyle}
-          >
+          <div style={combatActionsStyle}>
             <AbilitySlot
               img={fighter.equipment.weapon.img}
               alt={fighter.equipment.weapon.name}
@@ -29,9 +27,7 @@ export function CombatActions({ fighter }: { fighter: CharacterData }) {
       {fighter.spells?.length > 0 && (
         <>
           <SectionLabel>Skills</SectionLabel>
-          <div
-            style={combatActionsStyle2}
-          >
+          <div style={combatActionsStyle2}>
             {fighter.spells.map((spell, idx) => {
               const notEnoughMana = fighter.mp < spell.manaCost;
               return (

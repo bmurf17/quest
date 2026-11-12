@@ -1,8 +1,8 @@
-import type { GameState} from "@/state/GameState";
+import type { GameState } from "@/state/GameState";
 import { useGameStore } from "@/state/GameState";
 import closedChest from "@/assets/closed-chest.png";
 import openChest from "@/assets/open-chest.png";
-import emptyChest from "@/assets/empty-chest.png"
+import emptyChest from "@/assets/empty-chest.png";
 import type { CSSProperties } from "react";
 
 export default function RoomChest() {
@@ -13,21 +13,11 @@ export default function RoomChest() {
       {currentRoom && currentRoom.interaction?.type === "chest" ? (
         <div>
           {!currentRoom.interaction.chest.isOpen ? (
-            <img
-              src={closedChest}
-              alt="closed-chest"
-              className="mx-auto"
-              style={roomChestStyle}
-            />
+            <img src={closedChest} alt="closed-chest" className="mx-auto" style={roomChestStyle} />
           ) : (
             <>
               {currentRoom.interaction.chest.quantity > 0 ? (
-                <img
-                  src={openChest}
-                  alt="open-chest"
-                  className="mx-auto"
-                  style={roomChestStyle2}
-                />
+                <img src={openChest} alt="open-chest" className="mx-auto" style={roomChestStyle2} />
               ) : (
                 <img
                   src={emptyChest}

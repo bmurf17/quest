@@ -1,9 +1,4 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useGameStore } from "@/state/GameState";
 import { logger } from "@/lib/logger";
@@ -23,7 +18,7 @@ export default function SectionSelector({
   const startSection = useGameStore((s) => s.startSection);
   const rooms = useGameStore((s) => s.rooms);
 
-  const handleExplore = async (sectionId: number) => {
+  const handleExplore = (sectionId: number) => {
     if (!isSectionUnlocked(sectionId)) return;
     if (beatenSections.includes(sectionId)) return;
 
@@ -37,99 +32,89 @@ export default function SectionSelector({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent
-        style={sectionSelectorStyle}
-      >
-        <DialogHeader style={{ padding: "18px 22px 14px", borderBottom: `1px solid ${colors.goldBorder}` }}>
-          <DialogTitle
-            style={sectionSelectorStyle2}
-          >
-            Explore
-          </DialogTitle>
+      <DialogContent style={sectionSelectorStyle}>
+        <DialogHeader
+          style={{ padding: "18px 22px 14px", borderBottom: `1px solid ${colors.goldBorder}` }}
+        >
+          <DialogTitle style={sectionSelectorStyle2}>Explore</DialogTitle>
         </DialogHeader>
 
         <ScrollArea style={{ height: "55vh" }}>
           <div style={sectionSelectorStyle3}>
-          {availableSections.map((section) => {
-            const beaten = beatenSections.includes(section.id);
-            const unlocked = isSectionUnlocked(section.id);
-            const disabled = beaten || !unlocked;
+            {availableSections.map((section) => {
+              const beaten = beatenSections.includes(section.id);
+              const unlocked = isSectionUnlocked(section.id);
+              const disabled = beaten || !unlocked;
 
-            return (
-              <button
-                type="button"
-                key={section.id}
-                onClick={() => handleExplore(section.id)}
-                disabled={disabled}
-                aria-label={`Explore ${section.name}${
-                  beaten ? " (completed)" : disabled ? " (locked)" : ""
-                }`}
-                style={{
-                  font: "inherit",
-                  textAlign: "left",
-                  width: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "12px 14px",
-                  background: disabled ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.04)",
-                  border: `1px solid ${beaten ? "rgba(52,211,153,0.25)" : disabled ? colors.subtleBorder : colors.goldBorder}`,
-                  borderRadius: 6,
-                  cursor: disabled ? "not-allowed" : "pointer",
-                  opacity: disabled ? 0.55 : 1,
-                  transition: "background 0.15s, border-color 0.15s",
-                }}
-                onMouseEnter={(e) => {
-                  if (!disabled) {
-                    e.currentTarget.style.background = "rgba(180,140,80,0.1)";
-                    e.currentTarget.style.borderColor = colors.gold;
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = disabled ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.04)";
-                  e.currentTarget.style.borderColor = beaten ? "rgba(52,211,153,0.25)" : disabled ? colors.subtleBorder : colors.goldBorder;
-                }}
-              >
-                <span
+              return (
+                <button
+                  type="button"
+                  key={section.id}
+                  onClick={() => handleExplore(section.id)}
+                  disabled={disabled}
+                  aria-label={`Explore ${section.name}${
+                    beaten ? " (completed)" : disabled ? " (locked)" : ""
+                  }`}
                   style={{
-                    color: beaten ? "#6EE7B7" : disabled ? colors.muted : colors.text,
-                    fontFamily: fonts.display,
-                    fontSize: 14,
-                    letterSpacing: "0.04em",
+                    font: "inherit",
+                    textAlign: "left",
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "12px 14px",
+                    background: disabled ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.04)",
+                    border: `1px solid ${beaten ? "rgba(52,211,153,0.25)" : disabled ? colors.subtleBorder : colors.goldBorder}`,
+                    borderRadius: 6,
+                    cursor: disabled ? "not-allowed" : "pointer",
+                    opacity: disabled ? 0.55 : 1,
+                    transition: "background 0.15s, border-color 0.15s",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!disabled) {
+                      e.currentTarget.style.background = "rgba(180,140,80,0.1)";
+                      e.currentTarget.style.borderColor = colors.gold;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = disabled
+                      ? "rgba(0,0,0,0.2)"
+                      : "rgba(255,255,255,0.04)";
+                    e.currentTarget.style.borderColor = beaten
+                      ? "rgba(52,211,153,0.25)"
+                      : disabled
+                        ? colors.subtleBorder
+                        : colors.goldBorder;
                   }}
                 >
-                  {section.name}
-                </span>
-
-                {beaten && (
                   <span
-                    style={sectionSelectorStyle4}
-                    title="Completed"
+                    style={{
+                      color: beaten ? "#6EE7B7" : disabled ? colors.muted : colors.text,
+                      fontFamily: fonts.display,
+                      fontSize: 14,
+                      letterSpacing: "0.04em",
+                    }}
                   >
-                    ✓
+                    {section.name}
                   </span>
-                )}
 
-                {!unlocked && !beaten && (
-                  <span
-                    style={sectionSelectorStyle5}
-                    title="Complete the previous section first"
-                  >
-                    🔒
-                  </span>
-                )}
+                  {beaten && (
+                    <span style={sectionSelectorStyle4} title="Completed">
+                      ✓
+                    </span>
+                  )}
 
-                {unlocked && !beaten && (
-                  <span
-                    style={sectionSelectorStyle6}
-                  >
-                    Explore →
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
+                  {!unlocked && !beaten && (
+                    <span style={sectionSelectorStyle5} title="Complete the previous section first">
+                      🔒
+                    </span>
+                  )}
+
+                  {unlocked && !beaten && <span style={sectionSelectorStyle6}>Explore →</span>}
+                </button>
+              );
+            })}
+          </div>
         </ScrollArea>
       </DialogContent>
     </Dialog>
@@ -156,11 +141,16 @@ const sectionSelectorStyle2: CSSProperties = {
   letterSpacing: "0.1em",
   textTransform: "uppercase",
 };
-const sectionSelectorStyle3: CSSProperties = { padding: "10px 14px 20px", display: "flex", flexDirection: "column", gap: 8 };
-  const sectionSelectorStyle4: CSSProperties = {
-                        color: "#6EE7B7",
-                        fontSize: 16,
-                        lineHeight: 1,
+const sectionSelectorStyle3: CSSProperties = {
+  padding: "10px 14px 20px",
+  display: "flex",
+  flexDirection: "column",
+  gap: 8,
+};
+const sectionSelectorStyle4: CSSProperties = {
+  color: "#6EE7B7",
+  fontSize: 16,
+  lineHeight: 1,
 };
 const sectionSelectorStyle5: CSSProperties = {
   color: colors.muted,

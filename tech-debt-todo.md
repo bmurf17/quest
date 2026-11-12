@@ -124,14 +124,14 @@ Long actions extracted into pure helpers under `state/utils/`:
 
 ### 7. Break up oversized components
 
-| File | Lines |
-| --- | --- |
+| File                                              | Lines |
+| ------------------------------------------------- | ----- |
 | `src/components/Admin/game-design/CreateRoom.tsx` | 1,676 |
-| `src/components/Party/PartyManagement.tsx` | 1,485 |
-| `src/components/Party/PartySelection.tsx` | 1,047 |
-| `src/components/MainGameArea/_TavernOverlay.tsx` | 863 |
-| `src/components/ActionMenu.tsx` | 693 |
-| `src/components/Admin/game-design/RoomMap.tsx` | 560 |
+| `src/components/Party/PartyManagement.tsx`        | 1,485 |
+| `src/components/Party/PartySelection.tsx`         | 1,047 |
+| `src/components/MainGameArea/_TavernOverlay.tsx`  | 863   |
+| `src/components/ActionMenu.tsx`                   | 693   |
+| `src/components/Admin/game-design/RoomMap.tsx`    | 560   |
 
 - [x] `CreateRoom.tsx`: it already defines local form components; move `NPCForm`, `MoveForm`, `CombatForm`, `ChestForm`, `CampForm`, `TransitionForm`, `Toast`, and the styled primitives into their own files
 - [x] `PartyManagement.tsx`: split `CreateCharacterView` / `ManagePartyView`, extract character-card and equipment UI
@@ -230,20 +230,82 @@ The generated schema also exposed stale item/transition assumptions: `mapDbItem`
 
 ### 16. Tooling
 
-- [ ] Add `"typecheck": "tsc -b --noEmit"` (or `tsc -b`) and `"format"` scripts
+- [x] Add `"typecheck": "tsc -b --noEmit"` (or `tsc -b`) and `"format"` scripts
 - [x] Add an `e2e` script that matches `playwright.config.ts`
-- [ ] Add CI running `lint`, `typecheck`, `test`, `build` on PRs
-- [ ] Add Prettier (or Biome) config; formatting is currently inconsistent (single vs double quotes, semicolons)
-- [ ] Enable type-aware ESLint rules (`recommendedTypeChecked`) as the `any` count drops
-- [ ] Consider `@typescript-eslint/no-floating-promises` — `useEffect(() => { loadRooms(); }, ...)` and similar async calls are unawaited
+- [x] Add CI running `lint`, `typecheck`, `test`, `build` on PRs
+- [x] Add Prettier (or Biome) config; formatting is currently inconsistent (single vs double quotes, semicolons)
+- [x] Enable type-aware ESLint rules (`recommendedTypeChecked`) as the `any` count drops
+- [x] Consider `@typescript-eslint/no-floating-promises` — `useEffect(() => { loadRooms(); }, ...)` and similar async calls are unawaited
+
+Type-aware linting uses `tsconfig.eslint.json` so tests and root config files
+are covered. `no-floating-promises` and `no-misused-promises` are enabled, and
+the async call sites they surfaced now use `void` or explicit handlers.
+Prettier (`.prettierrc.json`, `.prettierignore`) is the single formatter;
+`pnpm format:check` runs in CI alongside lint, typecheck, tests, and build.
 
 ### 17. Docs and housekeeping
 
-- [ ] Replace the stock Vite `README.md` with setup, env vars, scripts, architecture, and DB migration instructions
-- [ ] Document the folder conventions and state-store layout after the split
-- [ ] Remove `src/.DS_Store` and any other untracked macOS artifacts (already gitignored, but present locally)
-- [ ] Merge `todos.md` into a single tracked backlog (this file), or clearly separate product TODOs from tech debt. `src/components/MainGameArea/Key Issues` has already been folded into the appendix below.
-- [ ] Add license/ownership notes if the project will be shared
+- [x] Replace the stock Vite `README.md` with setup, env vars, scripts, architecture, and DB migration instructions
+- [x] Document the folder conventions and state-store layout after the split
+- [x] Remove `src/.DS_Store` and any other untracked macOS artifacts (already gitignored, but present locally)
+- [x] Merge `todos.md` into a single tracked backlog (this file), or clearly separate product TODOs from tech debt. `src/components/MainGameArea/Key Issues` has already been folded into the appendix below.
+- [x] Add license/ownership notes if the project will be shared
+
+`README.md` now covers setup, environment variables, scripts, the `src/`
+architecture, the state-store composition, and applying Supabase migrations.
+`docs/conventions.md` gained a source-layout overview and a state-store section
+covering the slice split, helper extraction, stable action names, and save
+versioning. The local `.DS_Store` files were deleted (still gitignored), the
+product notes from `todos.md` moved to the Product backlog below, and the README
+records the current ownership/licensing position.
+
+---
+
+## Product backlog
+
+Product and gameplay work, kept separate from the technical-debt items above.
+Migrated from the former `todos.md`.
+
+### Database and admin
+
+- Export DB as backup
+- More control over room stuff
+- Admin
+- Database
+
+### Characters, items, and combat
+
+- NPC inventory
+- Spells using stats
+- Spells: Fireball, Heal
+- Equipment
+- Have equipment actually do something
+- Orbements — non-equipment items that affect stats
+- Set character skill trees
+- Crit hits
+- Can use spells outside combat
+- Heal dead party members
+- Buy item removes it from shop (limited shop stock)
+- Achievements
+- Make the battle order scrollable
+
+### World and presentation
+
+- World hub
+- Sound effects
+- Mobile doesn't suck
+
+### Art to draw
+
+- Axe
+- New chars
+- Animals
+- Armour
+- Trees
+
+### Done
+
+- Split game state into helper methods (see item 5)
 
 ---
 

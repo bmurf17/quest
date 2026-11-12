@@ -78,7 +78,7 @@ export async function createParty(
     // It changes to "Already in Party" if class is already in party
     const addBtn = page.getByText(/Add to Party/).first();
     const alreadyBtn = page.getByText("Already in Party").first();
-    
+
     if ((await addBtn.count()) > 0 && !(await addBtn.isDisabled().catch(() => true))) {
       await addBtn.click();
       await page.waitForTimeout(400);
@@ -113,7 +113,10 @@ export async function moveDirection(
   const count = await btn.count();
   if (count === 0) return false;
 
-  const isDisabled = await btn.first().isDisabled().catch(() => true);
+  const isDisabled = await btn
+    .first()
+    .isDisabled()
+    .catch(() => true);
   if (isDisabled) return false;
 
   logger.nextTurn();
@@ -219,7 +222,7 @@ export async function handleLevelUp(page: Page, logger: GameLogger): Promise<boo
   while (maxAttempts-- > 0) {
     let pointsRemaining = true;
     while (pointsRemaining) {
-      const plusBtn = page.locator('button:has(.lucide-plus)').first();
+      const plusBtn = page.locator("button:has(.lucide-plus)").first();
       if ((await plusBtn.count()) === 0) break;
 
       const isDisabled = await plusBtn.isDisabled().catch(() => false);
@@ -286,7 +289,10 @@ export async function speakToNPC(page: Page, logger: GameLogger): Promise<boolea
     return true;
   }
 
-  const dialoguePanel = page.locator("div").filter({ has: page.locator("p") }).first();
+  const dialoguePanel = page
+    .locator("div")
+    .filter({ has: page.locator("p") })
+    .first();
   const choices = dialoguePanel.locator("button");
   if ((await choices.count()) > 0) {
     await choices.first().click();
@@ -404,7 +410,6 @@ export async function restAtInn(page: Page, logger: GameLogger): Promise<boolean
   return true;
 }
 
-
 export async function isGameOver(page: Page): Promise<boolean> {
   return (await page.getByText("Game Over").count()) > 0;
 }
@@ -422,16 +427,22 @@ export async function isInTown(page: Page): Promise<boolean> {
 }
 
 export async function isExploring(page: Page): Promise<boolean> {
-  const navBtn = page.locator('button:has(.lucide-chevron-up)');
+  const navBtn = page.locator("button:has(.lucide-chevron-up)");
   return (await navBtn.count()) > 0;
 }
 
 export async function hasChest(page: Page): Promise<boolean> {
-  return (await page.getByText("Open Chest").count()) > 0 || (await page.getByText("You find a chest").count()) > 0;
+  return (
+    (await page.getByText("Open Chest").count()) > 0 ||
+    (await page.getByText("You find a chest").count()) > 0
+  );
 }
 
 export async function hasNPC(page: Page): Promise<boolean> {
-  return (await page.getByText("Speak").count()) > 0 || (await page.getByText("Continue Dialogue").count()) > 0;
+  return (
+    (await page.getByText("Speak").count()) > 0 ||
+    (await page.getByText("Continue Dialogue").count()) > 0
+  );
 }
 
 export async function hasCamp(page: Page): Promise<boolean> {
@@ -505,11 +516,7 @@ export async function getActivityLog(page: Page): Promise<string[]> {
   return messages;
 }
 
-export async function takeScreenshot(
-  page: Page,
-  dir: string,
-  name: string,
-): Promise<void> {
+export async function takeScreenshot(page: Page, dir: string, name: string): Promise<void> {
   if (!dir) return;
   fs.mkdirSync(dir, { recursive: true });
   await page.screenshot({

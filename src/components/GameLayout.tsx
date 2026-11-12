@@ -19,7 +19,9 @@ export default function GameLayout() {
 
         <div className="border-r border-gold-dark/20 p-2 overflow-hidden flex flex-col">
           <div className="flex items-center gap-2 shrink-0 mb-1.5">
-            <span className="text-[9px] font-bold text-gold-muted font-display tracking-[0.12em] uppercase">Log</span>
+            <span className="text-[9px] font-bold text-gold-muted font-display tracking-[0.12em] uppercase">
+              Log
+            </span>
             <div className="flex-1 h-px bg-gold-dark/20" />
           </div>
           <ActivityLog activityLog={activityLog} />
@@ -27,7 +29,9 @@ export default function GameLayout() {
 
         <div className="border-r border-gold-dark/20 px-2.5 py-2 flex flex-col gap-1.5 overflow-hidden">
           <div className="flex items-center gap-2 shrink-0">
-            <span className="text-[9px] font-bold text-gold-muted font-display tracking-[0.12em] uppercase">Party</span>
+            <span className="text-[9px] font-bold text-gold-muted font-display tracking-[0.12em] uppercase">
+              Party
+            </span>
             <div className="flex-1 h-px bg-gold-dark/20" />
           </div>
           <Party party={party} />
@@ -35,7 +39,9 @@ export default function GameLayout() {
 
         <div className="px-2.5 py-2 flex flex-col gap-1.5 overflow-hidden">
           <div className="flex items-center gap-2 shrink-0">
-            <span className="text-[9px] font-bold text-gold-muted font-display tracking-[0.12em] uppercase">Actions</span>
+            <span className="text-[9px] font-bold text-gold-muted font-display tracking-[0.12em] uppercase">
+              Actions
+            </span>
             <div className="flex-1 h-px bg-gold-dark/20" />
           </div>
           <div className="flex-1 min-h-0 overflow-hidden">

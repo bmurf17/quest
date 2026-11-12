@@ -21,10 +21,7 @@ export type MoveState = Pick<
  * Work out the state changes for moving in a direction. Returns `null` when
  * there is no room in that direction, so the caller can skip the update.
  */
-export function resolveMove(
-  state: MoveState,
-  direction: Directions,
-): Partial<GameState> | null {
+export function resolveMove(state: MoveState, direction: Directions): Partial<GameState> | null {
   const targetRoomTemplate = state.room.neighboringRooms.find(
     ([mapDirection]) => mapDirection === direction,
   )?.[1];
@@ -39,10 +36,7 @@ export function resolveMove(
     };
   }
 
-  const status =
-    roomInstance.enemies.length > 0
-      ? GameStatus.Combat
-      : GameStatus.Exploring;
+  const status = roomInstance.enemies.length > 0 ? GameStatus.Combat : GameStatus.Exploring;
 
   let combatOrder = state.combatOrder;
   if (status === GameStatus.Combat) {
@@ -53,9 +47,7 @@ export function resolveMove(
     .add(`Your party has moved ${Directions[direction]}`)
     .addIf(
       status === GameStatus.Exploring && !!roomInstance.interaction,
-      roomInstance.interaction
-        ? getDiscoveryMessage(roomInstance.interaction)
-        : "",
+      roomInstance.interaction ? getDiscoveryMessage(roomInstance.interaction) : "",
     )
     .addIf(
       roomInstance.enemies.length > 0,
@@ -77,13 +69,8 @@ export function resolveMove(
     activeDialogue: null,
     currentDialogueNodeId: null,
     enemyCooldowns:
-      status === GameStatus.Combat
-        ? new Map<number, Map<string, number>>()
-        : state.enemyCooldowns,
-    activeBuffs:
-      status === GameStatus.Combat
-        ? new Map<string, ActiveBuff[]>()
-        : state.activeBuffs,
+      status === GameStatus.Combat ? new Map<number, Map<string, number>>() : state.enemyCooldowns,
+    activeBuffs: status === GameStatus.Combat ? new Map<string, ActiveBuff[]>() : state.activeBuffs,
   };
 }
 
@@ -105,7 +92,6 @@ export function getRoomInstanceKey(state: {
 }): number | undefined {
   const currentRoomInstance = getCurrentRoomInstance(state);
   return [...state.roomInstances.entries()].find(
-    ([templateId, instance]) =>
-      instance === currentRoomInstance || templateId === state.room.id,
+    ([templateId, instance]) => instance === currentRoomInstance || templateId === state.room.id,
   )?.[0];
 }

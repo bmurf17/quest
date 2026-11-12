@@ -62,10 +62,7 @@ export function StatBar({
           background: isLow ? lowColor : color,
           borderRadius: radius,
           transition,
-          boxShadow:
-            isLow && glowWhenLow
-              ? "0 0 6px rgba(239,68,68,0.5)"
-              : "none",
+          boxShadow: isLow && glowWhenLow ? "0 0 6px rgba(239,68,68,0.5)" : "none",
         }}
       />
     </div>

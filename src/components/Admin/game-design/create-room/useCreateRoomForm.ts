@@ -34,13 +34,16 @@ const getOppositeDirection = (direction: Directions): Directions => {
   return opposites[direction];
 };
 
+const getFormString = (formData: FormData, name: string, fallback = ""): string => {
+  const value = formData.get(name);
+  return typeof value === "string" ? value : fallback;
+};
+
 export function useCreateRoomForm() {
   const [interaction, setInteraction] = useState<InteractionType>("NPC");
   const [enemies, setEnemies] = useState<EnemyEntry[]>([]);
   const [neighboringRoom, setNeighboringRoom] = useState(startRoom);
-  const [selectedSectionId, setSelectedSectionId] = useState<number | null>(
-    null,
-  );
+  const [selectedSectionId, setSelectedSectionId] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<{
     type: "success" | "error";
@@ -68,9 +71,7 @@ export function useCreateRoomForm() {
     .map(([key, value]) => ({ label: value as string, value: key }));
 
   const sectionRooms =
-    selectedSectionId !== null
-      ? rooms.filter((r) => r.sectionId === selectedSectionId)
-      : rooms;
+    selectedSectionId !== null ? rooms.filter((r) => r.sectionId === selectedSectionId) : rooms;
 
   const showToast = (type: "success" | "error", message: string) => {
     setToast({ type, message });
@@ -86,7 +87,7 @@ export function useCreateRoomForm() {
 
     try {
       const formData = new FormData(event.currentTarget);
-      const roomName = formData.get("name")?.toString() || "";
+      const roomName = getFormString(formData, "name");
       const direction = formData.get("direction");
 
       const { data: newRoomData, error: roomError } = await supabase
@@ -95,8 +96,7 @@ export function useCreateRoomForm() {
         .select()
         .single();
 
-      if (roomError)
-        throw new Error(`Failed to create room: ${roomError.message}`);
+      if (roomError) throw new Error(`Failed to create room: ${roomError.message}`);
 
       const newRoomId = newRoomData.id;
 
@@ -116,35 +116,25 @@ export function useCreateRoomForm() {
               exp_gain: enemy.expGain,
               type: enemy.type,
               max_health: enemy.maxHealth ?? null,
-              phase_thresholds:
-                enemy.phaseThresholds.length > 0
-                  ? enemy.phaseThresholds
-                  : null,
-              moves:
-                enemy.moves.length > 0
-                  ? (enemy.moves as unknown as Json)
-                  : null,
+              phase_thresholds: enemy.phaseThresholds.length > 0 ? enemy.phaseThresholds : null,
+              moves: enemy.moves.length > 0 ? (enemy.moves as unknown as Json) : null,
             })
             .select()
             .single();
 
-          if (enemyError)
-            throw new Error(`Failed to create enemy: ${enemyError.message}`);
+          if (enemyError) throw new Error(`Failed to create enemy: ${enemyError.message}`);
 
           const { error: roomEnemyError } = await supabase
             .from("room_enemies")
             .insert({ room_id: newRoomId, enemy_id: enemyData.id });
 
           if (roomEnemyError)
-            throw new Error(
-              `Failed to link enemy to room: ${roomEnemyError.message}`,
-            );
+            throw new Error(`Failed to link enemy to room: ${roomEnemyError.message}`);
         }
       } else if (interaction === "NPC") {
-        const npcName = formData.get("npcName")?.toString() || "";
-        const dialogue = formData.get("dialogue")?.toString() || "";
-        const discoveryMessage =
-          formData.get("discoveryMessage")?.toString() || "";
+        const npcName = getFormString(formData, "npcName");
+        const dialogue = getFormString(formData, "dialogue");
+        const discoveryMessage = getFormString(formData, "discoveryMessage");
 
         const { data: npcData, error: npcError } = await supabase
           .from("npcs")
@@ -156,22 +146,18 @@ export function useCreateRoomForm() {
           .select()
           .single();
 
-        if (npcError)
-          throw new Error(`Failed to create NPC: ${npcError.message}`);
+        if (npcError) throw new Error(`Failed to create NPC: ${npcError.message}`);
 
-        const { error: interactionError } = await supabase
-          .from("room_interactions")
-          .insert({
-            room_id: newRoomId,
-            interaction_type: "NPC",
-            npc_id: npcData.id,
-          });
+        const { error: interactionError } = await supabase.from("room_interactions").insert({
+          room_id: newRoomId,
+          interaction_type: "NPC",
+          npc_id: npcData.id,
+        });
 
-        if (interactionError)
-          throw new Error(`Failed to link NPC: ${interactionError.message}`);
+        if (interactionError) throw new Error(`Failed to link NPC: ${interactionError.message}`);
       } else if (interaction === "Chest") {
-        const itemId = formData.get("itemId")?.toString() || "";
-        const quantity = parseInt(formData.get("quantity")?.toString() || "1");
+        const itemId = getFormString(formData, "itemId");
+        const quantity = parseInt(getFormString(formData, "quantity", "1"));
         const isLocked = formData.get("isLocked") === "true";
 
         const { data: chestData, error: chestError } = await supabase
@@ -180,23 +166,17 @@ export function useCreateRoomForm() {
           .select()
           .single();
 
-        if (chestError)
-          throw new Error(`Failed to create chest: ${chestError.message}`);
+        if (chestError) throw new Error(`Failed to create chest: ${chestError.message}`);
 
-        const { error: interactionError } = await supabase
-          .from("room_interactions")
-          .insert({
-            room_id: newRoomId,
-            interaction_type: "chest",
-            chest_id: chestData.id,
-          });
+        const { error: interactionError } = await supabase.from("room_interactions").insert({
+          room_id: newRoomId,
+          interaction_type: "chest",
+          chest_id: chestData.id,
+        });
 
-        if (interactionError)
-          throw new Error(`Failed to link chest: ${interactionError.message}`);
+        if (interactionError) throw new Error(`Failed to link chest: ${interactionError.message}`);
       } else if (interaction === "Camp") {
-        const healAmount = parseInt(
-          formData.get("healAmount")?.toString() || "50",
-        );
+        const healAmount = parseInt(getFormString(formData, "healAmount", "50"));
         const restoresMana = formData.get("restoresMana") === "true";
 
         const { data: campData, error: campError } = await supabase
@@ -205,24 +185,18 @@ export function useCreateRoomForm() {
           .select()
           .single();
 
-        if (campError)
-          throw new Error(`Failed to create camp: ${campError.message}`);
+        if (campError) throw new Error(`Failed to create camp: ${campError.message}`);
 
-        const { error: interactionError } = await supabase
-          .from("room_interactions")
-          .insert({
-            room_id: newRoomId,
-            interaction_type: "camp",
-            camp_id: campData.id,
-          });
+        const { error: interactionError } = await supabase.from("room_interactions").insert({
+          room_id: newRoomId,
+          interaction_type: "camp",
+          camp_id: campData.id,
+        });
 
-        if (interactionError)
-          throw new Error(`Failed to link camp: ${interactionError.message}`);
+        if (interactionError) throw new Error(`Failed to link camp: ${interactionError.message}`);
       } else if (interaction === "Transition") {
-        const destination =
-          formData.get("destination")?.toString() || "next_dungeon";
-        const discoveryMessage =
-          formData.get("discoveryMessage")?.toString() || "";
+        const destination = getFormString(formData, "destination", "next_dungeon");
+        const discoveryMessage = getFormString(formData, "discoveryMessage");
 
         const { data: transitionData, error: transitionError } = await supabase
           .from("transitions")
@@ -234,51 +208,38 @@ export function useCreateRoomForm() {
           .single();
 
         if (transitionError)
-          throw new Error(
-            `Failed to create transition: ${transitionError.message}`,
-          );
+          throw new Error(`Failed to create transition: ${transitionError.message}`);
 
-        const { error: interactionError } = await supabase
-          .from("room_interactions")
-          .insert({
-            room_id: newRoomId,
-            interaction_type: "transition",
-            transition_id: transitionData.id,
-          });
+        const { error: interactionError } = await supabase.from("room_interactions").insert({
+          room_id: newRoomId,
+          interaction_type: "transition",
+          transition_id: transitionData.id,
+        });
 
         if (interactionError)
-          throw new Error(
-            `Failed to link transition: ${interactionError.message}`,
-          );
+          throw new Error(`Failed to link transition: ${interactionError.message}`);
       }
 
       if (direction && neighboringRoom.id) {
         const directionEnum = +direction;
         const oppositeDirectionEnum = getOppositeDirection(directionEnum);
 
-        const { error: neighborError1 } = await supabase
-          .from("neighboring_rooms")
-          .insert({
-            room_id: neighboringRoom.id,
-            neighbor_room_id: newRoomId,
-            direction: directionToDbEnum(directionEnum),
-          });
+        const { error: neighborError1 } = await supabase.from("neighboring_rooms").insert({
+          room_id: neighboringRoom.id,
+          neighbor_room_id: newRoomId,
+          direction: directionToDbEnum(directionEnum),
+        });
 
-        if (neighborError1)
-          throw new Error(`Failed to link rooms: ${neighborError1.message}`);
+        if (neighborError1) throw new Error(`Failed to link rooms: ${neighborError1.message}`);
 
-        const { error: neighborError2 } = await supabase
-          .from("neighboring_rooms")
-          .insert({
-            room_id: newRoomId,
-            neighbor_room_id: neighboringRoom.id,
-            direction: directionToDbEnum(oppositeDirectionEnum),
-          });
+        const { error: neighborError2 } = await supabase.from("neighboring_rooms").insert({
+          room_id: newRoomId,
+          neighbor_room_id: neighboringRoom.id,
+          direction: directionToDbEnum(oppositeDirectionEnum),
+        });
 
         if (neighborError2)
-          throw new Error(
-            `Failed to create reverse link: ${neighborError2.message}`,
-          );
+          throw new Error(`Failed to create reverse link: ${neighborError2.message}`);
       }
 
       const room: Room = {
@@ -291,10 +252,9 @@ export function useCreateRoomForm() {
             ? {
                 type: "NPC",
                 npc: {
-                  name: formData.get("npcName")?.toString() || "",
-                  dialogue: [formData.get("dialogue")?.toString() || ""],
-                  discoveryMessage:
-                    formData.get("discoveryMessage")?.toString() || "",
+                  name: getFormString(formData, "npcName"),
+                  dialogue: [getFormString(formData, "dialogue")],
+                  discoveryMessage: getFormString(formData, "discoveryMessage"),
                   NPCType: NPCType.GENERIC,
                   img: "",
                 },
@@ -315,10 +275,7 @@ export function useCreateRoomForm() {
       showToast("success", `"${roomName}" has been etched into the map.`);
       (event.target as HTMLFormElement).reset();
     } catch (err) {
-      showToast(
-        "error",
-        err instanceof Error ? err.message : "An unknown error occurred",
-      );
+      showToast("error", err instanceof Error ? err.message : "An unknown error occurred");
       logger.error("Error creating room:", err);
     } finally {
       setIsSubmitting(false);

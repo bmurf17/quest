@@ -29,36 +29,20 @@ export type AttackState = Pick<
  * Resolve a player attack. Pure with respect to zustand: the caller applies
  * the returned updates or schedules the next enemy turn.
  */
-export function resolveAttack(
-  state: AttackState,
-  enemy: Enemy,
-): Partial<GameState> {
+export function resolveAttack(state: AttackState, enemy: Enemy): Partial<GameState> {
   const currentAttacker = state.combatOrder[state.activeFighterIndex];
   const attackerName = currentAttacker?.name || "Unknown";
 
   let currentDex =
-    "abilities" in currentAttacker
-      ? currentAttacker.abilities.dex.score
-      : currentAttacker.dex;
+    "abilities" in currentAttacker ? currentAttacker.abilities.dex.score : currentAttacker.dex;
   let currentStr =
-    "abilities" in currentAttacker
-      ? currentAttacker.abilities.str.score
-      : currentAttacker.strength;
+    "abilities" in currentAttacker ? currentAttacker.abilities.str.score : currentAttacker.strength;
 
-  currentDex += getEffectiveBuffAmount(
-    state.activeBuffs,
-    currentAttacker.name,
-    "dex",
-  );
-  currentStr += getEffectiveBuffAmount(
-    state.activeBuffs,
-    currentAttacker.name,
-    "strength",
-  );
+  currentDex += getEffectiveBuffAmount(state.activeBuffs, currentAttacker.name, "dex");
+  currentStr += getEffectiveBuffAmount(state.activeBuffs, currentAttacker.name, "strength");
 
   const effectiveDef =
-    enemy.defense +
-    getEffectiveBuffAmount(state.activeBuffs, enemy.name, "defense");
+    enemy.defense + getEffectiveBuffAmount(state.activeBuffs, enemy.name, "defense");
 
   const weaponDmg = getWeaponDamage(currentAttacker);
   const damage = calcDamage(effectiveDef, currentStr, currentDex, weaponDmg);
@@ -66,30 +50,21 @@ export function resolveAttack(
   const hitEnemyId = enemy.id;
   const hitCount = state.lastHitCounter + 1;
 
-  let nextIndex = safeNextIndex(
-    state.activeFighterIndex,
-    state.combatOrder.length,
-  );
+  let nextIndex = safeNextIndex(state.activeFighterIndex, state.combatOrder.length);
   let combatOrder = state.combatOrder;
   let updatedEnemies: Enemy[];
 
-  const currentRoomInstance =
-    state.roomInstances.get(state.room.id) || state.room;
+  const currentRoomInstance = state.roomInstances.get(state.room.id) || state.room;
 
   if (newHealth <= 0) {
-    updatedEnemies = currentRoomInstance.enemies.filter(
-      (e) => e.id !== enemy.id,
-    );
+    updatedEnemies = currentRoomInstance.enemies.filter((e) => e.id !== enemy.id);
     combatOrder = combatOrder.filter((x) => x.name !== enemy.name);
 
     nextIndex = safeNextIndex(state.activeFighterIndex, combatOrder.length);
 
     const expMultiplier =
-      enemy.type === "boss"
-        ? Math.max(enemy.phaseThresholds?.length ?? 1, 2)
-        : 1;
-    const newAccumulatedExp =
-      state.accumulatedExp + (enemy.expGain ?? 10) * expMultiplier;
+      enemy.type === "boss" ? Math.max(enemy.phaseThresholds?.length ?? 1, 2) : 1;
+    const newAccumulatedExp = state.accumulatedExp + (enemy.expGain ?? 10) * expMultiplier;
 
     const completion = handleCombatCompletion(
       updatedEnemies,
@@ -118,13 +93,11 @@ export function resolveAttack(
         state.quests,
       ),
       party: completion.updatedParty,
-      accumulatedExp:
-        status === GameStatus.Exploring ? 0 : newAccumulatedExp,
+      accumulatedExp: status === GameStatus.Exploring ? 0 : newAccumulatedExp,
       isTargeting: false,
       levelingUpChars: completion.levelingUpChars || [],
       isLevelingUp: (completion.levelingUpChars || []).length > 0,
-      currentLevelingCharIndex:
-        (completion.levelingUpChars || []).length > 0 ? 0 : -1,
+      currentLevelingCharIndex: (completion.levelingUpChars || []).length > 0 ? 0 : -1,
     };
   }
 

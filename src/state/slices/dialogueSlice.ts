@@ -1,14 +1,7 @@
 import { getDialogueForNPC } from "@/queries/DialogueQueries";
 import type { Room } from "@/types/Room";
-import type {
-  DialogueNode,
-  DialogueOutcome,
-  NPC,
-} from "@/types/RoomInteractions";
-import {
-  DialogueOutcomeType,
-  NPCDisposition,
-} from "@/types/RoomInteractions";
+import type { DialogueNode, DialogueOutcome, NPC } from "@/types/RoomInteractions";
+import { DialogueOutcomeType, NPCDisposition } from "@/types/RoomInteractions";
 import type { GameState, GameSlice } from "./types";
 
 export type DialogueSlice = Pick<
@@ -53,7 +46,7 @@ export const createDialogueSlice: GameSlice<DialogueSlice> = (set, get) => ({
     const tree = node || (npc.id ? get().dialogueTrees.get(npc.id) : null);
     if (!tree) {
       if (npc.id) {
-        getDialogueForNPC(npc.id).then((fetchedTree) => {
+        void getDialogueForNPC(npc.id).then((fetchedTree) => {
           if (fetchedTree) {
             set((state) => {
               const updated = new Map(state.dialogueTrees);
@@ -83,7 +76,7 @@ export const createDialogueSlice: GameSlice<DialogueSlice> = (set, get) => ({
         const npcId = room.interaction.npc.id;
         const existing = get().dialogueTrees.get(npcId);
         if (!existing) {
-          getDialogueForNPC(npcId).then((tree) => {
+          void getDialogueForNPC(npcId).then((tree) => {
             if (tree) {
               set((state) => {
                 const updated = new Map(state.dialogueTrees);
@@ -125,10 +118,7 @@ export const createDialogueSlice: GameSlice<DialogueSlice> = (set, get) => ({
     }
 
     if (choice.outcome) {
-      const roomNpc =
-        state.room.interaction?.type === "NPC"
-          ? state.room.interaction.npc
-          : null;
+      const roomNpc = state.room.interaction?.type === "NPC" ? state.room.interaction.npc : null;
       if (roomNpc) {
         state.applyOutcome(choice.outcome, roomNpc);
       }
@@ -139,9 +129,7 @@ export const createDialogueSlice: GameSlice<DialogueSlice> = (set, get) => ({
     const state = get();
 
     for (const char of state.party) {
-      const skillObj = char.skills?.find(
-        (s) => s.name.toLowerCase() === skill.toLowerCase(),
-      );
+      const skillObj = char.skills?.find((s) => s.name.toLowerCase() === skill.toLowerCase());
       if (skillObj) {
         const modifier = parseInt(skillObj.modifier);
         const roll = Math.floor(Math.random() * 20) + 1;

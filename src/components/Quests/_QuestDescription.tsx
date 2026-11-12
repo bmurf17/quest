@@ -21,9 +21,7 @@ export default function QuestDescription({
   return (
     <>
       <ScrollArea style={{ height: "60vh" }}>
-        <div
-          style={questDescriptionStyle}
-        >
+        <div style={questDescriptionStyle}>
           <QuestSectionBox>
             <QuestSectionLabel>Description</QuestSectionLabel>
             <div style={questDescriptionStyle2}>
@@ -35,15 +33,8 @@ export default function QuestDescription({
             <QuestSectionLabel>Objectives</QuestSectionLabel>
             <div style={questDescriptionStyle3}>
               {quest.objectives.map((objective, index) => (
-                <div
-                  key={index}
-                  style={questDescriptionStyle4}
-                >
-                  <span
-                    style={questDescriptionStyle5}
-                  >
-                    ◆
-                  </span>
+                <div key={index} style={questDescriptionStyle4}>
+                  <span style={questDescriptionStyle5}>◆</span>
                   <span>{objective}</span>
                 </div>
               ))}
@@ -67,13 +58,8 @@ export default function QuestDescription({
             <QuestSectionLabel>Rewards</QuestSectionLabel>
             <div style={questDescriptionStyle3}>
               {quest.rewards.map((reward, index) => (
-                <div
-                  key={index}
-                  style={questDescriptionStyle6}
-                >
-                  <span style={{ color: colors.goldMuted, flexShrink: 0 }}>
-                    ◆
-                  </span>
+                <div key={index} style={questDescriptionStyle6}>
+                  <span style={{ color: colors.goldMuted, flexShrink: 0 }}>◆</span>
                   <span>{reward.name}</span>
                 </div>
               ))}
@@ -110,7 +96,6 @@ export default function QuestDescription({
               opacity: 1,
               userSelect: "none",
               margin: "8px",
-    
             }}
           >
             <span>Accept Quest</span>
@@ -131,14 +116,14 @@ const questDescriptionStyle: CSSProperties = {
   gap: 6,
 };
 const questDescriptionStyle2: CSSProperties = { fontSize: 13, color: "#7A6A52", lineHeight: 1.5 };
-  const questDescriptionStyle3: CSSProperties = { display: "flex", flexDirection: "column", gap: 4 };
-  const questDescriptionStyle4: CSSProperties = {
-                      display: "flex",
-                      alignItems: "flex-start",
-                      gap: 8,
-                      fontSize: 13,
-                      color: "#7A6A52",
-                      lineHeight: 1.5,
+const questDescriptionStyle3: CSSProperties = { display: "flex", flexDirection: "column", gap: 4 };
+const questDescriptionStyle4: CSSProperties = {
+  display: "flex",
+  alignItems: "flex-start",
+  gap: 8,
+  fontSize: 13,
+  color: "#7A6A52",
+  lineHeight: 1.5,
 };
 const questDescriptionStyle5: CSSProperties = {
   color: colors.goldMuted,

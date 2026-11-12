@@ -4,18 +4,10 @@ export function NPCForm() {
   return (
     <>
       <FieldGroup id="npcName" label="NPC Name">
-        <StyledInput
-          id="npcName"
-          name="npcName"
-          placeholder="e.g. Old Thornwick"
-        />
+        <StyledInput id="npcName" name="npcName" placeholder="e.g. Old Thornwick" />
       </FieldGroup>
       <FieldGroup id="dialogue" label="Opening Dialogue">
-        <StyledInput
-          id="dialogue"
-          name="dialogue"
-          placeholder="What the NPC says first…"
-        />
+        <StyledInput id="dialogue" name="dialogue" placeholder="What the NPC says first…" />
       </FieldGroup>
       <FieldGroup id="discoveryMessage" label="Discovery Message">
         <StyledInput

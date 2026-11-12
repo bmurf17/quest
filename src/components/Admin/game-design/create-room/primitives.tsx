@@ -2,17 +2,8 @@ import { colors, fonts } from "@/theme";
 import { inputStyle } from "./styles";
 import type { CSSProperties } from "react";
 
-export const Label = ({
-  htmlFor,
-  children,
-}: {
-  htmlFor: string;
-  children: React.ReactNode;
-}) => (
-  <label
-    htmlFor={htmlFor}
-    style={labelStyle}
-  >
+export const Label = ({ htmlFor, children }: { htmlFor: string; children: React.ReactNode }) => (
+  <label htmlFor={htmlFor} style={labelStyle}>
     {children}
   </label>
 );
@@ -32,9 +23,7 @@ export const FieldGroup = ({
   </div>
 );
 
-export const StyledInput = (
-  props: React.InputHTMLAttributes<HTMLInputElement>,
-) => (
+export const StyledInput = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
   <input
     {...props}
     style={{ ...inputStyle, ...props.style }}
@@ -47,9 +36,7 @@ export const StyledInput = (
   />
 );
 
-export const StyledSelect = (
-  props: React.SelectHTMLAttributes<HTMLSelectElement>,
-) => (
+export const StyledSelect = (props: React.SelectHTMLAttributes<HTMLSelectElement>) => (
   <select
     {...props}
     style={{
@@ -73,20 +60,10 @@ export const StyledSelect = (
 );
 
 export const Divider = ({ label }: { label: string }) => (
-  <div
-    style={dividerStyle}
-  >
-    <div
-      style={dividerStyle2}
-    />
-    <span
-      style={dividerStyle3}
-    >
-      {label}
-    </span>
-    <div
-      style={dividerStyle4}
-    />
+  <div style={dividerStyle}>
+    <div style={dividerStyle2} />
+    <span style={dividerStyle3}>{label}</span>
+    <div style={dividerStyle4} />
   </div>
 );
 
@@ -123,6 +100,5 @@ const dividerStyle3: CSSProperties = {
 const dividerStyle4: CSSProperties = {
   flex: 1,
   height: 1,
-  background:
-    "linear-gradient(to left, transparent, rgba(180,140,80,0.3))",
+  background: "linear-gradient(to left, transparent, rgba(180,140,80,0.3))",
 };

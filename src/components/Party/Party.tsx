@@ -8,7 +8,6 @@ interface Props {
   party: CharacterData[];
 }
 
-
 import { colors, fonts } from "@/theme";
 import { StatBar } from "@/components/shared/StatBar";
 import type { CSSProperties } from "react";
@@ -52,59 +51,40 @@ export default function Party({ party }: Props) {
 
   return (
     <>
-
       {isTargetingHeal && (
-        <div
-          style={partyStyle}
-        >
-          <div
-            style={partyStyle2}
-          />
-          <span
-            style={partyStyle3}
-          >
-            Select a party member to heal
-          </span>
+        <div style={partyStyle}>
+          <div style={partyStyle2} />
+          <span style={partyStyle3}>Select a party member to heal</span>
         </div>
       )}
 
       {isTargetingConsumable && (
-        <div
-          style={partyStyle}
-        >
-          <div
-            style={partyStyle2}
-          />
-          <span
-            style={partyStyle3}
-          >
-            Select a party member to use {targetingConsumable?.name}
-          </span>
+        <div style={partyStyle}>
+          <div style={partyStyle2} />
+          <span style={partyStyle3}>Select a party member to use {targetingConsumable?.name}</span>
         </div>
       )}
 
-      <div
-  style={partyStyle4}
-      >
+      <div style={partyStyle4}>
         {party.map((character, i) => {
           const isDead = character.alive === false || character.hp <= 0;
           const hpPct = (character.hp / character.maxHp) * 100;
           const isLowHp = hpPct <= 25 && !isDead;
 
           return (
-        <button
-          type="button"
-          key={i}
-          onClick={() => handleCharacterClick(character)}
-          disabled={isDead}
-          aria-label={
-            isTargetingHeal
-              ? `Heal ${character.name}`
-              : isTargetingConsumable
-                ? `Use ${targetingConsumable?.name} on ${character.name}`
-                : `View ${character.name}`
-          }
-          style={{
+            <button
+              type="button"
+              key={i}
+              onClick={() => handleCharacterClick(character)}
+              disabled={isDead}
+              aria-label={
+                isTargetingHeal
+                  ? `Heal ${character.name}`
+                  : isTargetingConsumable
+                    ? `Use ${targetingConsumable?.name} on ${character.name}`
+                    : `View ${character.name}`
+              }
+              style={{
                 padding: 0,
                 font: "inherit",
                 textAlign: "left",
@@ -120,7 +100,7 @@ export default function Party({ party }: Props) {
                   : isLowHp
                     ? "rgba(239,68,68,0.05)"
                     : "rgba(255,255,255,0.025)",
-                border: `1px solid ${isDead ? colors.subtleBorder : isLowHp ? 'rgba(239,68,68,0.3)' : colors.goldBorder}`,
+                border: `1px solid ${isDead ? colors.subtleBorder : isLowHp ? "rgba(239,68,68,0.3)" : colors.goldBorder}`,
                 borderRadius: 6,
                 overflow: "hidden",
                 opacity: isDead ? 0.4 : 1,
@@ -128,42 +108,20 @@ export default function Party({ party }: Props) {
                 cursor: isDead ? "default" : "pointer",
               }}
             >
-              <div
-                style={partyStyle5}
-              >
-                <img
-                  src={character.img}
-                  alt={character.name}
-                  style={partyStyle6}
-                />
-                <div
-                  style={partyStyle7}
-                >
-                  <div
-                    style={partyStyle8}
-                  >
-                    {character.name}
-                  </div>
+              <div style={partyStyle5}>
+                <img src={character.img} alt={character.name} style={partyStyle6} />
+                <div style={partyStyle7}>
+                  <div style={partyStyle8}>{character.name}</div>
                 </div>
                 {isDead && (
-                  <div
-                    style={partyStyle9}
-                  >
-                    <span
-                      style={partyStyle10}
-                    >
-                      FALLEN
-                    </span>
+                  <div style={partyStyle9}>
+                    <span style={partyStyle10}>FALLEN</span>
                   </div>
                 )}
               </div>
 
-              <div
-                style={partyStyle11}
-              >
-                <div
-                  style={partyStyle12}
-                >
+              <div style={partyStyle11}>
+                <div style={partyStyle12}>
                   <span
                     style={{
                       fontSize: 8,
@@ -186,19 +144,15 @@ export default function Party({ party }: Props) {
                   </span>
                 </div>
                 <div style={{ marginBottom: 4 }}>
-                  <StatBar value={character.hp} max={character.maxHp} color={isLowHp ? colors.danger : colors.success} />
+                  <StatBar
+                    value={character.hp}
+                    max={character.maxHp}
+                    color={isLowHp ? colors.danger : colors.success}
+                  />
                 </div>
-                <div
-                  style={partyStyle12}
-                >
-                  <span
-                    style={partyStyle13}
-                  >
-                    MP
-                  </span>
-                  <span
-                    style={partyStyle14}
-                  >
+                <div style={partyStyle12}>
+                  <span style={partyStyle13}>MP</span>
+                  <span style={partyStyle14}>
                     {character.mp}/{character.maxMp}
                   </span>
                 </div>
@@ -271,8 +225,7 @@ const partyStyle7: CSSProperties = {
   left: 0,
   right: 0,
   padding: "12px 5px 3px",
-  background:
-    "linear-gradient(to top, rgba(0,0,0,0.9), transparent)",
+  background: "linear-gradient(to top, rgba(0,0,0,0.9), transparent)",
 };
 const partyStyle8: CSSProperties = {
   fontSize: 9,

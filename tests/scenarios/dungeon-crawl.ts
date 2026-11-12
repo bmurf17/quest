@@ -25,10 +25,7 @@ import {
 } from "../game-helpers";
 import type { RunResult, ScenarioConfig } from "./types";
 
-export async function runDungeonCrawl(
-  page: Page,
-  config: ScenarioConfig,
-): Promise<RunResult> {
+export async function runDungeonCrawl(page: Page, config: ScenarioConfig): Promise<RunResult> {
   const logger = new GameLogger(config.verbose);
   let combatsWon = 0;
   let combatsLost = 0;
@@ -73,7 +70,7 @@ export async function runDungeonCrawl(
 
     if (await isInCombat(page)) {
       await attackEnemy(page, logger);
-      await page.waitForTimeout(800); 
+      await page.waitForTimeout(800);
 
       await handleLevelUp(page, logger);
 

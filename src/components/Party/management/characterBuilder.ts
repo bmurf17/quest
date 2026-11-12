@@ -1,17 +1,9 @@
-import type {
-  CharacterData,
-} from "@/types/Character";
+import type { CharacterData } from "@/types/Character";
 import type { Spell } from "@/types/Spell";
 import { MAX_SCORE, POINT_BUDGET } from "@/consts/constants";
-import {
-  abilityModifier,
-  totalAbilityPointsSpent,
-} from "@/lib/character";
-import type {
-  useCharacter} from "@/components/CharacterCreation/CharacterContext";
-import {
-  type Character,
-} from "@/components/CharacterCreation/CharacterContext";
+import { abilityModifier, totalAbilityPointsSpent } from "@/lib/character";
+import type { useCharacter } from "@/components/CharacterCreation/CharacterContext";
+import { type Character } from "@/components/CharacterCreation/CharacterContext";
 
 import warriorImg from "@/assets/warrior.png";
 import rogueImg from "@/assets/rogue.png";
@@ -70,13 +62,11 @@ const defaultSpells: Spell[] = [
 export function canCreateCharacter(character: Character): boolean {
   return Boolean(
     character.name.trim() &&
-      character.race &&
-      character.class &&
-      character.image &&
-      Object.values(character.abilities).every(
-        (value) => value >= 1 && value <= MAX_SCORE,
-      ) &&
-      totalAbilityPointsSpent(character.abilities) === POINT_BUDGET,
+    character.race &&
+    character.class &&
+    character.image &&
+    Object.values(character.abilities).every((value) => value >= 1 && value <= MAX_SCORE) &&
+    totalAbilityPointsSpent(character.abilities) === POINT_BUDGET,
   );
 }
 

@@ -21,33 +21,22 @@ export function PartyRosterPanel({
   const enterCombat = useGameStore((state) => state.enterCombat);
 
   return (
-    <div
-      style={partyRosterPanelStyle}
-    >
+    <div style={partyRosterPanelStyle}>
       <div
         style={{
           padding: "20px 18px 14px",
           borderBottom: `1px solid ${colors.goldBorder}`,
         }}
       >
-        <div
-          style={partyRosterPanelStyle2}
-        >
-          <h2
-            style={partyRosterPanelStyle3}
-          >
-            Your Party
-          </h2>
+        <div style={partyRosterPanelStyle2}>
+          <h2 style={partyRosterPanelStyle3}>Your Party</h2>
           <span
             style={{
               fontSize: 12,
-              color:
-                party.length === MAX_PARTY_SIZE ? colors.gold : colors.muted,
+              color: party.length === MAX_PARTY_SIZE ? colors.gold : colors.muted,
               fontFamily: fonts.display,
               background:
-                party.length === MAX_PARTY_SIZE
-                  ? "rgba(212,175,55,0.1)"
-                  : "rgba(255,255,255,0.04)",
+                party.length === MAX_PARTY_SIZE ? "rgba(212,175,55,0.1)" : "rgba(255,255,255,0.04)",
               border: `1px solid ${party.length === MAX_PARTY_SIZE ? "rgba(212,175,55,0.3)" : "rgba(255,255,255,0.08)"}`,
               borderRadius: 10,
               padding: "2px 8px",
@@ -58,37 +47,21 @@ export function PartyRosterPanel({
         </div>
       </div>
 
-      <div
-        style={partyRosterPanelStyle4}
-      >
+      <div style={partyRosterPanelStyle4}>
         {party.length === 0 ? (
           <div style={{ textAlign: "center", padding: "48px 16px" }}>
-            <p
-              style={partyRosterPanelStyle5}
-            >
-              {emptyTitle}
-            </p>
-            {emptyHint && (
-              <p style={partyRosterPanelStyle6}>
-                {emptyHint}
-              </p>
-            )}
+            <p style={partyRosterPanelStyle5}>{emptyTitle}</p>
+            {emptyHint && <p style={partyRosterPanelStyle6}>{emptyHint}</p>}
           </div>
         ) : (
           party.map((member, index) => (
-            <PartyRosterCard
-              key={index}
-              member={member}
-              onRemove={() => onRemove(index)}
-            />
+            <PartyRosterCard key={index} member={member} onRemove={() => onRemove(index)} />
           ))
         )}
       </div>
 
       {party.length > 0 && (
-        <div
-          style={partyRosterPanelStyle7}
-        >
+        <div style={partyRosterPanelStyle7}>
           <Link to="/game" style={{ textDecoration: "none" }}>
             <button
               onClick={enterCombat}
@@ -167,10 +140,10 @@ const partyRosterPanelStyle5: CSSProperties = {
   fontFamily: fonts.display,
 };
 const partyRosterPanelStyle6: CSSProperties = { margin: 0, color: "#374151", fontSize: 13 };
-  const partyRosterPanelStyle7: CSSProperties = {
-              padding: "12px",
-              borderTop: `1px solid ${colors.goldBorder}`,
-              flexShrink: 0,
+const partyRosterPanelStyle7: CSSProperties = {
+  padding: "12px",
+  borderTop: `1px solid ${colors.goldBorder}`,
+  flexShrink: 0,
 };
 const partyRosterPanelStyle8: CSSProperties = {
   width: "100%",

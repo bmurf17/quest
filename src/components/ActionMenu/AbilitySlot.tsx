@@ -48,20 +48,14 @@ export function AbilitySlot({
         }
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.background = disabled
-          ? "rgba(0,0,0,0.3)"
-          : "rgba(255,255,255,0.04)";
+        e.currentTarget.style.background = disabled ? "rgba(0,0,0,0.3)" : "rgba(255,255,255,0.04)";
         e.currentTarget.style.borderColor = disabled
           ? themeColors.subtleBorder
           : themeColors.goldBorder;
         e.currentTarget.style.transform = "scale(1)";
       }}
     >
-      <img
-        src={img}
-        alt={alt}
-        style={abilitySlotStyle}
-      />
+      <img src={img} alt={alt} style={abilitySlotStyle} />
       {badge !== undefined && (
         <div
           style={{

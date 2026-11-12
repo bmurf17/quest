@@ -1,9 +1,4 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { CharacterData } from "@/types/Character";
 import { useState, memo } from "react";
 import { Plus, Minus } from "lucide-react";
@@ -15,19 +10,14 @@ import type { CSSProperties } from "react";
 function SectionHeader({ children }: { children: React.ReactNode }) {
   return (
     <div style={sectionHeaderStyle}>
-      <span
-        style={sectionHeaderStyle2}
-      >
-        {children}
-      </span>
+      <span style={sectionHeaderStyle2}>{children}</span>
       <div style={sectionHeaderStyle3} />
     </div>
   );
 }
 
 function LevelUpModalComponent() {
-  const { levelingUpChars, currentLevelingCharIndex, applyLevelUp } =
-    useGameStore();
+  const { levelingUpChars, currentLevelingCharIndex, applyLevelUp } = useGameStore();
 
   const currentChar = levelingUpChars[currentLevelingCharIndex];
   const [statPoints, setStatPoints] = useState(3);
@@ -43,8 +33,7 @@ function LevelUpModalComponent() {
 
   if (!currentChar || currentLevelingCharIndex === -1) return null;
 
-  const remainingChars =
-    levelingUpChars.length - currentLevelingCharIndex - 1;
+  const remainingChars = levelingUpChars.length - currentLevelingCharIndex - 1;
 
   const incrementStat = (stat: string) => {
     if (statPoints > 0) {
@@ -90,9 +79,7 @@ function LevelUpModalComponent() {
 
   return (
     <Dialog open={true} onOpenChange={() => {}}>
-      <DialogContent
-        style={levelUpModalComponentStyle}
-      >
+      <DialogContent style={levelUpModalComponentStyle}>
         <DialogHeader
           style={{
             padding: "20px 24px 16px",
@@ -100,9 +87,7 @@ function LevelUpModalComponent() {
           }}
         >
           <div style={levelUpModalComponentStyle2}>
-            <div
-              style={levelUpModalComponentStyle3}
-            >
+            <div style={levelUpModalComponentStyle3}>
               <img
                 src={currentChar.img}
                 alt={currentChar.name}
@@ -111,30 +96,19 @@ function LevelUpModalComponent() {
             </div>
 
             <div style={{ flex: 1 }}>
-              <DialogTitle
-                style={levelUpModalComponentStyle5}
-              >
-                Level Up!
-              </DialogTitle>
+              <DialogTitle style={levelUpModalComponentStyle5}>Level Up!</DialogTitle>
               <div style={levelUpModalComponentStyle6}>
                 {[
                   currentChar.race,
                   currentChar.class,
                   `${currentChar.level} → ${currentChar.level + 1}`,
                 ].map((tag) => (
-                  <span
-                    key={tag}
-                    style={levelUpModalComponentStyle7}
-                  >
+                  <span key={tag} style={levelUpModalComponentStyle7}>
                     {tag}
                   </span>
                 ))}
                 {remainingChars > 0 && (
-                  <span
-                    style={levelUpModalComponentStyle8}
-                  >
-                    +{remainingChars} more waiting
-                  </span>
+                  <span style={levelUpModalComponentStyle8}>+{remainingChars} more waiting</span>
                 )}
               </div>
             </div>
@@ -143,9 +117,7 @@ function LevelUpModalComponent() {
 
         <div style={{ padding: "4px 24px 24px" }}>
           <SectionHeader>Experience</SectionHeader>
-          <div
-            style={levelUpModalComponentStyle9}
-          >
+          <div style={levelUpModalComponentStyle9}>
             <span
               style={{
                 fontSize: 11,
@@ -157,13 +129,9 @@ function LevelUpModalComponent() {
             >
               EXP
             </span>
-            <span
-              style={levelUpModalComponentStyle10}
-            >
+            <span style={levelUpModalComponentStyle10}>
               {currentChar.exp}
-              <span style={{ color: colors.muted }}>
-                /{currentChar.nextLevelExp}
-              </span>
+              <span style={{ color: colors.muted }}>/{currentChar.nextLevelExp}</span>
             </span>
           </div>
           <StatBar
@@ -186,13 +154,8 @@ function LevelUpModalComponent() {
               gap: 6,
               padding: "5px 12px",
               marginBottom: 12,
-              background:
-                statPoints === 0
-                  ? "rgba(34,197,94,0.08)"
-                  : "rgba(180,140,80,0.1)",
-              border: `1px solid ${
-                statPoints === 0 ? colors.success : colors.goldBorder
-              }`,
+              background: statPoints === 0 ? "rgba(34,197,94,0.08)" : "rgba(180,140,80,0.1)",
+              border: `1px solid ${statPoints === 0 ? colors.success : colors.goldBorder}`,
               borderRadius: 6,
             }}
           >
@@ -207,15 +170,11 @@ function LevelUpModalComponent() {
             >
               {statPoints === 0
                 ? "✓  All points allocated"
-                : `${statPoints} stat ${
-                    statPoints === 1 ? "point" : "points"
-                  } remaining`}
+                : `${statPoints} stat ${statPoints === 1 ? "point" : "points"} remaining`}
             </span>
           </div>
 
-          <div
-            style={levelUpModalComponentStyle11}
-          >
+          <div style={levelUpModalComponentStyle11}>
             {Object.entries(currentChar.abilities).map(([key, ability]) => {
               const allocated = allocatedStats[key] ?? 0;
               const newScore = ability.score + allocated;
@@ -225,38 +184,17 @@ function LevelUpModalComponent() {
                 <div
                   key={key}
                   style={{
-                    background:
-                      allocated > 0
-                        ? "rgba(180,140,80,0.07)"
-                        : "rgba(255,255,255,0.03)",
-                    border: `1px solid ${
-                      allocated > 0
-                        ? colors.goldMuted
-                        : colors.goldBorder
-                    }`,
+                    background: allocated > 0 ? "rgba(180,140,80,0.07)" : "rgba(255,255,255,0.03)",
+                    border: `1px solid ${allocated > 0 ? colors.goldMuted : colors.goldBorder}`,
                     borderRadius: 7,
                     padding: "10px 6px",
                     textAlign: "center",
                     transition: "border-color 0.2s, background 0.2s",
                   }}
                 >
-                  <div
-                    style={levelUpModalComponentStyle12}
-                  >
-                    {key}
-                  </div>
-                  <div
-                    style={levelUpModalComponentStyle13}
-                  >
-                    {newScore}
-                  </div>
-                  {allocated > 0 && (
-                    <div
-                      style={levelUpModalComponentStyle14}
-                    >
-                      +{allocated}
-                    </div>
-                  )}
+                  <div style={levelUpModalComponentStyle12}>{key}</div>
+                  <div style={levelUpModalComponentStyle13}>{newScore}</div>
+                  {allocated > 0 && <div style={levelUpModalComponentStyle14}>+{allocated}</div>}
                   <div
                     style={{
                       fontSize: 11,
@@ -269,9 +207,7 @@ function LevelUpModalComponent() {
                   </div>
 
                   {/* +/- controls */}
-                  <div
-                    style={levelUpModalComponentStyle15}
-                  >
+                  <div style={levelUpModalComponentStyle15}>
                     <button
                       type="button"
                       onClick={() => decrementStat(key)}
@@ -284,18 +220,13 @@ function LevelUpModalComponent() {
                         alignItems: "center",
                         justifyContent: "center",
                         background:
-                          allocated === 0
-                            ? "rgba(255,255,255,0.03)"
-                            : "rgba(180,140,80,0.15)",
+                          allocated === 0 ? "rgba(255,255,255,0.03)" : "rgba(180,140,80,0.15)",
                         border: `1px solid ${
-                          allocated === 0
-                            ? "rgba(255,255,255,0.08)"
-                            : colors.goldBorder
+                          allocated === 0 ? "rgba(255,255,255,0.08)" : colors.goldBorder
                         }`,
                         borderRadius: 4,
                         cursor: allocated === 0 ? "not-allowed" : "pointer",
-                        color:
-                          allocated === 0 ? colors.muted : colors.goldMuted,
+                        color: allocated === 0 ? colors.muted : colors.goldMuted,
                         padding: 0,
                       }}
                     >
@@ -313,18 +244,13 @@ function LevelUpModalComponent() {
                         alignItems: "center",
                         justifyContent: "center",
                         background:
-                          statPoints === 0
-                            ? "rgba(255,255,255,0.03)"
-                            : "rgba(180,140,80,0.15)",
+                          statPoints === 0 ? "rgba(255,255,255,0.03)" : "rgba(180,140,80,0.15)",
                         border: `1px solid ${
-                          statPoints === 0
-                            ? "rgba(255,255,255,0.08)"
-                            : colors.goldBorder
+                          statPoints === 0 ? "rgba(255,255,255,0.08)" : colors.goldBorder
                         }`,
                         borderRadius: 4,
                         cursor: statPoints === 0 ? "not-allowed" : "pointer",
-                        color:
-                          statPoints === 0 ? colors.muted : colors.goldMuted,
+                        color: statPoints === 0 ? colors.muted : colors.goldMuted,
                         padding: 0,
                       }}
                     >
@@ -344,16 +270,10 @@ function LevelUpModalComponent() {
               marginTop: 20,
               width: "100%",
               padding: "12px 0",
-              background:
-                statPoints === 0
-                  ? "rgba(180,140,80,0.15)"
-                  : "rgba(255,255,255,0.03)",
-              border: `1px solid ${
-                statPoints === 0 ? colors.goldMuted : "rgba(255,255,255,0.08)"
-              }`,
+              background: statPoints === 0 ? "rgba(180,140,80,0.15)" : "rgba(255,255,255,0.03)",
+              border: `1px solid ${statPoints === 0 ? colors.goldMuted : "rgba(255,255,255,0.08)"}`,
               borderRadius: 7,
-              color:
-                statPoints === 0 ? colors.goldMuted : colors.muted,
+              color: statPoints === 0 ? colors.goldMuted : colors.muted,
               fontFamily: fonts.display,
               fontSize: 13,
               fontWeight: 700,
@@ -374,39 +294,48 @@ function LevelUpModalComponent() {
 export default memo(LevelUpModalComponent);
 
 // Static style objects hoisted out of the render path.
-const sectionHeaderStyle: CSSProperties = { display: "flex", alignItems: "center", gap: 10, margin: "20px 0 12px" };
-  const sectionHeaderStyle2: CSSProperties = {
-            fontSize: 11,
-            color: colors.goldMuted,
-            fontFamily: fonts.display,
-            letterSpacing: "0.1em",
-            textTransform: "uppercase",
-            fontWeight: 700,
-            whiteSpace: "nowrap",
+const sectionHeaderStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  margin: "20px 0 12px",
+};
+const sectionHeaderStyle2: CSSProperties = {
+  fontSize: 11,
+  color: colors.goldMuted,
+  fontFamily: fonts.display,
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+  fontWeight: 700,
+  whiteSpace: "nowrap",
 };
 const sectionHeaderStyle3: CSSProperties = { flex: 1, height: 1, background: colors.goldBorder };
-  const levelUpModalComponentStyle: CSSProperties = {
-            maxWidth: 680,
-            background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 100%)",
-            border: `1px solid ${colors.goldBorder}`,
-            borderRadius: 12,
-            padding: 0,
-            overflow: "hidden",
-            fontFamily: fonts.body,
-            color: colors.text,
+const levelUpModalComponentStyle: CSSProperties = {
+  maxWidth: 680,
+  background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 100%)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 12,
+  padding: 0,
+  overflow: "hidden",
+  fontFamily: fonts.body,
+  color: colors.text,
 };
-const levelUpModalComponentStyle2: CSSProperties = { display: "flex", alignItems: "center", gap: 16 };
-  const levelUpModalComponentStyle3: CSSProperties = {
-                  width: 64,
-                  height: 64,
-                  flexShrink: 0,
-                  background: "rgba(0,0,0,0.5)",
-                  border: `1px solid rgba(180,140,80,0.2)`,
-                  borderRadius: 8,
-                  overflow: "hidden",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
+const levelUpModalComponentStyle2: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 16,
+};
+const levelUpModalComponentStyle3: CSSProperties = {
+  width: 64,
+  height: 64,
+  flexShrink: 0,
+  background: "rgba(0,0,0,0.5)",
+  border: `1px solid rgba(180,140,80,0.2)`,
+  borderRadius: 8,
+  overflow: "hidden",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
 };
 const levelUpModalComponentStyle4: CSSProperties = {
   width: 56,
@@ -422,16 +351,20 @@ const levelUpModalComponentStyle5: CSSProperties = {
   fontFamily: fonts.display,
   letterSpacing: "0.04em",
 };
-const levelUpModalComponentStyle6: CSSProperties = { display: "flex", gap: 6, alignItems: "center" };
-  const levelUpModalComponentStyle7: CSSProperties = {
-                        fontSize: 11,
-                        color: colors.goldMuted,
-                        background: "rgba(180,140,80,0.1)",
-                        border: `1px solid ${colors.goldBorder}`,
-                        borderRadius: 4,
-                        padding: "2px 9px",
-                        fontFamily: fonts.display,
-                        letterSpacing: "0.04em",
+const levelUpModalComponentStyle6: CSSProperties = {
+  display: "flex",
+  gap: 6,
+  alignItems: "center",
+};
+const levelUpModalComponentStyle7: CSSProperties = {
+  fontSize: 11,
+  color: colors.goldMuted,
+  background: "rgba(180,140,80,0.1)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 4,
+  padding: "2px 9px",
+  fontFamily: fonts.display,
+  letterSpacing: "0.04em",
 };
 const levelUpModalComponentStyle8: CSSProperties = {
   fontSize: 11,

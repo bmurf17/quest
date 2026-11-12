@@ -59,9 +59,9 @@ export function resolveEnemyTurn(state: EnemyTurnState): EnemyTurnResult {
   const effect = move.effect;
   let combatOrder = state.combatOrder;
   let updatedParty = state.party;
-  let updatedEnemies: Enemy[] = (
-    state.roomInstances.get(state.room.id) || state.room
-  ).enemies.map((e) => ({ ...e }));
+  let updatedEnemies: Enemy[] = (state.roomInstances.get(state.room.id) || state.room).enemies.map(
+    (e) => ({ ...e }),
+  );
   let logMessage = "";
   let newCooldowns = tickCooldowns(state.enemyCooldowns, currentEnemy.id);
   let newBuffs: Map<string, ActiveBuff[]> = tickBuffs(state.activeBuffs);
@@ -71,9 +71,7 @@ export function resolveEnemyTurn(state: EnemyTurnState): EnemyTurnResult {
       e.id === currentEnemy.id ? { ...e, phase: phaseResult.newPhase } : e,
     );
     combatOrder = combatOrder.map((f) =>
-      "id" in f && f.id === currentEnemy.id
-        ? { ...f, phase: phaseResult.newPhase }
-        : f,
+      "id" in f && f.id === currentEnemy.id ? { ...f, phase: phaseResult.newPhase } : f,
     );
   }
 
@@ -84,23 +82,18 @@ export function resolveEnemyTurn(state: EnemyTurnState): EnemyTurnResult {
       if (effect.target === "all") {
         targets = livingMembers;
       } else {
-        targets = [
-          livingMembers[Math.floor(Math.random() * livingMembers.length)],
-        ];
+        targets = [livingMembers[Math.floor(Math.random() * livingMembers.length)]];
       }
 
       const totalLogParts: string[] = [];
 
       for (const target of targets) {
         const effectiveDef =
-          target.abilities.def.score +
-          getEffectiveBuffAmount(newBuffs, target.name, "defense");
+          target.abilities.def.score + getEffectiveBuffAmount(newBuffs, target.name, "defense");
         const effectiveStr =
-          currentEnemy.strength +
-          getEffectiveBuffAmount(newBuffs, currentEnemy.name, "strength");
+          currentEnemy.strength + getEffectiveBuffAmount(newBuffs, currentEnemy.name, "strength");
         const effectiveDex =
-          currentEnemy.dex +
-          getEffectiveBuffAmount(newBuffs, currentEnemy.name, "dex");
+          currentEnemy.dex + getEffectiveBuffAmount(newBuffs, currentEnemy.name, "dex");
 
         const damage = calcDamage(effectiveDef, effectiveStr, effectiveDex);
         const newHealth = Math.max(0, target.hp - damage);
@@ -116,9 +109,7 @@ export function resolveEnemyTurn(state: EnemyTurnState): EnemyTurnResult {
           totalLogParts.push(`${target.name} has been defeated!`);
           combatOrder = combatOrder.filter((x) => x.name !== target.name);
         } else {
-          totalLogParts.push(
-            `${target.name} takes ${damage} damage (HP: ${newHealth})`,
-          );
+          totalLogParts.push(`${target.name} takes ${damage} damage (HP: ${newHealth})`);
         }
       }
 
@@ -136,8 +127,7 @@ export function resolveEnemyTurn(state: EnemyTurnState): EnemyTurnResult {
         targets = allies;
       } else if (effect.target === "lowest_hp_ally") {
         const sorted = [...allies].sort(
-          (a, b) =>
-            a.health / getEnemyMaxHealth(a) - b.health / getEnemyMaxHealth(b),
+          (a, b) => a.health / getEnemyMaxHealth(a) - b.health / getEnemyMaxHealth(b),
         );
         targets = sorted.length > 0 ? [sorted[0]] : [];
       }
@@ -158,8 +148,7 @@ export function resolveEnemyTurn(state: EnemyTurnState): EnemyTurnResult {
     }
 
     case "buff": {
-      const targets: Enemy[] =
-        effect.target === "self" ? [currentEnemy] : updatedEnemies;
+      const targets: Enemy[] = effect.target === "self" ? [currentEnemy] : updatedEnemies;
 
       for (const target of targets) {
         newBuffs = addBuff(newBuffs, target.name, {
@@ -176,8 +165,7 @@ export function resolveEnemyTurn(state: EnemyTurnState): EnemyTurnResult {
     }
 
     case "debuff": {
-      const partyTarget =
-        livingMembers[Math.floor(Math.random() * livingMembers.length)];
+      const partyTarget = livingMembers[Math.floor(Math.random() * livingMembers.length)];
       if (partyTarget) {
         newBuffs = addBuff(newBuffs, partyTarget.name, {
           stat: effect.stat,
@@ -218,8 +206,7 @@ export function resolveEnemyTurn(state: EnemyTurnState): EnemyTurnResult {
     }
 
     default: {
-      const target =
-        livingMembers[Math.floor(Math.random() * livingMembers.length)];
+      const target = livingMembers[Math.floor(Math.random() * livingMembers.length)];
       const damage = calcDamage(
         target.abilities.def.score,
         currentEnemy.strength,
@@ -244,20 +231,12 @@ export function resolveEnemyTurn(state: EnemyTurnState): EnemyTurnResult {
     }
   }
 
-  newCooldowns = setCooldown(
-    newCooldowns,
-    currentEnemy.id,
-    move.name,
-    move.cooldown,
-  );
+  newCooldowns = setCooldown(newCooldowns, currentEnemy.id, move.name, move.cooldown);
 
-  const currentRoomInstance =
-    state.roomInstances.get(state.room.id) || state.room;
+  const currentRoomInstance = state.roomInstances.get(state.room.id) || state.room;
   const updatedRoom: Room = { ...currentRoomInstance, enemies: updatedEnemies };
 
-  const isPartyDefeated = updatedParty.every(
-    (member) => member.hp <= 0 || !member.alive,
-  );
+  const isPartyDefeated = updatedParty.every((member) => member.hp <= 0 || !member.alive);
 
   if (isPartyDefeated) {
     return {
@@ -278,10 +257,7 @@ export function resolveEnemyTurn(state: EnemyTurnState): EnemyTurnResult {
     };
   }
 
-  const nextIndex = safeNextIndex(
-    state.activeFighterIndex,
-    combatOrder.length,
-  );
+  const nextIndex = safeNextIndex(state.activeFighterIndex, combatOrder.length);
 
   return {
     kind: "resolved",
@@ -293,10 +269,7 @@ export function resolveEnemyTurn(state: EnemyTurnState): EnemyTurnResult {
       enemyCooldowns: newCooldowns,
       activeBuffs: newBuffs,
       room: updatedRoom,
-      roomInstances: new Map(state.roomInstances).set(
-        state.room.id,
-        updatedRoom,
-      ),
+      roomInstances: new Map(state.roomInstances).set(state.room.id, updatedRoom),
     },
   };
 }

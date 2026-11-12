@@ -13,11 +13,11 @@ supabase/
 
 ### Migrations
 
-| File | Purpose |
-| --- | --- |
-| `000_schema_baseline.sql` | Core tables that predate migrations; makes a fresh project reproducible |
-| `001_dialogue_system.sql` | Dialogue trees, choices, outcomes, conversation flags, NPC disposition |
-| `002_enemy_enhancements.sql` | Boss phases, moves, spawns, and XP fields on `enemies` |
+| File                         | Purpose                                                                 |
+| ---------------------------- | ----------------------------------------------------------------------- |
+| `000_schema_baseline.sql`    | Core tables that predate migrations; makes a fresh project reproducible |
+| `001_dialogue_system.sql`    | Dialogue trees, choices, outcomes, conversation flags, NPC disposition  |
+| `002_enemy_enhancements.sql` | Boss phases, moves, spawns, and XP fields on `enemies`                  |
 
 Rules:
 
@@ -82,11 +82,11 @@ after the migrations. All inserts use `ON CONFLICT DO NOTHING`.
 The browser only ever receives the **anon** key (`VITE_SUPABASE_ANON_KEY`).
 Never ship the `service_role` key: it bypasses RLS. Current policy intent is:
 
-| Table | Read | Write |
-| --- | --- | --- |
+| Table                                                                                                                                                                                      | Read                                                 | Write                                                                                   |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------- | --------------------------------------------------------------------------------------- |
 | `sections`, `rooms`, `room_enemies`, `neighboring_rooms`, `room_interactions`, `items`, `enemies`, `npcs`, `chests`, `camps`, `transitions`, `quests`, `quest_objectives`, `quest_rewards` | Public (`USING (true)`) so the game can load content | Authenticated users only (`auth.uid() IS NOT NULL`), i.e. the admin/game-design screens |
-| `npc_dialogues`, `dialogue_nodes`, `dialogue_choices`, `dialogue_outcomes` | Public so dialogue can load | Authenticated users only |
-| `conversation_flags` | Public in the current migration | Authenticated users only |
+| `npc_dialogues`, `dialogue_nodes`, `dialogue_choices`, `dialogue_outcomes`                                                                                                                 | Public so dialogue can load                          | Authenticated users only                                                                |
+| `conversation_flags`                                                                                                                                                                       | Public in the current migration                      | Authenticated users only                                                                |
 
 `001_dialogue_system.sql` enables RLS for the dialogue tables and creates those
 policies. The baseline does not create policies for the core tables; those are

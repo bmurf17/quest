@@ -48,11 +48,7 @@ function migrateSave(input: unknown): unknown {
   let data = { ...(input as RawSave) };
   const rawVersion: unknown = data.version ?? 0;
 
-  if (
-    typeof rawVersion !== "number" ||
-    !Number.isInteger(rawVersion) ||
-    rawVersion < 0
-  ) {
+  if (typeof rawVersion !== "number" || !Number.isInteger(rawVersion) || rawVersion < 0) {
     throw new SaveDataError("Save file has an invalid version");
   }
   let version: number = rawVersion;
@@ -72,9 +68,7 @@ function migrateSave(input: unknown): unknown {
     const nextVersion = data.version;
     // Guard against a faulty migration that fails to advance the version.
     if (typeof nextVersion !== "number" || nextVersion <= version) {
-      throw new SaveDataError(
-        `Migration from save version ${version} did not advance the version`,
-      );
+      throw new SaveDataError(`Migration from save version ${version} did not advance the version`);
     }
     version = nextVersion;
   }
@@ -337,9 +331,7 @@ const saveSchema = z.looseObject({
   conversationFlags: z.record(z.string(), z.record(z.string(), z.string())),
   currentSection: finiteNumber.nullable(),
   beatenSections: z.array(finiteNumber),
-  availableSections: z.array(
-    z.looseObject({ id: finiteNumber, name: z.string() }),
-  ),
+  availableSections: z.array(z.looseObject({ id: finiteNumber, name: z.string() })),
   currentRoomId: finiteNumber,
   roomInstances: z.array(z.tuple([finiteNumber, serializedRoomSchema])),
   gameStatus: z.number().int().min(0).max(3),
@@ -361,9 +353,7 @@ const saveSchema = z.looseObject({
   dialogueTrees: z.array(z.tuple([finiteNumber, dialogueNodeSchema])),
   activeCutsceneId: z.string().nullable(),
   cutsceneSceneIndex: z.number().int().nonnegative(),
-  enemyCooldowns: z.array(
-    z.tuple([finiteNumber, z.array(z.tuple([z.string(), finiteNumber]))]),
-  ),
+  enemyCooldowns: z.array(z.tuple([finiteNumber, z.array(z.tuple([z.string(), finiteNumber]))])),
   activeBuffs: z.array(z.tuple([z.string(), z.array(activeBuffSchema)])),
 });
 
