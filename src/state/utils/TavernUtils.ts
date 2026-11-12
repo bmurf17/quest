@@ -2,6 +2,7 @@ import { CharacterData } from "@/types/Character";
 import { EquippableItem } from "@/types/Item";
 import { TavernConfig } from "@/types/Tavern";
 import { Spell } from "@/types/Spell";
+import { abilityModifier } from "@/lib/character";
 
 import warriorImg from "@/assets/Warrior.png";
 import rogueImg from "@/assets/Rogue.png";
@@ -91,10 +92,6 @@ function pick<T>(arr: readonly T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function computeModifier(score: number): number {
-  return Math.floor((score - 10) / 2);
-}
-
 function generateName(): string {
   const first = pick(FIRST_NAMES);
   const last = pick([
@@ -149,7 +146,7 @@ function generateAbilities(config: TavernConfig, cls: string) {
   for (const key of ABILITY_KEYS) {
     abilities[key] = {
       score: scores[key],
-      modifier: computeModifier(scores[key]),
+      modifier: abilityModifier(scores[key]),
     };
   }
 

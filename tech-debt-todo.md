@@ -150,13 +150,13 @@ ability tooltip, stat bar, and detail dialog live in `MainGameArea/tavern/`.
 Action-menu buttons, slots, combat targeting, and the dialogue/chest/camp/town
 sections live in `components/action-menu/`.
 
-### 8. Remove duplicated UI and logic
+### 8. Remove duplicated UI and logic — ✅ Done
 
-- [ ] **Four `StatBar` implementations**: `src/components/Shared/StatBar.tsx`, `CharacterSheet.tsx:16`, `_LevelUpModal.tsx:34`, `_TavernOverlay.tsx:14`. Consolidate on the shared version
-- [ ] **Two character-creation flows**: `CharacterBuilder.tsx` and `PartyManagement.tsx`'s `CreateCharacterView` / `buildCharacter` duplicate the tab/point-buy/form logic. Reuse one flow
-- [ ] Item mapping (`mapItem`) is inline in `RoomQueries.ts`; export a typed mapper and reuse it
-- [ ] Repeated DB query error handling (`if (error) throw error` via `.then`) — add a small query helper
-- [ ] `computeModifier` / ability modifier logic exists in `TavernUtils.ts` and `PartyManagement.ts`; centralize it
+- [x] **Four `StatBar` implementations**: consolidated on `src/components/Shared/StatBar.tsx` with size/track/low-value options; `CharacterSheet`, `_LevelUpModal`, and the tavern card now use it, and `TavernStatBar.tsx` was deleted
+- [x] **Two character-creation flows**: `CharacterBuilder.tsx` now exposes a shared `CharacterBuilderView` used by both `/create` and `PartyManagement`'s empty-party `CreateCharacterView`; the name step is a shared form and point-buy validation lives in `canCreateCharacter` / `src/lib/character.ts`
+- [x] Item mapping: exported typed `mapDbItem` from `RoomQueries.ts` and reused it for quests, chests, and reward rows
+- [x] Repeated DB query error handling: added `unwrapQuery` in `src/queries/queryHelpers.ts` and used it for room/section/enemy queries
+- [x] `computeModifier` / ability modifier logic: centralized as `abilityModifier` in `src/lib/character.ts`; `TavernUtils` and `buildCharacter` now share it, along with point-buy helpers used by `AbilitiesForm`
 
 ### 9. Separate types, data, and logic
 

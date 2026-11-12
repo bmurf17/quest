@@ -1,34 +1,24 @@
-import { MAX_SCORE, POINT_BUDGET } from "@/consts/constants";
+import { MAX_SCORE } from "@/consts/constants";
+import {
+  ABILITY_BASE,
+  ABILITY_KEYS,
+  remainingAbilityPoints,
+} from "@/lib/character";
 import { useCharacter } from "../CharacterContext";
 import { colors, fonts } from "@/theme";
-
-const BASE = 8;
-const ABILITY_KEYS = [
-  "strength",
-  "dexterity",
-  "constitution",
-  "intelligence",
-  "wisdom",
-  "charisma",
-  "defense",
-] as const;
 
 export default function AbilitiesForm() {
   const { character, updateCharacter } = useCharacter();
 
   const abilities = character.abilities;
-  const totalSpent = ABILITY_KEYS.reduce(
-    (sum, k) => sum + (abilities[k] - BASE),
-    0,
-  );
-  const remaining = POINT_BUDGET - totalSpent;
+  const remaining = remainingAbilityPoints(abilities);
 
   const adjust = (key: string, delta: number) => {
     const current = abilities[key as keyof typeof abilities];
     const next = current + delta;
-    if (next < BASE || next > MAX_SCORE) return;
+    if (next < ABILITY_BASE || next > MAX_SCORE) return;
     if (delta > 0 && remaining <= 0) return;
-    if (delta < 0 && current <= BASE) return;
+    if (delta < 0 && current <= ABILITY_BASE) return;
     updateCharacter("abilities", {
       ...abilities,
       [key]: next,
@@ -125,7 +115,7 @@ export default function AbilitiesForm() {
         >
           {ABILITY_KEYS.map((key) => {
             const val = abilities[key];
-            const atMin = val <= BASE;
+            const atMin = val <= ABILITY_BASE;
             const atMax = val >= MAX_SCORE;
             const noPoints = remaining <= 0;
             return (

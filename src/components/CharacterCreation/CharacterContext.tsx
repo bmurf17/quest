@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
+import type { AbilityScores } from "@/lib/character";
 
-interface Character {
+export interface Character {
   name: string;
   origin: string;
   race: string;
@@ -8,15 +9,7 @@ interface Character {
   class: string;
   background: string;
   image: string;
-  abilities: {
-    strength: number;
-    dexterity: number;
-    constitution: number;
-    intelligence: number;
-    wisdom: number;
-    charisma: number;
-    defense: number;
-  };
+  abilities: AbilityScores;
 }
 
 interface CharacterContextType {

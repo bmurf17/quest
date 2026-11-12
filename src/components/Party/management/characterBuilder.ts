@@ -2,7 +2,15 @@ import {
   CharacterData,
 } from "@/types/Character";
 import { Spell } from "@/types/Spell";
-import { useCharacter } from "../../CharacterCreation/CharacterContext";
+import { MAX_SCORE, POINT_BUDGET } from "@/consts/constants";
+import {
+  abilityModifier,
+  totalAbilityPointsSpent,
+} from "@/lib/character";
+import {
+  useCharacter,
+  type Character,
+} from "../../CharacterCreation/CharacterContext";
 
 import warriorImg from "@/assets/Warrior.png";
 import rogueImg from "@/assets/Rogue.png";
@@ -14,15 +22,6 @@ import assassinImg from "@/assets/Assassin.png";
 import swordImg from "@/assets/Sword.png";
 
 export const MAX_PARTY_SIZE = 6;
-
-export const TABS = [
-  { key: "name", label: "Name" },
-  { key: "origin", label: "Origin" },
-  { key: "race", label: "Race" },
-  { key: "class", label: "Class" },
-  { key: "abilities", label: "Abilities" },
-  { key: "image", label: "Portrait" },
-] as const;
 
 const IMAGE_SRC: Record<string, string> = {
   warrior: warriorImg,
@@ -67,8 +66,17 @@ const defaultSpells: Spell[] = [
   },
 ];
 
-function computeModifier(score: number): number {
-  return Math.floor((score - 10) / 2);
+export function canCreateCharacter(character: Character): boolean {
+  return Boolean(
+    character.name.trim() &&
+      character.race &&
+      character.class &&
+      character.image &&
+      Object.values(character.abilities).every(
+        (value) => value >= 1 && value <= MAX_SCORE,
+      ) &&
+      totalAbilityPointsSpent(character.abilities) === POINT_BUDGET,
+  );
 }
 
 export function buildCharacter(
@@ -88,31 +96,31 @@ export function buildCharacter(
     abilities: {
       str: {
         score: context.abilities.strength,
-        modifier: computeModifier(context.abilities.strength),
+        modifier: abilityModifier(context.abilities.strength),
       },
       dex: {
         score: context.abilities.dexterity,
-        modifier: computeModifier(context.abilities.dexterity),
+        modifier: abilityModifier(context.abilities.dexterity),
       },
       con: {
         score: context.abilities.constitution,
-        modifier: computeModifier(context.abilities.constitution),
+        modifier: abilityModifier(context.abilities.constitution),
       },
       int: {
         score: context.abilities.intelligence,
-        modifier: computeModifier(context.abilities.intelligence),
+        modifier: abilityModifier(context.abilities.intelligence),
       },
       wis: {
         score: context.abilities.wisdom,
-        modifier: computeModifier(context.abilities.wisdom),
+        modifier: abilityModifier(context.abilities.wisdom),
       },
       cha: {
         score: context.abilities.charisma,
-        modifier: computeModifier(context.abilities.charisma),
+        modifier: abilityModifier(context.abilities.charisma),
       },
       def: {
         score: context.abilities.defense,
-        modifier: computeModifier(context.abilities.defense),
+        modifier: abilityModifier(context.abilities.defense),
       },
     },
     skills: [

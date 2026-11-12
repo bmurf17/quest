@@ -4,6 +4,7 @@ import { Room, Section } from "@/types/Room";
 import { NPCType, Quest, QuestType, RoomInteraction } from "@/types/RoomInteractions";
 import { EquippableItem, EquipmentSlot, Item } from "@/types/Item";
 import { supabase } from "@/lib/supabase";
+import { unwrapQuery } from "./queryHelpers";
 export { supabase };
 
 /** Shape of a row from the `enemies` table. */
@@ -207,29 +208,20 @@ export const mapDbQuest = async (q: DbQuest): Promise<Quest> => ({
 });
 
 export async function getAllRooms(): Promise<Room[]> {
-  const { data: rooms, error: roomsError } = await supabase
-    .from("rooms")
-    .select("*")
-    .order("id");
-
-  if (roomsError) throw roomsError;
+  const rooms = unwrapQuery(
+    await supabase.from("rooms").select("*").order("id"),
+  );
 
   const [enemiesData, neighborsData, interactionsData] = await Promise.all([
     supabase
       .from("room_enemies")
       .select("room_id, enemies(*)")
-      .then(({ data, error }) => {
-        if (error) throw error;
-        return data;
-      }),
+      .then(unwrapQuery),
 
     supabase
       .from("neighboring_rooms")
       .select("room_id, direction, neighbor_room_id")
-      .then(({ data, error }) => {
-        if (error) throw error;
-        return data;
-      }),
+      .then(unwrapQuery),
 
     supabase
       .from("room_interactions")
@@ -250,10 +242,7 @@ export async function getAllRooms(): Promise<Room[]> {
         transitions(*)
         `,
       )
-      .then(({ data, error }) => {
-        if (error) throw error;
-        return data;
-      }),
+      .then(unwrapQuery),
   ]);
 
   const enemiesByRoom = new Map<number, Enemy[]>();
@@ -436,12 +425,10 @@ export async function getRoomByName(name: string): Promise<Room | null> {
 }
 
 export async function getSections(): Promise<Section[]> {
-  const { data, error } = await supabase
-    .from("sections")
-    .select("id, name")
-    .order("id");
+  const data = unwrapQuery(
+    await supabase.from("sections").select("id, name").order("id"),
+  );
 
-  if (error) throw error;
   return data as Section[];
 }
 
@@ -451,13 +438,10 @@ export async function getRoomsBySection(sectionId: number): Promise<Room[]> {
 }
 
 export async function getEnemyById(enemyId: number): Promise<Enemy | null> {
-  const { data, error } = await supabase
-    .from("enemies")
-    .select("*")
-    .eq("id", enemyId)
-    .single();
+  const data = unwrapQuery(
+    await supabase.from("enemies").select("*").eq("id", enemyId).single(),
+  );
 
-  if (error) throw error;
   if (!data) return null;
 
   return mapDbEnemy(data as DbEnemy);

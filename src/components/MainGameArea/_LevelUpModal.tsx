@@ -9,6 +9,7 @@ import { useState, memo } from "react";
 import { Plus, Minus } from "lucide-react";
 import { useGameStore } from "@/state/GameState";
 import { colors, fonts } from "@/theme";
+import { StatBar } from "@/components/Shared/StatBar";
 
 function SectionHeader({ children }: { children: React.ReactNode }) {
   return (
@@ -27,31 +28,6 @@ function SectionHeader({ children }: { children: React.ReactNode }) {
         {children}
       </span>
       <div style={{ flex: 1, height: 1, background: colors.goldBorder }} />
-    </div>
-  );
-}
-
-function StatBar({ value, max }: { value: number; max: number }) {
-  const pct = Math.min(100, (value / max) * 100);
-  return (
-    <div
-      style={{
-        height: 4,
-        background: "rgba(255,255,255,0.06)",
-        borderRadius: 3,
-        overflow: "hidden",
-        marginTop: 6,
-      }}
-    >
-      <div
-        style={{
-          height: "100%",
-          width: `${pct}%`,
-          background: colors.warning ?? "#F59E0B",
-          borderRadius: 3,
-          transition: "width 0.4s",
-        }}
-      />
     </div>
   );
 }
@@ -251,7 +227,16 @@ function LevelUpModalComponent() {
               </span>
             </span>
           </div>
-          <StatBar value={currentChar.exp} max={currentChar.nextLevelExp} />
+          <StatBar
+            value={currentChar.exp}
+            max={currentChar.nextLevelExp}
+            color={colors.warning}
+            radius={3}
+            trackColor="rgba(255,255,255,0.06)"
+            border={false}
+            lowThreshold={0}
+            style={{ marginTop: 6 }}
+          />
 
           <SectionHeader>Ability Scores</SectionHeader>
 

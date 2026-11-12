@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { CharacterData } from "@/types/Character";
 import { colors, fonts } from "@/theme";
-import { TavernStatBar } from "./TavernStatBar";
+import { StatBar } from "@/components/Shared/StatBar";
 import { TavernAbilityTooltip } from "./TavernAbilityTooltip";
 
 export function TavernCharacterCard({
@@ -145,10 +145,14 @@ export function TavernCharacterCard({
               {character.hp}/{character.maxHp}
             </span>
           </div>
-          <TavernStatBar
+          <StatBar
             value={character.hp}
             max={character.maxHp}
             color={colors.danger}
+            trackColor="rgba(255,255,255,0.06)"
+            border={false}
+            transition="width 0.3s"
+            lowThreshold={0}
           />
         </div>
         <div>
@@ -179,10 +183,14 @@ export function TavernCharacterCard({
               {character.mp}/{character.maxMp}
             </span>
           </div>
-          <TavernStatBar
+          <StatBar
             value={character.mp}
             max={character.maxMp}
             color="#6366F1"
+            trackColor="rgba(255,255,255,0.06)"
+            border={false}
+            transition="width 0.3s"
+            lowThreshold={0}
           />
         </div>
       </div>

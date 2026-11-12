@@ -12,16 +12,7 @@ import { EquippableItem, EquipmentSlot } from "@/types/Item";
 import { colors, fonts } from "../theme";
 import SkillTreeView from "./SkillTreeView";
 import { getSkillTree } from "@/data/skillTrees";
-
-function StatBar({ value, max, color }: { value: number; max: number; color: string }) {
-  const pct = Math.min(100, (value / max) * 100);
-  const isLow = color === "#22C55E" && pct <= 25;
-  return (
-    <div style={{ height: 5, background: "rgba(255,255,255,0.06)", borderRadius: 3, overflow: "hidden" }}>
-      <div style={{ height: "100%", width: `${pct}%`, background: isLow ? colors.danger : color, borderRadius: 3, transition: "width 0.3s" }} />
-    </div>
-  );
-}
+import { StatBar } from "./Shared/StatBar";
 
 function SectionHeader({ children }: { children: React.ReactNode }) {
   return (
@@ -47,7 +38,17 @@ function StatRow({ label, value, max, color }: { label: string; value: number; m
           {value}<span style={{ color: colors.muted }}>/{max}</span>
         </span>
       </div>
-      <StatBar value={value} max={max} color={color} />
+      <StatBar
+        value={value}
+        max={max}
+        color={isLow ? colors.danger : color}
+        height={5}
+        radius={3}
+        trackColor="rgba(255,255,255,0.06)"
+        border={false}
+        transition="width 0.3s"
+        lowThreshold={0}
+      />
     </div>
   );
 }
