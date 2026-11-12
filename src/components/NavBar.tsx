@@ -43,6 +43,8 @@ export default function NavBar() {
               <Link
                 key={i}
                 to={item.path}
+                aria-label={item.label}
+                aria-current={active ? "page" : undefined}
                 className="no-underline flex flex-col items-center gap-0.5 px-1.5 py-1"
               >
                 <div
@@ -59,7 +61,10 @@ export default function NavBar() {
           })}
 
           <button
+            type="button"
             onClick={() => setDevOpen((o) => !o)}
+            aria-label="Toggle developer panel"
+            aria-expanded={devOpen}
             className="no-underline flex flex-col items-center gap-0.5 px-1.5 py-1 bg-none border-none cursor-pointer"
           >
             <div

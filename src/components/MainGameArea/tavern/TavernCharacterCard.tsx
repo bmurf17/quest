@@ -30,6 +30,15 @@ export function TavernCharacterCard({
         e.currentTarget.style.boxShadow = "none";
       }}
       onClick={() => onView(character)}
+      role="button"
+      tabIndex={0}
+      aria-label={`View ${character.name}`}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onView(character);
+        }
+      }}
     >
       <div
         style={tavernCharacterCardStyle2}
@@ -122,21 +131,7 @@ export function TavernCharacterCard({
           padding: "8px 14px 14px",
         }}
       >
-        <div
-          style={tavernCharacterCardStyle13}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.filter = "brightness(1.1)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.filter = "none";
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            onView(character);
-          }}
-        >
-          View Character
-        </div>
+        <span style={tavernCharacterCardStyle13}>View Character</span>
       </div>
     </div>
   );
@@ -230,6 +225,7 @@ const tavernCharacterCardStyle12: CSSProperties = {
   fontWeight: 700,
 };
 const tavernCharacterCardStyle13: CSSProperties = {
+  display: "block",
   width: "100%",
   padding: "8px 0",
   background: `linear-gradient(135deg, ${colors.gold} 0%, #B4965A 100%)`,

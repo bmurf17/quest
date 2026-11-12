@@ -50,10 +50,12 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
               const active = selectedCharacter?.class === character.class;
               const inParty = party.some((m) => m.class === character.class);
               return (
-                <div
+                <button
+                  type="button"
                   key={i}
                   className="char-row"
                   onClick={() => setSelectedCharacter(character)}
+                  aria-pressed={active}
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -66,6 +68,9 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                       : "transparent",
                     cursor: "pointer",
                     transition: "background 0.12s, border-color 0.12s",
+                    font: "inherit",
+                    textAlign: "left",
+                    width: "100%",
                   }}
                 >
                   <div
@@ -110,7 +115,7 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                       style={partySelectionStyle7}
                     />
                   )}
-                </div>
+                </button>
               );
             })}
           </div>

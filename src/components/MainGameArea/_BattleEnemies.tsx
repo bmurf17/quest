@@ -87,10 +87,15 @@ function BattleEnemiesComponent() {
             const imgSize = isBoss ? 160 : 128;
 
             return (
-              <div
+              <button
+                type="button"
                 key={enemy.id}
                 onClick={() => handleEnemyClick(enemy)}
-                className={`flex flex-col items-center ${isTargeting ? "cursor-crosshair" : ""}`}
+                disabled={!isTargeting}
+                aria-label={`${targetingSpell ? "Cast on" : "Attack"} ${enemy.name}`}
+                className={`flex flex-col items-center border-0 bg-transparent p-0 font-[inherit] ${
+                  isTargeting ? "cursor-crosshair" : "cursor-default"
+                }`}
               >
                 <div className="relative">
                   <img
@@ -127,7 +132,7 @@ function BattleEnemiesComponent() {
                     />
                   </div>
                 </div>
-              </div>
+              </button>
             );
           })}
         </div>

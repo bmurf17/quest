@@ -208,11 +208,13 @@ failures to debug output. Vite reads env vars from the root `.env` only, so
 `src/.env` was merged into it and removed; `.env.example` plus the README now
 document every variable.
 
-### 14. Accessibility
+### 14. Accessibility — ✅ Done
 
-- [ ] Clickable `<div>`s are used as buttons (e.g. the character-builder tabs in `CharacterBuilder.tsx`). Replace with `<button>` or add role/tabIndex/key handlers
-- [ ] Audit modals/dialogs for focus trapping and labelled titles (Radix primitives are used in places, so standardize)
-- [ ] Ensure icon-only controls have `aria-label`s
+- [x] Clickable `<div>`s are used as buttons (e.g. the character-builder tabs in `CharacterBuilder.tsx`). Replace with `<button>` or add role/tabIndex/key handlers
+- [x] Audit modals/dialogs for focus trapping and labelled titles (Radix primitives are used in places, so standardize)
+- [x] Ensure icon-only controls have `aria-label`s
+
+Interactive cards, list rows, action buttons, ability slots, equipment slots, room nodes, and enemy targets are now real `<button>` elements (with `disabled`/`aria-pressed` where appropriate). The tavern character card uses `role="button"` + `tabIndex` + Enter/Space handling because it contains non-interactive presentation content. The custom admin room popup now uses the shared Radix `Dialog` (focus trap, Escape handling, labelled `DialogTitle`) instead of a hand-rolled overlay; the cutscene overlay is labelled as a modal dialog and focuses its continue button. Icon-only controls in the navbar, map navigation, level-up stat controls, toasts, and close buttons now have `aria-label`s, and toasts announce via `role="status"`/`role="alert"`.
 
 ### 15. Database/migrations hygiene
 

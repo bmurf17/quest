@@ -52,10 +52,12 @@ export function ManagePartyView({
           {party.map((character, i) => {
             const active = selectedCharacter?.name === character.name;
             return (
-              <div
+              <button
+                type="button"
                 key={i}
                 className="char-row"
                 onClick={() => setSelectedCharacter(character)}
+                aria-pressed={active}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -68,6 +70,9 @@ export function ManagePartyView({
                     : "transparent",
                   cursor: "pointer",
                   transition: "background 0.12s, border-color 0.12s",
+                  font: "inherit",
+                  textAlign: "left",
+                  width: "100%",
                 }}
               >
                 <div
@@ -107,7 +112,7 @@ export function ManagePartyView({
                     />
                   </div>
                 </div>
-              </div>
+              </button>
             );
           })}
         </div>

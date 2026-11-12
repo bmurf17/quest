@@ -193,7 +193,9 @@ export default function MapNav() {
 
             <div className="flex flex-col items-center space-y-2">
               <button
+                type="button"
                 onClick={() => state.move(Directions.North)}
+                aria-label="Move north"
                 className="p-3 bg-gray-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 active:scale-95 disabled:hover:bg-gray-700 disabled:bg-gray-700"
                 disabled={
                   !state.room.neighboringRooms.some(
@@ -206,7 +208,9 @@ export default function MapNav() {
 
               <div className="flex space-x-2">
                 <button
+                  type="button"
                   onClick={() => state.move(Directions.West)}
+                  aria-label="Move west"
                   className="p-3 bg-gray-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 active:scale-95 disabled:hover:bg-gray-700 disabled:bg-gray-700"
                   disabled={
                     !state.room.neighboringRooms.some(
@@ -218,7 +222,9 @@ export default function MapNav() {
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => state.move(Directions.East)}
+                  aria-label="Move east"
                   className="p-3 bg-gray-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 active:scale-95 disabled:hover:bg-gray-700 disabled:bg-gray-700"
                   disabled={
                     !state.room.neighboringRooms.some(
@@ -231,7 +237,9 @@ export default function MapNav() {
               </div>
 
               <button
+                type="button"
                 onClick={() => state.move(Directions.South)}
+                aria-label="Move south"
                 className="p-3 bg-gray-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 active:scale-95 disabled:hover:bg-gray-700 disabled:bg-gray-700"
                 disabled={
                   !state.room.neighboringRooms.some(
@@ -245,7 +253,9 @@ export default function MapNav() {
 
             {transition && (
               <button
+                type="button"
                 onClick={() => state.enterTown()}
+                aria-label="Enter town"
                 className="p-3 bg-gray-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 active:scale-95 disabled:hover:bg-gray-700 disabled:bg-gray-700"
               >
                 T

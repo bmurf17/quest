@@ -66,10 +66,16 @@ export default function Inventory({
               </div>
             ) : (
               inventory.map((item) => (
-                <div
+                <button
+                  type="button"
                   key={item.name}
                   onClick={() => handleUseItem(item)}
-                  style={inventoryStyle7}
+                  style={{
+                    ...inventoryStyle7,
+                    width: "100%",
+                    font: "inherit",
+                    textAlign: "left",
+                  }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.background = "rgba(180,140,80,0.08)";
                     e.currentTarget.style.borderColor = "rgba(212,175,55,0.35)";
@@ -105,7 +111,7 @@ export default function Inventory({
                   <div style={inventoryStyle12}>
                     Use
                   </div>
-                </div>
+                </button>
               ))
             )}
           </div>

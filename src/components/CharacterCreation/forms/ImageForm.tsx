@@ -43,11 +43,15 @@ export default function ImageForm() {
           {IMAGES.map(({ key, src, label }) => {
             const active = character.image === key;
             return (
-              <div
+              <button
+                type="button"
                 key={key}
                 className="image-card"
                 onClick={() => updateCharacter("image", key)}
+                aria-pressed={active}
                 style={{
+                  font: "inherit",
+                  width: "100%",
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
@@ -91,7 +95,7 @@ export default function ImageForm() {
                 >
                   {label}
                 </span>
-              </div>
+              </button>
             );
           })}
         </div>

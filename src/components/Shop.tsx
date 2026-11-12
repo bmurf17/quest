@@ -35,14 +35,17 @@ export default function Shop({
           <div className="flex flex-col">
             {inventory.map((item) => {
               return (
-                <div
-                  className={`flex gap-4 items-center ${
+                <button
+                  type="button"
+                  className={`flex gap-4 items-center w-full text-left bg-transparent border-0 p-0 ${
                     item.cost > goldPieces
                       ? "opacity-50 cursor-not-allowed"
                       : "hover:cursor-pointer hover:bg-gray-600"
                   }`}
                   key={item.name}
-                  onClick={() => item.cost <= goldPieces && buyItem(item)}
+                  onClick={() => buyItem(item)}
+                  disabled={item.cost > goldPieces}
+                  aria-label={`Buy ${item.name} for ${item.cost} GP`}
                 >
                   <img
                     src={item.img}
@@ -59,7 +62,7 @@ export default function Shop({
                     <p className="text-xl">{item.name}</p>{" "}
                     <p className="text-xl text-yellow-400">{item.cost} GP</p>
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>

@@ -37,11 +37,16 @@ export default function SubraceForm() {
               const id = subrace.toLowerCase().replace(" ", "-");
               const active = character.subrace === id;
               return (
-                <div
+                <button
+                  type="button"
                   key={subrace}
                   className="subrace-card"
                   onClick={() => updateCharacter("subrace", id)}
+                  aria-pressed={active}
                   style={{
+                    font: "inherit",
+                    textAlign: "left",
+                    width: "100%",
                     display: "flex",
                     alignItems: "center",
                     gap: 12,
@@ -85,7 +90,7 @@ export default function SubraceForm() {
                   >
                     {subrace}
                   </span>
-                </div>
+                </button>
               );
             })}
           </div>

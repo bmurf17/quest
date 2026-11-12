@@ -26,11 +26,16 @@ export default function ClassForm() {
           {CLASSES.map((cls) => {
             const active = character.class === cls.toLowerCase();
             return (
-              <div
+              <button
+                type="button"
                 key={cls}
                 className="class-card"
                 onClick={() => updateCharacter("class", cls.toLowerCase())}
+                aria-pressed={active}
                 style={{
+                  font: "inherit",
+                  textAlign: "left",
+                  width: "100%",
                   display: "flex",
                   alignItems: "center",
                   gap: 12,
@@ -74,7 +79,7 @@ export default function ClassForm() {
                 >
                   {cls}
                 </span>
-              </div>
+              </button>
             );
           })}
         </div>

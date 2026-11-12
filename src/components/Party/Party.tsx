@@ -92,10 +92,22 @@ export default function Party({ party }: Props) {
           const isLowHp = hpPct <= 25 && !isDead;
 
           return (
-        <div
+        <button
+          type="button"
           key={i}
-          onClick={() => !isDead && handleCharacterClick(character)}
+          onClick={() => handleCharacterClick(character)}
+          disabled={isDead}
+          aria-label={
+            isTargetingHeal
+              ? `Heal ${character.name}`
+              : isTargetingConsumable
+                ? `Use ${targetingConsumable?.name} on ${character.name}`
+                : `View ${character.name}`
+          }
           style={{
+                padding: 0,
+                font: "inherit",
+                textAlign: "left",
                 flexShrink: 0,
                 flex: 1,
                 minWidth: 0,
@@ -194,7 +206,7 @@ export default function Party({ party }: Props) {
                   <StatBar value={character.mp} max={character.maxMp} color="#6366F1" />
                 </div>
               </div>
-            </div>
+            </button>
           );
         })}
       </div>

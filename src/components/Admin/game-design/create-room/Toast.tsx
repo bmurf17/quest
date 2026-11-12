@@ -13,6 +13,7 @@ export function Toast({
   const isSuccess = type === "success";
   return (
     <div
+      role={isSuccess ? "status" : "alert"}
       style={{
         position: "fixed",
         bottom: 24,
@@ -44,6 +45,7 @@ export function Toast({
       <button
         type="button"
         onClick={onClose}
+        aria-label="Dismiss notification"
         style={toastStyle2}
       >
         ×

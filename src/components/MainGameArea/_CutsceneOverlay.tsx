@@ -22,6 +22,9 @@ export default function CutsceneOverlay() {
 
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Cutscene"
       style={cutsceneOverlayStyle}
     >
       <div
@@ -43,6 +46,8 @@ export default function CutsceneOverlay() {
           </div>
 
           <button
+            type="button"
+            autoFocus
             onClick={advanceCutsceneScene}
             style={cutsceneOverlayStyle6}
             onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.8")}

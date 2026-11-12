@@ -3,6 +3,7 @@ import { Directions } from "@/types/Directions";
 import type { Room } from "@/types/Room";
 import React, { useState, useRef, useEffect } from "react";
 import { colors, fonts } from "@/theme";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import type { CSSProperties } from "react";
 
 const MAX_DEPTH = 5;
@@ -137,11 +138,15 @@ const RoomNode = React.memo(({ room, x, y, visitedRooms, depth = 0, onRoomClick,
 
   return (
     <>
-      <div
+      <button
+        type="button"
         onClick={(e) => { e.stopPropagation(); onRoomClick(room); }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
+        aria-label={`Inspect room ${room.name}`}
   style={{
+          font: "inherit",
+          padding: 0,
           position: "absolute",
           left: x,
           top: y,
@@ -188,7 +193,7 @@ const RoomNode = React.memo(({ room, x, y, visitedRooms, depth = 0, onRoomClick,
             START
           </div>
         )}
-      </div>
+      </button>
 
       {depth < MAX_DEPTH &&
         room.neighboringRooms?.map(([direction, neighbor], i: number) => {
@@ -241,21 +246,16 @@ function RoomPopup({ room, onClose }: { room: Room; onClose: () => void }) {
   );
 
   return (
-    <div
-      onClick={onClose}
-      style={roomPopupStyle}
+    <Dialog
+      open
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
     >
-      <div
-          onClick={(e) => e.stopPropagation()}
+      <DialogContent
         style={{
-          background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 100%)",
-          border: `1px solid ${cfg.border}`,
-          borderRadius: 12,
-          padding: 28,
-          width: 340,
-          overflowY: "auto",
-          position: "relative",
-          fontFamily: "'Crimson Text', Georgia, serif",
+          ...roomPopupStyle,
+          borderColor: cfg.border,
         }}
       >
         {["tl","tr","bl","br"].map(pos => (
@@ -274,9 +274,9 @@ function RoomPopup({ room, onClose }: { room: Room; onClose: () => void }) {
         <div style={{ marginBottom: 20 }}>
           <div style={roomPopupStyle2}>
             <div style={{ width: 2, height: 18, background: cfg.color, borderRadius: 1 }} />
-            <h3 style={roomPopupStyle3}>
-              {room.name}
-            </h3>
+            <DialogTitle asChild>
+              <h3 style={roomPopupStyle3}>{room.name}</h3>
+            </DialogTitle>
           </div>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: cfg.bg, border: `1px solid ${cfg.border}`, borderRadius: 4, padding: "2px 10px", marginLeft: 10 }}>
             <span style={{ fontSize: 12, color: cfg.color, fontFamily: fonts.display, letterSpacing: "0.06em" }}>{cfg.label}</span>
@@ -352,8 +352,8 @@ function RoomPopup({ room, onClose }: { room: Room; onClose: () => void }) {
         >
           Close
         </button>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -520,11 +520,13 @@ const rowStyle: CSSProperties = { display: "flex", justifyContent: "space-betwee
   const rowStyle2: CSSProperties = { fontSize: 11, color: colors.muted, fontFamily: fonts.display, letterSpacing: "0.06em", textTransform: "uppercase" };
   const rowStyle3: CSSProperties = { fontSize: 14, color: colors.text, fontFamily: fonts.body };
   const roomPopupStyle: CSSProperties = {
-          position: "fixed", inset: 0,
-          background: "rgba(0,0,0,0.7)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          zIndex: 50,
-          backdropFilter: "blur(3px)",
+          background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 100%)",
+          borderRadius: 12,
+          padding: 28,
+          maxWidth: 340,
+          overflowY: "auto",
+          position: "relative",
+          fontFamily: "'Crimson Text', Georgia, serif",
 };
 const roomPopupStyle2: CSSProperties = { display: "flex", alignItems: "center", gap: 8, marginBottom: 4 };
   const roomPopupStyle3: CSSProperties = { margin: 0, fontSize: 20, fontWeight: 700, color: colors.text, fontFamily: fonts.display, letterSpacing: "0.04em" };

@@ -26,13 +26,18 @@ export default function BackgroundForm() {
           {BACKGROUNDS.map((bg) => {
             const active = character.background === bg.toLowerCase().replace(" ", "-");
             return (
-              <div
+              <button
+                type="button"
                 key={bg}
                 className="bg-card"
                 onClick={() =>
                   updateCharacter("background", bg.toLowerCase().replace(" ", "-"))
                 }
+                aria-pressed={active}
                 style={{
+                  font: "inherit",
+                  textAlign: "left",
+                  width: "100%",
                   display: "flex",
                   alignItems: "center",
                   gap: 12,
@@ -76,7 +81,7 @@ export default function BackgroundForm() {
                 >
                   {bg}
                 </span>
-              </div>
+              </button>
             );
           })}
         </div>

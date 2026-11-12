@@ -46,9 +46,11 @@ export function ActionBtn({
   const c = disabled ? colors.muted : colors[variant];
 
   return (
-    <div
+    <button
+      type="button"
       title={title}
-      onClick={!disabled ? onClick : undefined}
+      onClick={onClick}
+      disabled={disabled}
       style={{
         display: "flex",
         alignItems: "center",
@@ -68,6 +70,7 @@ export function ActionBtn({
         width: fullWidth ? "100%" : undefined,
         opacity: disabled ? 0.5 : 1,
         userSelect: "none",
+        font: "inherit",
       }}
       onMouseEnter={(e) => {
         if (!disabled) e.currentTarget.style.background = c.hover;
@@ -77,6 +80,6 @@ export function ActionBtn({
       }}
     >
       {children}
-    </div>
+    </button>
   );
 }

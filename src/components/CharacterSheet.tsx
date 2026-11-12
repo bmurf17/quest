@@ -74,8 +74,12 @@ function EquipSlot({
   onUnequip: () => void;
 }) {
   return (
-    <div
+    <button
+      type="button"
+      disabled={!item}
       style={{
+        font: "inherit",
+        width: "100%",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -94,6 +98,9 @@ function EquipSlot({
       }}
       onClick={item ? onUnequip : undefined}
       title={item ? `Click to unequip ${item.name}` : undefined}
+      aria-label={
+        item ? `Unequip ${item.name}` : `Empty ${SLOT_LABELS[slot]} slot`
+      }
     >
       {item ? (
         <>
@@ -127,7 +134,7 @@ function EquipSlot({
           {SLOT_LABELS[slot]}
         </span>
       )}
-    </div>
+    </button>
   );
 }
 

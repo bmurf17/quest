@@ -21,9 +21,12 @@ export function AbilitySlot({
   title,
 }: AbilitySlotProps) {
   return (
-    <div
+    <button
+      type="button"
       title={title}
-      onClick={!disabled ? onClick : undefined}
+      aria-label={title ?? alt}
+      onClick={onClick}
+      disabled={disabled}
       style={{
         position: "relative",
         display: "flex",
@@ -77,7 +80,7 @@ export function AbilitySlot({
           {badge}
         </div>
       )}
-    </div>
+    </button>
   );
 }
 

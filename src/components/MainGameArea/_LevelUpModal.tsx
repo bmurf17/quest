@@ -273,8 +273,10 @@ function LevelUpModalComponent() {
                     style={levelUpModalComponentStyle15}
                   >
                     <button
+                      type="button"
                       onClick={() => decrementStat(key)}
                       disabled={allocated === 0}
+                      aria-label={`Decrease ${key}`}
                       style={{
                         width: 20,
                         height: 20,
@@ -300,8 +302,10 @@ function LevelUpModalComponent() {
                       <Minus size={10} />
                     </button>
                     <button
+                      type="button"
                       onClick={() => incrementStat(key)}
                       disabled={statPoints === 0}
+                      aria-label={`Increase ${key}`}
                       style={{
                         width: 20,
                         height: 20,

@@ -26,13 +26,18 @@ export default function OriginForm() {
           {ORIGINS.map((origin) => {
             const active = character.origin === origin.toLowerCase().replace(" ", "-");
             return (
-              <div
+              <button
+                type="button"
                 key={origin}
                 className="origin-card"
                 onClick={() =>
                   updateCharacter("origin", origin.toLowerCase().replace(" ", "-"))
                 }
+                aria-pressed={active}
                 style={{
+                  font: "inherit",
+                  textAlign: "left",
+                  width: "100%",
                   display: "flex",
                   alignItems: "center",
                   gap: 12,
@@ -76,7 +81,7 @@ export default function OriginForm() {
                 >
                   {origin}
                 </span>
-              </div>
+              </button>
             );
           })}
         </div>

@@ -56,10 +56,18 @@ export default function SectionSelector({
             const disabled = beaten || !unlocked;
 
             return (
-              <div
+              <button
+                type="button"
                 key={section.id}
                 onClick={() => handleExplore(section.id)}
+                disabled={disabled}
+                aria-label={`Explore ${section.name}${
+                  beaten ? " (completed)" : disabled ? " (locked)" : ""
+                }`}
                 style={{
+                  font: "inherit",
+                  textAlign: "left",
+                  width: "100%",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
@@ -118,7 +126,7 @@ export default function SectionSelector({
                     Explore →
                   </span>
                 )}
-              </div>
+              </button>
             );
           })}
         </div>

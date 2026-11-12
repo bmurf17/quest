@@ -70,10 +70,16 @@ export default function QuestList({
                   </div>
                 ) : (
                   quests.map((quest) => (
-                    <div
+                    <button
+                      type="button"
                       key={quest.id}
                       onClick={() => setSelectedQuest(quest)}
-                      style={questListStyle5}
+                      style={{
+                        ...questListStyle5,
+                        width: "100%",
+                        font: "inherit",
+                        textAlign: "left",
+                      }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.background =
                           "rgba(180,140,80,0.08)";
@@ -115,7 +121,7 @@ export default function QuestList({
                       >
                         View
                       </div>
-                    </div>
+                    </button>
                   ))
                 )}
               </div>

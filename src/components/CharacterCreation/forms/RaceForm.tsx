@@ -26,11 +26,16 @@ export default function RaceForm() {
           {RACES.map((race) => {
             const active = character.race === race.toLowerCase();
             return (
-              <div
+              <button
+                type="button"
                 key={race}
                 className="race-card"
                 onClick={() => updateCharacter("race", race.toLowerCase())}
+                aria-pressed={active}
                 style={{
+                  font: "inherit",
+                  textAlign: "left",
+                  width: "100%",
                   display: "flex",
                   alignItems: "center",
                   gap: 12,
@@ -74,7 +79,7 @@ export default function RaceForm() {
                 >
                   {race}
                 </span>
-              </div>
+              </button>
             );
           })}
         </div>
