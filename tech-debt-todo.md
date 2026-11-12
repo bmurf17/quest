@@ -133,11 +133,22 @@ Long actions extracted into pure helpers under `state/utils/`:
 | `src/components/ActionMenu.tsx` | 693 |
 | `src/components/Admin/game-design/RoomMap.tsx` | 560 |
 
-- [ ] `CreateRoom.tsx`: it already defines local form components; move `NPCForm`, `MoveForm`, `CombatForm`, `ChestForm`, `CampForm`, `TransitionForm`, `Toast`, and the styled primitives into their own files
-- [ ] `PartyManagement.tsx`: split `CreateCharacterView` / `ManagePartyView`, extract character-card and equipment UI
-- [ ] `PartySelection.tsx`: extract party slot, stats panel, and selection logic
-- [ ] `_TavernOverlay.tsx`: extract card, tooltip, and stat components
-- [ ] `ActionMenu.tsx`: extract spell/item/attack menus and targeting logic
+- [x] `CreateRoom.tsx`: it already defines local form components; move `NPCForm`, `MoveForm`, `CombatForm`, `ChestForm`, `CampForm`, `TransitionForm`, `Toast`, and the styled primitives into their own files
+- [x] `PartyManagement.tsx`: split `CreateCharacterView` / `ManagePartyView`, extract character-card and equipment UI
+- [x] `PartySelection.tsx`: extract party slot, stats panel, and selection logic
+- [x] `_TavernOverlay.tsx`: extract card, tooltip, and stat components
+- [x] `ActionMenu.tsx`: extract spell/item/attack menus and targeting logic
+
+`CreateRoom.tsx` is now a 168-line page shell; forms live in
+`game-design/create-room/` (`NPCForm`, `MoveForm`, `CombatForm`, `ChestForm`,
+`CampForm`, `TransitionForm`, `Toast`, primitives, icons, form types) and the
+submit flow moved to `useCreateRoomForm`. `PartyManagement` and
+`PartySelection` share `shared/CharacterDetailPanel`, `PartyRosterPanel`,
+`PartyRosterCard`, `SectionHeader`, and `usePartySelection`; the management
+views and `buildCharacter` live in `Party/management/`. The tavern card,
+ability tooltip, stat bar, and detail dialog live in `MainGameArea/tavern/`.
+Action-menu buttons, slots, combat targeting, and the dialogue/chest/camp/town
+sections live in `components/action-menu/`.
 
 ### 8. Remove duplicated UI and logic
 
