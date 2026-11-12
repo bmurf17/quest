@@ -105,16 +105,18 @@ Long actions extracted into pure helpers under `state/utils/`:
 - [x] `WorldUtils.resolveMove` / `getCurrentRoomInstance` / `getRoomInstanceKey`
 - [x] `saveTransforms.hydrateRoomInstances` (the two-pass room linking used by `loadGame`)
 
-### 6. Fix test coverage
+### 6. Fix test coverage — ✅ Done
 
-5 tests for ~17,700 lines of source is the biggest long-term risk.
+5 tests for ~17,700 lines of source was the biggest long-term risk. The suite now covers save/load, store actions, DB mappers, and dialogue/quest behaviour.
 
-- [ ] Add tests for save/load round-tripping and version handling
-- [ ] Add tests for `GameState` actions: combat turn order, consumable use, death/revive, level-up
-- [ ] Add tests for `RoomQueries` mappers using fixture rows
-- [ ] Add tests for dialogue outcomes/flags
-- [ ] Add `test:coverage` script and a coverage floor for `src/state/` and `src/queries/`
-- [ ] `@playwright/test` is installed and configured, but there are **no `*.spec.ts` files** and the dev server command is `pnpm dev`. Either add real E2E specs or remove the dependency/config
+- [x] Add tests for save/load round-tripping and version handling (`saveLoad.test.ts`, plus the existing `saveSchema.test.ts` / `saveTransforms.test.ts`)
+- [x] Add tests for `GameState` actions: combat turn order, consumable use, death/revive, level-up (`gameStateActions.test.ts`)
+- [x] Add tests for `RoomQueries` mappers using fixture rows (`src/queries/__tests__/RoomQueries.test.ts`); `mapDbEnemy`, `mapDbItem`, and `mapDbQuest` are now exported for testing/reuse
+- [x] Add tests for dialogue outcomes/flags (`dialogue.test.ts`)
+- [x] Add `test:coverage` script and a coverage floor for `src/state/` and `src/queries/` (55% statements/lines for state, 35% for queries; `@vitest/coverage-v8` + thresholds in `vitest.config.ts`)
+- [x] Added Playwright smoke specs in `tests/e2e/` and the matching `e2e` package script (previously the dependency/config existed with no specs)
+
+`npx tsc -b`, `vitest run` (55 tests), and `eslint` pass. Coverage is reported to the terminal and `coverage/`.
 
 ---
 
@@ -204,7 +206,7 @@ Long actions extracted into pure helpers under `state/utils/`:
 ### 16. Tooling
 
 - [ ] Add `"typecheck": "tsc -b --noEmit"` (or `tsc -b`) and `"format"` scripts
-- [ ] Add an `e2e` script that matches `playwright.config.ts`
+- [x] Add an `e2e` script that matches `playwright.config.ts`
 - [ ] Add CI running `lint`, `typecheck`, `test`, `build` on PRs
 - [ ] Add Prettier (or Biome) config; formatting is currently inconsistent (single vs double quotes, semicolons)
 - [ ] Enable type-aware ESLint rules (`recommendedTypeChecked`) as the `any` count drops

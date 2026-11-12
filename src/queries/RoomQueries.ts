@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase";
 export { supabase };
 
 /** Shape of a row from the `enemies` table. */
-interface DbEnemy {
+export interface DbEnemy {
   id: number;
   name: string;
   health: number;
@@ -24,7 +24,7 @@ interface DbEnemy {
 }
 
 /** Shape of a row from the `items` table. */
-interface DbItem {
+export interface DbItem {
   name: string;
   value: number;
   img: string;
@@ -54,7 +54,7 @@ interface DbExploreRoom {
   section_id: number;
 }
 
-interface DbQuest {
+export interface DbQuest {
   id: number;
   name: string;
   description: string;
@@ -110,7 +110,7 @@ interface DbRoomInteraction {
   transitions: DbTransition | null;
 }
 
-const mapDbItem = (it: DbItem | null | undefined): Item | null => {
+export const mapDbItem = (it: DbItem | null | undefined): Item | null => {
   if (!it) return null;
 
   const base = {
@@ -141,7 +141,7 @@ const mapDbItem = (it: DbItem | null | undefined): Item | null => {
   };
 };
 
-const mapDbEnemy = (e: DbEnemy): Enemy => ({
+export const mapDbEnemy = (e: DbEnemy): Enemy => ({
   id: e.id,
   name: e.name,
   health: e.health,
@@ -191,7 +191,7 @@ const mapQuestType = async (q: DbQuest): Promise<QuestType> => {
   }
 };
 
-const mapDbQuest = async (q: DbQuest): Promise<Quest> => ({
+export const mapDbQuest = async (q: DbQuest): Promise<Quest> => ({
   id: q.id,
   name: q.name,
   description: q.description,
