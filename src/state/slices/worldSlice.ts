@@ -2,7 +2,7 @@ import { Directions } from "@/types/Directions";
 import type { ActiveBuff } from "@/types/EnemyMove";
 import { GameStatus } from "@/types/GameStatus";
 import type { Room, Section } from "@/types/Room";
-import { startRoom } from "@/types/Room";
+import { startRoom } from "@/data/fixtures/rooms";
 import type { Cutscene } from "@/types/Cutscene";
 import type { Camp, Chest } from "@/types/RoomInteractions";
 import { ActivityLogBuilder } from "../utils/ActivityLogUtils";

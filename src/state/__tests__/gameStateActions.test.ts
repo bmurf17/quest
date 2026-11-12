@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { CharacterData } from "@/types/Character";
-import { tempWarrior } from "@/types/Character";
+import { tempWarrior } from "@/data/fixtures/characters";
 import type { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
 import type { Consumable, Item } from "@/types/Item";
-import { healthPotion } from "@/types/Item";
+import { healthPotion } from "@/data/items";
 import type { Room } from "@/types/Room";
 import { useGameStore } from "../GameState";
 

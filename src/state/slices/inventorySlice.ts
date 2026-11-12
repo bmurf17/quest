@@ -1,9 +1,8 @@
 import type { CharacterData, CharacterEquipment } from "@/types/Character";
 import {
   healthPotion,
-  type Consumable,
-  type Item,
-} from "@/types/Item";
+} from "@/data/items";
+import type { Consumable, Item } from "@/types/Item";
 import { scheduleEnemyTurn } from "../utils/CombatUtils";
 import {
   applyConsumable,

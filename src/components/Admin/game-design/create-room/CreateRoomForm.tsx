@@ -1,4 +1,4 @@
-import { startRoom } from "@/types/Room";
+import { startRoom } from "@/data/fixtures/rooms";
 import { colors, fonts } from "@/theme";
 import { icons } from "./icons";
 import { Divider, FieldGroup, Label, StyledInput, StyledSelect } from "./primitives";

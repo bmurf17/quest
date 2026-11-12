@@ -1,7 +1,8 @@
 import { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
 import { GameState } from "../GameState";
-import { CharacterData, rollDamageDice } from "@/types/Character";
+import type { CharacterData } from "@/types/Character";
+import { rollDamageDice } from "@/lib/dice";
 import { Quest } from "@/types/RoomInteractions";
 import { ActiveBuff, EnemyMove } from "@/types/EnemyMove";
 

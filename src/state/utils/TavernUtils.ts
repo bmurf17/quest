@@ -4,17 +4,17 @@ import { TavernConfig } from "@/types/Tavern";
 import { Spell } from "@/types/Spell";
 import { abilityModifier } from "@/lib/character";
 
-import warriorImg from "@/assets/Warrior.png";
-import rogueImg from "@/assets/Rogue.png";
-import clericImg from "@/assets/Cleric.png";
-import wizardImg from "@/assets/Wizard.png";
-import bardImg from "@/assets/Bard.png";
-import barbarianImg from "@/assets/Barbarian.png";
-import assassinImg from "@/assets/Assassin.png";
-import swordImg from "@/assets/Sword.png";
-import staffImg from "@/assets/Staff.png";
-import bowImg from "@/assets/BowV1.png";
-import spearImg from "@/assets/Spear.png";
+import warriorImg from "@/assets/warrior.png";
+import rogueImg from "@/assets/rogue.png";
+import clericImg from "@/assets/cleric.png";
+import wizardImg from "@/assets/wizard.png";
+import bardImg from "@/assets/bard.png";
+import barbarianImg from "@/assets/barbarian.png";
+import assassinImg from "@/assets/assassin.png";
+import swordImg from "@/assets/sword.png";
+import staffImg from "@/assets/staff.png";
+import bowImg from "@/assets/bow-v1.png";
+import spearImg from "@/assets/spear.png";
 
 const CLASS_IMAGE: Record<string, string> = {
   warrior: warriorImg,

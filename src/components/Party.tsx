@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { CharacterData, tempRanger } from "../types/Character";
+import type { CharacterData } from "../types/Character";
+import { tempRanger } from "@/data/fixtures/characters";
 import CharacterSheet from "./CharacterSheet";
 import { useGameStore } from "@/state/GameState";
 

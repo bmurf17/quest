@@ -1,4 +1,5 @@
-import { CharacterData, formatDamageDice } from "@/types/Character";
+import type { CharacterData } from "@/types/Character";
+import { formatDamageDice } from "@/lib/dice";
 import { EquippableItem } from "@/types/Item";
 import { colors, fonts } from "@/theme";
 import { StatBar } from "../../Shared/StatBar";

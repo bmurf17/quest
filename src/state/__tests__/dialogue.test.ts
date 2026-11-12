@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { tempWarrior } from "@/types/Character";
+import { tempWarrior } from "@/data/fixtures/characters";
 import type { DialogueNode, NPC } from "@/types/RoomInteractions";
 import {
   DialogueOutcomeType,

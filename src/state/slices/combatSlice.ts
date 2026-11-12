@@ -2,7 +2,7 @@ import type { CharacterData } from "@/types/Character";
 import type { Enemy } from "@/types/Enemy";
 import type { ActiveBuff } from "@/types/EnemyMove";
 import { GameStatus } from "@/types/GameStatus";
-import { startRoom } from "@/types/Room";
+import { startRoom } from "@/data/fixtures/rooms";
 import type { Spell } from "@/types/Spell";
 import {
   calcDamage,

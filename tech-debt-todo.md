@@ -158,20 +158,20 @@ sections live in `components/action-menu/`.
 - [x] Repeated DB query error handling: added `unwrapQuery` in `src/queries/queryHelpers.ts` and used it for room/section/enemy queries
 - [x] `computeModifier` / ability modifier logic: centralized as `abilityModifier` in `src/lib/character.ts`; `TavernUtils` and `buildCharacter` now share it, along with point-buy helpers used by `AbilitiesForm`
 
-### 9. Separate types, data, and logic
+### 9. Separate types, data, and logic — ✅ Done
 
-- [ ] `src/types/Character.ts` (343 lines) mixes: type definitions, `rollDamageDice`/`formatDamageDice` utils, defaults, and seven `temp*` character fixtures. Move fixtures to `src/data/fixtures/` (or a `__fixtures__` module) and dice helpers to a utils file
-- [ ] `src/types/Room.ts` defines `startRoom`/`northRoom` demo data and mutates them at module load (`push` on import). Move demo rooms to fixtures and make them pure
-- [ ] Consider `src/types/` containing only types; data belongs in `src/data/`
+- [x] `src/types/Character.ts` now holds only type definitions. The seven `temp*` fixtures (plus their default spells/skills/equipment) moved to `src/data/fixtures/characters.ts`, and `rollDamageDice`/`formatDamageDice` moved to `src/lib/dice.ts`
+- [x] `src/types/Room.ts` now holds only the `Room`/`Section` types. The demo rooms moved to `src/data/fixtures/rooms.ts`, built inside a `createDemoRooms()` factory so importing the module no longer mutates shared state
+- [x] `src/types/` now contains only types/enums. Item data moved to `src/data/items.ts`, tavern defaults to `src/data/tavern.ts`, and `getDiscoveryMessage` (the one logic function left in `types/`) to `src/lib/roomInteractions.ts`. All imports/tests updated; `tsc -b`, `vitest run` (58 tests), and `eslint` pass.
 
-### 10. Remove dead/duplicate scaffolding
+### 10. Remove dead/duplicate scaffolding — ✅ Done
 
 - [x] Delete `vite-project/` (nested abandoned Vite scaffold, tracked in git)
-- [ ] Firebase config (`firebase.json`, `.firebase/`) coexists with Supabase; remove if hosting moved to Supabase, or document why both exist
+- [x] Firebase config (`firebase.json`, `.firebaserc`) is **hosting only**; Supabase is the database/backend. They are complementary, so both stay. Removed the leftover Firebase Hosting default `public/index.html` scaffold (it shadowed the real app shell in `dist/`) and stopped tracking the generated `.firebase/` deploy cache (now gitignored).
 - [x] Choose one lockfile: `package-lock.json` or `pnpm-lock.yaml`. `playwright.config.ts` assumes `pnpm`, while the repo also has an npm lockfile — pick one and wire `packageManager`
-- [ ] Remove unused `public/vite.svg` / `src/assets/react.svg` if unused
-- [ ] Decide whether `src/components/MainGameArea/Key Issues` should live as a tracked source file; move notes to `docs/` or fold into this doc
-- [ ] `src/assets/` and `public/images/` both hold game art with different naming conventions (`PascalCase` vs `kebab-case`). Pick one location/naming scheme
+- [x] Removed the stock `public/vite.svg` and unused `src/assets/react.svg`. `index.html` now points its favicon at an existing game asset and uses the real page title.
+- [x] Folded `src/components/MainGameArea/Key Issues` into the appendix below, then deleted the stray file.
+- [x] Art policy: app-bundled art lives in `src/assets/` with **kebab-case** filenames (renamed from `PascalCase`); `public/images/` is reserved for paths referenced at runtime from Supabase rows, so those filenames stay unchanged to avoid breaking existing data. New art should go to `src/assets/` unless it must be addressed by a stored URL.
 
 ### 11. Normalize imports and file conventions
 
@@ -228,7 +228,7 @@ sections live in `components/action-menu/`.
 - [ ] Replace the stock Vite `README.md` with setup, env vars, scripts, architecture, and DB migration instructions
 - [ ] Document the folder conventions and state-store layout after the split
 - [ ] Remove `src/.DS_Store` and any other untracked macOS artifacts (already gitignored, but present locally)
-- [ ] Merge `todos.md` and `src/components/MainGameArea/Key Issues` into a single tracked backlog (this file), or clearly separate product TODOs from tech debt
+- [ ] Merge `todos.md` into a single tracked backlog (this file), or clearly separate product TODOs from tech debt. `src/components/MainGameArea/Key Issues` has already been folded into the appendix below.
 - [ ] Add license/ownership notes if the project will be shared
 
 ---
@@ -243,3 +243,17 @@ sections live in `components/action-menu/`.
 6. Consolidate `StatBar`, character creation, styling/tokens
 7. Delete dead scaffolding and choose one package manager
 8. Raise test coverage in `src/state/` and `src/queries/`
+
+---
+
+## Appendix: notes migrated from `src/components/MainGameArea/Key Issues`
+
+These notes were folded in when the stray `Key Issues` source file was deleted. Status as of the current tree:
+
+1. **Monolithic `GameState.ts`** — resolved: split into slices (see item 5).
+2. **Inconsistent component organization** — still tracked under item 11.
+3. **`any` types in `saveLoad.ts`** — resolved (see item 3).
+4. **Types file doing too much** — resolved: types, fixtures, and logic separated (see item 9).
+5. **Dead/duplicate code (vite-project, Firebase alongside Supabase)** — resolved (see item 10).
+6. **No barrel exports** — still tracked under item 11.
+7. **Stub room fallback in `denormalizeNeighbors`** — resolved: missing rooms now throw instead of creating `"Unknown"` stubs (see item 4).

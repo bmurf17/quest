@@ -2,7 +2,7 @@ import type { ActiveBuff } from "@/types/EnemyMove";
 import { Directions } from "@/types/Directions";
 import { GameStatus } from "@/types/GameStatus";
 import type { Room } from "@/types/Room";
-import { getDiscoveryMessage } from "@/types/RoomInteractions";
+import { getDiscoveryMessage } from "@/lib/roomInteractions";
 import { ActivityLogBuilder } from "./ActivityLogUtils";
 import type { GameState } from "../slices/types";
 

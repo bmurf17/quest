@@ -4,7 +4,7 @@ import GameLayout from "./components/GameLayout";
 import NavBar from "./components/NavBar";
 import Home from "./components/Home/Home";
 import { PartySelection } from "./components/Party/PartySelection";
-import { tempCleric, tempRanger, tempWarrior, tempWizard, tempAssassin, tempBarbarian, tempBard } from "./types/Character";
+import { tempCleric, tempRanger, tempWarrior, tempWizard, tempAssassin, tempBarbarian, tempBard } from "@/data/fixtures/characters";
 import { useEffect } from "react";
 import { getAllRooms, getSections } from "./queries/RoomQueries";
 import { useGameStore } from "./state/GameState";

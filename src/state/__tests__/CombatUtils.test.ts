@@ -2,9 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { finalizeAttackState } from '../utils/CombatUtils';
 import type { GameState } from '../GameState';
 import { Enemy } from '@/types/Enemy';
-import { startRoom } from '@/types/Room';
+import { startRoom } from '@/data/fixtures/rooms';
 import { Quest } from '@/types/RoomInteractions';
-import { manaPotion } from '@/types/Item';
+import { manaPotion } from '@/data/items';
 import { GameStatus } from '@/types/GameStatus';
 
 describe('CombatUtils finalizeAttackState', () => {

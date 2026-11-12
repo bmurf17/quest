@@ -5,7 +5,7 @@ import { useState } from "react";
 import Inventory from "./Inventory";
 import Shop from "./Shop";
 import SectionSelector from "./SectionSelector";
-import { manaPotion } from "@/types/Item";
+import { manaPotion } from "@/data/items";
 import { GameStatus } from "@/types/GameStatus";
 import QuestList from "./Quests/QuestList";
 import QuestOffer from "./Quests/QuestOffer";

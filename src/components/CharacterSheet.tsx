@@ -6,7 +6,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CharacterData, CharacterEquipment, formatDamageDice } from "@/types/Character";
+import type { CharacterData, CharacterEquipment } from "@/types/Character";
+import { formatDamageDice } from "@/lib/dice";
 import { useGameStore } from "@/state/GameState";
 import { EquippableItem, EquipmentSlot } from "@/types/Item";
 import { colors, fonts } from "../theme";

@@ -1,4 +1,5 @@
-import { CharacterData, formatDamageDice } from "@/types/Character";
+import type { CharacterData } from "@/types/Character";
+import { formatDamageDice } from "@/lib/dice";
 import { AbilitySlot } from "./AbilitySlot";
 import { SectionLabel } from "./SectionLabel";
 import { useCombatActions } from "./useCombatActions";

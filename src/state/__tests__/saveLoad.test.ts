@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { CharacterData } from "@/types/Character";
-import { tempWarrior } from "@/types/Character";
+import { tempWarrior } from "@/data/fixtures/characters";
 import type { Cutscene } from "@/types/Cutscene";
 import { Directions } from "@/types/Directions";
 import type { ActiveBuff } from "@/types/EnemyMove";

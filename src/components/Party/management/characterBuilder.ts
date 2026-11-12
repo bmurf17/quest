@@ -12,14 +12,14 @@ import {
   type Character,
 } from "../../CharacterCreation/CharacterContext";
 
-import warriorImg from "@/assets/Warrior.png";
-import rogueImg from "@/assets/Rogue.png";
-import clericImg from "@/assets/Cleric.png";
-import wizardImg from "@/assets/Wizard.png";
-import bardImg from "@/assets/Bard.png";
-import barbarianImg from "@/assets/Barbarian.png";
-import assassinImg from "@/assets/Assassin.png";
-import swordImg from "@/assets/Sword.png";
+import warriorImg from "@/assets/warrior.png";
+import rogueImg from "@/assets/rogue.png";
+import clericImg from "@/assets/cleric.png";
+import wizardImg from "@/assets/wizard.png";
+import bardImg from "@/assets/bard.png";
+import barbarianImg from "@/assets/barbarian.png";
+import assassinImg from "@/assets/assassin.png";
+import swordImg from "@/assets/sword.png";
 
 export const MAX_PARTY_SIZE = 6;
 

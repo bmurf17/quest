@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { CharacterData } from "@/types/Character";
-import { tempWarrior } from "@/types/Character";
+import { tempWarrior } from "@/data/fixtures/characters";
 import type { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
 import type { Consumable, EquippableItem } from "@/types/Item";
-import { healthPotion, shortsword, staffWeapon } from "@/types/Item";
+import { healthPotion, shortsword, staffWeapon } from "@/data/items";
 import type { Room } from "@/types/Room";
 import { Directions } from "@/types/Directions";
 import {
