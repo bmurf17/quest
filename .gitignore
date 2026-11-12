@@ -28,3 +28,6 @@ playwright-report
 *.sw?
 src/.env
 .env
+
+# Supabase CLI cache
+supabase/.temp

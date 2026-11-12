@@ -36,9 +36,14 @@ pnpm lint           # ESLint
 pnpm test           # Vitest (watch mode)
 pnpm test:coverage  # Vitest with coverage floors
 pnpm e2e            # Playwright smoke tests
+pnpm db:types       # regenerate Supabase types from the linked project
+pnpm db:baseline    # dump the linked schema to supabase/schema.sql
+pnpm db:diff        # inspect pending schema differences
 ```
 
 ## Docs
 
 See [docs/conventions.md](docs/conventions.md) for the project's import, component layout, deep-import, and styling conventions.
+
+See [supabase/README.md](supabase/README.md) for migration order, seed data, generated database types, and RLS/permissions notes.
 

@@ -2,7 +2,7 @@ import { Directions } from "@/types/Directions";
 import type { Enemy } from "@/types/Enemy";
 import type { Room, Section } from "@/types/Room";
 import type { NPCType, Quest, QuestType, RoomInteraction } from "@/types/RoomInteractions";
-import type { EquippableItem, EquipmentSlot, Item } from "@/types/Item";
+import type { EquipmentSlot, Item } from "@/types/Item";
 import { supabase } from "@/lib/supabase";
 import { unwrapQuery } from "./queryHelpers";
 export { supabase };
@@ -26,6 +26,7 @@ export interface DbEnemy {
 
 /** Shape of a row from the `items` table. */
 export interface DbItem {
+  id: string;
   name: string;
   value: number;
   img: string;
@@ -33,12 +34,10 @@ export interface DbItem {
   effect: string | null;
   hp_change: number | null;
   mana_change: number | null;
-  target: "single" | "all" | null;
   stack_size: number | null;
   slot: EquipmentSlot | null;
-  cost: number;
-  stats: { attack?: number; defense?: number } | null;
-  action: EquippableItem["action"] | null;
+  attack: number | null;
+  defense: number | null;
 }
 
 interface DbQuestObjective {
@@ -118,7 +117,8 @@ export const mapDbItem = (it: DbItem | null | undefined): Item | null => {
     name: it.name,
     value: it.value,
     img: it.img,
-    cost: it.cost,
+    // `value` is the only price column in the database.
+    cost: it.value,
   };
 
   if (it.type === "consumable") {
@@ -128,7 +128,8 @@ export const mapDbItem = (it: DbItem | null | undefined): Item | null => {
       effect: it.effect ?? "",
       hpChange: it.hp_change ?? 0,
       manaChange: it.mana_change ?? 0,
-      target: it.target ?? "single",
+      // The items table has no target column; consumables default to single.
+      target: "single",
       stackSize: it.stack_size ?? undefined,
     };
   }
@@ -137,8 +138,10 @@ export const mapDbItem = (it: DbItem | null | undefined): Item | null => {
     ...base,
     type: "equipment",
     slot: it.slot as EquipmentSlot,
-    stats: it.stats ?? {},
-    action: it.action ?? undefined,
+    stats: {
+      attack: it.attack ?? undefined,
+      defense: it.defense ?? undefined,
+    },
   };
 };
 
@@ -264,7 +267,7 @@ export async function getAllRooms(): Promise<Room[]> {
     }
     neighborsByRoom
       .get(nr.room_id)!
-      .push([nr.direction as Directions, nr.neighbor_room_id]);
+      .push([nr.direction as unknown as Directions, nr.neighbor_room_id]);
   });
 
   const interactionsByRoom = new Map<number, DbRoomInteraction>();
@@ -379,7 +382,7 @@ export async function getAllRooms(): Promise<Room[]> {
       return {
         id: room.id,
         name: room.name,
-        sectionId: room.section_id,
+        sectionId: room.section_id ?? 0,
         enemies: enemiesByRoom.get(room.id) || [],
         neighboringRooms,
         interaction,

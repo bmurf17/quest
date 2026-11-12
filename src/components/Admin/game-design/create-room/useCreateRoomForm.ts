@@ -8,11 +8,14 @@ import { Directions } from "@/types/Directions";
 import type { Room } from "@/types/Room";
 import { startRoom } from "@/data/fixtures/rooms";
 import { NPCType } from "@/types/RoomInteractions";
+import type { Json, Database } from "@/types/database.generated";
 import type { EnemyEntry } from "./formTypes";
 import type { InteractionType } from "./interactionTypes";
 
-const directionToDbEnum = (direction: Directions): string => {
-  const map: { [key in Directions]: string } = {
+type DirectionEnum = Database["public"]["Enums"]["direction_enum"];
+
+const directionToDbEnum = (direction: Directions): DirectionEnum => {
+  const map: { [key in Directions]: DirectionEnum } = {
     [Directions.North]: "North",
     [Directions.South]: "South",
     [Directions.East]: "East",
@@ -117,7 +120,10 @@ export function useCreateRoomForm() {
                 enemy.phaseThresholds.length > 0
                   ? enemy.phaseThresholds
                   : null,
-              moves: enemy.moves.length > 0 ? enemy.moves : null,
+              moves:
+                enemy.moves.length > 0
+                  ? (enemy.moves as unknown as Json)
+                  : null,
             })
             .select()
             .single();

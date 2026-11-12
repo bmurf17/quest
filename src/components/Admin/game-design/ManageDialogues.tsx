@@ -14,7 +14,7 @@ interface DialogueNode {
   dialogue_id: string;
   npc_text: string;
   speaker: string;
-  is_endpoint: boolean;
+  is_endpoint: number;
 }
 
 interface DialogueChoice {
@@ -102,7 +102,7 @@ export default function ManageDialogues() {
       dialogue_id: dialogueId,
       npc_text: "Hello!",
       speaker: "NPC",
-      is_endpoint: false,
+      is_endpoint: 0,
     });
 
     await supabase.from("npc_dialogues").insert({

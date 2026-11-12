@@ -64,7 +64,7 @@ Highest-impact spots:
 
 Recommended approach:
 
-- [ ] Generate Supabase DB types (`supabase gen types typescript`) and type the client as `SupabaseClient<Database>`
+- [x] Generate Supabase DB types (`supabase gen types typescript`) and type the client as `SupabaseClient<Database>`
 - [x] Add explicit row types + mappers for DB → domain objects (`Room`, `Enemy`, `Item`, `Quest`)
 - [x] Replace non-null assertions with guards or explicit thrown errors
 
@@ -216,11 +216,13 @@ document every variable.
 
 Interactive cards, list rows, action buttons, ability slots, equipment slots, room nodes, and enemy targets are now real `<button>` elements (with `disabled`/`aria-pressed` where appropriate). The tavern character card uses `role="button"` + `tabIndex` + Enter/Space handling because it contains non-interactive presentation content. The custom admin room popup now uses the shared Radix `Dialog` (focus trap, Escape handling, labelled `DialogTitle`) instead of a hand-rolled overlay; the cutscene overlay is labelled as a modal dialog and focuses its continue button. Icon-only controls in the navbar, map navigation, level-up stat controls, toasts, and close buttons now have `aria-label`s, and toasts announce via `role="status"`/`role="alert"`.
 
-### 15. Database/migrations hygiene
+### 15. Database/migrations hygiene — ✅ Done
 
-- [ ] Two migrations share the `001_` prefix (`001_dialogue_system.sql`, `001_dialogue_system_example.sql`). Renumber; keep the example as a seed/example, not a migration
-- [ ] Add a schema baseline / generated types so the app and DB can't drift silently
-- [ ] Consider RLS/permissions documentation for the client-accessed tables
+- [x] Two migrations share the `001_` prefix (`001_dialogue_system.sql`, `001_dialogue_system_example.sql`). Renumber; keep the example as a seed/example, not a migration. The example moved to `supabase/seeds/001_clean_man_dialogue_example.sql` (idempotent inserts); migrations are now `000_schema_baseline.sql`, `001_dialogue_system.sql`, `002_enemy_enhancements.sql`.
+- [x] Add a schema baseline / generated types so the app and DB can't drift silently. `000_schema_baseline.sql` captures the pre-migration core tables so a fresh project can be built from the repo. `src/types/database.generated.ts` is the checked-in schema contract, `src/lib/supabase.ts` is typed as `SupabaseClient<Database>`, and `src/queries/__tests__/databaseContract.test.ts` fails on an unknown table or a `Db*` row type with columns absent from the generated schema. `pnpm db:types` / `pnpm db:baseline` / `pnpm db:diff` wrap the Supabase CLI.
+- [x] Consider RLS/permissions documentation for the client-accessed tables. `supabase/README.md` documents migration ordering, seeds, type regeneration, the anon-vs-service-role rule, and the current public-read/authenticated-write policy split, including a recommended per-player policy for `conversation_flags`.
+
+The generated schema also exposed stale item/transition assumptions: `mapDbItem` now reads the real `items` columns (`attack`/`defense` instead of removed `stats`/`action`/`target`/`cost`), and item price/cost comes from `value`.
 
 ---
 

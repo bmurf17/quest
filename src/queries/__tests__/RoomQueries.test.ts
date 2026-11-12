@@ -34,6 +34,7 @@ function enemyRow(overrides: Partial<DbEnemy> = {}): DbEnemy {
 
 function itemRow(overrides: Partial<DbItem> = {}): DbItem {
   return {
+    id: "health-potion",
     name: "Health Potion",
     value: 2,
     img: "/potion.png",
@@ -41,12 +42,10 @@ function itemRow(overrides: Partial<DbItem> = {}): DbItem {
     effect: null,
     hp_change: null,
     mana_change: null,
-    target: null,
     stack_size: null,
     slot: null,
-    cost: 3,
-    stats: null,
-    action: null,
+    attack: null,
+    defense: null,
     ...overrides,
   };
 }
@@ -129,7 +128,7 @@ describe("mapDbItem", () => {
       name: "Health Potion",
       value: 2,
       img: "/potion.png",
-      cost: 3,
+      cost: 2,
       type: "consumable",
       effect: "",
       hpChange: 0,
@@ -139,13 +138,14 @@ describe("mapDbItem", () => {
     });
   });
 
-  it("maps equipment stats and actions", () => {
+  it("maps equipment stats from the attack/defense columns", () => {
     const mapped = mapDbItem(
       itemRow({
         name: "Spear",
         type: "equipment",
         slot: "weapon",
-        stats: { attack: 3 },
+        attack: 3,
+        defense: null,
       }),
     );
 
@@ -155,7 +155,6 @@ describe("mapDbItem", () => {
       slot: "weapon",
       stats: { attack: 3 },
     });
-    expect(mapped && "action" in mapped && mapped.action).toBeUndefined();
   });
 });
 
