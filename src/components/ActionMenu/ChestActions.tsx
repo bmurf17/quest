@@ -1,6 +1,7 @@
 import type { Chest } from "@/types/RoomInteractions";
 import { ActionBtn } from "./ActionBtn";
 import { SectionLabel } from "./SectionLabel";
+import type { CSSProperties } from "react";
 
 export function ChestActions({
   chest,
@@ -12,7 +13,7 @@ export function ChestActions({
   onTakeAll: (chest: Chest) => void;
 }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+    <div style={chestActionsStyle}>
       <SectionLabel>Chest</SectionLabel>
       {!chest.isOpen ? (
         <ActionBtn
@@ -60,11 +61,7 @@ export function ChestActions({
         </ActionBtn>
       ) : (
         <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 6,
-          }}
+          style={chestActionsStyle2}
         >
           <ActionBtn onClick={() => onUpdate({ ...chest, isOpen: false })}>
             Close
@@ -94,3 +91,11 @@ export function ChestActions({
     </div>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const chestActionsStyle: CSSProperties = { display: "flex", flexDirection: "column", gap: 6 };
+  const chestActionsStyle2: CSSProperties = {
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 6,
+};

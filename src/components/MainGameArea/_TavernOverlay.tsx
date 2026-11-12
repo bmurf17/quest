@@ -4,6 +4,7 @@ import type { CharacterData } from "@/types/Character";
 import { colors, fonts } from "@/theme";
 import { TavernCharacterCard } from "./tavern/TavernCharacterCard";
 import { CharacterDetailDialog } from "./tavern/CharacterDetailDialog";
+import type { CSSProperties } from "react";
 
 export default function TavernOverlay() {
   const tavernCandidates = useGameStore((state) => state.tavernCandidates);
@@ -26,38 +27,16 @@ export default function TavernOverlay() {
   return isTavernOpen ? (
     <>
       <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 16,
-          padding: 20,
-          background: "rgba(0,0,0,0.7)",
-          border: `1px solid ${colors.goldBorder}`,
-          borderRadius: 12,
-          backdropFilter: "blur(4px)",
-          minWidth: 640,
-        }}
+        style={tavernOverlayStyle}
       >
         <div style={{ textAlign: "center" }}>
           <div
-            style={{
-              fontSize: 24,
-              fontWeight: 700,
-              color: colors.gold,
-              fontFamily: fonts.display,
-              letterSpacing: "0.08em",
-              marginBottom: 4,
-            }}
+            style={tavernOverlayStyle2}
           >
             ═══ The Tavern ═══
           </div>
           <div
-            style={{
-              fontSize: 12,
-              color: colors.textMuted,
-              fontFamily: fonts.body,
-            }}
+            style={tavernOverlayStyle3}
           >
             {hasRecruitedFromTavern
               ? "Your new companion awaits — you can recruit again on your next visit."
@@ -67,19 +46,7 @@ export default function TavernOverlay() {
 
         {hasRecruitedFromTavern && (
           <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "8px 16px",
-              background: "rgba(52,211,153,0.08)",
-              border: "1px solid rgba(52,211,153,0.2)",
-              borderRadius: 6,
-              fontSize: 12,
-              color: colors.success,
-              fontFamily: fonts.display,
-              letterSpacing: "0.04em",
-            }}
+            style={tavernOverlayStyle4}
           >
             <svg
               viewBox="0 0 24 24"
@@ -100,12 +67,7 @@ export default function TavernOverlay() {
         )}
 
         <div
-          style={{
-            display: "flex",
-            gap: 20,
-            justifyContent: "center",
-            flexWrap: "wrap",
-          }}
+          style={tavernOverlayStyle5}
         >
           {tavernCandidates.map((character, i) => (
             <TavernCharacterCard
@@ -118,19 +80,7 @@ export default function TavernOverlay() {
 
         <button
           onClick={closeTavern}
-          style={{
-            padding: "10px 32px",
-            background: "rgba(255,255,255,0.04)",
-            border: `1px solid ${colors.subtleBorder}`,
-            borderRadius: 6,
-            color: colors.textMuted,
-            fontSize: 12,
-            fontFamily: fonts.display,
-            fontWeight: 600,
-            cursor: "pointer",
-            letterSpacing: "0.06em",
-            transition: "background 0.12s, border-color 0.12s",
-          }}
+          style={tavernOverlayStyle6}
           onMouseEnter={(e) => {
             e.currentTarget.style.background = "rgba(255,255,255,0.08)";
             e.currentTarget.style.borderColor = colors.goldBorder;
@@ -163,3 +113,62 @@ export default function TavernOverlay() {
     <></>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const tavernOverlayStyle: CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: 16,
+  padding: 20,
+  background: "rgba(0,0,0,0.7)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 12,
+  backdropFilter: "blur(4px)",
+  minWidth: 640,
+};
+const tavernOverlayStyle2: CSSProperties = {
+  fontSize: 24,
+  fontWeight: 700,
+  color: colors.gold,
+  fontFamily: fonts.display,
+  letterSpacing: "0.08em",
+  marginBottom: 4,
+};
+const tavernOverlayStyle3: CSSProperties = {
+  fontSize: 12,
+  color: colors.textMuted,
+  fontFamily: fonts.body,
+};
+const tavernOverlayStyle4: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 8,
+  padding: "8px 16px",
+  background: "rgba(52,211,153,0.08)",
+  border: "1px solid rgba(52,211,153,0.2)",
+  borderRadius: 6,
+  fontSize: 12,
+  color: colors.success,
+  fontFamily: fonts.display,
+  letterSpacing: "0.04em",
+};
+const tavernOverlayStyle5: CSSProperties = {
+  display: "flex",
+  gap: 20,
+  justifyContent: "center",
+  flexWrap: "wrap",
+};
+const tavernOverlayStyle6: CSSProperties = {
+  padding: "10px 32px",
+  background: "rgba(255,255,255,0.04)",
+  border: `1px solid ${colors.subtleBorder}`,
+  borderRadius: 6,
+  color: colors.textMuted,
+  fontSize: 12,
+  fontFamily: fonts.display,
+  fontWeight: 600,
+  cursor: "pointer",
+  letterSpacing: "0.06em",
+  transition: "background 0.12s, border-color 0.12s",
+};

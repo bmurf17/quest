@@ -1,7 +1,8 @@
-import { fonts } from "@/theme";
+import { colors, fonts } from "@/theme";
 import { icons } from "./icons";
 import type { InteractionType} from "./interactionTypes";
 import { INTERACTION_TYPES, interactionColors } from "./interactionTypes";
+import type { CSSProperties } from "react";
 
 export function InteractionTabs({
   value,
@@ -11,7 +12,7 @@ export function InteractionTabs({
   onChange: (v: InteractionType) => void;
 }) {
   return (
-    <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+    <div style={interactionTabsStyle}>
       {INTERACTION_TYPES.map((type) => {
         const active = value === type;
         const color = interactionColors[type];
@@ -30,7 +31,7 @@ export function InteractionTabs({
                 ? `1px solid ${color}`
                 : "1px solid rgba(255,255,255,0.08)",
               background: active ? `${color}22` : "rgba(0,0,0,0.2)",
-              color: active ? color : "#9CA3AF",
+              color: active ? color : colors.muted,
               fontSize: 13,
               fontWeight: active ? 600 : 400,
               cursor: "pointer",
@@ -49,3 +50,6 @@ export function InteractionTabs({
     </div>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const interactionTabsStyle: CSSProperties = { display: "flex", gap: 6, flexWrap: "wrap" };

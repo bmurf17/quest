@@ -3,6 +3,7 @@ import { colors, fonts } from "@/theme";
 import type { Quest } from "@/types/RoomInteractions";
 import QuestDescription from "./_QuestDescription";
 import { QuestPanelHeader } from "./_QuestPanelParts";
+import type { CSSProperties } from "react";
 
 export default function QuestOffer({
   isOpen = false,
@@ -17,16 +18,7 @@ export default function QuestOffer({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent
         className="gap-0 p-0"
-        style={{
-          maxWidth: 480,
-          background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 100%)",
-          border: `1px solid ${colors.goldBorder}`,
-          borderRadius: 12,
-          padding: 0,
-          overflow: "hidden",
-          fontFamily: fonts.body,
-          color: colors.text,
-        }}
+        style={questOfferStyle}
       >
         <>
           <QuestPanelHeader
@@ -45,3 +37,15 @@ export default function QuestOffer({
     </Dialog>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const questOfferStyle: CSSProperties = {
+  maxWidth: 480,
+  background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 100%)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 12,
+  padding: 0,
+  overflow: "hidden",
+  fontFamily: fonts.body,
+  color: colors.text,
+};

@@ -12,6 +12,7 @@ import GameOverModal from "./_GameOverModal";
 import { GameStatus } from "@/types/GameStatus";
 import CutsceneOverlay from "./_CutsceneOverlay";
 import TavernOverlay from "./_TavernOverlay";
+import type { CSSProperties } from "react";
 
 export default function MainGameArea() {
   const party = useGameStore((state) => state.party);
@@ -69,12 +70,7 @@ export default function MainGameArea() {
   if (activeCutscene) {
     return (
       <div
-        style={{
-          width: "100%",
-          height: "100%",
-          position: "relative",
-          overflow: "hidden",
-        }}
+        style={mainGameAreaStyle}
         className={`bg-cover bg-center ${backgroundClass} bg-pixelated`}
       >
         <CutsceneOverlay />
@@ -84,24 +80,11 @@ export default function MainGameArea() {
 
   return (
     <div
-      style={{
-        width: "100%",
-        height: "100%",
-        position: "relative",
-        overflow: "hidden",
-      }}
+      style={mainGameAreaStyle2}
       className={`bg-cover bg-center ${backgroundClass} bg-pixelated`}
     >
       <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          pointerEvents: "none",
-          zIndex: 10,
-        }}
+        style={mainGameAreaStyle3}
       >
           <div style={{ textAlign: "center", pointerEvents: "auto" }}>
             <BattleEnemies />
@@ -114,16 +97,7 @@ export default function MainGameArea() {
       </div>
 
       <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          display: "flex",
-          alignItems: "flex-end",
-          justifyContent: "center",
-          paddingLeft: 256,
-          pointerEvents: "none",
-          zIndex: 20,
-        }}
+        style={mainGameAreaStyle4}
       >
         <div style={{ pointerEvents: "auto" }}>
           <RoomNPC />
@@ -135,3 +109,36 @@ export default function MainGameArea() {
     </div>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const mainGameAreaStyle: CSSProperties = {
+  width: "100%",
+  height: "100%",
+  position: "relative",
+  overflow: "hidden",
+};
+const mainGameAreaStyle2: CSSProperties = {
+  width: "100%",
+  height: "100%",
+  position: "relative",
+  overflow: "hidden",
+};
+const mainGameAreaStyle3: CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  pointerEvents: "none",
+  zIndex: 10,
+};
+const mainGameAreaStyle4: CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  display: "flex",
+  alignItems: "flex-end",
+  justifyContent: "center",
+  paddingLeft: 256,
+  pointerEvents: "none",
+  zIndex: 20,
+};

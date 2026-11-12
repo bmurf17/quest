@@ -14,14 +14,15 @@ import { colors, fonts } from "@/theme";
 import SkillTreeView from "./SkillTreeView";
 import { getSkillTree } from "@/data/skillTrees";
 import { StatBar } from "@/components/shared/StatBar";
+import type { CSSProperties } from "react";
 
 function SectionHeader({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "20px 0 12px" }}>
-      <span style={{ fontSize: 11, color: colors.goldMuted, fontFamily: fonts.display, letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, whiteSpace: "nowrap" }}>
+    <div style={sectionHeaderStyle}>
+      <span style={sectionHeaderStyle2}>
         {children}
       </span>
-      <div style={{ flex: 1, height: 1, background: colors.goldBorder }} />
+      <div style={sectionHeaderStyle3} />
     </div>
   );
 }
@@ -31,11 +32,11 @@ function StatRow({ label, value, max, color }: { label: string; value: number; m
   const isLow = color === "#22C55E" && pct <= 25;
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+      <div style={statRowStyle}>
         <span style={{ fontSize: 11, color: isLow ? colors.danger : color, fontFamily: fonts.display, fontWeight: 700, letterSpacing: "0.08em" }}>
           {label}
         </span>
-        <span style={{ fontSize: 12, color: colors.textMuted, fontFamily: fonts.body }}>
+        <span style={statRowStyle2}>
           {value}<span style={{ color: colors.muted }}>/{max}</span>
         </span>
       </div>
@@ -99,17 +100,10 @@ function EquipSlot({
           <img
             src={item.img}
             alt={item.name}
-            style={{ width: 36, height: 36, imageRendering: "pixelated" }}
+            style={equipSlotStyle}
           />
           <span
-            style={{
-              fontSize: 9,
-              color: colors.goldMuted,
-              fontFamily: fonts.display,
-              fontWeight: 700,
-              textAlign: "center",
-              lineHeight: 1.2,
-            }}
+            style={equipSlotStyle2}
           >
             {item.name}
           </span>
@@ -128,14 +122,7 @@ function EquipSlot({
         </>
       ) : (
         <span
-          style={{
-            fontSize: 9,
-            color: colors.muted,
-            fontFamily: fonts.display,
-            letterSpacing: "0.06em",
-            textTransform: "uppercase",
-            textAlign: "center",
-          }}
+          style={equipSlotStyle3}
         >
           {SLOT_LABELS[slot]}
         </span>
@@ -188,34 +175,25 @@ export default function CharacterSheet({
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent
-        style={{
-          maxWidth: 760,
-          background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 100%)",
-          border: `1px solid ${colors.goldBorder}`,
-          borderRadius: 12,
-          padding: 0,
-          overflow: "hidden",
-          fontFamily: fonts.body,
-          color: colors.text,
-        }}
+        style={characterSheetStyle}
       >
         {/* fonts loaded globally in src/index.css */}
 
         {/* Header */}
           <DialogHeader style={{ padding: "20px 24px 16px", borderBottom: `1px solid ${colors.goldBorder}` }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div style={characterSheetStyle2}>
             {/* Portrait */}
-            <div style={{ width: 64, height: 64, flexShrink: 0, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(180,140,80,0.2)", borderRadius: 8, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <img src={characterData.img} alt={characterData.name} style={{ width: 56, height: 56, imageRendering: "pixelated", filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.8))" }} />
+            <div style={characterSheetStyle3}>
+              <img src={characterData.img} alt={characterData.name} style={characterSheetStyle4} />
             </div>
 
             <div style={{ flex: 1 }}>
-              <DialogTitle style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 700, color: colors.text, fontFamily: fonts.display, letterSpacing: "0.04em" }}>
+              <DialogTitle style={characterSheetStyle5}>
                 {characterData.name}
               </DialogTitle>
               <div style={{ display: "flex", gap: 6 }}>
                 {[characterData.race, characterData.class, `Level ${characterData.level}`].map((tag) => (
-                  <span key={tag} style={{ fontSize: 11, color: colors.goldMuted, background: "rgba(180,140,80,0.1)", border: `1px solid ${colors.goldBorder}`, borderRadius: 4, padding: "2px 9px", fontFamily: fonts.display, letterSpacing: "0.04em" }}>
+                  <span key={tag} style={characterSheetStyle6}>
                     {tag}
                   </span>
                 ))}
@@ -226,12 +204,7 @@ export default function CharacterSheet({
 
         {/* Tab bar */}
         <div
-          style={{
-            display: "flex",
-            gap: 4,
-            padding: "12px 24px 0",
-            borderBottom: `1px solid ${colors.goldBorder}`,
-          }}
+          style={characterSheetStyle7}
         >
           <button onClick={() => setActiveTab("stats")} style={tabStyle("stats")}>
             Stats
@@ -249,18 +222,18 @@ export default function CharacterSheet({
             {activeTab === "stats" && (
               <>
                 <SectionHeader>Vitals</SectionHeader>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+                <div style={characterSheetStyle8}>
                   <StatRow label="HP" value={characterData.hp} max={characterData.maxHp} color={colors.success} />
                   <StatRow label="MP" value={characterData.mp} max={characterData.maxMp} color="#6366F1" />
                   <StatRow label="EXP" value={characterData.exp} max={characterData.nextLevelExp} color={colors.warning ?? '#F59E0B'} />
                 </div>
 
                 <SectionHeader>Ability Scores</SectionHeader>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 6 }}>
+                <div style={characterSheetStyle9}>
                   {Object.entries(characterData.abilities).map(([key, ability]) => (
-                    <div key={key} style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${colors.goldBorder}`, borderRadius: 7, padding: "10px 6px", textAlign: "center" }}>
-                      <div style={{ fontSize: 9, color: colors.textMuted, fontFamily: fonts.display, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 5 }}>{key}</div>
-                      <div style={{ fontSize: 22, fontWeight: 700, color: colors.text, fontFamily: fonts.display, lineHeight: 1 }}>{ability.score}</div>
+                    <div key={key} style={characterSheetStyle10}>
+                      <div style={characterSheetStyle11}>{key}</div>
+                      <div style={characterSheetStyle12}>{ability.score}</div>
                       <div style={{ fontSize: 12, color: ability.modifier >= 0 ? colors.success : colors.danger, marginTop: 3 }}>
                         {ability.modifier >= 0 ? "+" : ""}{ability.modifier}
                       </div>
@@ -269,10 +242,10 @@ export default function CharacterSheet({
                 </div>
 
                 <SectionHeader>Saving Throws</SectionHeader>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 6 }}>
+                <div style={characterSheetStyle9}>
                   {Object.entries(characterData.savingThrows).map(([key, value]) => (
-                    <div key={key} style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${colors.goldBorder}`, borderRadius: 7, padding: "10px 6px", textAlign: "center" }}>
-                      <div style={{ fontSize: 9, color: colors.textMuted, fontFamily: fonts.display, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 5 }}>{key}</div>
+                    <div key={key} style={characterSheetStyle10}>
+                      <div style={characterSheetStyle11}>{key}</div>
                       <div style={{ fontSize: 18, fontWeight: 700, color: (value as unknown as number) >= 0 ? colors.success : colors.danger, fontFamily: fonts.display, lineHeight: 1 }}>
                         {(value as unknown as number) >= 0 ? "+" : ""}{value}
                       </div>
@@ -283,12 +256,12 @@ export default function CharacterSheet({
                 {characterData.skills?.length > 0 && (
                   <>
                     <SectionHeader>Skills</SectionHeader>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 5 }}>
+                    <div style={characterSheetStyle13}>
                       {characterData.skills.map((skill) => (
-                        <div key={skill.name} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 10px", background: "rgba(255,255,255,0.02)", border: `1px solid ${colors.goldBorder}`, borderRadius: 5 }}>
+                        <div key={skill.name} style={characterSheetStyle14}>
                           <div>
-                            <span style={{ fontSize: 13, color: colors.textMuted, fontFamily: fonts.display }}>{skill.name}</span>
-                            <span style={{ fontSize: 10, color: colors.muted, marginLeft: 6, fontFamily: fonts.body }}>({skill.ability})</span>
+                            <span style={characterSheetStyle15}>{skill.name}</span>
+                            <span style={characterSheetStyle16}>({skill.ability})</span>
                           </div>
                           <span style={{ fontSize: 14, fontWeight: 700, color: (skill.modifier as unknown as number) >= 0 ? colors.success : colors.danger, fontFamily: fonts.display }}>
                             {(skill.modifier as unknown as number) >= 0 ? "+" : ""}{skill.modifier}
@@ -306,13 +279,7 @@ export default function CharacterSheet({
                 <SectionHeader>Equipment Slots</SectionHeader>
                 {/* Paperdoll grid: helmet top-center, weapon|armor|shield middle row, acc1|boots|acc2 bottom */}
                 <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr 1fr",
-                    gap: 8,
-                    maxWidth: 420,
-                    margin: "0 auto",
-                  }}
+                  style={characterSheetStyle17}
                 >
                   {/* Row 1: helmet centered */}
                   <div />
@@ -360,7 +327,7 @@ export default function CharacterSheet({
 
                 <SectionHeader>Inventory Equipment</SectionHeader>
                 {equipItems.length > 0 ? (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  <div style={characterSheetStyle18}>
                     {equipItems.map((item) => {
                       const targetSlot = item.slot;
                       const alreadyEquippedToSlot =
@@ -371,89 +338,41 @@ export default function CharacterSheet({
                       return (
                         <div
                           key={item.name}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 12,
-                            padding: "8px 12px",
-                            background: "rgba(255,255,255,0.025)",
-                            border: `1px solid ${colors.goldBorder}`,
-                            borderRadius: 7,
-                          }}
+                          style={characterSheetStyle19}
                         >
                           <div
-                            style={{
-                              width: 40,
-                              height: 40,
-                              flexShrink: 0,
-                              background: "rgba(0,0,0,0.4)",
-                              border: `1px solid ${colors.goldBorder}`,
-                              borderRadius: 6,
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                            }}
+                            style={characterSheetStyle20}
                           >
                             <img
                               src={item.img}
                               alt={item.name}
-                              style={{
-                                width: 30,
-                                height: 30,
-                                imageRendering: "pixelated",
-                              }}
+                              style={characterSheetStyle21}
                             />
                           </div>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div
-                              style={{
-                                fontSize: 13,
-                                fontWeight: 700,
-                                color: colors.text,
-                                fontFamily: fonts.display,
-                                marginBottom: 2,
-                              }}
+                              style={characterSheetStyle22}
                             >
                               {item.name}
                             </div>
                             <div
-                              style={{
-                                fontSize: 10,
-                                color: colors.textMuted,
-                                textTransform: "capitalize",
-                              }}
+                              style={characterSheetStyle23}
                             >
                               {SLOT_LABELS[item.slot]}
                             </div>
                           </div>
                           <div
-                            style={{
-                              display: "flex",
-                              gap: 10,
-                              flexShrink: 0,
-                              alignItems: "center",
-                            }}
+                            style={characterSheetStyle24}
                           >
                             {item.stats.attack != null && (
                               <div style={{ textAlign: "center" }}>
                                 <div
-                                  style={{
-                                    fontSize: 8,
-                                    color: colors.textMuted,
-                                    fontFamily: fonts.display,
-                                    letterSpacing: "0.08em",
-                                    textTransform: "uppercase",
-                                  }}
+                                  style={characterSheetStyle25}
                                 >
                                   ATK
                                 </div>
                                 <div
-                                  style={{
-                                    fontSize: 13,
-                                    fontWeight: 700,
-                                    color: colors.success,
-                                    fontFamily: fonts.display,
-                                  }}
+                                  style={characterSheetStyle26}
                                 >
                                   +{item.stats.attack}
                                 </div>
@@ -462,23 +381,12 @@ export default function CharacterSheet({
                             {item.stats.defense != null && (
                               <div style={{ textAlign: "center" }}>
                                 <div
-                                  style={{
-                                    fontSize: 8,
-                                    color: colors.textMuted,
-                                    fontFamily: fonts.display,
-                                    letterSpacing: "0.08em",
-                                    textTransform: "uppercase",
-                                  }}
+                                  style={characterSheetStyle25}
                                 >
                                   DEF
                                 </div>
                                 <div
-                                  style={{
-                                    fontSize: 13,
-                                    fontWeight: 700,
-                                    color: "#6366F1",
-                                    fontFamily: fonts.display,
-                                  }}
+                                  style={characterSheetStyle27}
                                 >
                                   +{item.stats.defense}
                                 </div>
@@ -524,11 +432,7 @@ export default function CharacterSheet({
                   </div>
                 ) : (
                   <div
-                    style={{
-                      fontSize: 12,
-                      color: colors.textMuted,
-                      padding: "12px 0",
-                    }}
+                    style={characterSheetStyle28}
                   >
                     No equippable items in inventory.
                   </div>
@@ -548,3 +452,132 @@ export default function CharacterSheet({
     </Dialog>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const sectionHeaderStyle: CSSProperties = { display: "flex", alignItems: "center", gap: 10, margin: "20px 0 12px" };
+  const sectionHeaderStyle2: CSSProperties = { fontSize: 11, color: colors.goldMuted, fontFamily: fonts.display, letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, whiteSpace: "nowrap" };
+  const sectionHeaderStyle3: CSSProperties = { flex: 1, height: 1, background: colors.goldBorder };
+  const statRowStyle: CSSProperties = { display: "flex", justifyContent: "space-between", marginBottom: 4 };
+  const statRowStyle2: CSSProperties = { fontSize: 12, color: colors.textMuted, fontFamily: fonts.body };
+  const equipSlotStyle: CSSProperties = { width: 36, height: 36, imageRendering: "pixelated" };
+  const equipSlotStyle2: CSSProperties = {
+                fontSize: 9,
+                color: colors.goldMuted,
+                fontFamily: fonts.display,
+                fontWeight: 700,
+                textAlign: "center",
+                lineHeight: 1.2,
+};
+const equipSlotStyle3: CSSProperties = {
+  fontSize: 9,
+  color: colors.muted,
+  fontFamily: fonts.display,
+  letterSpacing: "0.06em",
+  textTransform: "uppercase",
+  textAlign: "center",
+};
+const characterSheetStyle: CSSProperties = {
+  maxWidth: 760,
+  background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 100%)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 12,
+  padding: 0,
+  overflow: "hidden",
+  fontFamily: fonts.body,
+  color: colors.text,
+};
+const characterSheetStyle2: CSSProperties = { display: "flex", alignItems: "center", gap: 16 };
+  const characterSheetStyle3: CSSProperties = { width: 64, height: 64, flexShrink: 0, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(180,140,80,0.2)", borderRadius: 8, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" };
+  const characterSheetStyle4: CSSProperties = { width: 56, height: 56, imageRendering: "pixelated", filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.8))" };
+  const characterSheetStyle5: CSSProperties = { margin: "0 0 8px", fontSize: 22, fontWeight: 700, color: colors.text, fontFamily: fonts.display, letterSpacing: "0.04em" };
+  const characterSheetStyle6: CSSProperties = { fontSize: 11, color: colors.goldMuted, background: "rgba(180,140,80,0.1)", border: `1px solid ${colors.goldBorder}`, borderRadius: 4, padding: "2px 9px", fontFamily: fonts.display, letterSpacing: "0.04em" };
+  const characterSheetStyle7: CSSProperties = {
+              display: "flex",
+              gap: 4,
+              padding: "12px 24px 0",
+              borderBottom: `1px solid ${colors.goldBorder}`,
+};
+const characterSheetStyle8: CSSProperties = { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 };
+  const characterSheetStyle9: CSSProperties = { display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 6 };
+  const characterSheetStyle10: CSSProperties = { background: "rgba(255,255,255,0.03)", border: `1px solid ${colors.goldBorder}`, borderRadius: 7, padding: "10px 6px", textAlign: "center" };
+  const characterSheetStyle11: CSSProperties = { fontSize: 9, color: colors.textMuted, fontFamily: fonts.display, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 5 };
+  const characterSheetStyle12: CSSProperties = { fontSize: 22, fontWeight: 700, color: colors.text, fontFamily: fonts.display, lineHeight: 1 };
+  const characterSheetStyle13: CSSProperties = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 5 };
+  const characterSheetStyle14: CSSProperties = { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 10px", background: "rgba(255,255,255,0.02)", border: `1px solid ${colors.goldBorder}`, borderRadius: 5 };
+  const characterSheetStyle15: CSSProperties = { fontSize: 13, color: colors.textMuted, fontFamily: fonts.display };
+  const characterSheetStyle16: CSSProperties = { fontSize: 10, color: colors.muted, marginLeft: 6, fontFamily: fonts.body };
+  const characterSheetStyle17: CSSProperties = {
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr 1fr",
+                      gap: 8,
+                      maxWidth: 420,
+                      margin: "0 auto",
+};
+const characterSheetStyle18: CSSProperties = { display: "flex", flexDirection: "column", gap: 6 };
+  const characterSheetStyle19: CSSProperties = {
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 12,
+                              padding: "8px 12px",
+                              background: "rgba(255,255,255,0.025)",
+                              border: `1px solid ${colors.goldBorder}`,
+                              borderRadius: 7,
+};
+const characterSheetStyle20: CSSProperties = {
+  width: 40,
+  height: 40,
+  flexShrink: 0,
+  background: "rgba(0,0,0,0.4)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 6,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+const characterSheetStyle21: CSSProperties = {
+  width: 30,
+  height: 30,
+  imageRendering: "pixelated",
+};
+const characterSheetStyle22: CSSProperties = {
+  fontSize: 13,
+  fontWeight: 700,
+  color: colors.text,
+  fontFamily: fonts.display,
+  marginBottom: 2,
+};
+const characterSheetStyle23: CSSProperties = {
+  fontSize: 10,
+  color: colors.textMuted,
+  textTransform: "capitalize",
+};
+const characterSheetStyle24: CSSProperties = {
+  display: "flex",
+  gap: 10,
+  flexShrink: 0,
+  alignItems: "center",
+};
+const characterSheetStyle25: CSSProperties = {
+  fontSize: 8,
+  color: colors.textMuted,
+  fontFamily: fonts.display,
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+};
+const characterSheetStyle26: CSSProperties = {
+  fontSize: 13,
+  fontWeight: 700,
+  color: colors.success,
+  fontFamily: fonts.display,
+};
+const characterSheetStyle27: CSSProperties = {
+  fontSize: 13,
+  fontWeight: 700,
+  color: "#6366F1",
+  fontFamily: fonts.display,
+};
+const characterSheetStyle28: CSSProperties = {
+  fontSize: 12,
+  color: colors.textMuted,
+  padding: "12px 0",
+};

@@ -1,6 +1,7 @@
 import type { Camp } from "@/types/RoomInteractions";
 import { ActionBtn } from "./ActionBtn";
 import { SectionLabel } from "./SectionLabel";
+import type { CSSProperties } from "react";
 
 export function CampActions({
   camp,
@@ -10,7 +11,7 @@ export function CampActions({
   onRest: (camp: Camp) => void;
 }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+    <div style={campActionsStyle}>
       <SectionLabel>Camp</SectionLabel>
       <ActionBtn variant="success" onClick={() => onRest(camp)} fullWidth>
         <svg
@@ -32,3 +33,6 @@ export function CampActions({
     </div>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const campActionsStyle: CSSProperties = { display: "flex", flexDirection: "column", gap: 6 };

@@ -11,6 +11,7 @@ import { CampForm } from "./CampForm";
 import { TransitionForm } from "./TransitionForm";
 import { defaultEnemy } from "./formTypes";
 import type { useCreateRoomForm } from "./useCreateRoomForm";
+import type { CSSProperties } from "react";
 
 type CreateRoomFormState = ReturnType<typeof useCreateRoomForm>;
 
@@ -67,12 +68,7 @@ export function CreateRoomForm({ form }: { form: CreateRoomFormState }) {
       <Divider label="Connections" />
 
       <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: 16,
-          marginBottom: 0,
-        }}
+        style={createRoomFormStyle}
       >
         <FieldGroup id="neighboringRooms" label="Connect to room">
           <StyledSelect
@@ -144,11 +140,7 @@ export function CreateRoomForm({ form }: { form: CreateRoomFormState }) {
       )}
 
       <div
-        style={{
-          marginTop: 28,
-          display: "flex",
-          justifyContent: "flex-end",
-        }}
+        style={createRoomFormStyle2}
       >
         <button
           type="submit"
@@ -183,7 +175,7 @@ export function CreateRoomForm({ form }: { form: CreateRoomFormState }) {
             e.currentTarget.style.transform = "scale(1)";
           }}
         >
-          <span style={{ color: isSubmitting ? "#9CA3AF" : "#0d0b07" }}>
+          <span style={{ color: isSubmitting ? colors.muted : "#0d0b07" }}>
             {icons.door}
           </span>
           {isSubmitting ? "Forging…" : "Forge Room"}
@@ -192,3 +184,16 @@ export function CreateRoomForm({ form }: { form: CreateRoomFormState }) {
     </form>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const createRoomFormStyle: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr",
+  gap: 16,
+  marginBottom: 0,
+};
+const createRoomFormStyle2: CSSProperties = {
+  marginTop: 28,
+  display: "flex",
+  justifyContent: "flex-end",
+};

@@ -6,6 +6,7 @@ import { colors, fonts } from "@/theme";
 import { CharacterProvider } from "@/components/CharacterCreation/CharacterContext";
 import { CreateCharacterView } from "./management/CreateCharacterView";
 import { ManagePartyView } from "./management/ManagePartyView";
+import type { CSSProperties } from "react";
 
 export function PartyManagement() {
   const party = useGameStore((state: GameState) => state.party);
@@ -25,14 +26,7 @@ export function PartyManagement() {
     return (
       <CharacterProvider>
         <div
-          style={{
-            display: "flex",
-            height: "100vh",
-            background: "#111009",
-            fontFamily: fonts.body,
-            color: colors.text,
-            overflow: "hidden",
-          }}
+          style={partyManagementStyle}
         >
           <CreateCharacterView onCreate={handleCreate} />
         </div>
@@ -42,14 +36,7 @@ export function PartyManagement() {
 
   return (
     <div
-      style={{
-        display: "flex",
-        height: "100vh",
-        background: "#111009",
-        fontFamily: fonts.body,
-        color: colors.text,
-        overflow: "hidden",
-      }}
+      style={partyManagementStyle2}
     >
       <ManagePartyView
         party={localParty}
@@ -59,3 +46,21 @@ export function PartyManagement() {
     </div>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const partyManagementStyle: CSSProperties = {
+  display: "flex",
+  height: "100vh",
+  background: "#111009",
+  fontFamily: fonts.body,
+  color: colors.text,
+  overflow: "hidden",
+};
+const partyManagementStyle2: CSSProperties = {
+  display: "flex",
+  height: "100vh",
+  background: "#111009",
+  fontFamily: fonts.body,
+  color: colors.text,
+  overflow: "hidden",
+};

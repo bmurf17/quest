@@ -4,6 +4,7 @@ import { StatBar } from "@/components/shared/StatBar";
 import { CharacterDetailPanel } from "./shared/CharacterDetailPanel";
 import { PartyRosterPanel } from "./shared/PartyRosterPanel";
 import { usePartySelection } from "./shared/usePartySelection";
+import type { CSSProperties } from "react";
 
 interface PartyPickerProps {
   availableCharacters: CharacterData[];
@@ -22,36 +23,12 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
 
   return (
     <>
-      <style>{`
-        * { box-sizing: border-box; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(180,140,80,0.2); border-radius: 2px; }
-        .char-row:hover { background: rgba(212,175,55,0.07) !important; border-color: rgba(212,175,55,0.25) !important; }
-        .gear-card:hover { border-color: rgba(180,140,80,0.28) !important; background: rgba(255,255,255,0.05) !important; }
-        .remove-btn:hover { background: rgba(220,38,38,0.22) !important; }
-      `}</style>
 
       <div
-        style={{
-          display: "flex",
-          height: "100vh",
-          background: "#111009",
-          fontFamily: fonts.body,
-          color: colors.text,
-          overflow: "hidden",
-        }}
+        style={partySelectionStyle}
       >
         <div
-          style={{
-            width: 260,
-            flexShrink: 0,
-            borderRight: "1px solid rgba(180,140,80,0.12)",
-            display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
-            background: "rgba(0,0,0,0.25)",
-          }}
+          style={partySelectionStyle2}
         >
           <div
             style={{
@@ -60,28 +37,14 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
             }}
           >
             <h2
-              style={{
-                margin: 0,
-                fontSize: 11,
-                fontWeight: 700,
-                color: colors.goldMuted,
-                fontFamily: fonts.display,
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-              }}
+              style={partySelectionStyle3}
             >
               Choose Class
             </h2>
           </div>
           <div
-            style={{
-              flex: 1,
-              overflowY: "auto",
-              padding: "8px 10px",
-              display: "flex",
-              flexDirection: "column",
-              gap: 4,
-            }}
+            className="scrollbar-thin"
+            style={partySelectionStyle4}
           >
             {availableCharacters.map((character, i) => {
               const active = selectedCharacter?.class === character.class;
@@ -106,24 +69,12 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                   }}
                 >
                   <div
-                    style={{
-                      width: 64,
-                      height: 64,
-                      flexShrink: 0,
-                      background: "rgba(0,0,0,0.5)",
-                      borderRadius: 6,
-                      overflow: "hidden",
-                      border: "1px solid rgba(255,255,255,0.06)",
-                    }}
+                    style={partySelectionStyle5}
                   >
                     <img
                       src={character.img}
                       alt={character.name}
-                      style={{
-                        width: 64,
-                        height: 64,
-                        imageRendering: "pixelated",
-                      }}
+                      style={partySelectionStyle6}
                     />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -156,13 +107,7 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                   </div>
                   {inParty && (
                     <div
-                      style={{
-                        width: 7,
-                        height: 7,
-                        background: colors.success,
-                        borderRadius: "50%",
-                        flexShrink: 0,
-                      }}
+                      style={partySelectionStyle7}
                     />
                   )}
                 </div>
@@ -198,7 +143,7 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
                     }
                   : {
                       background:
-                        "linear-gradient(135deg, #B4965A 0%, #D4AF37 50%, #B4965A 100%)",
+                        `linear-gradient(135deg, #B4965A 0%, ${colors.gold} 50%, #B4965A 100%)`,
                       color: "#0d0b07",
                     }),
               }}
@@ -236,3 +181,60 @@ export function PartySelection({ availableCharacters }: PartyPickerProps) {
     </>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const partySelectionStyle: CSSProperties = {
+  display: "flex",
+  height: "100vh",
+  background: "#111009",
+  fontFamily: fonts.body,
+  color: colors.text,
+  overflow: "hidden",
+};
+const partySelectionStyle2: CSSProperties = {
+  width: 260,
+  flexShrink: 0,
+  borderRight: "1px solid rgba(180,140,80,0.12)",
+  display: "flex",
+  flexDirection: "column",
+  overflow: "hidden",
+  background: "rgba(0,0,0,0.25)",
+};
+const partySelectionStyle3: CSSProperties = {
+  margin: 0,
+  fontSize: 11,
+  fontWeight: 700,
+  color: colors.goldMuted,
+  fontFamily: fonts.display,
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
+};
+const partySelectionStyle4: CSSProperties = {
+  flex: 1,
+  overflowY: "auto",
+  padding: "8px 10px",
+  display: "flex",
+  flexDirection: "column",
+  gap: 4,
+};
+const partySelectionStyle5: CSSProperties = {
+  width: 64,
+  height: 64,
+  flexShrink: 0,
+  background: "rgba(0,0,0,0.5)",
+  borderRadius: 6,
+  overflow: "hidden",
+  border: "1px solid rgba(255,255,255,0.06)",
+};
+const partySelectionStyle6: CSSProperties = {
+  width: 64,
+  height: 64,
+  imageRendering: "pixelated",
+};
+const partySelectionStyle7: CSSProperties = {
+  width: 7,
+  height: 7,
+  background: colors.success,
+  borderRadius: "50%",
+  flexShrink: 0,
+};

@@ -2,6 +2,7 @@ import type { EnemyMoveEffect } from "@/types/EnemyMove";
 import { fonts } from "@/theme";
 import type { MoveEntry } from "./formTypes";
 import { Label, StyledInput, StyledSelect } from "./primitives";
+import type { CSSProperties } from "react";
 
 export function MoveForm({
   move,
@@ -46,49 +47,25 @@ export function MoveForm({
 
   return (
     <div
-      style={{
-        marginBottom: 12,
-        padding: 12,
-        background: "rgba(0,0,0,0.2)",
-        borderRadius: 6,
-        border: "1px solid rgba(180,140,80,0.15)",
-      }}
+      style={moveFormStyle}
     >
       <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 8,
-        }}
+        style={moveFormStyle2}
       >
         <span
-          style={{
-            fontSize: 11,
-            fontWeight: 600,
-            color: "#F87171",
-            fontFamily: fonts.display,
-          }}
+          style={moveFormStyle3}
         >
           Move {index + 1}
         </span>
         <button
           type="button"
           onClick={onRemove}
-          style={{
-            background: "rgba(220,38,38,0.15)",
-            border: "1px solid rgba(220,38,38,0.4)",
-            borderRadius: 4,
-            color: "#FCA5A5",
-            fontSize: 11,
-            cursor: "pointer",
-            padding: "2px 8px",
-          }}
+          style={moveFormStyle4}
         >
           Remove
         </button>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+      <div style={moveFormStyle5}>
         <div style={{ gridColumn: "1 / -1" }}>
           <Label htmlFor={`moveName-${index}`}>Name</Label>
           <StyledInput
@@ -364,3 +341,34 @@ export function MoveForm({
     </div>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const moveFormStyle: CSSProperties = {
+  marginBottom: 12,
+  padding: 12,
+  background: "rgba(0,0,0,0.2)",
+  borderRadius: 6,
+  border: "1px solid rgba(180,140,80,0.15)",
+};
+const moveFormStyle2: CSSProperties = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: 8,
+};
+const moveFormStyle3: CSSProperties = {
+  fontSize: 11,
+  fontWeight: 600,
+  color: "#F87171",
+  fontFamily: fonts.display,
+};
+const moveFormStyle4: CSSProperties = {
+  background: "rgba(220,38,38,0.15)",
+  border: "1px solid rgba(220,38,38,0.4)",
+  borderRadius: 4,
+  color: "#FCA5A5",
+  fontSize: 11,
+  cursor: "pointer",
+  padding: "2px 8px",
+};
+const moveFormStyle5: CSSProperties = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 };

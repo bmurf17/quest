@@ -3,6 +3,7 @@ import type { Quest } from "@/types/RoomInteractions";
 import { colors, fonts } from "@/theme";
 import { useGameStore } from "@/state/GameState";
 import { QuestSectionBox, QuestSectionLabel } from "./_QuestPanelParts";
+import type { CSSProperties } from "react";
 
 export default function QuestDescription({
   npcsName,
@@ -21,41 +22,25 @@ export default function QuestDescription({
     <>
       <ScrollArea style={{ height: "60vh" }}>
         <div
-          style={{
-            padding: "10px 14px 20px",
-            display: "flex",
-            flexDirection: "column",
-            gap: 6,
-          }}
+          style={questDescriptionStyle}
         >
           <QuestSectionBox>
             <QuestSectionLabel>Description</QuestSectionLabel>
-            <div style={{ fontSize: 13, color: "#7A6A52", lineHeight: 1.5 }}>
+            <div style={questDescriptionStyle2}>
               Help {npcsName} {quest.description}
             </div>
           </QuestSectionBox>
 
           <QuestSectionBox>
             <QuestSectionLabel>Objectives</QuestSectionLabel>
-            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={questDescriptionStyle3}>
               {quest.objectives.map((objective, index) => (
                 <div
                   key={index}
-                  style={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    gap: 8,
-                    fontSize: 13,
-                    color: "#7A6A52",
-                    lineHeight: 1.5,
-                  }}
+                  style={questDescriptionStyle4}
                 >
                   <span
-                    style={{
-                      color: colors.goldMuted,
-                      flexShrink: 0,
-                      marginTop: 1,
-                    }}
+                    style={questDescriptionStyle5}
                   >
                     ◆
                   </span>
@@ -68,7 +53,7 @@ export default function QuestDescription({
           {quest.type.type === "defeat" && (
             <QuestSectionBox>
               <QuestSectionLabel>Objective</QuestSectionLabel>
-              <div style={{ fontSize: 13, color: "#7A6A52", lineHeight: 1.5 }}>
+              <div style={questDescriptionStyle2}>
                 Defeat{" "}
                 <span style={{ fontWeight: 700, color: colors.goldMuted }}>
                   {quest.type.enemy.name}
@@ -80,17 +65,11 @@ export default function QuestDescription({
 
           <QuestSectionBox>
             <QuestSectionLabel>Rewards</QuestSectionLabel>
-            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={questDescriptionStyle3}>
               {quest.rewards.map((reward, index) => (
                 <div
                   key={index}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    fontSize: 13,
-                    color: "#7A6A52",
-                  }}
+                  style={questDescriptionStyle6}
                 >
                   <span style={{ color: colors.goldMuted, flexShrink: 0 }}>
                     ◆
@@ -143,3 +122,33 @@ export default function QuestDescription({
     </>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const questDescriptionStyle: CSSProperties = {
+  padding: "10px 14px 20px",
+  display: "flex",
+  flexDirection: "column",
+  gap: 6,
+};
+const questDescriptionStyle2: CSSProperties = { fontSize: 13, color: "#7A6A52", lineHeight: 1.5 };
+  const questDescriptionStyle3: CSSProperties = { display: "flex", flexDirection: "column", gap: 4 };
+  const questDescriptionStyle4: CSSProperties = {
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: 8,
+                      fontSize: 13,
+                      color: "#7A6A52",
+                      lineHeight: 1.5,
+};
+const questDescriptionStyle5: CSSProperties = {
+  color: colors.goldMuted,
+  flexShrink: 0,
+  marginTop: 1,
+};
+const questDescriptionStyle6: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 8,
+  fontSize: 13,
+  color: "#7A6A52",
+};

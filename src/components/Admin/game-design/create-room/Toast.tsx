@@ -1,4 +1,5 @@
 import { icons } from "./icons";
+import type { CSSProperties } from "react";
 
 export function Toast({
   type,
@@ -36,30 +37,34 @@ export function Toast({
         {isSuccess ? icons.check : icons.alert}
       </span>
       <div
-        style={{
-          flex: 1,
-          fontFamily: "'Crimson Text', Georgia, serif",
-          lineHeight: 1.5,
-        }}
+        style={toastStyle}
       >
         {message}
       </div>
       <button
         type="button"
         onClick={onClose}
-        style={{
-          background: "none",
-          border: "none",
-          color: "inherit",
-          cursor: "pointer",
-          padding: 0,
-          fontSize: 18,
-          lineHeight: 1,
-          opacity: 0.7,
-        }}
+        style={toastStyle2}
       >
         ×
       </button>
     </div>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const toastStyle: CSSProperties = {
+  flex: 1,
+  fontFamily: "'Crimson Text', Georgia, serif",
+  lineHeight: 1.5,
+};
+const toastStyle2: CSSProperties = {
+  background: "none",
+  border: "none",
+  color: "inherit",
+  cursor: "pointer",
+  padding: 0,
+  fontSize: 18,
+  lineHeight: 1,
+  opacity: 0.7,
+};

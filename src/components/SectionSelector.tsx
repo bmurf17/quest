@@ -7,6 +7,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useGameStore } from "@/state/GameState";
 import { colors, fonts } from "@/theme";
+import type { CSSProperties } from "react";
 
 export default function SectionSelector({
   isOpen,
@@ -36,35 +37,18 @@ export default function SectionSelector({
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent
-        style={{
-          maxWidth: 450,
-          background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 100%)",
-          border: `1px solid ${colors.goldBorder}`,
-          borderRadius: 12,
-          padding: 0,
-          overflow: "hidden",
-          fontFamily: fonts.body,
-          color: colors.text,
-        }}
+        style={sectionSelectorStyle}
       >
         <DialogHeader style={{ padding: "18px 22px 14px", borderBottom: `1px solid ${colors.goldBorder}` }}>
           <DialogTitle
-            style={{
-              margin: 0,
-              fontSize: 16,
-              fontWeight: 700,
-              color: colors.goldMuted,
-              fontFamily: fonts.display,
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-            }}
+            style={sectionSelectorStyle2}
           >
             Explore
           </DialogTitle>
         </DialogHeader>
 
         <ScrollArea style={{ height: "55vh" }}>
-          <div style={{ padding: "10px 14px 20px", display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={sectionSelectorStyle3}>
           {availableSections.map((section) => {
             const beaten = beatenSections.includes(section.id);
             const unlocked = isSectionUnlocked(section.id);
@@ -110,11 +94,7 @@ export default function SectionSelector({
 
                 {beaten && (
                   <span
-                    style={{
-                      color: "#6EE7B7",
-                      fontSize: 16,
-                      lineHeight: 1,
-                    }}
+                    style={sectionSelectorStyle4}
                     title="Completed"
                   >
                     ✓
@@ -123,11 +103,7 @@ export default function SectionSelector({
 
                 {!unlocked && !beaten && (
                   <span
-                    style={{
-                      color: colors.muted,
-                      fontSize: 14,
-                      lineHeight: 1,
-                    }}
+                    style={sectionSelectorStyle5}
                     title="Complete the previous section first"
                   >
                     🔒
@@ -136,12 +112,7 @@ export default function SectionSelector({
 
                 {unlocked && !beaten && (
                   <span
-                    style={{
-                      color: colors.goldMuted,
-                      fontSize: 12,
-                      fontFamily: fonts.display,
-                      letterSpacing: "0.06em",
-                    }}
+                    style={sectionSelectorStyle6}
                   >
                     Explore →
                   </span>
@@ -155,3 +126,41 @@ export default function SectionSelector({
     </Dialog>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const sectionSelectorStyle: CSSProperties = {
+  maxWidth: 450,
+  background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 100%)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 12,
+  padding: 0,
+  overflow: "hidden",
+  fontFamily: fonts.body,
+  color: colors.text,
+};
+const sectionSelectorStyle2: CSSProperties = {
+  margin: 0,
+  fontSize: 16,
+  fontWeight: 700,
+  color: colors.goldMuted,
+  fontFamily: fonts.display,
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+};
+const sectionSelectorStyle3: CSSProperties = { padding: "10px 14px 20px", display: "flex", flexDirection: "column", gap: 8 };
+  const sectionSelectorStyle4: CSSProperties = {
+                        color: "#6EE7B7",
+                        fontSize: 16,
+                        lineHeight: 1,
+};
+const sectionSelectorStyle5: CSSProperties = {
+  color: colors.muted,
+  fontSize: 14,
+  lineHeight: 1,
+};
+const sectionSelectorStyle6: CSSProperties = {
+  color: colors.goldMuted,
+  fontSize: 12,
+  fontFamily: fonts.display,
+  letterSpacing: "0.06em",
+};

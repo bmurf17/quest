@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 
 import { colors, fonts } from "@/theme";
+import type { CSSProperties } from "react";
 
 interface Props {
   activityLog: string[];
@@ -51,10 +52,10 @@ const classifyLog = (log: string): { color: string; prefix: string } => {
     l.includes("arrived") ||
     l.includes("discover")
   )
-    return { color: "#C9A84C", prefix: "▸" };
+    return { color: colors.goldMuted, prefix: "▸" };
   if (l.includes("miss") || l.includes("evad") || l.includes("dodge"))
-    return { color: "#9CA3AF", prefix: "◌" };
-  return { color: "#A8916A", prefix: "·" };
+    return { color: colors.muted, prefix: "◌" };
+  return { color: colors.textMuted, prefix: "·" };
 };
 
 export default function ActivityLog({ activityLog }: Props) {
@@ -67,52 +68,20 @@ export default function ActivityLog({ activityLog }: Props) {
 
   return (
     <>
-      <style>{`
-        .log-line { transition: background 0.1s; }
-  .log-line:hover { background: rgba(180,140,80,0.05) !important; }
-        .log-scroll::-webkit-scrollbar { width: 3px; }
-        .log-scroll::-webkit-scrollbar-track { background: transparent; }
-        .log-scroll::-webkit-scrollbar-thumb { background: rgba(180,140,80,0.2); border-radius: 2px; }
-      `}</style>
 
       <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          background: "rgba(0,0,0,0.35)",
-          border: `1px solid ${colors.goldBorder}`,
-          borderRadius: 8,
-          overflow: "hidden",
-        }}
+        style={activityLogStyle}
       >
         <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "8px 12px",
-            borderBottom: "1px solid rgba(180,140,80,0.12)",
-            flexShrink: 0,
-          }}
+          style={activityLogStyle2}
         >
           <span
-            style={{
-              fontSize: 10,
-              fontWeight: 700,
-              color: colors.goldMuted,
-              fontFamily: fonts.display,
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-            }}
+            style={activityLogStyle3}
           >
             Chronicle
           </span>
           <span
-            style={{
-              fontSize: 10,
-              color: colors.muted,
-              fontFamily: fonts.body,
-            }}
+            style={activityLogStyle4}
           >
             {activityLog.length} entries
           </span>
@@ -121,22 +90,11 @@ export default function ActivityLog({ activityLog }: Props) {
         <div
           ref={containerRef}
           className="log-scroll"
-          style={{
-            flex: 1,
-            overflowY: "auto",
-            padding: "6px 4px",
-          }}
+          style={activityLogStyle5}
         >
           {activityLog.length === 0 ? (
             <div
-              style={{
-                padding: "20px 12px",
-                textAlign: "center",
-                color: colors.muted,
-                fontSize: 12,
-                fontFamily: fonts.body,
-                fontStyle: "italic",
-              }}
+              style={activityLogStyle6}
             >
               The chronicle awaits your deeds…
             </div>
@@ -161,15 +119,7 @@ export default function ActivityLog({ activityLog }: Props) {
                   }}
                 >
                   <span
-                    style={{
-                      fontSize: 9,
-                      color: colors.textMuted,
-                      fontFamily: fonts.body,
-                      minWidth: 22,
-                      textAlign: "right",
-                      flexShrink: 0,
-                      userSelect: "none",
-                    }}
+                    style={activityLogStyle7}
                   >
                     {i + 1}
                   </span>
@@ -208,3 +158,56 @@ export default function ActivityLog({ activityLog }: Props) {
     </>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const activityLogStyle: CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  background: "rgba(0,0,0,0.35)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 8,
+  overflow: "hidden",
+};
+const activityLogStyle2: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  padding: "8px 12px",
+  borderBottom: "1px solid rgba(180,140,80,0.12)",
+  flexShrink: 0,
+};
+const activityLogStyle3: CSSProperties = {
+  fontSize: 10,
+  fontWeight: 700,
+  color: colors.goldMuted,
+  fontFamily: fonts.display,
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
+};
+const activityLogStyle4: CSSProperties = {
+  fontSize: 10,
+  color: colors.muted,
+  fontFamily: fonts.body,
+};
+const activityLogStyle5: CSSProperties = {
+  flex: 1,
+  overflowY: "auto",
+  padding: "6px 4px",
+};
+const activityLogStyle6: CSSProperties = {
+  padding: "20px 12px",
+  textAlign: "center",
+  color: colors.muted,
+  fontSize: 12,
+  fontFamily: fonts.body,
+  fontStyle: "italic",
+};
+const activityLogStyle7: CSSProperties = {
+  fontSize: 9,
+  color: colors.textMuted,
+  fontFamily: fonts.body,
+  minWidth: 22,
+  textAlign: "right",
+  flexShrink: 0,
+  userSelect: "none",
+};

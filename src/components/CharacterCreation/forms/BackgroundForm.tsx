@@ -1,5 +1,6 @@
 import { useCharacter } from "@/components/CharacterCreation/CharacterContext";
 import { colors, fonts } from "@/theme";
+import type { CSSProperties } from "react";
 
 const BACKGROUNDS = ["Acolyte", "Charlatan", "Criminal", "Entertainer", "Folk Hero"];
 
@@ -8,39 +9,19 @@ export default function BackgroundForm() {
 
   return (
     <>
-      <style>{`
-        .bg-card:hover { background: rgba(212,175,55,0.07) !important; border-color: rgba(212,175,55,0.25) !important; }
-      `}</style>
       <div>
         <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            margin: "0 0 18px",
-          }}
+          style={backgroundFormStyle}
         >
           <span
-            style={{
-              fontSize: 11,
-              color: colors.goldMuted,
-              fontFamily: fonts.display,
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              fontWeight: 700,
-              whiteSpace: "nowrap",
-            }}
+            style={backgroundFormStyle2}
           >
             Choose Your Background
           </span>
-          <div style={{ flex: 1, height: 1, background: colors.goldBorder }} />
+          <div style={backgroundFormStyle3} />
         </div>
         <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 6,
-          }}
+          style={backgroundFormStyle4}
         >
           {BACKGROUNDS.map((bg) => {
             const active = character.background === bg.toLowerCase().replace(" ", "-");
@@ -81,12 +62,7 @@ export default function BackgroundForm() {
                 >
                   {active && (
                     <div
-                      style={{
-                        width: 6,
-                        height: 6,
-                        borderRadius: "50%",
-                        background: "#0d0b07",
-                      }}
+                      style={backgroundFormStyle5}
                     />
                   )}
                 </div>
@@ -108,3 +84,32 @@ export default function BackgroundForm() {
     </>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const backgroundFormStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  margin: "0 0 18px",
+};
+const backgroundFormStyle2: CSSProperties = {
+  fontSize: 11,
+  color: colors.goldMuted,
+  fontFamily: fonts.display,
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+  fontWeight: 700,
+  whiteSpace: "nowrap",
+};
+const backgroundFormStyle3: CSSProperties = { flex: 1, height: 1, background: colors.goldBorder };
+  const backgroundFormStyle4: CSSProperties = {
+              display: "flex",
+              flexDirection: "column",
+              gap: 6,
+};
+const backgroundFormStyle5: CSSProperties = {
+  width: 6,
+  height: 6,
+  borderRadius: "50%",
+  background: "#0d0b07",
+};

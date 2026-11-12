@@ -2,7 +2,7 @@
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-See [docs/conventions.md](docs/conventions.md) for the project's import, component layout, and deep-import conventions.
+See [docs/conventions.md](docs/conventions.md) for the project's import, component layout, deep-import, and styling conventions.
 
 Currently, two official plugins are available:
 

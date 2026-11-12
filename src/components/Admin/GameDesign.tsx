@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { colors, fonts } from "@/theme";
+import type { CSSProperties } from "react";
 
 const navSections = [
   {
@@ -15,7 +16,7 @@ const navSections = [
             <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
           </svg>
         ),
-        accent: "#D4AF37",
+        accent: colors.gold,
         accentBg: "rgba(212,175,55,0.1)",
         accentBorder: "rgba(212,175,55,0.3)",
       },
@@ -65,21 +66,11 @@ const navSections = [
 export default function Admin() {
   return (
     <>
-      <style>{`
-        * { box-sizing: border-box; }
-        .admin-card { transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s, background 0.15s; }
-        .admin-card:hover { transform: translateY(-2px); }
-      `}</style>
 
-      <main style={{
-        minHeight: "100vh",
-        background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 50%, #0f0e09 100%)",
-        padding: "48px 32px 80px",
-        fontFamily: fonts.body,
-      }}>
+      <main style={adminStyle}>
 
         <div style={{ maxWidth: 700, margin: "0 auto 48px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 10 }}>
+          <div style={adminStyle2}>
         <div style={{
           width: 42, height: 42,
           background: colors.goldMuted + "22",
@@ -87,53 +78,42 @@ export default function Admin() {
               borderRadius: 10,
               display: "flex", alignItems: "center", justifyContent: "center",
             }}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth={1.5} width={22} height={22}>
+              <svg viewBox="0 0 24 24" fill="none" stroke={colors.gold} strokeWidth={1.5} width={22} height={22}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
               </svg>
             </div>
             <div>
-              <h1 style={{
-                margin: 0, fontSize: 30, fontWeight: 700,
-                color: colors.text,
-                fontFamily: fonts.display,
-                letterSpacing: "0.05em",
-              }}>
+              <h1 style={adminStyle3}>
                 Admin Console
               </h1>
-              <p style={{ margin: 0, fontSize: 14, color: colors.muted }}>
+              <p style={adminStyle4}>
                 Shape the realm from behind the veil
               </p>
             </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 24 }}>
-            <div style={{ flex: 1, height: 1, background: "linear-gradient(to right, transparent, rgba(180,140,80,0.3))" }} />
-            <div style={{ width: 5, height: 5, background: "rgba(212,175,55,0.5)", borderRadius: "50%", transform: "rotate(45deg)" }} />
-            <div style={{ flex: 1, height: 1, background: "linear-gradient(to left, transparent, rgba(180,140,80,0.3))" }} />
+          <div style={adminStyle5}>
+            <div style={adminStyle6} />
+            <div style={adminStyle7} />
+            <div style={adminStyle8} />
           </div>
         </div>
 
-        <div style={{ maxWidth: 700, margin: "0 auto", display: "flex", flexDirection: "column", gap: 40 }}>
+        <div style={adminStyle9}>
           {navSections.map((section) => (
             <div key={section.title}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-                <div style={{ width: 2, height: 20, background: "rgba(212,175,55,0.6)", borderRadius: 1 }} />
-                <h2 style={{
-                  margin: 0, fontSize: 12, fontWeight: 700,
-                  color: colors.gold,
-                  fontFamily: fonts.display,
-                  letterSpacing: "0.12em",
-                  textTransform: "uppercase",
-                }}>
+              <div style={adminStyle10}>
+                <div style={adminStyle11} />
+                <h2 style={adminStyle12}>
                   {section.title}
                 </h2>
-                <span style={{ fontSize: 13, color: "#4B5563", fontFamily: "'Crimson Text', Georgia, serif" }}>
+                <span style={adminStyle13}>
                   — {section.description}
                 </span>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 14 }}>
+              <div style={adminStyle14}>
                 {section.items.map((item) => (
                   <Link
                     key={item.to}
@@ -180,16 +160,10 @@ export default function Admin() {
                     </div>
 
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{
-                        fontSize: 15, fontWeight: 600,
-                        color: colors.text,
-                        fontFamily: fonts.display,
-                        letterSpacing: "0.03em",
-                        marginBottom: 3,
-                      }}>
+                      <div style={adminStyle15}>
                         {item.label}
                       </div>
-                      <div style={{ fontSize: 13, color: "#6B7280", lineHeight: 1.4 }}>
+                      <div style={adminStyle16}>
                         {item.description}
                       </div>
                     </div>
@@ -207,3 +181,43 @@ export default function Admin() {
     </>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const adminStyle: CSSProperties = {
+  minHeight: "100vh",
+  background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 50%, #0f0e09 100%)",
+  padding: "48px 32px 80px",
+  fontFamily: fonts.body,
+};
+const adminStyle2: CSSProperties = { display: "flex", alignItems: "center", gap: 14, marginBottom: 10 };
+  const adminStyle3: CSSProperties = {
+                  margin: 0, fontSize: 30, fontWeight: 700,
+                  color: colors.text,
+                  fontFamily: fonts.display,
+                  letterSpacing: "0.05em",
+};
+const adminStyle4: CSSProperties = { margin: 0, fontSize: 14, color: colors.muted };
+  const adminStyle5: CSSProperties = { display: "flex", alignItems: "center", gap: 12, marginTop: 24 };
+  const adminStyle6: CSSProperties = { flex: 1, height: 1, background: "linear-gradient(to right, transparent, rgba(180,140,80,0.3))" };
+  const adminStyle7: CSSProperties = { width: 5, height: 5, background: "rgba(212,175,55,0.5)", borderRadius: "50%", transform: "rotate(45deg)" };
+  const adminStyle8: CSSProperties = { flex: 1, height: 1, background: "linear-gradient(to left, transparent, rgba(180,140,80,0.3))" };
+  const adminStyle9: CSSProperties = { maxWidth: 700, margin: "0 auto", display: "flex", flexDirection: "column", gap: 40 };
+  const adminStyle10: CSSProperties = { display: "flex", alignItems: "center", gap: 10, marginBottom: 16 };
+  const adminStyle11: CSSProperties = { width: 2, height: 20, background: "rgba(212,175,55,0.6)", borderRadius: 1 };
+  const adminStyle12: CSSProperties = {
+                    margin: 0, fontSize: 12, fontWeight: 700,
+                    color: colors.gold,
+                    fontFamily: fonts.display,
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+};
+const adminStyle13: CSSProperties = { fontSize: 13, color: "#4B5563", fontFamily: "'Crimson Text', Georgia, serif" };
+  const adminStyle14: CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 14 };
+  const adminStyle15: CSSProperties = {
+                          fontSize: 15, fontWeight: 600,
+                          color: colors.text,
+                          fontFamily: fonts.display,
+                          letterSpacing: "0.03em",
+                          marginBottom: 3,
+};
+const adminStyle16: CSSProperties = { fontSize: 13, color: "#6B7280", lineHeight: 1.4 };

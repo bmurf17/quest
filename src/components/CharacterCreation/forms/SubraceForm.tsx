@@ -1,5 +1,6 @@
 import { useCharacter } from "@/components/CharacterCreation/CharacterContext";
 import { colors, fonts } from "@/theme";
+import type { CSSProperties } from "react";
 
 const SUBRACES: Record<string, string[]> = {
   human: ["Standard", "Variant"],
@@ -17,40 +18,20 @@ export default function SubraceForm() {
 
   return (
     <>
-      <style>{`
-        .subrace-card:hover { background: rgba(212,175,55,0.07) !important; border-color: rgba(212,175,55,0.25) !important; }
-      `}</style>
       <div>
         <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            margin: "0 0 18px",
-          }}
+          style={subraceFormStyle}
         >
           <span
-            style={{
-              fontSize: 11,
-              color: colors.goldMuted,
-              fontFamily: fonts.display,
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              fontWeight: 700,
-              whiteSpace: "nowrap",
-            }}
+            style={subraceFormStyle2}
           >
             Choose Your Subrace
           </span>
-          <div style={{ flex: 1, height: 1, background: colors.goldBorder }} />
+          <div style={subraceFormStyle3} />
         </div>
         {character.race ? (
           <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 6,
-            }}
+            style={subraceFormStyle4}
           >
             {(SUBRACES[character.race] || []).map((subrace) => {
               const id = subrace.toLowerCase().replace(" ", "-");
@@ -90,12 +71,7 @@ export default function SubraceForm() {
                   >
                     {active && (
                       <div
-                        style={{
-                          width: 6,
-                          height: 6,
-                          borderRadius: "50%",
-                          background: "#0d0b07",
-                        }}
+                        style={subraceFormStyle5}
                       />
                     )}
                   </div>
@@ -115,12 +91,7 @@ export default function SubraceForm() {
           </div>
         ) : (
           <p
-            style={{
-              color: "#4B5563",
-              fontSize: 13,
-              fontFamily: fonts.body,
-              margin: 0,
-            }}
+            style={subraceFormStyle6}
           >
             Please select a race first.
           </p>
@@ -129,3 +100,38 @@ export default function SubraceForm() {
     </>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const subraceFormStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  margin: "0 0 18px",
+};
+const subraceFormStyle2: CSSProperties = {
+  fontSize: 11,
+  color: colors.goldMuted,
+  fontFamily: fonts.display,
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+  fontWeight: 700,
+  whiteSpace: "nowrap",
+};
+const subraceFormStyle3: CSSProperties = { flex: 1, height: 1, background: colors.goldBorder };
+  const subraceFormStyle4: CSSProperties = {
+                display: "flex",
+                flexDirection: "column",
+                gap: 6,
+};
+const subraceFormStyle5: CSSProperties = {
+  width: 6,
+  height: 6,
+  borderRadius: "50%",
+  background: "#0d0b07",
+};
+const subraceFormStyle6: CSSProperties = {
+  color: "#4B5563",
+  fontSize: 13,
+  fontFamily: fonts.body,
+  margin: 0,
+};

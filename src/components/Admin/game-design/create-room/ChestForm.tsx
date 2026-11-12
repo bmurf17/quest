@@ -1,9 +1,10 @@
 import { FieldGroup, StyledInput, StyledSelect } from "./primitives";
+import type { CSSProperties } from "react";
 
 export function ChestForm() {
   return (
     <>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+      <div style={chestFormStyle}>
         <div style={{ gridColumn: "1 / -1" }}>
           <FieldGroup id="itemId" label="Item ID">
             <StyledInput
@@ -31,3 +32,6 @@ export function ChestForm() {
     </>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const chestFormStyle: CSSProperties = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 };

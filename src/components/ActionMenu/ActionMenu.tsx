@@ -15,6 +15,7 @@ import { DialogueActions } from "./DialogueActions";
 import { ChestActions } from "./ChestActions";
 import { CampActions } from "./CampActions";
 import { TownActions } from "./TownActions";
+import type { CSSProperties } from "react";
 
 export default function ActionMenu() {
   const party = useGameStore((state) => state.party);
@@ -66,13 +67,7 @@ export default function ActionMenu() {
   return (
     <>
       <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 10,
-          height: "100%",
-          fontFamily: "'Lato', sans-serif",
-        }}
+        style={actionMenuStyle}
       >
         {inCombat && !isFighterEnemy && currentFighter && (
           <CombatActions fighter={currentFighter} />
@@ -106,12 +101,7 @@ export default function ActionMenu() {
         )}
 
         <div
-          style={{
-            marginTop: "auto",
-            display: "flex",
-            flexDirection: "row",
-            gap: 6,
-          }}
+          style={actionMenuStyle2}
         >
           <div style={{ height: 1, background: "rgba(180,140,80,0.1)" }} />
           <ActionBtn onClick={() => setIsInventoryModalOpen(true)} fullWidth>
@@ -181,3 +171,18 @@ export default function ActionMenu() {
     </>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const actionMenuStyle: CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 10,
+  height: "100%",
+  fontFamily: "'Lato', sans-serif",
+};
+const actionMenuStyle2: CSSProperties = {
+  marginTop: "auto",
+  display: "flex",
+  flexDirection: "row",
+  gap: 6,
+};

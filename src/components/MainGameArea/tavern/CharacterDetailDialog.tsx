@@ -10,31 +10,19 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import type { CSSProperties } from "react";
 
 function SectionHeader({ children }: { children: React.ReactNode }) {
   return (
     <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 10,
-        margin: "20px 0 12px",
-      }}
+      style={sectionHeaderStyle}
     >
       <span
-        style={{
-          fontSize: 11,
-          color: colors.goldMuted,
-          fontFamily: fonts.display,
-          letterSpacing: "0.1em",
-          textTransform: "uppercase",
-          fontWeight: 700,
-          whiteSpace: "nowrap",
-        }}
+        style={sectionHeaderStyle2}
       >
         {children}
       </span>
-      <div style={{ flex: 1, height: 1, background: colors.goldBorder }} />
+      <div style={sectionHeaderStyle3} />
     </div>
   );
 }
@@ -61,16 +49,7 @@ export function CharacterDetailDialog({
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent
-        style={{
-          maxWidth: 640,
-          background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 100%)",
-          border: `1px solid ${colors.goldBorder}`,
-          borderRadius: 12,
-          padding: 0,
-          overflow: "hidden",
-          fontFamily: fonts.body,
-          color: colors.text,
-        }}
+        style={characterDetailDialogStyle}
       >
         <DialogHeader
           style={{
@@ -78,42 +57,19 @@ export function CharacterDetailDialog({
             borderBottom: `1px solid ${colors.goldBorder}`,
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div style={characterDetailDialogStyle2}>
             <div
-              style={{
-                width: 64,
-                height: 64,
-                flexShrink: 0,
-                background: "rgba(0,0,0,0.5)",
-                border: "1px solid rgba(180,140,80,0.2)",
-                borderRadius: 8,
-                overflow: "hidden",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              style={characterDetailDialogStyle3}
             >
               <img
                 src={character.img}
                 alt={character.name}
-                style={{
-                  width: 56,
-                  height: 56,
-                  imageRendering: "pixelated",
-                  filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.8))",
-                }}
+                style={characterDetailDialogStyle4}
               />
             </div>
             <div style={{ flex: 1 }}>
               <DialogTitle
-                style={{
-                  margin: "0 0 8px",
-                  fontSize: 22,
-                  fontWeight: 700,
-                  color: colors.text,
-                  fontFamily: fonts.display,
-                  letterSpacing: "0.04em",
-                }}
+                style={characterDetailDialogStyle5}
               >
                 {character.name}
               </DialogTitle>
@@ -125,16 +81,7 @@ export function CharacterDetailDialog({
                 ].map((tag) => (
                   <span
                     key={tag}
-                    style={{
-                      fontSize: 11,
-                      color: colors.goldMuted,
-                      background: "rgba(180,140,80,0.1)",
-                      border: `1px solid ${colors.goldBorder}`,
-                      borderRadius: 4,
-                      padding: "2px 9px",
-                      fontFamily: fonts.display,
-                      letterSpacing: "0.04em",
-                    }}
+                    style={characterDetailDialogStyle6}
                   >
                     {tag}
                   </span>
@@ -148,43 +95,20 @@ export function CharacterDetailDialog({
           <div style={{ padding: "4px 24px 28px" }}>
             <SectionHeader>Ability Scores</SectionHeader>
             <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(7, 1fr)",
-                gap: 6,
-              }}
+              style={characterDetailDialogStyle7}
             >
               {Object.entries(character.abilities).map(([key, ability]) => (
                 <div
                   key={key}
-                  style={{
-                    background: "rgba(255,255,255,0.03)",
-                    border: `1px solid ${colors.goldBorder}`,
-                    borderRadius: 7,
-                    padding: "10px 6px",
-                    textAlign: "center",
-                  }}
+                  style={characterDetailDialogStyle8}
                 >
                   <div
-                    style={{
-                      fontSize: 9,
-                      color: colors.textMuted,
-                      fontFamily: fonts.display,
-                      letterSpacing: "0.1em",
-                      textTransform: "uppercase",
-                      marginBottom: 5,
-                    }}
+                    style={characterDetailDialogStyle9}
                   >
                     {key}
                   </div>
                   <div
-                    style={{
-                      fontSize: 22,
-                      fontWeight: 700,
-                      color: colors.text,
-                      fontFamily: fonts.display,
-                      lineHeight: 1,
-                    }}
+                    style={characterDetailDialogStyle10}
                   >
                     {ability.score}
                   </div>
@@ -209,59 +133,27 @@ export function CharacterDetailDialog({
               <>
                 <SectionHeader>Equipment</SectionHeader>
                 <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 6,
-                  }}
+                  style={characterDetailDialogStyle11}
                 >
                   {Object.values(character.equipment)
                     .filter((i): i is EquippableItem => i !== null)
                     .map((item) => (
                       <div
                         key={item.name}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 12,
-                          padding: "10px 12px",
-                          background: "rgba(255,255,255,0.025)",
-                          border: `1px solid ${colors.goldBorder}`,
-                          borderRadius: 7,
-                        }}
+                        style={characterDetailDialogStyle12}
                       >
                         <div
-                          style={{
-                            width: 44,
-                            height: 44,
-                            flexShrink: 0,
-                            background: "rgba(0,0,0,0.4)",
-                            border: `1px solid ${colors.goldBorder}`,
-                            borderRadius: 6,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
+                          style={characterDetailDialogStyle13}
                         >
                           <img
                             src={item.img}
                             alt={item.name}
-                            style={{
-                              width: 34,
-                              height: 34,
-                              imageRendering: "pixelated",
-                            }}
+                            style={characterDetailDialogStyle14}
                           />
                         </div>
                         <div style={{ flex: 1 }}>
                           <div
-                            style={{
-                              fontSize: 14,
-                              fontWeight: 700,
-                              color: colors.text,
-                              fontFamily: fonts.display,
-                              marginBottom: 3,
-                            }}
+                            style={characterDetailDialogStyle15}
                           >
                             {item.name}
                           </div>
@@ -271,7 +163,7 @@ export function CharacterDetailDialog({
                         </div>
                         {item.action && (
                           <div
-                            style={{ display: "flex", gap: 16, flexShrink: 0 }}
+                            style={characterDetailDialogStyle16}
                           >
                             {[
                               ["Hit", item.action.hitDC],
@@ -282,24 +174,12 @@ export function CharacterDetailDialog({
                                 style={{ textAlign: "center" }}
                               >
                                 <div
-                                  style={{
-                                    fontSize: 9,
-                                    color: colors.textMuted,
-                                    fontFamily: fonts.display,
-                                    letterSpacing: "0.08em",
-                                    textTransform: "uppercase",
-                                    marginBottom: 2,
-                                  }}
+                                  style={characterDetailDialogStyle17}
                                 >
                                   {label}
                                 </div>
                                 <div
-                                  style={{
-                                    fontSize: 14,
-                                    fontWeight: 700,
-                                    color: colors.goldMuted,
-                                    fontFamily: fonts.display,
-                                  }}
+                                  style={characterDetailDialogStyle18}
                                 >
                                   {val as string}
                                 </div>
@@ -316,28 +196,11 @@ export function CharacterDetailDialog({
         </ScrollArea>
 
         <div
-          style={{
-            padding: "14px 24px",
-            borderTop: `1px solid ${colors.goldBorder}`,
-            display: "flex",
-            justifyContent: "flex-end",
-            gap: 10,
-          }}
+          style={characterDetailDialogStyle19}
         >
           <button
             onClick={() => onOpenChange(false)}
-            style={{
-              padding: "10px 20px",
-              background: "rgba(255,255,255,0.04)",
-              border: `1px solid ${colors.subtleBorder}`,
-              borderRadius: 6,
-              color: colors.textMuted,
-              fontSize: 13,
-              fontFamily: fonts.display,
-              fontWeight: 600,
-              cursor: "pointer",
-              transition: "background 0.12s",
-            }}
+            style={characterDetailDialogStyle20}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = "rgba(255,255,255,0.08)";
             }}
@@ -394,3 +257,166 @@ export function CharacterDetailDialog({
     </Dialog>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const sectionHeaderStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  margin: "20px 0 12px",
+};
+const sectionHeaderStyle2: CSSProperties = {
+  fontSize: 11,
+  color: colors.goldMuted,
+  fontFamily: fonts.display,
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+  fontWeight: 700,
+  whiteSpace: "nowrap",
+};
+const sectionHeaderStyle3: CSSProperties = { flex: 1, height: 1, background: colors.goldBorder };
+  const characterDetailDialogStyle: CSSProperties = {
+            maxWidth: 640,
+            background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 100%)",
+            border: `1px solid ${colors.goldBorder}`,
+            borderRadius: 12,
+            padding: 0,
+            overflow: "hidden",
+            fontFamily: fonts.body,
+            color: colors.text,
+};
+const characterDetailDialogStyle2: CSSProperties = { display: "flex", alignItems: "center", gap: 16 };
+  const characterDetailDialogStyle3: CSSProperties = {
+                  width: 64,
+                  height: 64,
+                  flexShrink: 0,
+                  background: "rgba(0,0,0,0.5)",
+                  border: "1px solid rgba(180,140,80,0.2)",
+                  borderRadius: 8,
+                  overflow: "hidden",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+};
+const characterDetailDialogStyle4: CSSProperties = {
+  width: 56,
+  height: 56,
+  imageRendering: "pixelated",
+  filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.8))",
+};
+const characterDetailDialogStyle5: CSSProperties = {
+  margin: "0 0 8px",
+  fontSize: 22,
+  fontWeight: 700,
+  color: colors.text,
+  fontFamily: fonts.display,
+  letterSpacing: "0.04em",
+};
+const characterDetailDialogStyle6: CSSProperties = {
+  fontSize: 11,
+  color: colors.goldMuted,
+  background: "rgba(180,140,80,0.1)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 4,
+  padding: "2px 9px",
+  fontFamily: fonts.display,
+  letterSpacing: "0.04em",
+};
+const characterDetailDialogStyle7: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(7, 1fr)",
+  gap: 6,
+};
+const characterDetailDialogStyle8: CSSProperties = {
+  background: "rgba(255,255,255,0.03)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 7,
+  padding: "10px 6px",
+  textAlign: "center",
+};
+const characterDetailDialogStyle9: CSSProperties = {
+  fontSize: 9,
+  color: colors.textMuted,
+  fontFamily: fonts.display,
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+  marginBottom: 5,
+};
+const characterDetailDialogStyle10: CSSProperties = {
+  fontSize: 22,
+  fontWeight: 700,
+  color: colors.text,
+  fontFamily: fonts.display,
+  lineHeight: 1,
+};
+const characterDetailDialogStyle11: CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 6,
+};
+const characterDetailDialogStyle12: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 12,
+  padding: "10px 12px",
+  background: "rgba(255,255,255,0.025)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 7,
+};
+const characterDetailDialogStyle13: CSSProperties = {
+  width: 44,
+  height: 44,
+  flexShrink: 0,
+  background: "rgba(0,0,0,0.4)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 6,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+const characterDetailDialogStyle14: CSSProperties = {
+  width: 34,
+  height: 34,
+  imageRendering: "pixelated",
+};
+const characterDetailDialogStyle15: CSSProperties = {
+  fontSize: 14,
+  fontWeight: 700,
+  color: colors.text,
+  fontFamily: fonts.display,
+  marginBottom: 3,
+};
+const characterDetailDialogStyle16: CSSProperties = { display: "flex", gap: 16, flexShrink: 0 };
+  const characterDetailDialogStyle17: CSSProperties = {
+                                      fontSize: 9,
+                                      color: colors.textMuted,
+                                      fontFamily: fonts.display,
+                                      letterSpacing: "0.08em",
+                                      textTransform: "uppercase",
+                                      marginBottom: 2,
+};
+const characterDetailDialogStyle18: CSSProperties = {
+  fontSize: 14,
+  fontWeight: 700,
+  color: colors.goldMuted,
+  fontFamily: fonts.display,
+};
+const characterDetailDialogStyle19: CSSProperties = {
+  padding: "14px 24px",
+  borderTop: `1px solid ${colors.goldBorder}`,
+  display: "flex",
+  justifyContent: "flex-end",
+  gap: 10,
+};
+const characterDetailDialogStyle20: CSSProperties = {
+  padding: "10px 20px",
+  background: "rgba(255,255,255,0.04)",
+  border: `1px solid ${colors.subtleBorder}`,
+  borderRadius: 6,
+  color: colors.textMuted,
+  fontSize: 13,
+  fontFamily: fonts.display,
+  fontWeight: 600,
+  cursor: "pointer",
+  transition: "background 0.12s",
+};

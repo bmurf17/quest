@@ -1,15 +1,11 @@
 import CharacterBuilder from "./CharacterBuilder";
 import { colors, fonts } from "@/theme";
+import type { CSSProperties } from "react";
 
 export default function CharacterCreation() {
   return (
     <div
-      style={{
-        minHeight: "100vh",
-        background: "#111009",
-        fontFamily: fonts.body,
-        color: colors.text,
-      }}
+      style={characterCreationStyle}
     >
       <div
         style={{
@@ -18,15 +14,7 @@ export default function CharacterCreation() {
         }}
       >
         <h1
-          style={{
-            margin: 0,
-            fontSize: 11,
-            fontWeight: 700,
-            color: colors.goldMuted,
-            fontFamily: fonts.display,
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
-          }}
+          style={characterCreationStyle2}
         >
           Character Builder
         </h1>
@@ -35,3 +23,20 @@ export default function CharacterCreation() {
     </div>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const characterCreationStyle: CSSProperties = {
+  minHeight: "100vh",
+  background: "#111009",
+  fontFamily: fonts.body,
+  color: colors.text,
+};
+const characterCreationStyle2: CSSProperties = {
+  margin: 0,
+  fontSize: 11,
+  fontWeight: 700,
+  color: colors.goldMuted,
+  fontFamily: fonts.display,
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
+};

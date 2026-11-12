@@ -3,6 +3,7 @@ import { useGameStore } from "@/state/GameState";
 import closedChest from "@/assets/closed-chest.png";
 import openChest from "@/assets/open-chest.png";
 import emptyChest from "@/assets/empty-chest.png"
+import type { CSSProperties } from "react";
 
 export default function RoomChest() {
   const state = useGameStore((state: GameState) => state);
@@ -16,12 +17,7 @@ export default function RoomChest() {
               src={closedChest}
               alt="closed-chest"
               className="mx-auto"
-              style={{
-                width: "128px",
-                height: "128px",
-                imageRendering: "pixelated",
-                filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.5))",
-              }}
+              style={roomChestStyle}
             />
           ) : (
             <>
@@ -30,24 +26,14 @@ export default function RoomChest() {
                   src={openChest}
                   alt="open-chest"
                   className="mx-auto"
-                  style={{
-                    width: "128px",
-                    height: "128px",
-                    imageRendering: "pixelated",
-                    filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.5))",
-                  }}
+                  style={roomChestStyle2}
                 />
               ) : (
                 <img
                   src={emptyChest}
                   alt="empty-chest"
                   className="mx-auto"
-                  style={{
-                    width: "128px",
-                    height: "128px",
-                    imageRendering: "pixelated",
-                    filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.5))",
-                  }}
+                  style={roomChestStyle2}
                 />
               )}
             </>
@@ -63,3 +49,17 @@ export default function RoomChest() {
     </>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const roomChestStyle: CSSProperties = {
+  width: "128px",
+  height: "128px",
+  imageRendering: "pixelated",
+  filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.5))",
+};
+const roomChestStyle2: CSSProperties = {
+  width: "128px",
+  height: "128px",
+  imageRendering: "pixelated",
+  filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.5))",
+};

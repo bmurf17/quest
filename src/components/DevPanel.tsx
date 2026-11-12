@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
+import type { CSSProperties } from "react";
 import { colors, fonts } from "@/theme";
 import { useGameStore } from "@/state/GameState";
 import {
@@ -118,42 +119,13 @@ export default function DevPanel() {
 
   return (
     <div
-      style={{
-        position: "fixed",
-        top: 56,
-        right: 12,
-        width: 360,
-        maxHeight: "calc(100vh - 70px)",
-        background: "rgba(10,9,6,0.97)",
-        border: `1px solid ${colors.goldBorder}`,
-        borderRadius: 8,
-        zIndex: 200,
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
-      }}
+      style={devPanelStyle}
     >
       <div
-        style={{
-          padding: "10px 12px",
-          borderBottom: `1px solid ${colors.goldBorder}`,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 8,
-          flexShrink: 0,
-        }}
+        style={devPanelStyle2}
       >
         <span
-          style={{
-            fontSize: 12,
-            fontWeight: 700,
-            color: colors.gold,
-            fontFamily: fonts.display,
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
-          }}
+          style={devPanelStyle3}
         >
           Dev Panel
         </span>
@@ -161,36 +133,20 @@ export default function DevPanel() {
 
       {message && (
         <div
-          style={{
-            padding: "6px 12px",
-            fontSize: 11,
-            color: colors.gold,
-            background: "rgba(212,175,55,0.08)",
-            borderBottom: `1px solid ${colors.goldBorder}`,
-          }}
+          style={devPanelStyle4}
         >
           {message}
         </div>
       )}
 
-      <div style={{ padding: "10px 12px", borderBottom: `1px solid ${colors.goldBorder}`, flexShrink: 0 }}>
-        <div style={{ display: "flex", gap: 6, marginBottom: 6 }}>
+      <div style={devPanelStyle5}>
+        <div style={devPanelStyle6}>
           <input
             value={newSlotName}
             onChange={(e) => setNewSlotName(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleCreateNew()}
             placeholder="New save name..."
-            style={{
-              flex: 1,
-              padding: "4px 8px",
-              fontSize: 11,
-              background: "rgba(255,255,255,0.05)",
-              border: `1px solid ${colors.goldBorder}`,
-              borderRadius: 4,
-              color: colors.text,
-              fontFamily: fonts.body,
-              outline: "none",
-            }}
+            style={devPanelStyle7}
           />
           <button onClick={handleCreateNew} style={btnBase}>
             Save
@@ -213,15 +169,10 @@ export default function DevPanel() {
         </div>
       </div>
 
-      <div style={{ flex: 1, overflowY: "auto", padding: "4px 0" }}>
+      <div style={devPanelStyle8}>
         {saves.length === 0 && (
           <div
-            style={{
-              padding: "20px 12px",
-              textAlign: "center",
-              fontSize: 11,
-              color: colors.textMuted,
-            }}
+            style={devPanelStyle9}
           >
             No saves yet.
           </div>
@@ -232,34 +183,21 @@ export default function DevPanel() {
           return (
             <div
               key={slot}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                padding: "6px 12px",
-                borderBottom: `1px solid ${colors.subtleBorder}`,
-              }}
+              style={devPanelStyle10}
             >
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: colors.text,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
+                  style={devPanelStyle11}
                 >
                   {label || slot}
                 </div>
                 {data && (
-                  <div style={{ fontSize: 9, color: colors.textMuted, marginTop: 1 }}>
+                  <div style={devPanelStyle12}>
                     {formatDate(data.timestamp)}
                   </div>
                 )}
               </div>
-              <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
+              <div style={devPanelStyle13}>
                 <button
                   onClick={() => handleSave(slot)}
                   style={{ ...btnBase, fontSize: 9, padding: "3px 7px" }}
@@ -306,3 +244,81 @@ export default function DevPanel() {
     </div>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const devPanelStyle: CSSProperties = {
+  position: "fixed",
+  top: 56,
+  right: 12,
+  width: 360,
+  maxHeight: "calc(100vh - 70px)",
+  background: "rgba(10,9,6,0.97)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 8,
+  zIndex: 200,
+  display: "flex",
+  flexDirection: "column",
+  overflow: "hidden",
+  boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
+};
+const devPanelStyle2: CSSProperties = {
+  padding: "10px 12px",
+  borderBottom: `1px solid ${colors.goldBorder}`,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: 8,
+  flexShrink: 0,
+};
+const devPanelStyle3: CSSProperties = {
+  fontSize: 12,
+  fontWeight: 700,
+  color: colors.gold,
+  fontFamily: fonts.display,
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+};
+const devPanelStyle4: CSSProperties = {
+  padding: "6px 12px",
+  fontSize: 11,
+  color: colors.gold,
+  background: "rgba(212,175,55,0.08)",
+  borderBottom: `1px solid ${colors.goldBorder}`,
+};
+const devPanelStyle5: CSSProperties = { padding: "10px 12px", borderBottom: `1px solid ${colors.goldBorder}`, flexShrink: 0 };
+  const devPanelStyle6: CSSProperties = { display: "flex", gap: 6, marginBottom: 6 };
+  const devPanelStyle7: CSSProperties = {
+                flex: 1,
+                padding: "4px 8px",
+                fontSize: 11,
+                background: "rgba(255,255,255,0.05)",
+                border: `1px solid ${colors.goldBorder}`,
+                borderRadius: 4,
+                color: colors.text,
+                fontFamily: fonts.body,
+                outline: "none",
+};
+const devPanelStyle8: CSSProperties = { flex: 1, overflowY: "auto", padding: "4px 0" };
+  const devPanelStyle9: CSSProperties = {
+                padding: "20px 12px",
+                textAlign: "center",
+                fontSize: 11,
+                color: colors.textMuted,
+};
+const devPanelStyle10: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 6,
+  padding: "6px 12px",
+  borderBottom: `1px solid ${colors.subtleBorder}`,
+};
+const devPanelStyle11: CSSProperties = {
+  fontSize: 11,
+  fontWeight: 600,
+  color: colors.text,
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
+};
+const devPanelStyle12: CSSProperties = { fontSize: 9, color: colors.textMuted, marginTop: 1 };
+const devPanelStyle13: CSSProperties = { display: "flex", gap: 4, flexShrink: 0 };

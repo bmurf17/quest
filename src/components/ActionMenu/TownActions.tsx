@@ -1,5 +1,6 @@
 import { ActionBtn } from "./ActionBtn";
 import { SectionLabel } from "./SectionLabel";
+import type { CSSProperties } from "react";
 
 export function TownActions({
   onExplore,
@@ -11,7 +12,7 @@ export function TownActions({
   onRest: () => void;
 }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+    <div style={townActionsStyle}>
       <SectionLabel>Town</SectionLabel>
       <ActionBtn variant="success" onClick={onExplore} fullWidth>
         <svg
@@ -67,3 +68,6 @@ export function TownActions({
     </div>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const townActionsStyle: CSSProperties = { display: "flex", flexDirection: "column", gap: 6 };

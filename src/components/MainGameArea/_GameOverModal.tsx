@@ -10,6 +10,7 @@ import { colors, fonts } from "@/theme";
 import { memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Skull } from "lucide-react";
+import type { CSSProperties } from "react";
 
 function GameOverModalComponent() {
   const gameStatus = useGameStore((state) => state.gameStatus);
@@ -24,17 +25,7 @@ function GameOverModalComponent() {
   return (
     <Dialog open={true} onOpenChange={() => {}}>
       <DialogContent
-        style={{
-          maxWidth: 420,
-          background: "linear-gradient(160deg, #1a0a0a 0%, #2d1515 100%)",
-          border: `1px solid ${colors.danger}`,
-          borderRadius: 12,
-          padding: 0,
-          overflow: "hidden",
-          fontFamily: fonts.body,
-          color: colors.text,
-          textAlign: "center",
-        }}
+        style={gameOverModalComponentStyle}
       >
         <DialogHeader
           style={{
@@ -43,23 +34,10 @@ function GameOverModalComponent() {
           }}
         >
           <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              marginBottom: 16,
-            }}
+            style={gameOverModalComponentStyle2}
           >
             <div
-              style={{
-                width: 72,
-                height: 72,
-                borderRadius: "50%",
-                background: "rgba(239,68,68,0.15)",
-                border: `2px solid ${colors.danger}`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              style={gameOverModalComponentStyle3}
             >
               <Skull
                 size={36}
@@ -70,27 +48,13 @@ function GameOverModalComponent() {
           </div>
 
           <DialogTitle
-            style={{
-              margin: 0,
-              fontSize: 28,
-              fontWeight: 700,
-              color: colors.danger,
-              fontFamily: fonts.display,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-            }}
+            style={gameOverModalComponentStyle4}
           >
             Game Over
           </DialogTitle>
 
           <p
-            style={{
-              margin: "12px 0 0",
-              fontSize: 14,
-              color: colors.textMuted,
-              fontFamily: fonts.body,
-              lineHeight: 1.5,
-            }}
+            style={gameOverModalComponentStyle5}
           >
             Your party has fallen in battle.
             <br />
@@ -101,25 +65,7 @@ function GameOverModalComponent() {
         <div style={{ padding: "24px" }}>
           <button
             onClick={handleRestart}
-            style={{
-              width: "100%",
-              padding: "14px 0",
-              background: `rgba(239,68,68,0.15)`,
-              border: `1px solid ${colors.danger}`,
-              borderRadius: 7,
-              color: colors.danger,
-              fontFamily: fonts.display,
-              fontSize: 14,
-              fontWeight: 700,
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              cursor: "pointer",
-              transition: "all 0.2s",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-            }}
+            style={gameOverModalComponentStyle6}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = "rgba(239,68,68,0.25)";
             }}
@@ -136,3 +82,66 @@ function GameOverModalComponent() {
 }
 
 export default memo(GameOverModalComponent);
+
+// Static style objects hoisted out of the render path.
+const gameOverModalComponentStyle: CSSProperties = {
+  maxWidth: 420,
+  background: "linear-gradient(160deg, #1a0a0a 0%, #2d1515 100%)",
+  border: `1px solid ${colors.danger}`,
+  borderRadius: 12,
+  padding: 0,
+  overflow: "hidden",
+  fontFamily: fonts.body,
+  color: colors.text,
+  textAlign: "center",
+};
+const gameOverModalComponentStyle2: CSSProperties = {
+  display: "flex",
+  justifyContent: "center",
+  marginBottom: 16,
+};
+const gameOverModalComponentStyle3: CSSProperties = {
+  width: 72,
+  height: 72,
+  borderRadius: "50%",
+  background: "rgba(239,68,68,0.15)",
+  border: `2px solid ${colors.danger}`,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+const gameOverModalComponentStyle4: CSSProperties = {
+  margin: 0,
+  fontSize: 28,
+  fontWeight: 700,
+  color: colors.danger,
+  fontFamily: fonts.display,
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+};
+const gameOverModalComponentStyle5: CSSProperties = {
+  margin: "12px 0 0",
+  fontSize: 14,
+  color: colors.textMuted,
+  fontFamily: fonts.body,
+  lineHeight: 1.5,
+};
+const gameOverModalComponentStyle6: CSSProperties = {
+  width: "100%",
+  padding: "14px 0",
+  background: `rgba(239,68,68,0.15)`,
+  border: `1px solid ${colors.danger}`,
+  borderRadius: 7,
+  color: colors.danger,
+  fontFamily: fonts.display,
+  fontSize: 14,
+  fontWeight: 700,
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+  cursor: "pointer",
+  transition: "all 0.2s",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 8,
+};

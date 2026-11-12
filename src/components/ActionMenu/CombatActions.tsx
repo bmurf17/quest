@@ -3,6 +3,7 @@ import { formatDamageDice } from "@/lib/dice";
 import { AbilitySlot } from "./AbilitySlot";
 import { SectionLabel } from "./SectionLabel";
 import { useCombatActions } from "./useCombatActions";
+import type { CSSProperties } from "react";
 
 export function CombatActions({ fighter }: { fighter: CharacterData }) {
   const { handleAttackClick, handleSpellClick } = useCombatActions();
@@ -13,13 +14,7 @@ export function CombatActions({ fighter }: { fighter: CharacterData }) {
         <>
           <SectionLabel>Weapons</SectionLabel>
           <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(4, 1fr)",
-              gap: 6,
-              marginBottom: 4,
-              marginLeft: 4,
-            }}
+            style={combatActionsStyle}
           >
             <AbilitySlot
               img={fighter.equipment.weapon.img}
@@ -35,12 +30,7 @@ export function CombatActions({ fighter }: { fighter: CharacterData }) {
         <>
           <SectionLabel>Skills</SectionLabel>
           <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(4, 1fr)",
-              gap: 6,
-              marginLeft: 4,
-            }}
+            style={combatActionsStyle2}
           >
             {fighter.spells.map((spell, idx) => {
               const notEnoughMana = fighter.mp < spell.manaCost;
@@ -63,3 +53,18 @@ export function CombatActions({ fighter }: { fighter: CharacterData }) {
     </div>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const combatActionsStyle: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(4, 1fr)",
+  gap: 6,
+  marginBottom: 4,
+  marginLeft: 4,
+};
+const combatActionsStyle2: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(4, 1fr)",
+  gap: 6,
+  marginLeft: 4,
+};

@@ -3,6 +3,7 @@ import { useGameStore } from "@/state/GameState";
 import type { Section } from "@/types/Room";
 import { useEffect, useState } from "react";
 import { colors, fonts } from "@/theme";
+import type { CSSProperties } from "react";
 
 function Toast({
   type,
@@ -34,22 +35,13 @@ function Toast({
         maxWidth: 360,
       }}
     >
-      <div style={{ flex: 1, fontFamily: "'Crimson Text', Georgia, serif", lineHeight: 1.5 }}>
+      <div style={toastStyle}>
         {message}
       </div>
       <button
         type="button"
         onClick={onClose}
-        style={{
-          background: "none",
-          border: "none",
-          color: "inherit",
-          cursor: "pointer",
-          padding: 0,
-          fontSize: 18,
-          lineHeight: 1,
-          opacity: 0.7,
-        }}
+        style={toastStyle2}
       >
         ×
       </button>
@@ -155,55 +147,27 @@ export default function ManageSections() {
   return (
     <>
       <main
-        style={{
-          minHeight: "100vh",
-          background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 50%, #0f0e09 100%)",
-          padding: "48px 32px 80px",
-          fontFamily: fonts.body,
-        }}
+        style={manageSectionsStyle}
       >
         <div style={{ maxWidth: 640, margin: "0 auto" }}>
           <a
             href="/admin"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 6,
-              color: colors.goldMuted,
-              fontSize: 13,
-              textDecoration: "none",
-              marginBottom: 24,
-              fontFamily: fonts.display,
-              letterSpacing: "0.04em",
-            }}
+            style={manageSectionsStyle2}
           >
             ← Back to Admin
           </a>
 
           <h1
-            style={{
-              margin: 0,
-              marginBottom: 8,
-              fontSize: 26,
-              fontWeight: 700,
-              color: colors.text,
-              fontFamily: fonts.display,
-              letterSpacing: "0.06em",
-            }}
+            style={manageSectionsStyle3}
           >
             Sections
           </h1>
-          <p style={{ margin: 0, marginBottom: 32, fontSize: 14, color: colors.muted }}>
+          <p style={manageSectionsStyle4}>
             Create and manage exploration sections
           </p>
 
           <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 16,
-              marginBottom: 40,
-            }}
+            style={manageSectionsStyle5}
           >
             {sections.map((section) => {
               const isEditing = editingId === section.id;
@@ -222,26 +186,13 @@ export default function ManageSections() {
                   }}
                 >
                   <div
-                    style={{
-                      width: 28,
-                      height: 28,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      background: "rgba(212,175,55,0.1)",
-                      border: "1px solid rgba(212,175,55,0.2)",
-                      borderRadius: 6,
-                      color: colors.gold,
-                      fontSize: 12,
-                      fontFamily: fonts.display,
-                      fontWeight: 700,
-                    }}
+                    style={manageSectionsStyle6}
                   >
                     {section.id}
                   </div>
 
                   {isEditing ? (
-                    <div style={{ flex: 1, display: "flex", gap: 8 }}>
+                    <div style={manageSectionsStyle7}>
                       <input
                         value={editName}
                         onChange={(e) => setEditName(e.target.value)}
@@ -249,49 +200,19 @@ export default function ManageSections() {
                           if (e.key === "Enter") handleUpdate(section.id);
                           if (e.key === "Escape") setEditingId(null);
                         }}
-                        style={{
-                          flex: 1,
-                          padding: "6px 10px",
-                          background: "rgba(0,0,0,0.3)",
-                          border: `1px solid ${colors.goldBorder}`,
-                          borderRadius: 4,
-                          color: colors.text,
-                          fontSize: 14,
-                          fontFamily: fonts.body,
-                          outline: "none",
-                        }}
+                        style={manageSectionsStyle8}
                         autoFocus
                       />
                       <button
                         onClick={() => handleUpdate(section.id)}
                         disabled={isSubmitting || !editName.trim()}
-                        style={{
-                          padding: "6px 12px",
-                          background: "rgba(5,150,105,0.15)",
-                          border: "1px solid rgba(52,211,153,0.25)",
-                          borderRadius: 4,
-                          color: "#6EE7B7",
-                          fontSize: 12,
-                          fontFamily: fonts.display,
-                          cursor: "pointer",
-                          letterSpacing: "0.04em",
-                        }}
+                        style={manageSectionsStyle9}
                       >
                         Save
                       </button>
                       <button
                         onClick={() => setEditingId(null)}
-                        style={{
-                          padding: "6px 12px",
-                          background: "rgba(255,255,255,0.04)",
-                          border: `1px solid ${colors.subtleBorder}`,
-                          borderRadius: 4,
-                          color: colors.muted,
-                          fontSize: 12,
-                          fontFamily: fonts.display,
-                          cursor: "pointer",
-                          letterSpacing: "0.04em",
-                        }}
+                        style={manageSectionsStyle10}
                       >
                         Cancel
                       </button>
@@ -299,13 +220,7 @@ export default function ManageSections() {
                   ) : (
                     <>
                       <span
-                        style={{
-                          flex: 1,
-                          color: colors.text,
-                          fontSize: 15,
-                          fontFamily: fonts.display,
-                          letterSpacing: "0.03em",
-                        }}
+                        style={manageSectionsStyle11}
                       >
                         {section.name}
                       </span>
@@ -314,34 +229,14 @@ export default function ManageSections() {
                           setEditingId(section.id);
                           setEditName(section.name);
                         }}
-                        style={{
-                          padding: "5px 10px",
-                          background: "rgba(255,255,255,0.04)",
-                          border: `1px solid ${colors.subtleBorder}`,
-                          borderRadius: 4,
-                          color: colors.goldMuted,
-                          fontSize: 11,
-                          fontFamily: fonts.display,
-                          cursor: "pointer",
-                          letterSpacing: "0.04em",
-                        }}
+                        style={manageSectionsStyle12}
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => handleDelete(section.id, section.name)}
                         disabled={isSubmitting}
-                        style={{
-                          padding: "5px 10px",
-                          background: "rgba(220,38,38,0.07)",
-                          border: "1px solid rgba(220,38,38,0.25)",
-                          borderRadius: 4,
-                          color: "#FCA5A5",
-                          fontSize: 11,
-                          fontFamily: fonts.display,
-                          cursor: "pointer",
-                          letterSpacing: "0.04em",
-                        }}
+                        style={manageSectionsStyle13}
                       >
                         Delete
                       </button>
@@ -353,15 +248,7 @@ export default function ManageSections() {
 
             {sections.length === 0 && (
               <div
-                style={{
-                  padding: "24px 16px",
-                  background: "rgba(255,255,255,0.02)",
-                  border: `1px solid ${colors.subtleBorder}`,
-                  borderRadius: 8,
-                  textAlign: "center",
-                  color: colors.muted,
-                  fontSize: 14,
-                }}
+                style={manageSectionsStyle14}
               >
                 No sections yet. Create one below.
               </div>
@@ -369,23 +256,10 @@ export default function ManageSections() {
           </div>
 
           <div
-            style={{
-              padding: "20px 18px",
-              background: "rgba(255,255,255,0.025)",
-              border: `1px solid ${colors.goldBorder}`,
-              borderRadius: 10,
-            }}
+            style={manageSectionsStyle15}
           >
             <div
-              style={{
-                fontSize: 12,
-                fontWeight: 700,
-                color: colors.gold,
-                fontFamily: fonts.display,
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                marginBottom: 14,
-              }}
+              style={manageSectionsStyle16}
             >
               Create Section
             </div>
@@ -395,17 +269,7 @@ export default function ManageSections() {
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder="Section name"
-                style={{
-                  flex: 1,
-                  padding: "10px 12px",
-                  background: "rgba(0,0,0,0.3)",
-                  border: `1px solid ${colors.goldBorder}`,
-                  borderRadius: 6,
-                  color: colors.text,
-                  fontSize: 14,
-                  fontFamily: fonts.body,
-                  outline: "none",
-                }}
+                style={manageSectionsStyle17}
               />
               <button
                 type="submit"
@@ -442,3 +306,161 @@ export default function ManageSections() {
     </>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const toastStyle: CSSProperties = { flex: 1, fontFamily: "'Crimson Text', Georgia, serif", lineHeight: 1.5 };
+  const toastStyle2: CSSProperties = {
+            background: "none",
+            border: "none",
+            color: "inherit",
+            cursor: "pointer",
+            padding: 0,
+            fontSize: 18,
+            lineHeight: 1,
+            opacity: 0.7,
+};
+const manageSectionsStyle: CSSProperties = {
+  minHeight: "100vh",
+  background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 50%, #0f0e09 100%)",
+  padding: "48px 32px 80px",
+  fontFamily: fonts.body,
+};
+const manageSectionsStyle2: CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 6,
+  color: colors.goldMuted,
+  fontSize: 13,
+  textDecoration: "none",
+  marginBottom: 24,
+  fontFamily: fonts.display,
+  letterSpacing: "0.04em",
+};
+const manageSectionsStyle3: CSSProperties = {
+  margin: 0,
+  marginBottom: 8,
+  fontSize: 26,
+  fontWeight: 700,
+  color: colors.text,
+  fontFamily: fonts.display,
+  letterSpacing: "0.06em",
+};
+const manageSectionsStyle4: CSSProperties = { margin: 0, marginBottom: 32, fontSize: 14, color: colors.muted };
+  const manageSectionsStyle5: CSSProperties = {
+                display: "flex",
+                flexDirection: "column",
+                gap: 16,
+                marginBottom: 40,
+};
+const manageSectionsStyle6: CSSProperties = {
+  width: 28,
+  height: 28,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: "rgba(212,175,55,0.1)",
+  border: "1px solid rgba(212,175,55,0.2)",
+  borderRadius: 6,
+  color: colors.gold,
+  fontSize: 12,
+  fontFamily: fonts.display,
+  fontWeight: 700,
+};
+const manageSectionsStyle7: CSSProperties = { flex: 1, display: "flex", gap: 8 };
+  const manageSectionsStyle8: CSSProperties = {
+                            flex: 1,
+                            padding: "6px 10px",
+                            background: "rgba(0,0,0,0.3)",
+                            border: `1px solid ${colors.goldBorder}`,
+                            borderRadius: 4,
+                            color: colors.text,
+                            fontSize: 14,
+                            fontFamily: fonts.body,
+                            outline: "none",
+};
+const manageSectionsStyle9: CSSProperties = {
+  padding: "6px 12px",
+  background: "rgba(5,150,105,0.15)",
+  border: "1px solid rgba(52,211,153,0.25)",
+  borderRadius: 4,
+  color: "#6EE7B7",
+  fontSize: 12,
+  fontFamily: fonts.display,
+  cursor: "pointer",
+  letterSpacing: "0.04em",
+};
+const manageSectionsStyle10: CSSProperties = {
+  padding: "6px 12px",
+  background: "rgba(255,255,255,0.04)",
+  border: `1px solid ${colors.subtleBorder}`,
+  borderRadius: 4,
+  color: colors.muted,
+  fontSize: 12,
+  fontFamily: fonts.display,
+  cursor: "pointer",
+  letterSpacing: "0.04em",
+};
+const manageSectionsStyle11: CSSProperties = {
+  flex: 1,
+  color: colors.text,
+  fontSize: 15,
+  fontFamily: fonts.display,
+  letterSpacing: "0.03em",
+};
+const manageSectionsStyle12: CSSProperties = {
+  padding: "5px 10px",
+  background: "rgba(255,255,255,0.04)",
+  border: `1px solid ${colors.subtleBorder}`,
+  borderRadius: 4,
+  color: colors.goldMuted,
+  fontSize: 11,
+  fontFamily: fonts.display,
+  cursor: "pointer",
+  letterSpacing: "0.04em",
+};
+const manageSectionsStyle13: CSSProperties = {
+  padding: "5px 10px",
+  background: "rgba(220,38,38,0.07)",
+  border: "1px solid rgba(220,38,38,0.25)",
+  borderRadius: 4,
+  color: "#FCA5A5",
+  fontSize: 11,
+  fontFamily: fonts.display,
+  cursor: "pointer",
+  letterSpacing: "0.04em",
+};
+const manageSectionsStyle14: CSSProperties = {
+  padding: "24px 16px",
+  background: "rgba(255,255,255,0.02)",
+  border: `1px solid ${colors.subtleBorder}`,
+  borderRadius: 8,
+  textAlign: "center",
+  color: colors.muted,
+  fontSize: 14,
+};
+const manageSectionsStyle15: CSSProperties = {
+  padding: "20px 18px",
+  background: "rgba(255,255,255,0.025)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 10,
+};
+const manageSectionsStyle16: CSSProperties = {
+  fontSize: 12,
+  fontWeight: 700,
+  color: colors.gold,
+  fontFamily: fonts.display,
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+  marginBottom: 14,
+};
+const manageSectionsStyle17: CSSProperties = {
+  flex: 1,
+  padding: "10px 12px",
+  background: "rgba(0,0,0,0.3)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 6,
+  color: colors.text,
+  fontSize: 14,
+  fontFamily: fonts.body,
+  outline: "none",
+};

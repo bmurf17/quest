@@ -1,5 +1,6 @@
 import { colors, fonts } from "@/theme";
 import { inputStyle } from "./styles";
+import type { CSSProperties } from "react";
 
 export const Label = ({
   htmlFor,
@@ -10,16 +11,7 @@ export const Label = ({
 }) => (
   <label
     htmlFor={htmlFor}
-    style={{
-      display: "block",
-      fontSize: 11,
-      fontWeight: 600,
-      letterSpacing: "0.08em",
-      textTransform: "uppercase",
-      color: colors.muted,
-      marginBottom: 6,
-      fontFamily: fonts.display,
-    }}
+    style={labelStyle}
   >
     {children}
   </label>
@@ -82,39 +74,55 @@ export const StyledSelect = (
 
 export const Divider = ({ label }: { label: string }) => (
   <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: 12,
-      margin: "20px 0 16px",
-    }}
+    style={dividerStyle}
   >
     <div
-      style={{
-        flex: 1,
-        height: 1,
-        background: `linear-gradient(to right, transparent, ${colors.goldBorder})`,
-      }}
+      style={dividerStyle2}
     />
     <span
-      style={{
-        fontSize: 11,
-        fontWeight: 700,
-        letterSpacing: "0.12em",
-        textTransform: "uppercase",
-        color: colors.goldMuted,
-        fontFamily: fonts.display,
-      }}
+      style={dividerStyle3}
     >
       {label}
     </span>
     <div
-      style={{
-        flex: 1,
-        height: 1,
-        background:
-          "linear-gradient(to left, transparent, rgba(180,140,80,0.3))",
-      }}
+      style={dividerStyle4}
     />
   </div>
 );
+
+// Static style objects hoisted out of the render path.
+const labelStyle: CSSProperties = {
+  display: "block",
+  fontSize: 11,
+  fontWeight: 600,
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+  color: colors.muted,
+  marginBottom: 6,
+  fontFamily: fonts.display,
+};
+const dividerStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 12,
+  margin: "20px 0 16px",
+};
+const dividerStyle2: CSSProperties = {
+  flex: 1,
+  height: 1,
+  background: `linear-gradient(to right, transparent, ${colors.goldBorder})`,
+};
+const dividerStyle3: CSSProperties = {
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
+  color: colors.goldMuted,
+  fontFamily: fonts.display,
+};
+const dividerStyle4: CSSProperties = {
+  flex: 1,
+  height: 1,
+  background:
+    "linear-gradient(to left, transparent, rgba(180,140,80,0.3))",
+};

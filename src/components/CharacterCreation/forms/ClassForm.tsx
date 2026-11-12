@@ -1,5 +1,6 @@
 import { useCharacter } from "@/components/CharacterCreation/CharacterContext";
 import { colors, fonts } from "@/theme";
+import type { CSSProperties } from "react";
 
 const CLASSES = ["Barbarian", "Bard", "Cleric", "Druid", "Fighter"];
 
@@ -8,39 +9,19 @@ export default function ClassForm() {
 
   return (
     <>
-      <style>{`
-        .class-card:hover { background: rgba(212,175,55,0.07) !important; border-color: rgba(212,175,55,0.25) !important; }
-      `}</style>
       <div>
         <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            margin: "0 0 18px",
-          }}
+          style={classFormStyle}
         >
           <span
-            style={{
-              fontSize: 11,
-              color: colors.goldMuted,
-              fontFamily: fonts.display,
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              fontWeight: 700,
-              whiteSpace: "nowrap",
-            }}
+            style={classFormStyle2}
           >
             Choose Your Class
           </span>
-          <div style={{ flex: 1, height: 1, background: colors.goldBorder }} />
+          <div style={classFormStyle3} />
         </div>
         <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 6,
-          }}
+          style={classFormStyle4}
         >
           {CLASSES.map((cls) => {
             const active = character.class === cls.toLowerCase();
@@ -79,12 +60,7 @@ export default function ClassForm() {
                 >
                   {active && (
                     <div
-                      style={{
-                        width: 6,
-                        height: 6,
-                        borderRadius: "50%",
-                        background: "#0d0b07",
-                      }}
+                      style={classFormStyle5}
                     />
                   )}
                 </div>
@@ -106,3 +82,32 @@ export default function ClassForm() {
     </>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const classFormStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  margin: "0 0 18px",
+};
+const classFormStyle2: CSSProperties = {
+  fontSize: 11,
+  color: colors.goldMuted,
+  fontFamily: fonts.display,
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+  fontWeight: 700,
+  whiteSpace: "nowrap",
+};
+const classFormStyle3: CSSProperties = { flex: 1, height: 1, background: colors.goldBorder };
+  const classFormStyle4: CSSProperties = {
+              display: "flex",
+              flexDirection: "column",
+              gap: 6,
+};
+const classFormStyle5: CSSProperties = {
+  width: 6,
+  height: 6,
+  borderRadius: "50%",
+  background: "#0d0b07",
+};

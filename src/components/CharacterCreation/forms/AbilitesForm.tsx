@@ -6,6 +6,7 @@ import {
 } from "@/lib/character";
 import { useCharacter } from "@/components/CharacterCreation/CharacterContext";
 import { colors, fonts } from "@/theme";
+import type { CSSProperties } from "react";
 
 export default function AbilitiesForm() {
   const { character, updateCharacter } = useCharacter();
@@ -27,36 +28,16 @@ export default function AbilitiesForm() {
 
   return (
     <>
-      <style>{`
-        input[type=number]::-webkit-inner-spin-button,
-        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type=number] { -moz-appearance: textfield; }
-        .ability-card:hover { border-color: rgba(180,140,80,0.28) !important; background: rgba(255,255,255,0.05) !important; }
-        .pt-btn:hover { background: rgba(212,175,55,0.15) !important; }
-      `}</style>
       <div>
         <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            margin: "0 0 18px",
-          }}
+          style={abilitiesFormStyle}
         >
           <span
-            style={{
-              fontSize: 11,
-              color: colors.goldMuted,
-              fontFamily: fonts.display,
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              fontWeight: 700,
-              whiteSpace: "nowrap",
-            }}
+            style={abilitiesFormStyle2}
           >
             Set Your Abilities
           </span>
-          <div style={{ flex: 1, height: 1, background: colors.goldBorder }} />
+          <div style={abilitiesFormStyle3} />
         </div>
 
         <div
@@ -77,14 +58,7 @@ export default function AbilitiesForm() {
           }}
         >
           <span
-            style={{
-              fontSize: 11,
-              color: colors.goldMuted,
-              fontFamily: fonts.display,
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              fontWeight: 700,
-            }}
+            style={abilitiesFormStyle4}
           >
             Points Remaining
           </span>
@@ -107,11 +81,7 @@ export default function AbilitiesForm() {
         </div>
 
         <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 8,
-          }}
+          style={abilitiesFormStyle5}
         >
           {ABILITY_KEYS.map((key) => {
             const val = abilities[key];
@@ -122,16 +92,7 @@ export default function AbilitiesForm() {
               <div
                 key={key}
                 className="ability-card"
-                style={{
-                  background: "rgba(255,255,255,0.03)",
-                  border: "1px solid rgba(180,140,80,0.12)",
-                  borderRadius: 7,
-                  padding: "12px 14px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  transition: "border-color 0.12s, background 0.12s",
-                }}
+                style={abilitiesFormStyle6}
               >
                 <button
                   className="pt-btn"
@@ -159,25 +120,12 @@ export default function AbilitiesForm() {
                 </button>
                 <div style={{ flex: 1, textAlign: "center" }}>
                   <div
-                    style={{
-                      fontSize: 22,
-                      fontWeight: 700,
-                      color: colors.text,
-                      fontFamily: fonts.display,
-                      lineHeight: 1.1,
-                    }}
+                    style={abilitiesFormStyle7}
                   >
                     {val}
                   </div>
                   <div
-                    style={{
-                      fontSize: 9,
-                      color: colors.textMuted,
-                      fontFamily: fonts.display,
-                      letterSpacing: "0.08em",
-                      textTransform: "uppercase",
-                      marginTop: 2,
-                    }}
+                    style={abilitiesFormStyle8}
                   >
                     {key.slice(0, 3)}
                   </div>
@@ -215,3 +163,59 @@ export default function AbilitiesForm() {
     </>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const abilitiesFormStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  margin: "0 0 18px",
+};
+const abilitiesFormStyle2: CSSProperties = {
+  fontSize: 11,
+  color: colors.goldMuted,
+  fontFamily: fonts.display,
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+  fontWeight: 700,
+  whiteSpace: "nowrap",
+};
+const abilitiesFormStyle3: CSSProperties = { flex: 1, height: 1, background: colors.goldBorder };
+  const abilitiesFormStyle4: CSSProperties = {
+                fontSize: 11,
+                color: colors.goldMuted,
+                fontFamily: fonts.display,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                fontWeight: 700,
+};
+const abilitiesFormStyle5: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr",
+  gap: 8,
+};
+const abilitiesFormStyle6: CSSProperties = {
+  background: "rgba(255,255,255,0.03)",
+  border: "1px solid rgba(180,140,80,0.12)",
+  borderRadius: 7,
+  padding: "12px 14px",
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  transition: "border-color 0.12s, background 0.12s",
+};
+const abilitiesFormStyle7: CSSProperties = {
+  fontSize: 22,
+  fontWeight: 700,
+  color: colors.text,
+  fontFamily: fonts.display,
+  lineHeight: 1.1,
+};
+const abilitiesFormStyle8: CSSProperties = {
+  fontSize: 9,
+  color: colors.textMuted,
+  fontFamily: fonts.display,
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+  marginTop: 2,
+};

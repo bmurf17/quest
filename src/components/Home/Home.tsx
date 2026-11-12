@@ -1,191 +1,53 @@
 import { Link } from "react-router-dom";
 
 import { colors, fonts } from "@/theme";
+import type { CSSProperties } from "react";
 
 export default function Home() {
   return (
     <>
-      <style>{`
-        * { box-sizing: border-box; }
-
-        @keyframes flicker {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.85; }
-          75% { opacity: 0.95; }
-        }
-        @keyframes rise {
-          from { opacity: 0; transform: translateY(16px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes glow-pulse {
-          0%, 100% { box-shadow: 0 0 20px ${colors.gold}33, inset 0 0 20px ${colors.gold}0D; }
-          50%       { box-shadow: 0 0 40px ${colors.gold}40, inset 0 0 30px ${colors.gold}0F; }
-        }
-
-        .home-title   { animation: rise 1.2s ease both, flicker 6s ease-in-out 1.5s infinite; }
-        .home-sub     { animation: rise 1.2s ease 0.2s both; }
-        .home-divider { animation: rise 1.2s ease 0.35s both; }
-        .home-btn     { animation: rise 1.2s ease 0.5s both; }
-        .home-settings { animation: rise 1.2s ease 0.65s both; }
-
-  .start-btn {
-          position: relative;
-          display: inline-flex;
-          align-items: center;
-          gap: 12px;
-          padding: 16px 40px;
-          background: linear-gradient(135deg, ${colors.gold} 0%, ${colors.gold} 50%, ${colors.gold} 100%);
-          border: none;
-          border-radius: 8px;
-          color: #0d0b07;
-          font-size: 16px;
-          font-weight: 700;
-          font-family: ${fonts.display};
-          letter-spacing: 0.1em;
-          text-decoration: none;
-          cursor: pointer;
-          transition: transform 0.15s, filter 0.15s;
-          animation: glow-pulse 3s ease-in-out infinite;
-        }
-        .start-btn:hover  { transform: scale(1.04); filter: brightness(1.1); }
-        .start-btn:active { transform: scale(0.97); }
-
-  .settings-link {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          padding: 10px 24px;
-          background: transparent;
-          border: 1px solid ${colors.goldBorder};
-          border-radius: 6px;
-          color: ${colors.muted};
-          font-size: 13px;
-          font-family: ${fonts.display};
-          letter-spacing: 0.08em;
-          text-decoration: none;
-          cursor: pointer;
-          transition: all 0.2s;
-        }
-        .settings-link:hover {
-          color: ${colors.gold};
-          border-color: ${colors.goldBorder};
-          background: rgba(212,175,55,0.06);
-        }
-      `}</style>
 
       <div
-        style={{
-          minHeight: "100vh",
-          background:
-            "linear-gradient(160deg, #0d0b07 0%, #1a1209 55%, #0f0e09 100%)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "40px 24px",
-          fontFamily: fonts.body,
-          position: "relative",
-          overflow: "hidden",
-        }}
+        style={homeStyle}
       >
         <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            pointerEvents: "none",
-            backgroundImage:
-              "radial-gradient(circle, rgba(180,140,80,0.1) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }}
+          style={homeStyle2}
         />
         <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            pointerEvents: "none",
-            background:
-              "radial-gradient(ellipse at center, transparent 30%, rgba(13,11,7,0.85) 100%)",
-          }}
+          style={homeStyle3}
         />
 
         <div
-          style={{
-            position: "relative",
-            zIndex: 1,
-            textAlign: "center",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 0,
-          }}
+          style={homeStyle4}
         >
           <div
             className="home-divider"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              marginBottom: 28,
-            }}
+            style={homeStyle5}
           >
             <div
-              style={{
-                width: 48,
-                height: 1,
-                background:
-                  "linear-gradient(to left, rgba(212,175,55,0.5), transparent)",
-              }}
+              style={homeStyle6}
             />
             <div
-              style={{
-                width: 6,
-                height: 6,
-                background: "rgba(212,175,55,0.6)",
-                transform: "rotate(45deg)",
-              }}
+              style={homeStyle7}
             />
             <div
-              style={{
-                width: 48,
-                height: 1,
-                background:
-                  "linear-gradient(to right, rgba(212,175,55,0.5), transparent)",
-              }}
+              style={homeStyle8}
             />
           </div>
 
           <h1
             className="home-title"
-            style={{
-              margin: "0 0 12px",
-              fontSize: "clamp(40px, 8vw, 72px)",
-              fontWeight: 900,
-              fontFamily: fonts.display,
-              color: colors.text,
-              letterSpacing: "0.08em",
-              lineHeight: 1.1,
-              textShadow: `0 2px 40px ${colors.gold}26`,
-            }}
+            style={homeStyle9}
           >
             Qwest
           </h1>
 
           <div
             className="home-divider"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              marginBottom: 44,
-            }}
+            style={homeStyle10}
           >
             <div
-              style={{
-                width: 80,
-                height: 1,
-                background:
-                  "linear-gradient(to left, rgba(180,140,80,0.3), transparent)",
-              }}
+              style={homeStyle11}
             />
             <div style={{ display: "flex", gap: 6 }}>
               {[0, 1, 2].map((i) => (
@@ -201,12 +63,7 @@ export default function Home() {
               ))}
             </div>
             <div
-              style={{
-                width: 80,
-                height: 1,
-                background:
-                  "linear-gradient(to right, rgba(180,140,80,0.3), transparent)",
-              }}
+              style={homeStyle12}
             />
           </div>
 
@@ -259,3 +116,94 @@ export default function Home() {
     </>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const homeStyle: CSSProperties = {
+  minHeight: "100vh",
+  background:
+    "linear-gradient(160deg, #0d0b07 0%, #1a1209 55%, #0f0e09 100%)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: "40px 24px",
+  fontFamily: fonts.body,
+  position: "relative",
+  overflow: "hidden",
+};
+const homeStyle2: CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  pointerEvents: "none",
+  backgroundImage:
+    "radial-gradient(circle, rgba(180,140,80,0.1) 1px, transparent 1px)",
+  backgroundSize: "40px 40px",
+};
+const homeStyle3: CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  pointerEvents: "none",
+  background:
+    "radial-gradient(ellipse at center, transparent 30%, rgba(13,11,7,0.85) 100%)",
+};
+const homeStyle4: CSSProperties = {
+  position: "relative",
+  zIndex: 1,
+  textAlign: "center",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: 0,
+};
+const homeStyle5: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 12,
+  marginBottom: 28,
+};
+const homeStyle6: CSSProperties = {
+  width: 48,
+  height: 1,
+  background:
+    "linear-gradient(to left, rgba(212,175,55,0.5), transparent)",
+};
+const homeStyle7: CSSProperties = {
+  width: 6,
+  height: 6,
+  background: "rgba(212,175,55,0.6)",
+  transform: "rotate(45deg)",
+};
+const homeStyle8: CSSProperties = {
+  width: 48,
+  height: 1,
+  background:
+    "linear-gradient(to right, rgba(212,175,55,0.5), transparent)",
+};
+const homeStyle9: CSSProperties = {
+  margin: "0 0 12px",
+  fontSize: "clamp(40px, 8vw, 72px)",
+  fontWeight: 900,
+  fontFamily: fonts.display,
+  color: colors.text,
+  letterSpacing: "0.08em",
+  lineHeight: 1.1,
+  textShadow: `0 2px 40px ${colors.gold}26`,
+};
+const homeStyle10: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 12,
+  marginBottom: 44,
+};
+const homeStyle11: CSSProperties = {
+  width: 80,
+  height: 1,
+  background:
+    "linear-gradient(to left, rgba(180,140,80,0.3), transparent)",
+};
+const homeStyle12: CSSProperties = {
+  width: 80,
+  height: 1,
+  background:
+    "linear-gradient(to right, rgba(180,140,80,0.3), transparent)",
+};

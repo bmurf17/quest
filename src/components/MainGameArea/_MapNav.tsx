@@ -1,3 +1,4 @@
+import { colors } from "@/theme";
 import type { GameState } from "@/state/GameState";
 import { useGameStore } from "@/state/GameState";
 import { Directions } from "@/types/Directions";
@@ -10,6 +11,7 @@ import {
   ChevronRight,
   ChevronUp,
 } from "lucide-react";
+import type { CSSProperties } from "react";
 
 const CELL = 12;
 const GAP = 4;
@@ -22,7 +24,7 @@ const MAP_SIZE = MAP_CELLS * STEP - GAP;
 const interactionColor: Record<string, string> = {
   NPC: "#818CF8",
   chest: "#F59E0B",
-  camp: "#34D399",
+  camp: colors.success,
   Combat: "#F87171",
   none: "#4B5563",
 };
@@ -101,23 +103,11 @@ function MiniMap({ currentRoom }: { currentRoom: Room }) {
       }}
     >
       <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          backgroundImage:
-            "radial-gradient(circle, rgba(180,140,80,0.2) 1px, transparent 1px)",
-          backgroundSize: "6px 6px",
-        }}
+        style={miniMapStyle}
       />
 
       <svg
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          pointerEvents: "none",
-        }}
+        style={miniMapStyle2}
       >
         {visible.map(({ room, gx, gy }) =>
           (room.neighboringRooms ?? []).map(([dir], i) => {
@@ -191,17 +181,10 @@ export default function MapNav() {
     <>
       {state.gameStatus === GameStatus.Exploring ? (
         <div className="absolute bottom-4 left-4 text-white">
-          <div style={{ display: "flex", alignItems: "flex-end", gap: 10 }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <div style={mapNavStyle}>
+            <div style={mapNavStyle2}>
               <span
-                style={{
-                  fontSize: 8,
-                  color: "rgba(180,140,80,0.6)",
-                  fontFamily: "'Cinzel', Georgia, serif",
-                  letterSpacing: "0.12em",
-                  textTransform: "uppercase",
-                  textAlign: "center",
-                }}
+                style={mapNavStyle3}
               >
                 Map
               </span>
@@ -276,3 +259,29 @@ export default function MapNav() {
     </>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const miniMapStyle: CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  backgroundImage:
+    "radial-gradient(circle, rgba(180,140,80,0.2) 1px, transparent 1px)",
+  backgroundSize: "6px 6px",
+};
+const miniMapStyle2: CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  width: "100%",
+  height: "100%",
+  pointerEvents: "none",
+};
+const mapNavStyle: CSSProperties = { display: "flex", alignItems: "flex-end", gap: 10 };
+  const mapNavStyle2: CSSProperties = { display: "flex", flexDirection: "column", gap: 4 };
+  const mapNavStyle3: CSSProperties = {
+                    fontSize: 8,
+                    color: "rgba(180,140,80,0.6)",
+                    fontFamily: "'Cinzel', Georgia, serif",
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    textAlign: "center",
+};

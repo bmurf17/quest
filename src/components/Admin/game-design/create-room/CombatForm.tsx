@@ -3,6 +3,7 @@ import type { EnemyEntry, MoveEntry} from "./formTypes";
 import { defaultEnemy, defaultMove } from "./formTypes";
 import { FieldGroup, StyledInput, StyledSelect } from "./primitives";
 import { MoveForm } from "./MoveForm";
+import type { CSSProperties } from "react";
 
 export function CombatForm({
   enemyImgs,
@@ -73,44 +74,24 @@ export function CombatForm({
         >
           {enemies.length > 1 && (
             <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: 12,
-              }}
+              style={combatFormStyle}
             >
               <span
-                style={{
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: "#DC2626",
-                  fontFamily: fonts.display,
-                  letterSpacing: "0.06em",
-                }}
+                style={combatFormStyle2}
               >
                 Enemy {index + 1}
               </span>
               <button
                 type="button"
                 onClick={() => removeEnemy(index)}
-                style={{
-                  background: "rgba(220,38,38,0.15)",
-                  border: "1px solid rgba(220,38,38,0.4)",
-                  borderRadius: 4,
-                  color: "#FCA5A5",
-                  fontSize: 12,
-                  cursor: "pointer",
-                  padding: "3px 10px",
-                  fontFamily: fonts.display,
-                }}
+                style={combatFormStyle3}
               >
                 Remove
               </button>
             </div>
           )}
           <div
-            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}
+            style={combatFormStyle4}
           >
             <div style={{ gridColumn: "1 / -1" }}>
               <FieldGroup id={`enemyName-${index}`} label="Enemy Name">
@@ -147,11 +128,7 @@ export function CombatForm({
             </FieldGroup>
           </div>
           <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr 1fr",
-              gap: 12,
-            }}
+            style={combatFormStyle5}
           >
             <FieldGroup id={`strength-${index}`} label="Strength">
               <StyledInput
@@ -186,12 +163,7 @@ export function CombatForm({
           </div>
 
           <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr 1fr",
-              gap: 12,
-              marginTop: 12,
-            }}
+            style={combatFormStyle6}
           >
             <FieldGroup id={`expGain-${index}`} label="Exp Gain">
               <StyledInput
@@ -260,38 +232,17 @@ export function CombatForm({
 
           <div style={{ marginTop: 16 }}>
             <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                marginBottom: 8,
-              }}
+              style={combatFormStyle7}
             >
               <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase",
-                  color: "#DC2626",
-                  fontFamily: fonts.display,
-                }}
+                style={combatFormStyle8}
               >
                 Moves ({enemy.moves.length})
               </span>
               <button
                 type="button"
                 onClick={() => addMove(index)}
-                style={{
-                  background: "rgba(220,38,38,0.1)",
-                  border: "1px dashed rgba(220,38,38,0.4)",
-                  borderRadius: 4,
-                  color: "#F87171",
-                  fontSize: 11,
-                  cursor: "pointer",
-                  padding: "2px 10px",
-                  fontFamily: fonts.display,
-                }}
+                style={combatFormStyle9}
               >
                 + Add Move
               </button>
@@ -307,12 +258,7 @@ export function CombatForm({
             ))}
             {enemy.moves.length === 0 && (
               <p
-                style={{
-                  margin: 0,
-                  fontSize: 12,
-                  color: "#6B7280",
-                  fontStyle: "italic",
-                }}
+                style={combatFormStyle10}
               >
                 No custom moves. Enemy will use a basic attack.
               </p>
@@ -323,27 +269,95 @@ export function CombatForm({
       <button
         type="button"
         onClick={addEnemy}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 6,
-          marginTop: 8,
-          padding: "8px 16px",
-          background: "rgba(220,38,38,0.1)",
-          border: "1px dashed rgba(220,38,38,0.4)",
-          borderRadius: 6,
-          color: "#F87171",
-          fontSize: 13,
-          fontWeight: 600,
-          cursor: "pointer",
-          fontFamily: fonts.display,
-          letterSpacing: "0.04em",
-          width: "100%",
-          justifyContent: "center",
-        }}
+        style={combatFormStyle11}
       >
         + Add Enemy
       </button>
     </>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const combatFormStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  marginBottom: 12,
+};
+const combatFormStyle2: CSSProperties = {
+  fontSize: 12,
+  fontWeight: 600,
+  color: "#DC2626",
+  fontFamily: fonts.display,
+  letterSpacing: "0.06em",
+};
+const combatFormStyle3: CSSProperties = {
+  background: "rgba(220,38,38,0.15)",
+  border: "1px solid rgba(220,38,38,0.4)",
+  borderRadius: 4,
+  color: "#FCA5A5",
+  fontSize: 12,
+  cursor: "pointer",
+  padding: "3px 10px",
+  fontFamily: fonts.display,
+};
+const combatFormStyle4: CSSProperties = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 };
+  const combatFormStyle5: CSSProperties = {
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr 1fr",
+                gap: 12,
+};
+const combatFormStyle6: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr 1fr",
+  gap: 12,
+  marginTop: 12,
+};
+const combatFormStyle7: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 8,
+  marginBottom: 8,
+};
+const combatFormStyle8: CSSProperties = {
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+  color: "#DC2626",
+  fontFamily: fonts.display,
+};
+const combatFormStyle9: CSSProperties = {
+  background: "rgba(220,38,38,0.1)",
+  border: "1px dashed rgba(220,38,38,0.4)",
+  borderRadius: 4,
+  color: "#F87171",
+  fontSize: 11,
+  cursor: "pointer",
+  padding: "2px 10px",
+  fontFamily: fonts.display,
+};
+const combatFormStyle10: CSSProperties = {
+  margin: 0,
+  fontSize: 12,
+  color: "#6B7280",
+  fontStyle: "italic",
+};
+const combatFormStyle11: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 6,
+  marginTop: 8,
+  padding: "8px 16px",
+  background: "rgba(220,38,38,0.1)",
+  border: "1px dashed rgba(220,38,38,0.4)",
+  borderRadius: 6,
+  color: "#F87171",
+  fontSize: 13,
+  fontWeight: 600,
+  cursor: "pointer",
+  fontFamily: fonts.display,
+  letterSpacing: "0.04em",
+  width: "100%",
+  justifyContent: "center",
+};

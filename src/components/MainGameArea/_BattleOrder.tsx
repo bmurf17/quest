@@ -6,6 +6,7 @@ import type { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
 import { memo, useEffect, useLayoutEffect, useRef } from "react";
 import mushroom from "/images/Mushroom.png";
+import type { CSSProperties } from "react";
 
 function BattleOrderComponent() {
   const state = useGameStore((state: GameState) => state);
@@ -107,24 +108,14 @@ function BattleOrderComponent() {
                       <img
                         src={characterOrEnemy.img}
                         alt={characterOrEnemy.name}
-                        style={{
-                          width: "64px",
-                          height: "64x",
-                          imageRendering: "pixelated",
-                          filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.5))",
-                        }}
+                        style={battleOrderComponentStyle}
                       />
                     </div>
                   ) : (
                     <img
                       src={mushroom}
                       alt={characterOrEnemy.name}
-                      style={{
-                        width: "64px",
-                        height: "64x",
-                        imageRendering: "pixelated",
-                        filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.5))",
-                      }}
+                      style={battleOrderComponentStyle2}
                     />
                   )}
                 </div>
@@ -140,3 +131,17 @@ function BattleOrderComponent() {
 }
 
 export default memo(BattleOrderComponent);
+
+// Static style objects hoisted out of the render path.
+const battleOrderComponentStyle: CSSProperties = {
+  width: "64px",
+  height: "64x",
+  imageRendering: "pixelated",
+  filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.5))",
+};
+const battleOrderComponentStyle2: CSSProperties = {
+  width: "64px",
+  height: "64x",
+  imageRendering: "pixelated",
+  filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.5))",
+};

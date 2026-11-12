@@ -4,6 +4,7 @@ import type { EquippableItem } from "@/types/Item";
 import { colors, fonts } from "@/theme";
 import { StatBar } from "@/components/shared/StatBar";
 import { SectionHeader } from "./SectionHeader";
+import type { CSSProperties } from "react";
 
 export function CharacterDetailPanel({
   character,
@@ -18,71 +19,30 @@ export function CharacterDetailPanel({
 }) {
   return (
     <div
-      style={{
-        flex: 1,
-        overflowY: "auto",
-        borderRight: `1px solid ${colors.goldBorder}`,
-      }}
+      style={characterDetailPanelStyle}
     >
       {character ? (
         <div style={{ padding: "28px 28px 48px" }}>
           <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 20,
-              marginBottom: 24,
-              padding: "20px 20px",
-              background: "rgba(255,255,255,0.02)",
-              border: "1px solid rgba(180,140,80,0.12)",
-              borderRadius: 10,
-            }}
+            style={characterDetailPanelStyle2}
           >
             <div
-              style={{
-                width: 96,
-                height: 96,
-                flexShrink: 0,
-                background: "rgba(0,0,0,0.5)",
-                border: "1px solid rgba(180,140,80,0.2)",
-                borderRadius: 10,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              style={characterDetailPanelStyle3}
             >
               <img
                 src={character.img || "/placeholder.svg"}
                 alt={character.name}
-                style={{
-                  width: 80,
-                  height: 80,
-                  imageRendering: "pixelated",
-                  filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.7))",
-                }}
+                style={characterDetailPanelStyle4}
               />
             </div>
             <div style={{ flex: 1 }}>
               <h3
-                style={{
-                  margin: "0 0 8px",
-                  fontSize: 28,
-                  fontWeight: 700,
-                  color: colors.text,
-                  fontFamily: fonts.display,
-                  letterSpacing: "0.03em",
-                  lineHeight: 1.1,
-                }}
+                style={characterDetailPanelStyle5}
               >
                 {character.name}
               </h3>
               <div
-                style={{
-                  display: "flex",
-                  gap: 6,
-                  flexWrap: "wrap",
-                  marginBottom: 14,
-                }}
+                style={characterDetailPanelStyle6}
               >
                 {[
                   character.race,
@@ -91,34 +51,21 @@ export function CharacterDetailPanel({
                 ].map((tag) => (
                   <span
                     key={tag}
-                    style={{
-                      fontSize: 12,
-                      color: colors.goldMuted,
-                      background: "rgba(180,140,80,0.1)",
-                      border: `1px solid ${colors.goldBorder}`,
-                      borderRadius: 4,
-                      padding: "3px 10px",
-                      fontFamily: fonts.display,
-                      letterSpacing: "0.04em",
-                    }}
+                    style={characterDetailPanelStyle7}
                   >
                     {tag}
                   </span>
                 ))}
               </div>
               <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: 12,
-                }}
+                style={characterDetailPanelStyle8}
               >
                 {[
                   {
                     label: "HP",
                     value: character.hp,
                     max: character.maxHp,
-                    color: "#EF4444",
+                    color: colors.danger,
                   },
                   {
                     label: "MP",
@@ -129,11 +76,7 @@ export function CharacterDetailPanel({
                 ].map(({ label, value, max, color }) => (
                   <div key={label}>
                     <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        marginBottom: 5,
-                      }}
+                      style={characterDetailPanelStyle9}
                     >
                       <span
                         style={{
@@ -159,67 +102,30 @@ export function CharacterDetailPanel({
           </div>
 
           <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 20,
-            }}
+            style={characterDetailPanelStyle10}
           >
             <div>
               <SectionHeader>Ability Scores</SectionHeader>
               <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: 6,
-                }}
+                style={characterDetailPanelStyle11}
               >
                 {Object.entries(character.abilities).map(([key, ability]) => (
                   <div
                     key={key}
-                    style={{
-                      background: "rgba(255,255,255,0.03)",
-                      border: "1px solid rgba(180,140,80,0.12)",
-                      borderRadius: 7,
-                      padding: "12px 10px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 10,
-                    }}
+                    style={characterDetailPanelStyle12}
                   >
                     <div
-                      style={{
-                        width: 36,
-                        height: 36,
-                        background: "rgba(0,0,0,0.3)",
-                        borderRadius: 5,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
-                      }}
+                      style={characterDetailPanelStyle13}
                     >
                       <span
-                        style={{
-                          fontSize: 20,
-                          fontWeight: 700,
-                          color: colors.text,
-                          fontFamily: fonts.display,
-                          lineHeight: 1,
-                        }}
+                        style={characterDetailPanelStyle14}
                       >
                         {ability.score}
                       </span>
                     </div>
                     <div>
                       <div
-                        style={{
-                          fontSize: 10,
-                          color: colors.textMuted,
-                          fontFamily: fonts.display,
-                          letterSpacing: "0.1em",
-                          textTransform: "uppercase",
-                        }}
+                        style={characterDetailPanelStyle15}
                       >
                         {key}
                       </div>
@@ -250,11 +156,7 @@ export function CharacterDetailPanel({
                   <>
                     <SectionHeader>Equipment</SectionHeader>
                     <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 6,
-                      }}
+                      style={characterDetailPanelStyle16}
                     >
                       {[
                         character.equipment.helmet,
@@ -270,66 +172,30 @@ export function CharacterDetailPanel({
                           <div
                             key={idx}
                             className="gear-card"
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 12,
-                              background: "rgba(255,255,255,0.03)",
-                              border: "1px solid rgba(180,140,80,0.12)",
-                              borderRadius: 7,
-                              padding: "10px 12px",
-                              transition:
-                                "border-color 0.12s, background 0.12s",
-                            }}
+                            style={characterDetailPanelStyle17}
                           >
                             <div
-                              style={{
-                                width: 72,
-                                height: 72,
-                                background: "rgba(0,0,0,0.4)",
-                                borderRadius: 6,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                flexShrink: 0,
-                              }}
+                              style={characterDetailPanelStyle18}
                             >
                               <img
                                 src={item.img || "/placeholder.svg"}
                                 alt={item.name}
-                                style={{
-                                  width: 64,
-                                  height: 64,
-                                  imageRendering: "pixelated",
-                                }}
+                                style={characterDetailPanelStyle19}
                               />
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <div
-                                style={{
-                                  fontSize: 14,
-                                  fontWeight: 700,
-                                  color: colors.text,
-                                  fontFamily: fonts.display,
-                                }}
+                                style={characterDetailPanelStyle20}
                               >
                                 {item.name}
                               </div>
                               <div
-                                style={{
-                                  fontSize: 12,
-                                  color: colors.textMuted,
-                                  marginTop: 1,
-                                }}
+                                style={characterDetailPanelStyle21}
                               >
                                 {item.action?.type}
                               </div>
                               <div
-                                style={{
-                                  display: "flex",
-                                  gap: 12,
-                                  marginTop: 3,
-                                }}
+                                style={characterDetailPanelStyle22}
                               >
                                 {item.action && (
                                   <>
@@ -364,76 +230,36 @@ export function CharacterDetailPanel({
                 <>
                   <SectionHeader>Skills</SectionHeader>
                   <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 6,
-                    }}
+                    style={characterDetailPanelStyle23}
                   >
                     {character.spells.map((spell, idx) => (
                       <div
                         key={idx}
                         className="gear-card"
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 12,
-                          background: "rgba(255,255,255,0.03)",
-                          border: "1px solid rgba(180,140,80,0.12)",
-                          borderRadius: 7,
-                          padding: "10px 12px",
-                          transition:
-                            "border-color 0.12s, background 0.12s",
-                        }}
+                        style={characterDetailPanelStyle24}
                       >
                         <div
-                          style={{
-                            width: 72,
-                            height: 72,
-                            background: "rgba(0,0,0,0.4)",
-                            borderRadius: 6,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            flexShrink: 0,
-                          }}
+                          style={characterDetailPanelStyle25}
                         >
                           <img
                             src={spell.image || "/placeholder.svg"}
                             alt={spell.name}
-                            style={{
-                              width: 64,
-                              height: 64,
-                              imageRendering: "pixelated",
-                            }}
+                            style={characterDetailPanelStyle26}
                           />
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div
-                            style={{
-                              fontSize: 14,
-                              fontWeight: 700,
-                              color: colors.text,
-                              fontFamily: fonts.display,
-                            }}
+                            style={characterDetailPanelStyle27}
                           >
                             {spell.name}
                           </div>
                           <div
-                            style={{
-                              fontSize: 12,
-                              color: "#6366F1",
-                              marginTop: 1,
-                            }}
+                            style={characterDetailPanelStyle28}
                           >
                             {spell.manaCost} MP
                           </div>
                           <div
-                            style={{
-                              display: "flex",
-                              gap: 12,
-                              marginTop: 3,
-                            }}
+                            style={characterDetailPanelStyle29}
                           >
                             <span style={{ fontSize: 11, color: "#6B5E48" }}>
                               Hit: 6
@@ -455,15 +281,7 @@ export function CharacterDetailPanel({
         </div>
       ) : (
         <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            height: "100%",
-            color: "#4B5563",
-            fontFamily: fonts.display,
-            fontSize: 14,
-          }}
+          style={characterDetailPanelStyle30}
         >
           {emptyMessage}
         </div>
@@ -471,3 +289,218 @@ export function CharacterDetailPanel({
     </div>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const characterDetailPanelStyle: CSSProperties = {
+  flex: 1,
+  overflowY: "auto",
+  borderRight: `1px solid ${colors.goldBorder}`,
+};
+const characterDetailPanelStyle2: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 20,
+  marginBottom: 24,
+  padding: "20px 20px",
+  background: "rgba(255,255,255,0.02)",
+  border: "1px solid rgba(180,140,80,0.12)",
+  borderRadius: 10,
+};
+const characterDetailPanelStyle3: CSSProperties = {
+  width: 96,
+  height: 96,
+  flexShrink: 0,
+  background: "rgba(0,0,0,0.5)",
+  border: "1px solid rgba(180,140,80,0.2)",
+  borderRadius: 10,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+const characterDetailPanelStyle4: CSSProperties = {
+  width: 80,
+  height: 80,
+  imageRendering: "pixelated",
+  filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.7))",
+};
+const characterDetailPanelStyle5: CSSProperties = {
+  margin: "0 0 8px",
+  fontSize: 28,
+  fontWeight: 700,
+  color: colors.text,
+  fontFamily: fonts.display,
+  letterSpacing: "0.03em",
+  lineHeight: 1.1,
+};
+const characterDetailPanelStyle6: CSSProperties = {
+  display: "flex",
+  gap: 6,
+  flexWrap: "wrap",
+  marginBottom: 14,
+};
+const characterDetailPanelStyle7: CSSProperties = {
+  fontSize: 12,
+  color: colors.goldMuted,
+  background: "rgba(180,140,80,0.1)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 4,
+  padding: "3px 10px",
+  fontFamily: fonts.display,
+  letterSpacing: "0.04em",
+};
+const characterDetailPanelStyle8: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr",
+  gap: 12,
+};
+const characterDetailPanelStyle9: CSSProperties = {
+  display: "flex",
+  justifyContent: "space-between",
+  marginBottom: 5,
+};
+const characterDetailPanelStyle10: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr",
+  gap: 20,
+};
+const characterDetailPanelStyle11: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr",
+  gap: 6,
+};
+const characterDetailPanelStyle12: CSSProperties = {
+  background: "rgba(255,255,255,0.03)",
+  border: "1px solid rgba(180,140,80,0.12)",
+  borderRadius: 7,
+  padding: "12px 10px",
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+};
+const characterDetailPanelStyle13: CSSProperties = {
+  width: 36,
+  height: 36,
+  background: "rgba(0,0,0,0.3)",
+  borderRadius: 5,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  flexShrink: 0,
+};
+const characterDetailPanelStyle14: CSSProperties = {
+  fontSize: 20,
+  fontWeight: 700,
+  color: colors.text,
+  fontFamily: fonts.display,
+  lineHeight: 1,
+};
+const characterDetailPanelStyle15: CSSProperties = {
+  fontSize: 10,
+  color: colors.textMuted,
+  fontFamily: fonts.display,
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+};
+const characterDetailPanelStyle16: CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 6,
+};
+const characterDetailPanelStyle17: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 12,
+  background: "rgba(255,255,255,0.03)",
+  border: "1px solid rgba(180,140,80,0.12)",
+  borderRadius: 7,
+  padding: "10px 12px",
+  transition:
+    "border-color 0.12s, background 0.12s",
+};
+const characterDetailPanelStyle18: CSSProperties = {
+  width: 72,
+  height: 72,
+  background: "rgba(0,0,0,0.4)",
+  borderRadius: 6,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  flexShrink: 0,
+};
+const characterDetailPanelStyle19: CSSProperties = {
+  width: 64,
+  height: 64,
+  imageRendering: "pixelated",
+};
+const characterDetailPanelStyle20: CSSProperties = {
+  fontSize: 14,
+  fontWeight: 700,
+  color: colors.text,
+  fontFamily: fonts.display,
+};
+const characterDetailPanelStyle21: CSSProperties = {
+  fontSize: 12,
+  color: colors.textMuted,
+  marginTop: 1,
+};
+const characterDetailPanelStyle22: CSSProperties = {
+  display: "flex",
+  gap: 12,
+  marginTop: 3,
+};
+const characterDetailPanelStyle23: CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 6,
+};
+const characterDetailPanelStyle24: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 12,
+  background: "rgba(255,255,255,0.03)",
+  border: "1px solid rgba(180,140,80,0.12)",
+  borderRadius: 7,
+  padding: "10px 12px",
+  transition:
+    "border-color 0.12s, background 0.12s",
+};
+const characterDetailPanelStyle25: CSSProperties = {
+  width: 72,
+  height: 72,
+  background: "rgba(0,0,0,0.4)",
+  borderRadius: 6,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  flexShrink: 0,
+};
+const characterDetailPanelStyle26: CSSProperties = {
+  width: 64,
+  height: 64,
+  imageRendering: "pixelated",
+};
+const characterDetailPanelStyle27: CSSProperties = {
+  fontSize: 14,
+  fontWeight: 700,
+  color: colors.text,
+  fontFamily: fonts.display,
+};
+const characterDetailPanelStyle28: CSSProperties = {
+  fontSize: 12,
+  color: "#6366F1",
+  marginTop: 1,
+};
+const characterDetailPanelStyle29: CSSProperties = {
+  display: "flex",
+  gap: 12,
+  marginTop: 3,
+};
+const characterDetailPanelStyle30: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  height: "100%",
+  color: "#4B5563",
+  fontFamily: fonts.display,
+  fontSize: 14,
+};

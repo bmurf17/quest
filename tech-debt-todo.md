@@ -180,13 +180,13 @@ sections live in `components/action-menu/`.
 - [x] Documented the deep-import policy in `docs/conventions.md`: no barrels; import modules directly to keep dependencies explicit and preserve tree-shaking/bundle splitting.
 - [x] Added `@typescript-eslint/consistent-type-imports` and auto-fixed type-only imports across the tree (including `CharacterData`, `GameState`, `Item`, and other type-only imports).
 
-### 12. Consolidate styling
+### 12. Consolidate styling — ✅ Done
 
-- [ ] ~700+ inline `style={{ ... }}` objects (e.g. `PartyManagement` 104, `PartySelection` 88, `_TavernOverlay` 64) alongside 34 files using Tailwind classes
-- [ ] 15 components embed raw `<style>` blocks (keyframes/global selectors). Move to CSS modules or a global stylesheet
-- [ ] Dozens of hardcoded hex colors duplicate `src/theme.ts` (`#D4AF37` = `colors.gold`, etc.). Replace with theme tokens or Tailwind custom colors
-- [ ] Inline style objects recreate allocations on every render; extract static styles or use Tailwind/CSS classes
-- [ ] Pick one styling strategy (Tailwind vs inline vs CSS modules) and document it
+- [x] **One global stylesheet.** The 15 embedded `<style>` blocks moved to `src/styles/components.css` (keyframes, hover/scrollbar selectors, shared classes) and are loaded once from `main.tsx`; no component injects `<style>` any more. Box-sizing and number-input resets live in `src/index.css`.
+- [x] **Theme tokens instead of duplicated hex.** `#D4AF37`, `#C9A84C`, `#E8DCC8`, `#A8916A`, `#9CA3AF`, `#34D399`, and `#EF4444` usages in components now resolve to `colors.gold`, `colors.goldMuted`, `colors.text`, `colors.textMuted`, `colors.muted`, `colors.success`, and `colors.danger`. Theme-equivalent hex values in `src/` are now zero (excluding `theme.ts` itself).
+- [x] **Static styles hoisted.** 488 large static style objects were extracted to module-level `CSSProperties` constants, so they are allocated once instead of on every render. The remaining ~230 inline `style` props are dynamic (computed positions, per-entity colors, animated widths).
+- [x] **Strategy documented** in `docs/conventions.md` § Styling: Tailwind utilities + theme tokens first, global component classes for selectors/keyframes, module-level `CSSProperties` for static objects, inline `style` only for runtime-computed values. No CSS modules or CSS-in-JS.
+- [x] `tsc -b`, `vitest run` (58 tests), `eslint` (0 errors / 3 pre-existing fast-refresh warnings), and `vite build` all pass.
 
 ### 13. Improve resilience and UX
 

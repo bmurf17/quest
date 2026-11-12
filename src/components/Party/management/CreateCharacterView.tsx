@@ -3,18 +3,12 @@ import { colors, fonts } from "@/theme";
 import { useCharacter } from "@/components/CharacterCreation/CharacterContext";
 import { CharacterBuilderView } from "@/components/CharacterCreation/CharacterBuilder";
 import { buildCharacter, canCreateCharacter } from "./characterBuilder";
+import type { CSSProperties } from "react";
 
 function EmptyPartyPanel() {
   return (
     <div
-      style={{
-        width: 320,
-        flexShrink: 0,
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-        background: "rgba(0,0,0,0.2)",
-      }}
+      style={emptyPartyPanelStyle}
     >
       <div
         style={{
@@ -23,41 +17,21 @@ function EmptyPartyPanel() {
         }}
       >
         <h2
-          style={{
-            margin: 0,
-            fontSize: 11,
-            fontWeight: 700,
-            color: colors.goldMuted,
-            fontFamily: fonts.display,
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
-          }}
+          style={emptyPartyPanelStyle2}
         >
           Your Party
         </h2>
       </div>
       <div
-        style={{
-          flex: 1,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "32px 24px",
-          textAlign: "center",
-        }}
+        style={emptyPartyPanelStyle3}
       >
         <div>
           <p
-            style={{
-              margin: "0 0 8px",
-              color: "#4B5563",
-              fontSize: 13,
-              fontFamily: fonts.display,
-            }}
+            style={emptyPartyPanelStyle4}
           >
             No party members yet
           </p>
-          <p style={{ margin: 0, color: "#374151", fontSize: 13 }}>
+          <p style={emptyPartyPanelStyle5}>
             Build your character on the left, then click Create Character to
             start your adventure
           </p>
@@ -102,7 +76,7 @@ export function CreateCharacterView({
             ...(canCreate
               ? {
                   background:
-                    "linear-gradient(135deg, #B4965A 0%, #D4AF37 50%, #B4965A 100%)",
+                    `linear-gradient(135deg, #B4965A 0%, ${colors.gold} 50%, #B4965A 100%)`,
                   color: "#0d0b07",
                   border: "none",
                 }
@@ -133,3 +107,37 @@ export function CreateCharacterView({
     />
   );
 }
+
+// Static style objects hoisted out of the render path.
+const emptyPartyPanelStyle: CSSProperties = {
+  width: 320,
+  flexShrink: 0,
+  display: "flex",
+  flexDirection: "column",
+  overflow: "hidden",
+  background: "rgba(0,0,0,0.2)",
+};
+const emptyPartyPanelStyle2: CSSProperties = {
+  margin: 0,
+  fontSize: 11,
+  fontWeight: 700,
+  color: colors.goldMuted,
+  fontFamily: fonts.display,
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
+};
+const emptyPartyPanelStyle3: CSSProperties = {
+  flex: 1,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: "32px 24px",
+  textAlign: "center",
+};
+const emptyPartyPanelStyle4: CSSProperties = {
+  margin: "0 0 8px",
+  color: "#4B5563",
+  fontSize: 13,
+  fontFamily: fonts.display,
+};
+const emptyPartyPanelStyle5: CSSProperties = { margin: 0, color: "#374151", fontSize: 13 };

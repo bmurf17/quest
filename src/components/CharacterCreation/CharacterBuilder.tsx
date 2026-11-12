@@ -10,6 +10,7 @@ import BackgroundForm from "./forms/BackgroundForm";
 import AbilitiesForm from "./forms/AbilitesForm";
 import ImageForm from "./forms/ImageForm";
 import { colors, fonts } from "@/theme";
+import type { CSSProperties } from "react";
 
 const CHARACTER_TABS = [
   { key: "name", label: "Name" },
@@ -67,15 +68,7 @@ export function CharacterBuilderView({
       }}
     >
       <div
-        style={{
-          width: 260,
-          flexShrink: 0,
-          borderRight: "1px solid rgba(180,140,80,0.12)",
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden",
-          background: "rgba(0,0,0,0.25)",
-        }}
+        style={characterBuilderViewStyle}
       >
         <div
           style={{
@@ -86,12 +79,7 @@ export function CharacterBuilderView({
           <CharacterOverview />
         </div>
         <div
-          style={{
-            padding: "8px 10px",
-            display: "flex",
-            flexDirection: "column",
-            gap: 4,
-          }}
+          style={characterBuilderViewStyle2}
         >
           {CHARACTER_TABS.map(({ key, label }) => {
             const active = activeTab === key;
@@ -182,3 +170,20 @@ export default function CharacterBuilder() {
     </CharacterProvider>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const characterBuilderViewStyle: CSSProperties = {
+  width: 260,
+  flexShrink: 0,
+  borderRight: "1px solid rgba(180,140,80,0.12)",
+  display: "flex",
+  flexDirection: "column",
+  overflow: "hidden",
+  background: "rgba(0,0,0,0.25)",
+};
+const characterBuilderViewStyle2: CSSProperties = {
+  padding: "8px 10px",
+  display: "flex",
+  flexDirection: "column",
+  gap: 4,
+};

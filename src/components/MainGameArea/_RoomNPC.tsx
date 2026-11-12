@@ -2,6 +2,7 @@ import type { GameState} from "@/state/GameState";
 import { useGameStore } from "@/state/GameState";
 import type { DialogueNode, NPC } from "@/types/RoomInteractions";
 import { useEffect, useRef } from "react";
+import type { CSSProperties } from "react";
 
 export default function RoomNPC() {
   const state = useGameStore((state: GameState) => state);
@@ -66,7 +67,7 @@ export default function RoomNPC() {
 
       <div className="relative">
         <img src={npc.img} alt={npc.name} className="mx-auto"
-          style={{ width: "192px", height: "192px", imageRendering: "pixelated" }}
+          style={roomNPCStyle}
         />
       </div>
     </div>
@@ -123,9 +124,12 @@ function DialogueTreeView({
 
       <div className="relative">
         <img src={npc.img} alt={npc.name} className="mx-auto"
-          style={{ width: "192px", height: "192px", imageRendering: "pixelated" }}
+          style={roomNPCStyle}
         />
       </div>
     </div>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const roomNPCStyle: CSSProperties = { width: "192px", height: "192px", imageRendering: "pixelated" };

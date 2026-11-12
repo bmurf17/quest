@@ -1,4 +1,5 @@
 import { colors as themeColors, fonts } from "@/theme";
+import type { CSSProperties } from "react";
 
 interface AbilitySlotProps {
   img: string;
@@ -56,12 +57,7 @@ export function AbilitySlot({
       <img
         src={img}
         alt={alt}
-        style={{
-          width: "60%",
-          height: "60%",
-          imageRendering: "pixelated",
-          filter: "drop-shadow(0 1px 3px rgba(0,0,0,0.6))",
-        }}
+        style={abilitySlotStyle}
       />
       {badge !== undefined && (
         <div
@@ -84,3 +80,11 @@ export function AbilitySlot({
     </div>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const abilitySlotStyle: CSSProperties = {
+  width: "60%",
+  height: "60%",
+  imageRendering: "pixelated",
+  filter: "drop-shadow(0 1px 3px rgba(0,0,0,0.6))",
+};

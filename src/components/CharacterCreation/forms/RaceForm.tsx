@@ -1,5 +1,6 @@
 import { useCharacter } from "@/components/CharacterCreation/CharacterContext";
 import { colors, fonts } from "@/theme";
+import type { CSSProperties } from "react";
 
 const RACES = ["Human", "Elf", "Dwarf", "Halfling", "Dragonborn"];
 
@@ -8,39 +9,19 @@ export default function RaceForm() {
 
   return (
     <>
-      <style>{`
-        .race-card:hover { background: rgba(212,175,55,0.07) !important; border-color: rgba(212,175,55,0.25) !important; }
-      `}</style>
       <div>
         <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            margin: "0 0 18px",
-          }}
+          style={raceFormStyle}
         >
           <span
-            style={{
-              fontSize: 11,
-              color: colors.goldMuted,
-              fontFamily: fonts.display,
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              fontWeight: 700,
-              whiteSpace: "nowrap",
-            }}
+            style={raceFormStyle2}
           >
             Choose Your Race
           </span>
-          <div style={{ flex: 1, height: 1, background: colors.goldBorder }} />
+          <div style={raceFormStyle3} />
         </div>
         <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 6,
-          }}
+          style={raceFormStyle4}
         >
           {RACES.map((race) => {
             const active = character.race === race.toLowerCase();
@@ -79,12 +60,7 @@ export default function RaceForm() {
                 >
                   {active && (
                     <div
-                      style={{
-                        width: 6,
-                        height: 6,
-                        borderRadius: "50%",
-                        background: "#0d0b07",
-                      }}
+                      style={raceFormStyle5}
                     />
                   )}
                 </div>
@@ -106,3 +82,32 @@ export default function RaceForm() {
     </>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const raceFormStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  margin: "0 0 18px",
+};
+const raceFormStyle2: CSSProperties = {
+  fontSize: 11,
+  color: colors.goldMuted,
+  fontFamily: fonts.display,
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+  fontWeight: 700,
+  whiteSpace: "nowrap",
+};
+const raceFormStyle3: CSSProperties = { flex: 1, height: 1, background: colors.goldBorder };
+  const raceFormStyle4: CSSProperties = {
+              display: "flex",
+              flexDirection: "column",
+              gap: 6,
+};
+const raceFormStyle5: CSSProperties = {
+  width: 6,
+  height: 6,
+  borderRadius: "50%",
+  background: "#0d0b07",
+};

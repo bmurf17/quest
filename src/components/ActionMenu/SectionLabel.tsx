@@ -1,9 +1,10 @@
 import { colors as themeColors, fonts } from "@/theme";
+import type { CSSProperties } from "react";
 
 export function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <div
-      style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}
+      style={sectionLabelStyle}
     >
       <span
         style={{
@@ -20,3 +21,6 @@ export function SectionLabel({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const sectionLabelStyle: CSSProperties = { display: "flex", alignItems: "center", gap: 8, marginBottom: 6 };

@@ -10,24 +10,17 @@ import { Plus, Minus } from "lucide-react";
 import { useGameStore } from "@/state/GameState";
 import { colors, fonts } from "@/theme";
 import { StatBar } from "@/components/shared/StatBar";
+import type { CSSProperties } from "react";
 
 function SectionHeader({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "20px 0 12px" }}>
+    <div style={sectionHeaderStyle}>
       <span
-        style={{
-          fontSize: 11,
-          color: colors.goldMuted,
-          fontFamily: fonts.display,
-          letterSpacing: "0.1em",
-          textTransform: "uppercase",
-          fontWeight: 700,
-          whiteSpace: "nowrap",
-        }}
+        style={sectionHeaderStyle2}
       >
         {children}
       </span>
-      <div style={{ flex: 1, height: 1, background: colors.goldBorder }} />
+      <div style={sectionHeaderStyle3} />
     </div>
   );
 }
@@ -98,16 +91,7 @@ function LevelUpModalComponent() {
   return (
     <Dialog open={true} onOpenChange={() => {}}>
       <DialogContent
-        style={{
-          maxWidth: 680,
-          background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 100%)",
-          border: `1px solid ${colors.goldBorder}`,
-          borderRadius: 12,
-          padding: 0,
-          overflow: "hidden",
-          fontFamily: fonts.body,
-          color: colors.text,
-        }}
+        style={levelUpModalComponentStyle}
       >
         <DialogHeader
           style={{
@@ -115,47 +99,24 @@ function LevelUpModalComponent() {
             borderBottom: `1px solid ${colors.goldBorder}`,
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div style={levelUpModalComponentStyle2}>
             <div
-              style={{
-                width: 64,
-                height: 64,
-                flexShrink: 0,
-                background: "rgba(0,0,0,0.5)",
-                border: `1px solid rgba(180,140,80,0.2)`,
-                borderRadius: 8,
-                overflow: "hidden",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              style={levelUpModalComponentStyle3}
             >
               <img
                 src={currentChar.img}
                 alt={currentChar.name}
-                style={{
-                  width: 56,
-                  height: 56,
-                  imageRendering: "pixelated",
-                  filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.8))",
-                }}
+                style={levelUpModalComponentStyle4}
               />
             </div>
 
             <div style={{ flex: 1 }}>
               <DialogTitle
-                style={{
-                  margin: "0 0 8px",
-                  fontSize: 22,
-                  fontWeight: 700,
-                  color: colors.text,
-                  fontFamily: fonts.display,
-                  letterSpacing: "0.04em",
-                }}
+                style={levelUpModalComponentStyle5}
               >
                 Level Up!
               </DialogTitle>
-              <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+              <div style={levelUpModalComponentStyle6}>
                 {[
                   currentChar.race,
                   currentChar.class,
@@ -163,28 +124,14 @@ function LevelUpModalComponent() {
                 ].map((tag) => (
                   <span
                     key={tag}
-                    style={{
-                      fontSize: 11,
-                      color: colors.goldMuted,
-                      background: "rgba(180,140,80,0.1)",
-                      border: `1px solid ${colors.goldBorder}`,
-                      borderRadius: 4,
-                      padding: "2px 9px",
-                      fontFamily: fonts.display,
-                      letterSpacing: "0.04em",
-                    }}
+                    style={levelUpModalComponentStyle7}
                   >
                     {tag}
                   </span>
                 ))}
                 {remainingChars > 0 && (
                   <span
-                    style={{
-                      fontSize: 11,
-                      color: colors.textMuted,
-                      fontFamily: fonts.body,
-                      marginLeft: "auto",
-                    }}
+                    style={levelUpModalComponentStyle8}
                   >
                     +{remainingChars} more waiting
                   </span>
@@ -197,11 +144,7 @@ function LevelUpModalComponent() {
         <div style={{ padding: "4px 24px 24px" }}>
           <SectionHeader>Experience</SectionHeader>
           <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: 6,
-            }}
+            style={levelUpModalComponentStyle9}
           >
             <span
               style={{
@@ -215,11 +158,7 @@ function LevelUpModalComponent() {
               EXP
             </span>
             <span
-              style={{
-                fontSize: 12,
-                color: colors.textMuted,
-                fontFamily: fonts.body,
-              }}
+              style={levelUpModalComponentStyle10}
             >
               {currentChar.exp}
               <span style={{ color: colors.muted }}>
@@ -275,11 +214,7 @@ function LevelUpModalComponent() {
           </div>
 
           <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(7, 1fr)",
-              gap: 6,
-            }}
+            style={levelUpModalComponentStyle11}
           >
             {Object.entries(currentChar.abilities).map(([key, ability]) => {
               const allocated = allocatedStats[key] ?? 0;
@@ -306,36 +241,18 @@ function LevelUpModalComponent() {
                   }}
                 >
                   <div
-                    style={{
-                      fontSize: 9,
-                      color: colors.textMuted,
-                      fontFamily: fonts.display,
-                      letterSpacing: "0.1em",
-                      textTransform: "uppercase",
-                      marginBottom: 4,
-                    }}
+                    style={levelUpModalComponentStyle12}
                   >
                     {key}
                   </div>
                   <div
-                    style={{
-                      fontSize: 20,
-                      fontWeight: 700,
-                      color: colors.text,
-                      fontFamily: fonts.display,
-                      lineHeight: 1,
-                    }}
+                    style={levelUpModalComponentStyle13}
                   >
                     {newScore}
                   </div>
                   {allocated > 0 && (
                     <div
-                      style={{
-                        fontSize: 10,
-                        color: colors.success,
-                        fontFamily: fonts.display,
-                        marginTop: 1,
-                      }}
+                      style={levelUpModalComponentStyle14}
                     >
                       +{allocated}
                     </div>
@@ -353,12 +270,7 @@ function LevelUpModalComponent() {
 
                   {/* +/- controls */}
                   <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      gap: 3,
-                      marginTop: 7,
-                    }}
+                    style={levelUpModalComponentStyle15}
                   >
                     <button
                       onClick={() => decrementStat(key)}
@@ -456,3 +368,112 @@ function LevelUpModalComponent() {
 }
 
 export default memo(LevelUpModalComponent);
+
+// Static style objects hoisted out of the render path.
+const sectionHeaderStyle: CSSProperties = { display: "flex", alignItems: "center", gap: 10, margin: "20px 0 12px" };
+  const sectionHeaderStyle2: CSSProperties = {
+            fontSize: 11,
+            color: colors.goldMuted,
+            fontFamily: fonts.display,
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            fontWeight: 700,
+            whiteSpace: "nowrap",
+};
+const sectionHeaderStyle3: CSSProperties = { flex: 1, height: 1, background: colors.goldBorder };
+  const levelUpModalComponentStyle: CSSProperties = {
+            maxWidth: 680,
+            background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 100%)",
+            border: `1px solid ${colors.goldBorder}`,
+            borderRadius: 12,
+            padding: 0,
+            overflow: "hidden",
+            fontFamily: fonts.body,
+            color: colors.text,
+};
+const levelUpModalComponentStyle2: CSSProperties = { display: "flex", alignItems: "center", gap: 16 };
+  const levelUpModalComponentStyle3: CSSProperties = {
+                  width: 64,
+                  height: 64,
+                  flexShrink: 0,
+                  background: "rgba(0,0,0,0.5)",
+                  border: `1px solid rgba(180,140,80,0.2)`,
+                  borderRadius: 8,
+                  overflow: "hidden",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+};
+const levelUpModalComponentStyle4: CSSProperties = {
+  width: 56,
+  height: 56,
+  imageRendering: "pixelated",
+  filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.8))",
+};
+const levelUpModalComponentStyle5: CSSProperties = {
+  margin: "0 0 8px",
+  fontSize: 22,
+  fontWeight: 700,
+  color: colors.text,
+  fontFamily: fonts.display,
+  letterSpacing: "0.04em",
+};
+const levelUpModalComponentStyle6: CSSProperties = { display: "flex", gap: 6, alignItems: "center" };
+  const levelUpModalComponentStyle7: CSSProperties = {
+                        fontSize: 11,
+                        color: colors.goldMuted,
+                        background: "rgba(180,140,80,0.1)",
+                        border: `1px solid ${colors.goldBorder}`,
+                        borderRadius: 4,
+                        padding: "2px 9px",
+                        fontFamily: fonts.display,
+                        letterSpacing: "0.04em",
+};
+const levelUpModalComponentStyle8: CSSProperties = {
+  fontSize: 11,
+  color: colors.textMuted,
+  fontFamily: fonts.body,
+  marginLeft: "auto",
+};
+const levelUpModalComponentStyle9: CSSProperties = {
+  display: "flex",
+  justifyContent: "space-between",
+  marginBottom: 6,
+};
+const levelUpModalComponentStyle10: CSSProperties = {
+  fontSize: 12,
+  color: colors.textMuted,
+  fontFamily: fonts.body,
+};
+const levelUpModalComponentStyle11: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(7, 1fr)",
+  gap: 6,
+};
+const levelUpModalComponentStyle12: CSSProperties = {
+  fontSize: 9,
+  color: colors.textMuted,
+  fontFamily: fonts.display,
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+  marginBottom: 4,
+};
+const levelUpModalComponentStyle13: CSSProperties = {
+  fontSize: 20,
+  fontWeight: 700,
+  color: colors.text,
+  fontFamily: fonts.display,
+  lineHeight: 1,
+};
+const levelUpModalComponentStyle14: CSSProperties = {
+  fontSize: 10,
+  color: colors.success,
+  fontFamily: fonts.display,
+  marginTop: 1,
+};
+const levelUpModalComponentStyle15: CSSProperties = {
+  display: "flex",
+  justifyContent: "center",
+  gap: 3,
+  marginTop: 7,
+};

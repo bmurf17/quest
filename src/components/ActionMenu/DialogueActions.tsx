@@ -5,6 +5,7 @@ import { NPCType } from "@/types/RoomInteractions";
 import { partyHasAnimalHandling } from "@/state/utils/DialogueUtils";
 import { ActionBtn } from "./ActionBtn";
 import { SectionLabel } from "./SectionLabel";
+import type { CSSProperties } from "react";
 
 export function DialogueActions({
   npc,
@@ -20,7 +21,7 @@ export function DialogueActions({
   const speak = useGameStore((state) => state.speak);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+    <div style={dialogueActionsStyle}>
       <SectionLabel>Dialogue</SectionLabel>
       {npc.NPCType === NPCType.ANIMAL && !partyHasAnimalHandling(party) ? (
         <ActionBtn disabled variant="muted" fullWidth>
@@ -106,3 +107,6 @@ export function DialogueActions({
     </div>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const dialogueActionsStyle: CSSProperties = { display: "flex", flexDirection: "column", gap: 6 };

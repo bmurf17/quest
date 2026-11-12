@@ -8,6 +8,7 @@ import wizardImg from "@/assets/wizard.png";
 import bardImg from "@/assets/bard.png";
 import barbarianImg from "@/assets/barbarian.png";
 import assassinImg from "@/assets/assassin.png";
+import type { CSSProperties } from "react";
 
 const IMAGES = [
   { key: "warrior", src: warriorImg, label: "Warrior" },
@@ -25,39 +26,19 @@ export default function ImageForm() {
 
   return (
     <>
-      <style>{`
-        .image-card:hover { background: rgba(212,175,55,0.07) !important; border-color: rgba(212,175,55,0.25) !important; }
-      `}</style>
       <div>
         <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            margin: "0 0 18px",
-          }}
+          style={imageFormStyle}
         >
           <span
-            style={{
-              fontSize: 11,
-              color: colors.goldMuted,
-              fontFamily: fonts.display,
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              fontWeight: 700,
-              whiteSpace: "nowrap",
-            }}
+            style={imageFormStyle2}
           >
             Choose Your Portrait
           </span>
-          <div style={{ flex: 1, height: 1, background: colors.goldBorder }} />
+          <div style={imageFormStyle3} />
         </div>
         <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))",
-            gap: 10,
-          }}
+          style={imageFormStyle4}
         >
           {IMAGES.map(({ key, src, label }) => {
             const active = character.image === key;
@@ -97,11 +78,7 @@ export default function ImageForm() {
                   <img
                     src={src}
                     alt={label}
-                    style={{
-                      width: 80,
-                      height: 80,
-                      imageRendering: "pixelated",
-                    }}
+                    style={imageFormStyle5}
                   />
                 </div>
                 <span
@@ -122,3 +99,31 @@ export default function ImageForm() {
     </>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const imageFormStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  margin: "0 0 18px",
+};
+const imageFormStyle2: CSSProperties = {
+  fontSize: 11,
+  color: colors.goldMuted,
+  fontFamily: fonts.display,
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+  fontWeight: 700,
+  whiteSpace: "nowrap",
+};
+const imageFormStyle3: CSSProperties = { flex: 1, height: 1, background: colors.goldBorder };
+  const imageFormStyle4: CSSProperties = {
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))",
+              gap: 10,
+};
+const imageFormStyle5: CSSProperties = {
+  width: 80,
+  height: 80,
+  imageRendering: "pixelated",
+};

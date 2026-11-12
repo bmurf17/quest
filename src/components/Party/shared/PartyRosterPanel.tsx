@@ -3,6 +3,7 @@ import { useGameStore } from "@/state/GameState";
 import { colors, fonts } from "@/theme";
 import { Link } from "react-router-dom";
 import { PartyRosterCard } from "./PartyRosterCard";
+import type { CSSProperties } from "react";
 
 const MAX_PARTY_SIZE = 6;
 
@@ -21,14 +22,7 @@ export function PartyRosterPanel({
 
   return (
     <div
-      style={{
-        width: 320,
-        flexShrink: 0,
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-        background: "rgba(0,0,0,0.2)",
-      }}
+      style={partyRosterPanelStyle}
     >
       <div
         style={{
@@ -37,22 +31,10 @@ export function PartyRosterPanel({
         }}
       >
         <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
+          style={partyRosterPanelStyle2}
         >
           <h2
-            style={{
-              margin: 0,
-              fontSize: 11,
-              fontWeight: 700,
-              color: colors.goldMuted,
-              fontFamily: fonts.display,
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-            }}
+            style={partyRosterPanelStyle3}
           >
             Your Party
           </h2>
@@ -77,29 +59,17 @@ export function PartyRosterPanel({
       </div>
 
       <div
-        style={{
-          flex: 1,
-          overflowY: "auto",
-          padding: "10px 12px",
-          display: "flex",
-          flexDirection: "column",
-          gap: 8,
-        }}
+        style={partyRosterPanelStyle4}
       >
         {party.length === 0 ? (
           <div style={{ textAlign: "center", padding: "48px 16px" }}>
             <p
-              style={{
-                margin: "0 0 6px",
-                color: "#4B5563",
-                fontSize: 13,
-                fontFamily: fonts.display,
-              }}
+              style={partyRosterPanelStyle5}
             >
               {emptyTitle}
             </p>
             {emptyHint && (
-              <p style={{ margin: 0, color: "#374151", fontSize: 13 }}>
+              <p style={partyRosterPanelStyle6}>
                 {emptyHint}
               </p>
             )}
@@ -117,33 +87,12 @@ export function PartyRosterPanel({
 
       {party.length > 0 && (
         <div
-          style={{
-            padding: "12px",
-            borderTop: `1px solid ${colors.goldBorder}`,
-            flexShrink: 0,
-          }}
+          style={partyRosterPanelStyle7}
         >
           <Link to="/game" style={{ textDecoration: "none" }}>
             <button
               onClick={enterCombat}
-              style={{
-                width: "100%",
-                padding: "14px",
-                background: `linear-gradient(135deg, ${colors.gold} 0%, ${colors.gold} 50%, ${colors.gold} 100%)`,
-                border: "none",
-                borderRadius: 8,
-                color: "#0d0b07",
-                fontSize: 13,
-                fontWeight: 700,
-                fontFamily: fonts.display,
-                letterSpacing: "0.06em",
-                cursor: "pointer",
-                transition: "filter 0.15s, transform 0.1s",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 8,
-              }}
+              style={partyRosterPanelStyle8}
               onMouseEnter={(e) => {
                 e.currentTarget.style.filter = "brightness(1.08)";
               }}
@@ -179,3 +128,65 @@ export function PartyRosterPanel({
     </div>
   );
 }
+
+// Static style objects hoisted out of the render path.
+const partyRosterPanelStyle: CSSProperties = {
+  width: 320,
+  flexShrink: 0,
+  display: "flex",
+  flexDirection: "column",
+  overflow: "hidden",
+  background: "rgba(0,0,0,0.2)",
+};
+const partyRosterPanelStyle2: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+};
+const partyRosterPanelStyle3: CSSProperties = {
+  margin: 0,
+  fontSize: 11,
+  fontWeight: 700,
+  color: colors.goldMuted,
+  fontFamily: fonts.display,
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
+};
+const partyRosterPanelStyle4: CSSProperties = {
+  flex: 1,
+  overflowY: "auto",
+  padding: "10px 12px",
+  display: "flex",
+  flexDirection: "column",
+  gap: 8,
+};
+const partyRosterPanelStyle5: CSSProperties = {
+  margin: "0 0 6px",
+  color: "#4B5563",
+  fontSize: 13,
+  fontFamily: fonts.display,
+};
+const partyRosterPanelStyle6: CSSProperties = { margin: 0, color: "#374151", fontSize: 13 };
+  const partyRosterPanelStyle7: CSSProperties = {
+              padding: "12px",
+              borderTop: `1px solid ${colors.goldBorder}`,
+              flexShrink: 0,
+};
+const partyRosterPanelStyle8: CSSProperties = {
+  width: "100%",
+  padding: "14px",
+  background: `linear-gradient(135deg, ${colors.gold} 0%, ${colors.gold} 50%, ${colors.gold} 100%)`,
+  border: "none",
+  borderRadius: 8,
+  color: "#0d0b07",
+  fontSize: 13,
+  fontWeight: 700,
+  fontFamily: fonts.display,
+  letterSpacing: "0.06em",
+  cursor: "pointer",
+  transition: "filter 0.15s, transform 0.1s",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 8,
+};
