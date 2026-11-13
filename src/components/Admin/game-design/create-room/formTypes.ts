@@ -10,6 +10,8 @@ export interface MoveEntry {
 }
 
 export interface EnemyEntry {
+  /** When set, the room links this existing library enemy instead of creating a copy. */
+  libraryId?: number;
   name: string;
   health: number;
   strength: number;

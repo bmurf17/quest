@@ -21,6 +21,7 @@ export function CreateRoomForm({ form }: { form: CreateRoomFormState }) {
     setInteraction,
     enemies,
     setEnemies,
+    libraryEnemies,
     setNeighboringRoom,
     selectedSectionId,
     setSelectedSectionId,
@@ -123,7 +124,12 @@ export function CreateRoomForm({ form }: { form: CreateRoomFormState }) {
           </fieldset>
           <fieldset disabled={interaction !== "Combat"} style={formFieldsetStyle}>
             <div style={{ display: interaction === "Combat" ? "block" : "none" }}>
-              <CombatForm enemyImgs={enemyImgs} enemies={enemies} onChange={setEnemies} />
+              <CombatForm
+                enemyImgs={enemyImgs}
+                enemies={enemies}
+                libraryEnemies={libraryEnemies}
+                onChange={setEnemies}
+              />
             </div>
           </fieldset>
           <fieldset disabled={interaction !== "Chest"} style={formFieldsetStyle}>

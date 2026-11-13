@@ -4,6 +4,7 @@ import type { Room, Section } from "@/types/Room";
 import type { NPCType, Quest, QuestType, RoomInteraction } from "@/types/RoomInteractions";
 import type { EquipmentSlot, Item } from "@/types/Item";
 import { supabase } from "@/lib/supabase";
+import { resolveItemImage } from "@/lib/itemImages";
 import { unwrapQuery } from "./queryHelpers";
 export { supabase };
 
@@ -116,9 +117,12 @@ export const mapDbItem = (it: DbItem | null | undefined): Item | null => {
   const base = {
     name: it.name,
     value: it.value,
-    img: it.img,
+    img: resolveItemImage(it.img),
     // `value` is the only price column in the database.
     cost: it.value,
+    // The items table has no dedicated description column; `effect` doubles as
+    // the shop description for both consumables and equipment.
+    description: it.effect ?? undefined,
   };
 
   if (it.type === "consumable") {

@@ -15,10 +15,15 @@ import {
 } from "@/data/fixtures/characters";
 import { getAllRooms, getSections } from "@/queries/RoomQueries";
 import { useGameStore } from "@/state/GameState";
+import { AdminLayout } from "@/components/Admin/AdminLayout";
 import ManageRooms from "@/components/Admin/game-design/CreateRoom";
+import Rooms from "@/components/Admin/game-design/Rooms";
 import RoomMap from "@/components/Admin/game-design/RoomMap";
 import ManageSections from "@/components/Admin/game-design/ManageSections";
 import ManageDialogues from "@/components/Admin/game-design/ManageDialogues";
+import ManageItems from "@/components/Admin/game-design/ManageItems";
+import ManageEnemies from "@/components/Admin/game-design/ManageEnemies";
+import ManageBackup from "@/components/Admin/game-design/ManageBackup";
 import { PartyManagement } from "@/components/Party/PartyManagement";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { logger } from "@/lib/logger";
@@ -144,11 +149,17 @@ function App() {
                 />
                 <Route path={"/party"} element={<PartyManagement />} />
                 <Route path={"/create"} element={<CharacterCreation />} />
-                <Route path={"/admin/game-design/rooms"} element={<ManageRooms />} />
-                <Route path={"/admin/game-design/roomMap"} element={<RoomMap />} />
-                <Route path={"/admin/game-design/sections"} element={<ManageSections />} />
-                <Route path={"/admin/game-design/dialogues"} element={<ManageDialogues />} />
-                <Route path={"/admin"} element={<Admin />} />
+                <Route path={"/admin"} element={<AdminLayout />}>
+                  <Route index element={<Admin />} />
+                  <Route path={"game-design/rooms"} element={<Rooms />} />
+                  <Route path={"game-design/rooms/new"} element={<ManageRooms />} />
+                  <Route path={"game-design/items"} element={<ManageItems />} />
+                  <Route path={"game-design/enemies"} element={<ManageEnemies />} />
+                  <Route path={"game-design/backup"} element={<ManageBackup />} />
+                  <Route path={"game-design/roomMap"} element={<RoomMap />} />
+                  <Route path={"game-design/sections"} element={<ManageSections />} />
+                  <Route path={"game-design/dialogues"} element={<ManageDialogues />} />
+                </Route>
               </Routes>
             </Suspense>
           )}

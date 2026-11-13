@@ -280,7 +280,7 @@ const toastStyle2: CSSProperties = {
   opacity: 0.7,
 };
 const manageSectionsStyle: CSSProperties = {
-  minHeight: "100vh",
+  minHeight: "100%",
   background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 50%, #0f0e09 100%)",
   padding: "48px 32px 80px",
   fontFamily: fonts.body,

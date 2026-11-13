@@ -1,4 +1,5 @@
 import { useGameStore } from "@/state/GameState";
+import { NPCType } from "@/types/RoomInteractions";
 import type { NPC, Quest } from "@/types/RoomInteractions";
 import type { CharacterData } from "@/types/Character";
 import { useState } from "react";
@@ -6,6 +7,7 @@ import Inventory from "@/components/Inventory";
 import Shop from "@/components/Shop";
 import SectionSelector from "@/components/SectionSelector";
 import { manaPotion } from "@/data/items";
+import { merchantShopKey, TOWN_SHOP_KEY } from "@/queries/ItemQueries";
 import { GameStatus } from "@/types/GameStatus";
 import QuestList from "@/components/Quests/QuestList";
 import QuestOffer from "@/components/Quests/QuestOffer";
@@ -41,6 +43,8 @@ export default function ActionMenu() {
   const inCombat = room && room.enemies.length > 0;
   const npc =
     room?.interaction?.type === "NPC" ? (room.interaction as { type: "NPC"; npc: NPC }).npc : null;
+  const shopKey =
+    npc?.NPCType === NPCType.MERCHANT && npc.id ? merchantShopKey(npc.id) : TOWN_SHOP_KEY;
   const chest = room?.interaction?.type === "chest" ? room.interaction.chest : null;
   const camp = room?.interaction?.type === "camp" ? room.interaction.camp : null;
 
@@ -132,8 +136,8 @@ export default function ActionMenu() {
       <Shop
         isOpen={isShopModalOpen}
         onOpenChange={setIsShopModalOpen}
-        inventory={[manaPotion]}
-        ownersName={npc?.name ?? "Shopkeeper"}
+        shopKey={shopKey}
+        ownersName={npc?.name ?? "Town"}
       />
       <SectionSelector isOpen={isSectionSelectorOpen} onOpenChange={setIsSectionSelectorOpen} />
       <QuestList isOpen={isQuestListOpen} onOpenChange={setIsQuestListOpen} />

@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import type { Database } from "@/types/database.generated";
 import type { DbEnemy, DbItem } from "@/queries/RoomQueries";
+import type { ShopStockRow } from "@/queries/ItemQueries";
 
 type Assert<T extends true> = T;
 
@@ -14,6 +15,11 @@ type EnemyColumnsExist = Assert<
 >;
 type ItemColumnsExist = Assert<
   keyof DbItem extends keyof Database["public"]["Tables"]["items"]["Row"] ? true : false
+>;
+type ShopStockColumnsExist = Assert<
+  keyof ShopStockRow extends keyof Database["public"]["Tables"]["shop_stock"]["Row"]
+    ? true
+    : false
 >;
 
 const srcDir = fileURLToPath(new URL("../..", import.meta.url));
@@ -67,4 +73,4 @@ describe("database schema contract", () => {
 });
 
 // Keep the type helpers referenced so unused-type lint rules stay quiet.
-export type DatabaseContractChecks = [EnemyColumnsExist, ItemColumnsExist];
+export type DatabaseContractChecks = [EnemyColumnsExist, ItemColumnsExist, ShopStockColumnsExist];

@@ -442,20 +442,34 @@ function RoomPopup({ room, onClose }: { room: Room; onClose: () => void }) {
           </div>
         )}
 
-        <button
-          onClick={onClose}
-          style={roomPopupStyle14}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = "rgba(180,140,80,0.1)";
-            e.currentTarget.style.color = colors.gold;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = "transparent";
-            e.currentTarget.style.color = colors.goldMuted;
-          }}
-        >
-          Close
-        </button>
+        <div style={roomPopupActionsStyle}>
+          <a
+            href={`/admin/game-design/rooms?room=${room.id}`}
+            style={{
+              ...roomPopupStyle14,
+              marginTop: 0,
+              textAlign: "center",
+              textDecoration: "none",
+              color: colors.gold,
+            }}
+          >
+            Edit Room
+          </a>
+          <button
+            onClick={onClose}
+            style={{ ...roomPopupStyle14, marginTop: 0 }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "rgba(180,140,80,0.1)";
+              e.currentTarget.style.color = colors.gold;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "transparent";
+              e.currentTarget.style.color = colors.goldMuted;
+            }}
+          >
+            Close
+          </button>
+        </div>
       </DialogContent>
     </Dialog>
   );
@@ -677,7 +691,6 @@ const roomPopupStyle: CSSProperties = {
   padding: 28,
   maxWidth: 340,
   overflowY: "auto",
-  position: "relative",
   fontFamily: "'Crimson Text', Georgia, serif",
 };
 const roomPopupStyle2: CSSProperties = {
@@ -767,6 +780,11 @@ const roomPopupStyle14: CSSProperties = {
   cursor: "pointer",
   transition: "all 0.15s",
 };
+const roomPopupActionsStyle: CSSProperties = {
+  display: "flex",
+  gap: 8,
+  marginTop: 24,
+};
 const legendStyle: CSSProperties = {
   position: "absolute",
   bottom: 16,
@@ -791,14 +809,14 @@ const legendStyle2: CSSProperties = {
 };
 const legendStyle3: CSSProperties = { display: "flex", alignItems: "center", gap: 7 };
 const roomMapStyle: CSSProperties = {
-  minHeight: "100vh",
+  minHeight: "100%",
   background: "linear-gradient(160deg, #0d0b07, #1a1209)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
 };
 const roomMapStyle2: CSSProperties = {
-  minHeight: "100vh",
+  minHeight: "100%",
   background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 50%, #0f0e09 100%)",
   display: "flex",
   flexDirection: "column",

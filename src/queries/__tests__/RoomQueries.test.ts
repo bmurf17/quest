@@ -156,6 +156,19 @@ describe("mapDbItem", () => {
       stats: { attack: 3 },
     });
   });
+
+  it("uses the effect column as the description for shops", () => {
+    const mapped = mapDbItem(itemRow({ effect: "You are healed 3 hp" }));
+
+    expect(mapped?.description).toBe("You are healed 3 hp");
+  });
+
+  it("resolves stable image keys from the database", () => {
+    const mapped = mapDbItem(itemRow({ img: "health-potion.png" }));
+
+    expect(mapped?.img).not.toBe("health-potion.png");
+    expect(mapped?.img).toMatch(/health-potion/);
+  });
 });
 
 describe("mapDbQuest", () => {

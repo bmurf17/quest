@@ -1,23 +1,80 @@
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { decrementShopStock, getShopEntries, type ShopEntry } from "@/queries/ItemQueries";
 import { useGameStore } from "@/state/GameState";
 import { colors, fonts } from "@/theme";
-import type { Item } from "@/types/Item";
 import type { CSSProperties } from "react";
+
+const errorMessage = (err: unknown) =>
+  err instanceof Error ? err.message : "The shop could not complete that purchase.";
 
 export default function Shop({
   isOpen = false,
   onOpenChange,
-  inventory,
+  shopKey,
   ownersName,
 }: {
   isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  inventory: Item[];
+  shopKey: string;
   ownersName: string;
 }) {
   const buyItem = useGameStore((state) => state.buyItem);
   const goldPieces = useGameStore((state) => state.goldPieces);
+
+  const [entries, setEntries] = useState<ShopEntry[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [pendingItemId, setPendingItemId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    let cancelled = false;
+    setIsLoading(true);
+    setError(null);
+
+    void getShopEntries(shopKey)
+      .then(({ entries: next }) => {
+        if (!cancelled) setEntries(next);
+      })
+      .catch((err) => {
+        if (!cancelled) setError(errorMessage(err));
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, shopKey]);
+
+  async function handleBuy(entry: ShopEntry) {
+    if (entry.item.cost > goldPieces) return;
+    if (entry.quantity !== null && entry.quantity <= 0) return;
+
+    setPendingItemId(entry.itemId);
+    setError(null);
+    try {
+      if (entry.stockId !== null && entry.quantity !== null) {
+        await decrementShopStock(shopKey, entry.itemId);
+      }
+      buyItem(entry.item);
+      setEntries((current) =>
+        current.map((row) =>
+          row.itemId === entry.itemId && row.quantity !== null
+            ? { ...row, quantity: Math.max(0, row.quantity - 1) }
+            : row,
+        ),
+      );
+    } catch (err) {
+      setError(errorMessage(err));
+    } finally {
+      setPendingItemId(null);
+    }
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -29,24 +86,35 @@ export default function Shop({
           </div>
         </DialogHeader>
 
+        {error && <div style={shopErrorStyle}>{error}</div>}
+
         <ScrollArea style={{ height: "60vh" }}>
           <div style={shopListStyle}>
-            {inventory.length === 0 ? (
+            {isLoading ? (
+              <div style={{ textAlign: "center", padding: "48px 16px" }}>
+                <p style={shopEmptyTextStyle}>Opening the shop…</p>
+              </div>
+            ) : entries.length === 0 ? (
               <div style={{ textAlign: "center", padding: "48px 16px" }}>
                 <div style={shopEmptyIconStyle}>◇</div>
                 <p style={shopEmptyTextStyle}>This shop has nothing for sale</p>
               </div>
             ) : (
-              inventory.map((item) => {
-                const canAfford = item.cost <= goldPieces;
+              entries.map((entry) => {
+                const item = entry.item;
+                const soldOut = entry.quantity !== null && entry.quantity <= 0;
+                const pending = pendingItemId === entry.itemId;
+                const canAfford = item.cost <= goldPieces && !soldOut && !pending;
 
                 return (
                   <button
                     type="button"
-                    key={item.name}
-                    onClick={() => buyItem(item)}
+                    key={entry.itemId}
+                    onClick={() => void handleBuy(entry)}
                     disabled={!canAfford}
-                    aria-label={`Buy ${item.name} for ${item.cost} GP`}
+                    aria-label={`Buy ${item.name} for ${item.cost} GP${
+                      entry.quantity === null ? "" : `, ${entry.quantity} left`
+                    }`}
                     style={{
                       ...shopItemStyle,
                       opacity: canAfford ? 1 : 0.55,
@@ -88,7 +156,16 @@ export default function Shop({
                       {item.description && (
                         <div style={shopItemDescriptionStyle}>{item.description}</div>
                       )}
-                      <div style={shopItemPriceStyle}>{item.cost} GP</div>
+                      <div style={shopItemPriceStyle}>
+                        {item.cost} GP
+                        <span style={shopStockStyle}>
+                          {entry.quantity === null
+                            ? " · unlimited"
+                            : soldOut
+                              ? " · sold out"
+                              : ` · ${entry.quantity} left`}
+                        </span>
+                      </div>
                     </div>
 
                     <div
@@ -98,7 +175,7 @@ export default function Shop({
                         borderColor: canAfford ? colors.goldBorder : colors.subtleBorder,
                       }}
                     >
-                      {canAfford ? "Buy" : "Too costly"}
+                      {soldOut ? "Sold out" : pending ? "Buying…" : canAfford ? "Buy" : "Too costly"}
                     </div>
                   </button>
                 );
@@ -148,6 +225,22 @@ const shopGoldStyle: CSSProperties = {
   color: "#F5D76E",
   fontFamily: fonts.display,
   letterSpacing: "0.03em",
+};
+const shopErrorStyle: CSSProperties = {
+  margin: "10px 14px 0",
+  padding: "8px 10px",
+  background: "rgba(220,38,38,0.08)",
+  border: "1px solid rgba(220,38,38,0.25)",
+  borderRadius: 6,
+  color: "#FCA5A5",
+  fontSize: 12,
+  lineHeight: 1.5,
+};
+const shopStockStyle: CSSProperties = {
+  fontSize: 10,
+  fontWeight: 400,
+  color: "#7A6A52",
+  letterSpacing: "0.02em",
 };
 const shopListStyle: CSSProperties = {
   padding: "10px 14px 20px",

@@ -446,6 +446,27 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["sections"]["Row"]>;
         Relationships: [];
       };
+      shop_stock: {
+        Row: {
+          id: number;
+          shop_key: string;
+          item_id: string;
+          quantity: number | null;
+          sort_order: number;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["shop_stock"]["Row"]>;
+        Update: Partial<Database["public"]["Tables"]["shop_stock"]["Row"]>;
+        Relationships: [
+          {
+            foreignKeyName: "shop_stock_item_id_fkey";
+            columns: ["item_id"];
+            isOneRelation: true;
+            referencedRelation: "items";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       transitions: {
         Row: {
           id: number;
@@ -461,7 +482,10 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      reset_content_sequences: {
+        Args: Record<string, never>;
+        Returns: undefined;
+      };
     };
     Enums: {
       direction_enum: "North" | "South" | "East" | "West";

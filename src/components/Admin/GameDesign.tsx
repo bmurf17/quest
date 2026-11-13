@@ -8,8 +8,8 @@ const navSections = [
     description: "Shape the world adventurers will explore",
     items: [
       {
-        label: "World Builder",
-        description: "Forge new rooms, enemies, and interactions",
+        label: "Rooms",
+        description: "Browse, edit, and forge rooms and their connections",
         to: "/admin/game-design/rooms",
         icon: (
           <svg
@@ -103,6 +103,78 @@ const navSections = [
         accentBg: "rgba(16,185,129,0.1)",
         accentBorder: "rgba(16,185,129,0.3)",
       },
+      {
+        label: "Items & Shops",
+        description: "Create items and control shop stock and pricing",
+        to: "/admin/game-design/items",
+        icon: (
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.5}
+            width={22}
+            height={22}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="m21 7.5-9-4.5-9 4.5 9 4.5 9-4.5Zm0 0v9l-9 4.5m9-13.5-9 4.5m0 0v9m0-9L3 7.5m0 0v9l9 4.5"
+            />
+          </svg>
+        ),
+        accent: "#F59E0B",
+        accentBg: "rgba(245,158,11,0.1)",
+        accentBorder: "rgba(245,158,11,0.3)",
+      },
+      {
+        label: "Enemies & Balance",
+        description: "Reusable enemies, boss phases, and quick balance estimates",
+        to: "/admin/game-design/enemies",
+        icon: (
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.5}
+            width={22}
+            height={22}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6.75 3.75 3 7.5l3.75 3.75M3 7.5h12l3 3m3.75 9.75L21 16.5l-3.75-3.75M21 16.5H9l-3-3"
+            />
+          </svg>
+        ),
+        accent: "#EF4444",
+        accentBg: "rgba(239,68,68,0.1)",
+        accentBorder: "rgba(239,68,68,0.3)",
+      },
+      {
+        label: "Backup & Restore",
+        description: "Export core content, keep snapshots, and restore safely",
+        to: "/admin/game-design/backup",
+        icon: (
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.5}
+            width={22}
+            height={22}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 2.625c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125"
+            />
+          </svg>
+        ),
+        accent: "#6366F1",
+        accentBg: "rgba(99,102,241,0.1)",
+        accentBorder: "rgba(99,102,241,0.3)",
+      },
     ],
   },
 ];
@@ -146,8 +218,8 @@ export default function Admin() {
               </svg>
             </div>
             <div>
-              <h1 style={adminStyle3}>Admin Console</h1>
-              <p style={adminStyle4}>Shape the realm from behind the veil</p>
+              <h1 style={adminStyle3}>Overview</h1>
+              <p style={adminStyle4}>Everything you can edit, in one place</p>
             </div>
           </div>
 
@@ -258,7 +330,7 @@ export default function Admin() {
 
 // Static style objects hoisted out of the render path.
 const adminStyle: CSSProperties = {
-  minHeight: "100vh",
+  minHeight: "100%",
   background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 50%, #0f0e09 100%)",
   padding: "48px 32px 80px",
   fontFamily: fonts.body,

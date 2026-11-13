@@ -8,10 +8,12 @@ import type { CSSProperties } from "react";
 export function CombatForm({
   enemyImgs,
   enemies,
+  libraryEnemies,
   onChange,
 }: {
   enemyImgs: string[];
   enemies: EnemyEntry[];
+  libraryEnemies: EnemyEntry[];
   onChange: (enemies: EnemyEntry[]) => void;
 }) {
   const updateEnemy = <K extends keyof EnemyEntry>(
@@ -19,8 +21,22 @@ export function CombatForm({
     field: K,
     value: EnemyEntry[K],
   ) => {
-    const updated = enemies.map((e, i) => (i === index ? { ...e, [field]: value } : e));
+    const updated = enemies.map((e, i) =>
+      i === index
+        ? {
+            ...e,
+            [field]: value,
+            // Editing a library pick turns it into a custom copy for this room.
+            ...(field === "libraryId" ? {} : { libraryId: undefined }),
+          }
+        : e,
+    );
     onChange(updated);
+  };
+
+  const addFromLibrary = (libraryId: number) => {
+    const picked = libraryEnemies.find((enemy) => enemy.libraryId === libraryId);
+    if (picked) onChange([...enemies, { ...picked }]);
   };
 
   const addEnemy = () => {
@@ -55,6 +71,32 @@ export function CombatForm({
 
   return (
     <>
+      {libraryEnemies.length > 0 && (
+        <div style={libraryPickerStyle}>
+          <StyledSelect
+            aria-label="Add enemy from library"
+            defaultValue=""
+            onChange={(event) => {
+              const value = event.target.value;
+              if (value) {
+                addFromLibrary(Number(value));
+                event.target.value = "";
+              }
+            }}
+          >
+            <option value="">Add from enemy library…</option>
+            {libraryEnemies.map((enemy) => (
+              <option key={enemy.libraryId} value={enemy.libraryId}>
+                {enemy.name} · {enemy.health} HP
+              </option>
+            ))}
+          </StyledSelect>
+          <span style={libraryHintStyle}>
+            Links the shared enemy instead of creating a duplicate.
+          </span>
+        </div>
+      )}
+
       {enemies.map((enemy, index) => (
         <div
           key={index}
@@ -74,6 +116,11 @@ export function CombatForm({
               <button type="button" onClick={() => removeEnemy(index)} style={combatFormStyle3}>
                 Remove
               </button>
+            </div>
+          )}
+          {enemy.libraryId && (
+            <div style={libraryBadgeStyle}>
+              Library enemy · editing a field creates a custom copy for this room
             </div>
           )}
           <div style={combatFormStyle4}>
@@ -307,4 +354,25 @@ const combatFormStyle11: CSSProperties = {
   letterSpacing: "0.04em",
   width: "100%",
   justifyContent: "center",
+};
+const libraryPickerStyle: CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 5,
+  marginBottom: 14,
+};
+const libraryHintStyle: CSSProperties = {
+  fontSize: 11,
+  color: "#7A6A52",
+  fontStyle: "italic",
+};
+const libraryBadgeStyle: CSSProperties = {
+  marginBottom: 10,
+  padding: "5px 9px",
+  background: "rgba(212,175,55,0.07)",
+  border: "1px solid rgba(212,175,55,0.2)",
+  borderRadius: 5,
+  color: "#C9A84C",
+  fontSize: 10,
+  letterSpacing: "0.03em",
 };

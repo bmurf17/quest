@@ -41,6 +41,7 @@ export default function ManageRooms() {
 
 // Static style objects hoisted out of the render path.
 const manageRoomsStyle: CSSProperties = {
+  minHeight: "100%",
   background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 50%, #0f0e09 100%)",
   padding: "32px 24px 64px",
   fontFamily: "'Crimson Text', Georgia, serif",

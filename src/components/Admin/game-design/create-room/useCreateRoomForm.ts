@@ -2,35 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import mushroom from "/images/Mushroom.png";
 import blord from "/images/Blord.png";
 import { getRoomById, supabase } from "@/queries/RoomQueries";
+import { getAdminEnemies } from "@/queries/AdminEnemyQueries";
 import { useGameStore } from "@/state/GameState";
 import { logger } from "@/lib/logger";
+import { directionToDbEnum, oppositeDirection } from "@/lib/directions";
 import { Directions } from "@/types/Directions";
 import { startRoom } from "@/data/fixtures/rooms";
-import type { Json, Database } from "@/types/database.generated";
+import type { Json } from "@/types/database.generated";
 import type { EnemyEntry } from "./formTypes";
 import type { InteractionType } from "./interactionTypes";
-
-type DirectionEnum = Database["public"]["Enums"]["direction_enum"];
-
-const directionToDbEnum = (direction: Directions): DirectionEnum => {
-  const map: { [key in Directions]: DirectionEnum } = {
-    [Directions.North]: "North",
-    [Directions.South]: "South",
-    [Directions.East]: "East",
-    [Directions.West]: "West",
-  };
-  return map[direction];
-};
-
-const getOppositeDirection = (direction: Directions): Directions => {
-  const opposites: { [key in Directions]: Directions } = {
-    [Directions.North]: Directions.South,
-    [Directions.South]: Directions.North,
-    [Directions.East]: Directions.West,
-    [Directions.West]: Directions.East,
-  };
-  return opposites[direction];
-};
 
 const getFormString = (formData: FormData, name: string, fallback = ""): string => {
   const value = formData.get(name);
@@ -40,6 +20,7 @@ const getFormString = (formData: FormData, name: string, fallback = ""): string 
 export function useCreateRoomForm() {
   const [interaction, setInteraction] = useState<InteractionType>("NPC");
   const [enemies, setEnemies] = useState<EnemyEntry[]>([]);
+  const [libraryEnemies, setLibraryEnemies] = useState<EnemyEntry[]>([]);
   const [neighboringRoom, setNeighboringRoom] = useState(startRoom);
   const [selectedSectionId, setSelectedSectionId] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,6 +42,37 @@ export function useCreateRoomForm() {
       setSelectedSectionId(availableSections[0].id);
     }
   }, [availableSections, selectedSectionId]);
+
+  useEffect(() => {
+    let cancelled = false;
+    void getAdminEnemies()
+      .then((rows) => {
+        if (cancelled) return;
+        setLibraryEnemies(
+          rows.map((row) => ({
+            libraryId: row.id,
+            name: row.name,
+            health: row.health,
+            strength: row.strength,
+            dex: row.dex,
+            defense: row.defense,
+            img: row.img,
+            expGain: row.exp_gain,
+            type: row.type,
+            maxHealth: row.max_health ?? undefined,
+            phaseThresholds: row.phase_thresholds ?? [],
+            moves: row.moves ?? [],
+            spawns: (row.spawns ?? []) as EnemyEntry[],
+          })),
+        );
+      })
+      .catch(() => {
+        // The library is optional here; room creation still supports new enemies.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const enemyImgs = [mushroom, blord];
 
@@ -101,6 +113,16 @@ export function useCreateRoomForm() {
       if (interaction === "Combat") {
         for (const enemy of enemies) {
           if (!enemy.name) continue;
+
+          if (enemy.libraryId) {
+            const { error: roomEnemyError } = await supabase
+              .from("room_enemies")
+              .insert({ room_id: newRoomId, enemy_id: enemy.libraryId });
+
+            if (roomEnemyError)
+              throw new Error(`Failed to link enemy to room: ${roomEnemyError.message}`);
+            continue;
+          }
 
           const { data: enemyData, error: enemyError } = await supabase
             .from("enemies")
@@ -220,7 +242,7 @@ export function useCreateRoomForm() {
 
       if (direction && neighboringRoom.id) {
         const directionEnum = +direction;
-        const oppositeDirectionEnum = getOppositeDirection(directionEnum);
+        const oppositeDirectionEnum = oppositeDirection(directionEnum);
 
         const { error: neighborError1 } = await supabase.from("neighboring_rooms").insert({
           room_id: neighboringRoom.id,
@@ -271,6 +293,7 @@ export function useCreateRoomForm() {
     setInteraction,
     enemies,
     setEnemies,
+    libraryEnemies,
     neighboringRoom,
     setNeighboringRoom,
     selectedSectionId,
