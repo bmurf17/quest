@@ -114,13 +114,33 @@ export function CreateRoomForm({ form }: { form: CreateRoomFormState }) {
             marginBottom: 8,
           }}
         >
-          {interaction === "NPC" && <NPCForm />}
-          {interaction === "Combat" && (
-            <CombatForm enemyImgs={enemyImgs} enemies={enemies} onChange={setEnemies} />
-          )}
-          {interaction === "Chest" && <ChestForm />}
-          {interaction === "Camp" && <CampForm />}
-          {interaction === "Transition" && <TransitionForm />}
+          {/* Keep every interaction form mounted so typed values survive tab
+              switches; disabled fieldsets are excluded from FormData. */}
+          <fieldset disabled={interaction !== "NPC"} style={formFieldsetStyle}>
+            <div style={{ display: interaction === "NPC" ? "block" : "none" }}>
+              <NPCForm />
+            </div>
+          </fieldset>
+          <fieldset disabled={interaction !== "Combat"} style={formFieldsetStyle}>
+            <div style={{ display: interaction === "Combat" ? "block" : "none" }}>
+              <CombatForm enemyImgs={enemyImgs} enemies={enemies} onChange={setEnemies} />
+            </div>
+          </fieldset>
+          <fieldset disabled={interaction !== "Chest"} style={formFieldsetStyle}>
+            <div style={{ display: interaction === "Chest" ? "block" : "none" }}>
+              <ChestForm />
+            </div>
+          </fieldset>
+          <fieldset disabled={interaction !== "Camp"} style={formFieldsetStyle}>
+            <div style={{ display: interaction === "Camp" ? "block" : "none" }}>
+              <CampForm />
+            </div>
+          </fieldset>
+          <fieldset disabled={interaction !== "Transition"} style={formFieldsetStyle}>
+            <div style={{ display: interaction === "Transition" ? "block" : "none" }}>
+              <TransitionForm />
+            </div>
+          </fieldset>
         </div>
       )}
 
@@ -176,4 +196,10 @@ const createRoomFormStyle2: CSSProperties = {
   marginTop: 28,
   display: "flex",
   justifyContent: "flex-end",
+};
+const formFieldsetStyle: CSSProperties = {
+  border: 0,
+  margin: 0,
+  padding: 0,
+  minWidth: 0,
 };

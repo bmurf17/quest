@@ -2,6 +2,7 @@ import { getEnemyMaxHealth } from "@/state/utils/CombatUtils";
 import type { GameState } from "@/state/GameState";
 import { useGameStore } from "@/state/GameState";
 import type { Enemy } from "@/types/Enemy";
+import { GameStatus } from "@/types/GameStatus";
 import { useEffect, useState, memo } from "react";
 import { useSound } from "@/hooks/useSound";
 
@@ -75,9 +76,11 @@ function BattleEnemiesComponent() {
     return "bg-red-500";
   };
 
+  const inCombat = state.gameStatus === GameStatus.Combat;
+
   return (
     <>
-      {currentRoom ? (
+      {currentRoom && inCombat ? (
         <div className="flex gap-4 items-start">
           {currentRoom.enemies.map((enemy) => {
             const isFlashing = flashingEnemyId === enemy.id.toString();
@@ -141,7 +144,7 @@ function BattleEnemiesComponent() {
       ) : (
         <> </>
       )}
-      {isTargeting && currentRoom && currentRoom.enemies.length > 1 && (
+      {isTargeting && inCombat && currentRoom && currentRoom.enemies.length > 1 && (
         <div
           className={`mt-4 text-sm font-bold bg-black bg-opacity-70 rounded-lg px-4 py-2 ${
             targetingSpell ? "text-purple-400" : "text-yellow-400"

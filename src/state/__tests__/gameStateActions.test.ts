@@ -101,6 +101,18 @@ describe("combat turn order", () => {
     expect(useGameStore.getState().isCurrentFighterEnemy()).toBe(true);
   });
 
+  it("restores missing party members to an incomplete combat order", () => {
+    const warrior = hero({ name: "Warrior" });
+    const boss = enemy({ id: 16, name: "Mushroom Boss", type: "boss" });
+    seedCombat([warrior], [boss]);
+    useGameStore.setState({ gameStatus: GameStatus.Combat, combatOrder: [boss] });
+
+    useGameStore.getState().normalizeCombatOrder();
+
+    const state = useGameStore.getState();
+    expect(state.combatOrder.map((fighter) => fighter.name)).toEqual(["Mushroom Boss", "Warrior"]);
+  });
+
   it("advances the active fighter after an attack", () => {
     const warrior = hero({ name: "Warrior" });
     const goblin = enemy({ health: 100, defense: 5 });
@@ -159,6 +171,51 @@ describe("consumables", () => {
     expect(state.party[0].alive).toBe(true);
     expect(state.combatOrder.map((f) => f.name)).toContain("Fallen");
     expect(state.activeFighterIndex).toBe(1);
+  });
+});
+
+describe("game over retry", () => {
+  it("revives the party and returns to the village", () => {
+    const fallen = hero({ name: "Fallen", hp: 0, mp: 0, alive: false });
+    useGameStore.setState({
+      party: [fallen],
+      gameStatus: GameStatus.GameOver,
+      combatOrder: [enemy()],
+      activeFighterIndex: 1,
+      activityLog: [],
+    });
+
+    useGameStore.getState().retryFromGameOver();
+
+    const state = useGameStore.getState();
+    expect(state.gameStatus).toBe(GameStatus.InTown);
+    expect(state.party[0].hp).toBe(state.party[0].maxHp);
+    expect(state.party[0].mp).toBe(state.party[0].maxMp);
+    expect(state.party[0].alive).toBe(true);
+    expect(state.combatOrder).toEqual([]);
+    expect(state.activeFighterIndex).toBe(0);
+    expect(state.activityLog).toContain("You awaken back in the village, battered but alive.");
+  });
+});
+
+describe("tavern recruitment", () => {
+  it("closes the tavern after recruiting a companion", () => {
+    const warrior = hero({ name: "Warrior" });
+    const rogue = hero({ name: "Rogue", class: "Rogue" });
+    useGameStore.setState({
+      party: [warrior],
+      tavernCandidates: [rogue],
+      isTavernOpen: true,
+      hasRecruitedFromTavern: false,
+      activityLog: [],
+    });
+
+    useGameStore.getState().addTavernCharacterToParty(rogue);
+
+    const state = useGameStore.getState();
+    expect(state.party.map((member) => member.name)).toEqual(["Warrior", "Rogue"]);
+    expect(state.hasRecruitedFromTavern).toBe(true);
+    expect(state.isTavernOpen).toBe(false);
   });
 });
 

@@ -100,6 +100,23 @@ describe("dialogue outcomes", () => {
     expect(state.activityLog).toContain("Elder storms off in anger!");
   });
 
+  it("persists the NPC leaving to the room instance", () => {
+    const elder = npc();
+    const room = roomWithNpc(elder);
+    useGameStore.setState({
+      party: [tempWarrior],
+      room,
+      roomInstances: new Map([[room.id, room]]),
+      activeDialogue: dialogueNode(),
+      activityLog: [],
+    });
+
+    useGameStore.getState().applyOutcome({ type: DialogueOutcomeType.NPC_LEAVE }, elder);
+
+    const state = useGameStore.getState();
+    expect(state.roomInstances.get(room.id)?.interaction).toBeNull();
+  });
+
   it("clears the active node when the conversation ends", () => {
     const elder = npc();
     seedDialogue(elder, dialogueNode());

@@ -1,4 +1,5 @@
 import type { CharacterData } from "@/types/Character";
+import type { ActiveBuff } from "@/types/EnemyMove";
 import type { Quest } from "@/types/RoomInteractions";
 import { GameStatus } from "@/types/GameStatus";
 import { DEFAULT_TAVERN_CONFIG } from "@/data/tavern";
@@ -29,6 +30,7 @@ export type PartySlice = Pick<
   | "enterTown"
   | "exitTown"
   | "restInTown"
+  | "retryFromGameOver"
 >;
 
 export const createPartySlice: GameSlice<PartySlice> = (set, get) => ({
@@ -127,7 +129,8 @@ export const createPartySlice: GameSlice<PartySlice> = (set, get) => ({
           ...state.activityLog,
           `${char.name} the ${char.class} has joined your party!`,
         ],
-        isTavernOpen: updatedCandidates.length === 0 ? false : state.isTavernOpen,
+        // Recruiting a companion ends the tavern visit; the overlay closes on its own.
+        isTavernOpen: false,
       };
     });
   },
@@ -179,6 +182,39 @@ export const createPartySlice: GameSlice<PartySlice> = (set, get) => ({
       return {
         party: updatedParty,
         activityLog: [...state.activityLog, "You rest at the inn. Your party is fully restored!"],
+      };
+    }),
+
+  retryFromGameOver: () =>
+    set((state) => {
+      const revivedParty = state.party.map((member) => ({
+        ...member,
+        hp: member.maxHp,
+        mp: member.maxMp,
+        alive: member.maxHp > 0,
+      }));
+
+      return {
+        party: revivedParty,
+        gameStatus: GameStatus.InTown,
+        combatOrder: [],
+        activeFighterIndex: 0,
+        enemyCooldowns: new Map<number, Map<string, number>>(),
+        activeBuffs: new Map<string, ActiveBuff[]>(),
+        accumulatedExp: 0,
+        isTargeting: false,
+        targetingSpell: null,
+        targetingConsumable: null,
+        isLevelingUp: false,
+        levelingUpChars: [],
+        currentLevelingCharIndex: -1,
+        activeDialogue: null,
+        currentDialogueNodeId: null,
+        activeCutscene: null,
+        activityLog: [
+          ...state.activityLog,
+          "You awaken back in the village, battered but alive.",
+        ],
       };
     }),
 });

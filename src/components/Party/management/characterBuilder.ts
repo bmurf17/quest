@@ -7,6 +7,7 @@ import { type Character } from "@/components/CharacterCreation/CharacterContext"
 
 import warriorImg from "@/assets/warrior.png";
 import rogueImg from "@/assets/rogue.png";
+import rogue1Img from "@/assets/rogue-1.png";
 import clericImg from "@/assets/cleric.png";
 import wizardImg from "@/assets/wizard.png";
 import bardImg from "@/assets/bard.png";
@@ -19,6 +20,7 @@ export const MAX_PARTY_SIZE = 6;
 const IMAGE_SRC: Record<string, string> = {
   warrior: warriorImg,
   rogue: rogueImg,
+  "rogue-1": rogue1Img,
   cleric: clericImg,
   wizard: wizardImg,
   bard: bardImg,

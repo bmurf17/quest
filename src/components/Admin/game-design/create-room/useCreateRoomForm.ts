@@ -1,13 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import mushroom from "/images/Mushroom.png";
 import blord from "/images/Blord.png";
-import { supabase } from "@/queries/RoomQueries";
+import { getRoomById, supabase } from "@/queries/RoomQueries";
 import { useGameStore } from "@/state/GameState";
 import { logger } from "@/lib/logger";
 import { Directions } from "@/types/Directions";
-import type { Room } from "@/types/Room";
 import { startRoom } from "@/data/fixtures/rooms";
-import { NPCType } from "@/types/RoomInteractions";
 import type { Json, Database } from "@/types/database.generated";
 import type { EnemyEntry } from "./formTypes";
 import type { InteractionType } from "./interactionTypes";
@@ -242,36 +240,21 @@ export function useCreateRoomForm() {
           throw new Error(`Failed to create reverse link: ${neighborError2.message}`);
       }
 
-      const room: Room = {
-        name: roomName,
-        sectionId: selectedSectionId ?? 0,
-        enemies: [],
-        neighboringRooms: [],
-        interaction:
-          interaction === "NPC"
-            ? {
-                type: "NPC",
-                npc: {
-                  name: getFormString(formData, "npcName"),
-                  dialogue: [getFormString(formData, "dialogue")],
-                  discoveryMessage: getFormString(formData, "discoveryMessage"),
-                  NPCType: NPCType.GENERIC,
-                  img: "",
-                },
-              }
-            : null,
-        id: newRoomId,
-      };
-
-      if (direction) {
-        const directionEnum = +direction;
-        const oppositeDirectionEnum = getOppositeDirection(directionEnum);
-        neighboringRoom.neighboringRooms.push([directionEnum, room]);
-        room.neighboringRooms.push([oppositeDirectionEnum, neighboringRoom]);
-        updateRoom(neighboringRoom);
+      // Re-read the room from the database so the local copy includes its
+      // enemies, interaction, and neighbour links instead of only the form's
+      // NPC fields. Without this, newly created interactions appeared to
+      // vanish until the page was refreshed.
+      const createdRoom = await getRoomById(newRoomId);
+      if (!createdRoom) {
+        throw new Error("The room was created but could not be loaded.");
       }
 
-      addRoom(room);
+      if (direction) {
+        const updatedNeighbor = await getRoomById(neighboringRoom.id);
+        if (updatedNeighbor) updateRoom(updatedNeighbor);
+      }
+
+      addRoom(createdRoom);
       showToast("success", `"${roomName}" has been etched into the map.`);
       (event.target as HTMLFormElement).reset();
     } catch (err) {

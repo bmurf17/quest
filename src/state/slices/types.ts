@@ -53,6 +53,7 @@ export interface GameState {
   enterTown: () => void;
   exitTown: () => void;
   restInTown: () => void;
+  retryFromGameOver: () => void;
 
   // Combat ----------------------------------------------------------------
   combatOrder: (CharacterData | Enemy)[];
@@ -61,6 +62,7 @@ export interface GameState {
   activeBuffs: Map<string, ActiveBuff[]>;
   attack: (enemy: Enemy) => void;
   enterCombat: () => void;
+  normalizeCombatOrder: () => void;
   isCurrentFighterEnemy: () => boolean;
   performEnemyTurn: () => void;
   castSpell: (spell: Spell, target?: Enemy | CharacterData) => void;

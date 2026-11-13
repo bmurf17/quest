@@ -1,4 +1,5 @@
-import { getDialogueForNPC } from "@/queries/DialogueQueries";
+import { getDialogueForNPC, getDialogueNode } from "@/queries/DialogueQueries";
+import { getRoomInstanceKey } from "@/state/utils/WorldUtils";
 import type { Room } from "@/types/Room";
 import type { DialogueNode, DialogueOutcome, NPC } from "@/types/RoomInteractions";
 import { DialogueOutcomeType, NPCDisposition } from "@/types/RoomInteractions";
@@ -101,20 +102,36 @@ export const createDialogueSlice: GameSlice<DialogueSlice> = (set, get) => ({
       activityLog: [...state.activityLog, `You: ${choice.text}`],
     });
 
+    let nextNodeId: string | null | undefined;
+
     if (choice.skillCondition) {
       const passed = state.checkSkillCondition(
         choice.skillCondition.skill,
         choice.skillCondition.dc,
       );
-      const nextNodeId = passed
+      nextNodeId = passed
         ? choice.skillCondition.successNodeId
         : choice.skillCondition.failureNodeId;
+    } else {
+      nextNodeId = choice.nextNodeId;
+    }
 
-      if (nextNodeId) {
-        set({ currentDialogueNodeId: nextNodeId });
-      }
-    } else if (choice.nextNodeId) {
-      set({ currentDialogueNodeId: choice.nextNodeId });
+    if (nextNodeId) {
+      set({ currentDialogueNodeId: nextNodeId });
+      // Load the chosen node so the visible dialogue actually advances. The
+      // current id is updated immediately for callers that only inspect state.
+      void getDialogueNode(nextNodeId)
+        .then((node) => {
+          if (!node) return;
+          set((current) =>
+            current.activeDialogue !== null && current.currentDialogueNodeId === nextNodeId
+              ? { activeDialogue: node }
+              : {},
+          );
+        })
+        .catch(() => {
+          // Leave the current node in place if the follow-up cannot be loaded.
+        });
     }
 
     if (choice.outcome) {
@@ -150,23 +167,37 @@ export const createDialogueSlice: GameSlice<DialogueSlice> = (set, get) => ({
         state.setDisposition(npc, NPCDisposition.HOSTILE);
         state.addToLog(`${npc.name} becomes hostile!`);
         break;
-      case DialogueOutcomeType.NPC_FRIENDLY:
+      case DialogueOutcomeType.NPC_FRIENDLY: {
         state.setDisposition(npc, NPCDisposition.FRIENDLY);
         state.addToLog(`${npc.name} is now friendly toward you.`);
+        const current = get();
+        const updatedRoom = { ...current.room };
+        const roomInstances = new Map(current.roomInstances);
+        const instanceKey = getRoomInstanceKey(current);
+        if (instanceKey !== undefined) roomInstances.set(instanceKey, updatedRoom);
         set({
-          room: { ...get().room },
+          room: updatedRoom,
+          roomInstances,
           activeDialogue: null,
           currentDialogueNodeId: null,
         });
         break;
-      case DialogueOutcomeType.NPC_LEAVE:
+      }
+      case DialogueOutcomeType.NPC_LEAVE: {
+        const current = get();
+        const updatedRoom = { ...current.room, interaction: null };
+        const roomInstances = new Map(current.roomInstances);
+        const instanceKey = getRoomInstanceKey(current);
+        if (instanceKey !== undefined) roomInstances.set(instanceKey, updatedRoom);
         set({
-          room: { ...get().room, interaction: null },
+          room: updatedRoom,
+          roomInstances,
           activeDialogue: null,
           currentDialogueNodeId: null,
         });
         state.addToLog(`${npc.name} storms off in anger!`);
         break;
+      }
       case DialogueOutcomeType.QUEST_START:
         if (outcome.value) {
           state.addToLog(`Quest started: ${outcome.value}`);
@@ -205,7 +236,12 @@ export const createDialogueSlice: GameSlice<DialogueSlice> = (set, get) => ({
           npc: { ...npc, disposition },
         };
       }
-      return { room: updatedRoom };
+
+      const roomInstances = new Map(state.roomInstances);
+      const instanceKey = getRoomInstanceKey(state);
+      if (instanceKey !== undefined) roomInstances.set(instanceKey, updatedRoom);
+
+      return { room: updatedRoom, roomInstances };
     });
   },
 

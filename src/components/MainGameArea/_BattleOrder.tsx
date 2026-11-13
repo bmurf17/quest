@@ -5,14 +5,49 @@ import type { CharacterData } from "@/types/Character";
 import type { Enemy } from "@/types/Enemy";
 import { GameStatus } from "@/types/GameStatus";
 import { memo, useEffect, useLayoutEffect, useRef } from "react";
-import mushroom from "/images/Mushroom.png";
 import type { CSSProperties } from "react";
 
 function BattleOrderComponent() {
   const state = useGameStore((state: GameState) => state);
+  const normalizeCombatOrder = useGameStore((state: GameState) => state.normalizeCombatOrder);
+
+  useEffect(() => {
+    normalizeCombatOrder();
+  }, [
+    normalizeCombatOrder,
+    state.gameStatus,
+    state.combatOrder,
+    state.party,
+    state.room,
+  ]);
 
   const activeIndex = state.activeFighterIndex;
-  const raw = state.combatOrder || [];
+  const knownOrder = state.combatOrder || [];
+
+  // `combatOrder` should always contain the party, but older saves and some
+  // encounter transitions could leave it holding only the enemies (most
+  // visibly in the boss room). Merge in any living combatants that are missing
+  // so the order never collapses to a single boss icon.
+  const raw = [...knownOrder];
+  if (state.gameStatus === GameStatus.Combat) {
+    const partyNames = new Set(
+      knownOrder.filter((fighter) => !isEnemy(fighter)).map((fighter) => fighter.name),
+    );
+    for (const member of state.party) {
+      if (member.alive && member.hp > 0 && !partyNames.has(member.name)) {
+        raw.push(member);
+      }
+    }
+
+    const enemyIds = new Set(
+      knownOrder.filter((fighter): fighter is Enemy => isEnemy(fighter)).map((enemy) => enemy.id),
+    );
+    for (const enemy of state.room?.enemies ?? []) {
+      if (!enemyIds.has(enemy.id)) {
+        raw.push(enemy);
+      }
+    }
+  }
   const displayOrder = [] as { item: (typeof raw)[number]; originalIndex: number }[];
   const n = raw.length;
   if (n > 0) {
@@ -111,7 +146,7 @@ function BattleOrderComponent() {
                     </div>
                   ) : (
                     <img
-                      src={mushroom}
+                      src={characterOrEnemy.img}
                       alt={characterOrEnemy.name}
                       style={battleOrderComponentStyle2}
                     />
@@ -133,13 +168,13 @@ export default memo(BattleOrderComponent);
 // Static style objects hoisted out of the render path.
 const battleOrderComponentStyle: CSSProperties = {
   width: "64px",
-  height: "64x",
+  height: "64px",
   imageRendering: "pixelated",
   filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.5))",
 };
 const battleOrderComponentStyle2: CSSProperties = {
   width: "64px",
-  height: "64x",
+  height: "64px",
   imageRendering: "pixelated",
   filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.5))",
 };

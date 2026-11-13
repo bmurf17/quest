@@ -9,12 +9,14 @@ import type { CSSProperties } from "react";
 
 function GameOverModalComponent() {
   const gameStatus = useGameStore((state) => state.gameStatus);
+  const retryFromGameOver = useGameStore((state) => state.retryFromGameOver);
   const navigate = useNavigate();
 
   if (gameStatus !== GameStatus.GameOver) return null;
 
   const handleRestart = () => {
-    void navigate("/party");
+    retryFromGameOver();
+    void navigate("/game");
   };
 
   return (
@@ -52,7 +54,7 @@ function GameOverModalComponent() {
               e.currentTarget.style.background = "rgba(239,68,68,0.15)";
             }}
           >
-            Try Again
+            Return to Village
           </button>
         </div>
       </DialogContent>

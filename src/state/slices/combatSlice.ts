@@ -26,6 +26,7 @@ export type CombatSlice = Pick<
   | "accumulatedExp"
   | "attack"
   | "enterCombat"
+  | "normalizeCombatOrder"
   | "isCurrentFighterEnemy"
   | "performEnemyTurn"
   | "castSpell"
@@ -83,6 +84,39 @@ export const createCombatSlice: GameSlice<CombatSlice> = (set, get) => ({
         enemyCooldowns: new Map<number, Map<string, number>>(),
         activeBuffs: new Map<string, ActiveBuff[]>(),
       };
+    }),
+
+  normalizeCombatOrder: () =>
+    set((state) => {
+      if (state.gameStatus !== GameStatus.Combat) return state;
+
+      const order = state.combatOrder;
+      const partyNames = new Set(
+        order.filter((fighter) => !isEnemy(fighter)).map((fighter) => fighter.name),
+      );
+      const enemyIds = new Set(
+        order.filter((fighter): fighter is Enemy => isEnemy(fighter)).map((enemy) => enemy.id),
+      );
+
+      const nextOrder = [...order];
+      let changed = false;
+
+      for (const member of state.party) {
+        if (member.alive && member.hp > 0 && !partyNames.has(member.name)) {
+          nextOrder.push(member);
+          changed = true;
+        }
+      }
+
+      const room = state.roomInstances.get(state.room.id) ?? state.room;
+      for (const enemy of room.enemies) {
+        if (!enemyIds.has(enemy.id)) {
+          nextOrder.push(enemy);
+          changed = true;
+        }
+      }
+
+      return changed ? { combatOrder: nextOrder } : state;
     }),
 
   castSpell: (spell: Spell, target?: Enemy | CharacterData) =>
