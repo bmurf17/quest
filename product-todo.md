@@ -20,7 +20,7 @@
 - Crit hits
 - Can use spells outside combat
 - Heal dead party members
-- Buy item removes it from shop (limited shop stock)
+- [x] Buy item removes it from shop (limited shop stock)
 - Achievements
 - Make the battle order scrollable
 
@@ -44,8 +44,8 @@
 - [ ] More control of creating rooms
 - [ ] Can create dialog in the room creation
 - [x] Create items
-- [ ] Balance changes quickly
-- [ ] more elaborate boss creation
+- [x] Balance changes quickly
+- [x] more elaborate boss creation
 
 ## Admin overhaul progress
 
@@ -84,17 +84,19 @@ Note: the runtime only applies outcomes attached to choices. Node-level outcomes
 - [x] Shop stock and quantities, including limited stock
 - [x] Point the shop at the item data instead of hardcoded potions
 
-Note: run `supabase/migrations/003_items_shop.sql` to create `shop_stock`. Until then the in-game shop falls back to the `items` table with unlimited stock. Item descriptions reuse the existing `effect` column, so no item migration is required.
+Note: `003_items_shop.sql` is applied to the live project. Item descriptions reuse the existing `effect` column, so no item migration was required.
 
 ### Phase 4 — Enemies, bosses, and balance
 
 - [x] Reusable enemy library instead of per-room duplication
 - [x] Attach library enemies to rooms
-- [ ] Boss editor: phases, per-phase moves, spawns, rewards
+- [x] Boss editor: phases, per-phase moves, spawns, rewards
 - [x] Balance table with inline stat editing and computed estimates
 - [ ] Encounter test/simulation using existing combat helpers
 
-Boss phases, moves, and spawns can be edited as validated JSON on the Enemies page. Per-boss reward data has no schema yet, and the balance tools currently give a deterministic threat estimate rather than a full combat simulation.
+Boss phases, moves, and spawns are edited with structured forms on the Enemies page. Each boss/enemy can carry a gold reward and a list of item rewards; both pay out once per kill at runtime (auto-attacks and spells). Rewards use full item snapshots in `reward_items`, the same approach as `spawns`, so combat never needs an extra item lookup.
+
+Note: `006_enemy_rewards.sql` is applied to the live project, so `gold_reward` and `reward_items` exist on `enemies`. The balance tools still give a deterministic threat estimate rather than a full combat simulation.
 
 ### Phase 5 — Backup and ops
 

@@ -217,6 +217,10 @@ const enemySchema: z.ZodType = z.lazy(() =>
     phaseThresholds: z.array(finiteNumber).optional(),
     spawnOnDefeat: z.array(finiteNumber).optional(),
     spawns: z.array(enemySchema).optional(),
+    goldReward: finiteNumber.optional(),
+    rewardItems: z
+      .array(z.looseObject({ item: itemSchema, quantity: finiteNumber }))
+      .optional(),
   }),
 );
 

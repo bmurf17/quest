@@ -28,6 +28,8 @@ function enemyRow(overrides: Partial<DbEnemy> = {}): DbEnemy {
     phase_thresholds: null,
     moves: null,
     spawns: null,
+    gold_reward: 0,
+    reward_items: null,
     ...overrides,
   };
 }

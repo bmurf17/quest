@@ -4,6 +4,7 @@ import {
   calcDamage,
   finalizeAttackState,
   getEffectiveBuffAmount,
+  getEnemyRewards,
   getWeaponDamage,
   handleCombatCompletion,
   safeNextIndex,
@@ -23,6 +24,8 @@ export type AttackState = Pick<
   | "roomInstances"
   | "party"
   | "quests"
+  | "inventory"
+  | "goldPieces"
 >;
 
 /**
@@ -77,6 +80,7 @@ export function resolveAttack(state: AttackState, enemy: Enemy): Partial<GameSta
 
     const logMessage = `${attackerName} defeated ${enemy.name}!${completion.logSuffix}`;
     const defeatedCount = state.lastDefeatedCounter + 1;
+    const rewards = getEnemyRewards(enemy);
 
     return {
       ...finalizeAttackState(
@@ -94,6 +98,8 @@ export function resolveAttack(state: AttackState, enemy: Enemy): Partial<GameSta
       ),
       party: completion.updatedParty,
       accumulatedExp: status === GameStatus.Exploring ? 0 : newAccumulatedExp,
+      goldPieces: state.goldPieces + rewards.gold,
+      inventory: [...state.inventory, ...rewards.items],
       isTargeting: false,
       levelingUpChars: completion.levelingUpChars || [],
       isLevelingUp: (completion.levelingUpChars || []).length > 0,

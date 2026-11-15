@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import type { EnemyMove } from "@/types/EnemyMove";
-import type { Enemy } from "@/types/Enemy";
+import type { Enemy, EnemyRewardItem } from "@/types/Enemy";
 
 export interface AdminEnemyRow {
   id: number;
@@ -16,6 +16,8 @@ export interface AdminEnemyRow {
   phase_thresholds: number[] | null;
   moves: EnemyMove[] | null;
   spawns: Enemy[] | null;
+  gold_reward: number;
+  reward_items: EnemyRewardItem[] | null;
 }
 
 export interface AdminRoomSummary {
@@ -25,7 +27,7 @@ export interface AdminRoomSummary {
 }
 
 const enemyColumns =
-  "id, name, health, max_health, strength, dex, defense, img, exp_gain, type, phase_thresholds, moves, spawns";
+  "id, name, health, max_health, strength, dex, defense, img, exp_gain, type, phase_thresholds, moves, spawns, gold_reward, reward_items";
 
 export async function getAdminEnemies(): Promise<AdminEnemyRow[]> {
   const { data, error } = await supabase
@@ -43,6 +45,10 @@ export async function getAdminEnemies(): Promise<AdminEnemyRow[]> {
       : null,
     moves: Array.isArray(row.moves) ? (row.moves as unknown as EnemyMove[]) : null,
     spawns: Array.isArray(row.spawns) ? (row.spawns as unknown as Enemy[]) : null,
+    gold_reward: row.gold_reward ?? 0,
+    reward_items: Array.isArray(row.reward_items)
+      ? (row.reward_items as unknown as EnemyRewardItem[])
+      : null,
   }));
 }
 
@@ -90,6 +96,7 @@ function toWriteRow(values: Partial<AdminEnemyValues>) {
     ...values,
     moves: values.moves as unknown as never,
     spawns: values.spawns as unknown as never,
+    reward_items: values.reward_items as unknown as never,
   };
 }
 

@@ -177,6 +177,8 @@ export const createCombatSlice: GameSlice<CombatSlice> = (set, get) => ({
           room: updatedRoom,
           roomInstances: newRoomInstances,
           accumulatedExp: gameStatus === GameStatus.Exploring ? 0 : result.newAccumulatedExp,
+          goldPieces: state.goldPieces + result.goldGained,
+          inventory: [...state.inventory, ...result.itemsGained],
           isTargeting: false,
           targetingSpell: null,
           levelingUpChars: completion.levelingUpChars || [],
@@ -214,6 +216,8 @@ export const createCombatSlice: GameSlice<CombatSlice> = (set, get) => ({
           room: updatedRoom,
           roomInstances: newRoomInstances,
           accumulatedExp: completion.status === GameStatus.Exploring ? 0 : newAccumulatedExp,
+          goldPieces: state.goldPieces + result.goldGained,
+          inventory: [...state.inventory, ...result.itemsGained],
           isTargeting: false,
           targetingSpell: null,
         };
@@ -233,6 +237,8 @@ export const createCombatSlice: GameSlice<CombatSlice> = (set, get) => ({
         room: updatedRoom,
         roomInstances: newRoomInstances,
         accumulatedExp: newAccumulatedExp,
+        goldPieces: state.goldPieces + result.goldGained,
+        inventory: [...state.inventory, ...result.itemsGained],
         isTargeting: false,
         targetingSpell: null,
       };

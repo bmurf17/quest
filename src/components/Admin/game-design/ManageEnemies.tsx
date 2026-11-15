@@ -12,7 +12,12 @@ import {
   type AdminEnemyRow,
   type AdminRoomSummary,
 } from "@/queries/AdminEnemyQueries";
-import type { Enemy } from "@/types/Enemy";
+import type { Enemy, EnemyRewardItem } from "@/types/Enemy";
+import type { EnemyMove } from "@/types/EnemyMove";
+import type { Item } from "@/types/Item";
+import { getAllItems } from "@/queries/ItemQueries";
+import { mapDbItem } from "@/queries/RoomQueries";
+import { BossEditor } from "./BossEditor";
 import { Toast } from "./create-room/Toast";
 import { FieldGroup, StyledInput, StyledSelect } from "./create-room/primitives";
 import type { CSSProperties } from "react";
@@ -32,8 +37,10 @@ interface EnemyDraft {
   defense: number;
   exp_gain: number;
   phaseThresholds: string;
-  movesJson: string;
-  spawnsJson: string;
+  moves: EnemyMove[];
+  spawns: Enemy[];
+  goldReward: number;
+  rewardItems: EnemyRewardItem[];
 }
 
 const errorMessage = (err: unknown) =>
@@ -50,8 +57,10 @@ const emptyDraft = (): EnemyDraft => ({
   defense: 5,
   exp_gain: 10,
   phaseThresholds: "",
-  movesJson: "[]",
-  spawnsJson: "[]",
+  moves: [],
+  spawns: [],
+  goldReward: 0,
+  rewardItems: [],
 });
 
 const draftFromEnemy = (enemy: AdminEnemyRow): EnemyDraft => ({
@@ -65,8 +74,10 @@ const draftFromEnemy = (enemy: AdminEnemyRow): EnemyDraft => ({
   defense: enemy.defense,
   exp_gain: enemy.exp_gain,
   phaseThresholds: (enemy.phase_thresholds ?? []).join(", "),
-  movesJson: JSON.stringify(enemy.moves ?? [], null, 2),
-  spawnsJson: JSON.stringify(enemy.spawns ?? [], null, 2),
+  moves: enemy.moves ?? [],
+  spawns: enemy.spawns ?? [],
+  goldReward: enemy.gold_reward ?? 0,
+  rewardItems: enemy.reward_items ?? [],
 });
 
 const parseThresholds = (value: string): number[] =>
@@ -76,17 +87,23 @@ const parseThresholds = (value: string): number[] =>
     .filter((value) => Number.isFinite(value) && value > 0)
     .sort((a, b) => b - a);
 
-const parseJsonArray = (label: string, value: string): unknown[] => {
-  if (!value.trim()) return [];
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(value);
-  } catch {
-    throw new Error(`${label} must be valid JSON.`);
-  }
-  if (!Array.isArray(parsed)) throw new Error(`${label} must be a JSON array.`);
-  return parsed;
-};
+const rowToEnemy = (row: AdminEnemyRow): Enemy => ({
+  id: row.id,
+  name: row.name,
+  health: row.health,
+  maxHealth: row.max_health ?? undefined,
+  strength: row.strength,
+  dex: row.dex,
+  defense: row.defense,
+  img: row.img,
+  expGain: row.exp_gain,
+  type: row.type,
+  moves: row.moves ?? undefined,
+  phaseThresholds: row.phase_thresholds ?? undefined,
+  spawns: row.spawns ?? undefined,
+  goldReward: row.gold_reward,
+  rewardItems: row.reward_items ?? undefined,
+});
 
 const draftToEnemy = (draft: EnemyDraft): Enemy => ({
   id: 0,
@@ -99,12 +116,12 @@ const draftToEnemy = (draft: EnemyDraft): Enemy => ({
   img: draft.img,
   expGain: draft.exp_gain,
   type: draft.type,
+  moves: draft.moves,
+  phaseThresholds: parseThresholds(draft.phaseThresholds),
+  spawns: draft.spawns,
 });
 
 const draftToValues = (draft: EnemyDraft) => {
-  const moves = parseJsonArray("Moves", draft.movesJson) as AdminEnemyRow["moves"];
-  const spawns = parseJsonArray("Spawns", draft.spawnsJson) as AdminEnemyRow["spawns"];
-
   return {
     name: draft.name.trim(),
     type: draft.type,
@@ -116,8 +133,10 @@ const draftToValues = (draft: EnemyDraft) => {
     defense: draft.defense,
     exp_gain: Math.max(0, draft.exp_gain),
     phase_thresholds: parseThresholds(draft.phaseThresholds),
-    moves,
-    spawns,
+    moves: draft.moves,
+    spawns: draft.spawns,
+    gold_reward: Math.max(0, draft.goldReward),
+    reward_items: draft.rewardItems,
   };
 };
 
@@ -159,6 +178,7 @@ export default function ManageEnemies() {
   const [tab, setTab] = useState<Tab>("library");
   const [enemies, setEnemies] = useState<AdminEnemyRow[]>([]);
   const [rooms, setRooms] = useState<AdminRoomSummary[]>([]);
+  const [itemLibrary, setItemLibrary] = useState<Item[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [draft, setDraft] = useState<EnemyDraft>(emptyDraft);
   const [isNew, setIsNew] = useState(false);
@@ -179,13 +199,17 @@ export default function ManageEnemies() {
     void (async () => {
       setIsLoading(true);
       try {
-        const [enemyRows, roomRows] = await Promise.all([
+        const [enemyRows, roomRows, itemRows] = await Promise.all([
           getAdminEnemies(),
           getAdminRoomSummaries(),
+          getAllItems(),
         ]);
         if (cancelled) return;
         setEnemies(enemyRows);
         setRooms(roomRows);
+        setItemLibrary(
+          itemRows.map((row) => mapDbItem(row)).filter((item): item is Item => item !== null),
+        );
         setSelectedId(enemyRows[0]?.id ?? null);
         if (enemyRows[0]) setDraft(draftFromEnemy(enemyRows[0]));
       } catch (err) {
@@ -228,6 +252,7 @@ export default function ManageEnemies() {
   }, [enemies, query, typeFilter]);
 
   const selectedEnemy = enemies.find((enemy) => enemy.id === selectedId) ?? null;
+  const enemyLibrary = useMemo(() => enemies.map(rowToEnemy), [enemies]);
   const estimate = useMemo(() => estimateEnemy(draftToEnemy(draft)), [draft]);
 
   function selectEnemy(enemy: AdminEnemyRow) {
@@ -545,52 +570,30 @@ export default function ManageEnemies() {
                     </div>
 
                     {draft.type === "boss" && (
-                      <div style={bossSectionStyle}>
-                        <div style={bossHeadingStyle}>Boss configuration</div>
-                        <div style={formGridStyle}>
-                          <FieldGroup id="enemy-thresholds" label="Phase thresholds (HP %, descending)">
-                            <StyledInput
-                              id="enemy-thresholds"
-                              value={draft.phaseThresholds}
-                              placeholder="50, 25"
-                              onChange={(event) =>
-                                setDraft((current) => ({
-                                  ...current,
-                                  phaseThresholds: event.target.value,
-                                }))
-                              }
-                            />
-                          </FieldGroup>
-                        </div>
-                        <FieldGroup id="enemy-moves" label="Moves (JSON array)">
-                          <textarea
-                            id="enemy-moves"
-                            value={draft.movesJson}
-                            onChange={(event) =>
-                              setDraft((current) => ({
-                                ...current,
-                                movesJson: event.target.value,
-                              }))
-                            }
-                            spellCheck={false}
-                            style={jsonStyle}
-                          />
-                        </FieldGroup>
-                        <FieldGroup id="enemy-spawns" label="Spawns (JSON array)">
-                          <textarea
-                            id="enemy-spawns"
-                            value={draft.spawnsJson}
-                            onChange={(event) =>
-                              setDraft((current) => ({
-                                ...current,
-                                spawnsJson: event.target.value,
-                              }))
-                            }
-                            spellCheck={false}
-                            style={jsonStyle}
-                          />
-                        </FieldGroup>
-                      </div>
+                      <BossEditor
+                        thresholds={draft.phaseThresholds}
+                        onThresholdsChange={(value) =>
+                          setDraft((current) => ({ ...current, phaseThresholds: value }))
+                        }
+                        moves={draft.moves}
+                        onMovesChange={(moves) =>
+                          setDraft((current) => ({ ...current, moves }))
+                        }
+                        spawns={draft.spawns}
+                        spawnLibrary={enemyLibrary.filter((enemy) => enemy.id !== selectedId)}
+                        onSpawnsChange={(spawns) =>
+                          setDraft((current) => ({ ...current, spawns }))
+                        }
+                        goldReward={draft.goldReward}
+                        onGoldRewardChange={(goldReward) =>
+                          setDraft((current) => ({ ...current, goldReward }))
+                        }
+                        rewardItems={draft.rewardItems}
+                        itemLibrary={itemLibrary}
+                        onRewardItemsChange={(rewardItems) =>
+                          setDraft((current) => ({ ...current, rewardItems }))
+                        }
+                      />
                     )}
 
                     <div style={estimateBoxStyle}>
@@ -932,13 +935,6 @@ const formGridStyle: CSSProperties = {
   gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
   gap: "0 14px",
 };
-const bossSectionStyle: CSSProperties = {
-  marginTop: 8,
-  padding: 14,
-  background: "rgba(139,92,246,0.05)",
-  border: "1px solid rgba(139,92,246,0.2)",
-  borderRadius: 8,
-};
 const bossHeadingStyle: CSSProperties = {
   fontSize: 11,
   fontWeight: 700,
@@ -947,20 +943,6 @@ const bossHeadingStyle: CSSProperties = {
   color: "#C4B5FD",
   fontFamily: fonts.display,
   marginBottom: 12,
-};
-const jsonStyle: CSSProperties = {
-  width: "100%",
-  minHeight: 120,
-  padding: 10,
-  background: "rgba(0,0,0,0.4)",
-  border: "1px solid rgba(139,92,246,0.25)",
-  borderRadius: 6,
-  color: "#E8DCC8",
-  fontSize: 11,
-  fontFamily: "monospace",
-  resize: "vertical",
-  boxSizing: "border-box",
-  outline: "none",
 };
 const estimateBoxStyle: CSSProperties = {
   padding: 14,

@@ -5,6 +5,25 @@ import type { CharacterData } from "@/types/Character";
 import { rollDamageDice } from "@/lib/dice";
 import type { Quest } from "@/types/RoomInteractions";
 import type { ActiveBuff, EnemyMove } from "@/types/EnemyMove";
+import type { Item } from "@/types/Item";
+
+export interface EnemyReward {
+  gold: number;
+  items: Item[];
+}
+
+/** Rewards owed for a single kill. Each enemy pays out exactly once. */
+export const getEnemyRewards = (enemy: Enemy): EnemyReward => ({
+  gold: Math.max(0, enemy.goldReward ?? 0),
+  items: (enemy.rewardItems ?? []).flatMap(({ item, quantity }) =>
+    Array.from({ length: Math.max(0, Math.floor(quantity)) }, () => ({ ...item })),
+  ),
+});
+
+export const mergeEnemyRewards = (rewards: EnemyReward[]): EnemyReward => ({
+  gold: rewards.reduce((total, reward) => total + reward.gold, 0),
+  items: rewards.flatMap((reward) => reward.items),
+});
 
 export const handleCombatCompletion = (
   enemies: Enemy[],

@@ -1,5 +1,5 @@
 import { Directions } from "@/types/Directions";
-import type { Enemy } from "@/types/Enemy";
+import type { Enemy, EnemyRewardItem } from "@/types/Enemy";
 import type { Room, Section } from "@/types/Room";
 import type { NPCType, Quest, QuestType, RoomInteraction } from "@/types/RoomInteractions";
 import type { EquipmentSlot, Item } from "@/types/Item";
@@ -23,6 +23,8 @@ export interface DbEnemy {
   phase_thresholds: number[] | null;
   moves: Enemy["moves"] | null;
   spawns: Enemy["spawns"] | null;
+  gold_reward: number;
+  reward_items: EnemyRewardItem[] | null;
 }
 
 /** Shape of a row from the `items` table. */
@@ -164,6 +166,8 @@ export const mapDbEnemy = (e: DbEnemy): Enemy => ({
   phaseThresholds: Array.isArray(e.phase_thresholds) ? e.phase_thresholds : undefined,
   moves: Array.isArray(e.moves) ? e.moves : undefined,
   spawns: Array.isArray(e.spawns) ? e.spawns : undefined,
+  goldReward: e.gold_reward ?? 0,
+  rewardItems: Array.isArray(e.reward_items) ? e.reward_items : undefined,
 });
 
 const mapQuestType = async (q: DbQuest): Promise<QuestType> => {

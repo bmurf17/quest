@@ -4,7 +4,13 @@ import type { CharacterData } from "@/types/Character";
 import type { ActiveBuff } from "@/types/EnemyMove";
 import type { GameStatus } from "@/types/GameStatus";
 import type { Room } from "@/types/Room";
-import { getEffectiveBuffAmount, isEnemy, handleCombatCompletion } from "./CombatUtils";
+import {
+  getEffectiveBuffAmount,
+  isEnemy,
+  getEnemyRewards,
+  handleCombatCompletion,
+} from "./CombatUtils";
+import type { Item } from "@/types/Item";
 
 export type SpellHandlerResult = {
   updatedParty: CharacterData[];
@@ -12,6 +18,8 @@ export type SpellHandlerResult = {
   combatOrder: (CharacterData | Enemy)[];
   nextIndex: number;
   newAccumulatedExp: number;
+  goldGained: number;
+  itemsGained: Item[];
   gameStatus: GameStatus;
   earlyCompletion?: {
     completion: ReturnType<typeof handleCombatCompletion>;
@@ -42,6 +50,8 @@ export function handleSpell(
   let combatOrder: (CharacterData | Enemy)[] = state.combatOrder;
   let nextIndex = (state.activeFighterIndex + 1) % Math.max(1, combatOrder.length);
   let newAccumulatedExp = state.accumulatedExp;
+  let goldGained = 0;
+  const itemsGained: Item[] = [];
   const gameStatus: GameStatus = state.gameStatus;
 
   switch (spell.effect.type) {
@@ -71,6 +81,9 @@ export function handleSpell(
           updatedEnemies = updatedEnemies.filter((e) => e.id !== enemy.id);
           combatOrder = combatOrder.filter((x) => x.name !== enemy.name);
           newAccumulatedExp += enemy.expGain ?? 10;
+          const reward = getEnemyRewards(enemy);
+          goldGained += reward.gold;
+          itemsGained.push(...reward.items);
 
           logBuilder.add(`${enemy.name} takes ${damage} damage and is defeated!`);
 
@@ -93,6 +106,8 @@ export function handleSpell(
             combatOrder,
             nextIndex,
             newAccumulatedExp,
+            goldGained,
+            itemsGained,
             gameStatus,
             earlyCompletion: { completion },
           };
@@ -121,6 +136,9 @@ export function handleSpell(
             const newHealth = Math.max(0, enemy.health - spell.effect.amount);
             if (newHealth <= 0) {
               newAccumulatedExp += enemy.expGain ?? 10;
+              const reward = getEnemyRewards(enemy);
+              goldGained += reward.gold;
+              itemsGained.push(...reward.items);
             }
             return { ...enemy, health: newHealth };
           })
@@ -192,6 +210,8 @@ export function handleSpell(
     combatOrder,
     nextIndex,
     newAccumulatedExp,
+    goldGained,
+    itemsGained,
     gameStatus,
   };
 }

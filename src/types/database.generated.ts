@@ -151,6 +151,8 @@ export type Database = {
           phase_thresholds: Json | null;
           moves: Json | null;
           spawns: Json | null;
+          gold_reward: number;
+          reward_items: Json | null;
         };
         Insert: Partial<Database["public"]["Tables"]["enemies"]["Row"]>;
         Update: Partial<Database["public"]["Tables"]["enemies"]["Row"]>;

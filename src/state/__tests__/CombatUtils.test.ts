@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { finalizeAttackState } from "@/state/utils/CombatUtils";
+import { finalizeAttackState, getEnemyRewards } from "@/state/utils/CombatUtils";
 import type { GameState } from "@/state/GameState";
 import type { Enemy } from "@/types/Enemy";
 import { startRoom } from "@/data/fixtures/rooms";
@@ -64,5 +64,49 @@ describe("CombatUtils finalizeAttackState", () => {
     // the updated room should be stored under the numeric id
     expect(result.roomInstances.get(startRoom.id)).toBeDefined();
     expect(result.room.enemies).toEqual([]);
+  });
+});
+
+describe("CombatUtils getEnemyRewards", () => {
+  const enemy: Enemy = {
+    id: 7,
+    name: "Boss",
+    health: 100,
+    strength: 10,
+    dex: 5,
+    defense: 5,
+    img: "",
+    expGain: 50,
+    goldReward: 25,
+    rewardItems: [
+      { item: manaPotion, quantity: 2 },
+      { item: { ...manaPotion, name: "Rare Gem" }, quantity: 1 },
+    ],
+  };
+
+  it("grants gold and duplicates items by quantity", () => {
+    const rewards = getEnemyRewards(enemy);
+
+    expect(rewards.gold).toBe(25);
+    expect(rewards.items).toHaveLength(3);
+    expect(rewards.items.map((item) => item.name)).toEqual([
+      manaPotion.name,
+      manaPotion.name,
+      "Rare Gem",
+    ]);
+  });
+
+  it("defaults to no rewards", () => {
+    expect(getEnemyRewards({ ...enemy, goldReward: undefined, rewardItems: undefined })).toEqual({
+      gold: 0,
+      items: [],
+    });
+  });
+
+  it("does not mutate the enemy's item snapshots", () => {
+    const rewards = getEnemyRewards(enemy);
+    rewards.items[0].name = "Changed";
+
+    expect(enemy.rewardItems?.[0].item.name).toBe(manaPotion.name);
   });
 });
