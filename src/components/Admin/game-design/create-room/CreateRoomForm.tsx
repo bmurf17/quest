@@ -1,4 +1,3 @@
-import { startRoom } from "@/data/fixtures/rooms";
 import { colors, fonts } from "@/theme";
 import { icons } from "./icons";
 import { Divider, FieldGroup, Label, StyledInput, StyledSelect } from "./primitives";
@@ -10,6 +9,7 @@ import { ChestForm } from "./ChestForm";
 import { CampForm } from "./CampForm";
 import { TransitionForm } from "./TransitionForm";
 import { defaultEnemy } from "./formTypes";
+import type { Directions } from "@/types/Directions";
 import type { useCreateRoomForm } from "./useCreateRoomForm";
 import type { CSSProperties } from "react";
 
@@ -22,9 +22,12 @@ export function CreateRoomForm({ form }: { form: CreateRoomFormState }) {
     enemies,
     setEnemies,
     libraryEnemies,
-    setNeighboringRoom,
+    exits,
+    addExit,
+    removeExit,
+    updateExit,
+    handleSectionChange,
     selectedSectionId,
-    setSelectedSectionId,
     isSubmitting,
     availableSections,
     enemyImgs,
@@ -32,6 +35,38 @@ export function CreateRoomForm({ form }: { form: CreateRoomFormState }) {
     sectionRooms,
     handleSubmit,
   } = form;
+
+  const usedDirections = new Set(exits.map((exit) => exit.direction));
+
+  const directionsFor = (exit: CreateRoomFormState["exits"][number]) => {
+    const target = sectionRooms.find((room) => room.id === exit.roomId);
+    const targetDirections = new Set(
+      target?.neighboringRooms.map(([direction]) => direction) ?? [],
+    );
+    return directionOptions.filter(
+      ({ value }) =>
+        value === exit.direction || (!usedDirections.has(value) && !targetDirections.has(value)),
+    );
+  };
+
+  const handleTargetChange = (exit: CreateRoomFormState["exits"][number], roomId: number) => {
+    const target = sectionRooms.find((room) => room.id === roomId);
+    const targetDirections = new Set(
+      target?.neighboringRooms.map(([direction]) => direction) ?? [],
+    );
+    const directionStillValid =
+      !targetDirections.has(exit.direction) &&
+      exits.filter((entry) => entry.direction === exit.direction).length <= 1;
+    if (directionStillValid) {
+      updateExit(exit.key, { roomId });
+      return;
+    }
+    const nextDirection =
+      directionOptions.find(
+        ({ value }) => !targetDirections.has(value) && !usedDirections.has(value),
+      )?.value ?? exit.direction;
+    updateExit(exit.key, { roomId, direction: nextDirection });
+  };
 
   return (
     <form onSubmit={(event) => void handleSubmit(event)}>
@@ -43,8 +78,7 @@ export function CreateRoomForm({ form }: { form: CreateRoomFormState }) {
           name="section"
           value={selectedSectionId ?? ""}
           onChange={(e) => {
-            setSelectedSectionId(e.target.value ? Number(e.target.value) : null);
-            setNeighboringRoom(startRoom);
+            handleSectionChange(e.target.value ? Number(e.target.value) : null);
           }}
         >
           {availableSections.map((section) => (
@@ -61,34 +95,82 @@ export function CreateRoomForm({ form }: { form: CreateRoomFormState }) {
 
       <Divider label="Connections" />
 
-      <div style={createRoomFormStyle}>
-        <FieldGroup id="neighboringRooms" label="Connect to room">
-          <StyledSelect
-            id="neighboringRooms"
-            name="neighboringRooms"
-            onChange={(e) => {
-              const selected = sectionRooms.find((r) => r.name === e.target.value);
-              if (selected) setNeighboringRoom(selected);
-            }}
-          >
-            {sectionRooms.map((room, i) => (
-              <option key={`${room.name}-${i}`} value={room.name}>
-                {room.name}
-              </option>
-            ))}
-          </StyledSelect>
-        </FieldGroup>
+      <p style={connectionsHintStyle}>
+        Add one or more doorways. Each new exit is mirrored on the destination room.
+      </p>
 
-        <FieldGroup id="direction" label="Direction from that room">
-          <StyledSelect id="direction" name="direction">
-            {directionOptions.map((d, i) => (
-              <option key={d.label + i} value={d.value}>
-                {d.label}
-              </option>
-            ))}
-          </StyledSelect>
-        </FieldGroup>
+      <div style={exitListStyle}>
+        {exits.map((exit, index) => (
+          <div key={exit.key} style={exitRowStyle}>
+            <FieldGroup id={`neighborRoom-${exit.key}`} label={`Exit ${index + 1}: room`}>
+              <StyledSelect
+                id={`neighborRoom-${exit.key}`}
+                value={exit.roomId ?? ""}
+                onChange={(e) => {
+                  if (!e.target.value) {
+                    updateExit(exit.key, { roomId: null });
+                    return;
+                  }
+                  handleTargetChange(exit, Number(e.target.value));
+                }}
+              >
+                <option value="">Choose a room…</option>
+                {sectionRooms.map((room) => (
+                  <option key={room.id} value={room.id}>
+                    {room.name}
+                  </option>
+                ))}
+              </StyledSelect>
+            </FieldGroup>
+
+            <FieldGroup id={`direction-${exit.key}`} label="Direction from that room">
+              <StyledSelect
+                id={`direction-${exit.key}`}
+                value={exit.direction}
+                onChange={(e) =>
+                  updateExit(exit.key, { direction: Number(e.target.value) as Directions })
+                }
+              >
+                {directionsFor(exit).map((direction) => (
+                  <option key={direction.value} value={direction.value}>
+                    {direction.label}
+                  </option>
+                ))}
+              </StyledSelect>
+            </FieldGroup>
+
+            <button
+              type="button"
+              onClick={() => removeExit(exit.key)}
+              disabled={exits.length <= 1}
+              style={{
+                ...removeExitButtonStyle,
+                opacity: exits.length <= 1 ? 0.4 : 1,
+                cursor: exits.length <= 1 ? "not-allowed" : "pointer",
+              }}
+            >
+              Remove
+            </button>
+          </div>
+        ))}
       </div>
+
+      <button
+        type="button"
+        onClick={addExit}
+        disabled={sectionRooms.length === 0}
+        style={{
+          ...addExitButtonStyle,
+          opacity: sectionRooms.length === 0 ? 0.5 : 1,
+          cursor: sectionRooms.length === 0 ? "not-allowed" : "pointer",
+        }}
+      >
+        + Add another exit
+      </button>
+
+      {sectionRooms.length === 0 && (
+        <p style={connectionsHintStyle}>There are no rooms in this section to connect to yet.</p>
+      )}
 
       <Divider label="Room Interaction" />
 
@@ -192,11 +274,48 @@ export function CreateRoomForm({ form }: { form: CreateRoomFormState }) {
 }
 
 // Static style objects hoisted out of the render path.
-const createRoomFormStyle: CSSProperties = {
+const connectionsHintStyle: CSSProperties = {
+  margin: "0 0 12px",
+  fontSize: 12,
+  lineHeight: 1.5,
+  color: colors.muted,
+};
+const exitListStyle: CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 10,
+  marginBottom: 12,
+};
+const exitRowStyle: CSSProperties = {
   display: "grid",
-  gridTemplateColumns: "1fr 1fr",
-  gap: 16,
-  marginBottom: 0,
+  gridTemplateColumns: "minmax(0, 1fr) minmax(140px, 0.7fr) auto",
+  alignItems: "start",
+  gap: 12,
+  padding: "12px 12px 0",
+  background: "rgba(0,0,0,0.2)",
+  border: `1px solid ${colors.subtleBorder}`,
+  borderRadius: 8,
+};
+const removeExitButtonStyle: CSSProperties = {
+  marginTop: 24,
+  padding: "8px 12px",
+  background: "rgba(220,38,38,0.08)",
+  border: "1px solid rgba(220,38,38,0.25)",
+  borderRadius: 6,
+  color: "#FCA5A5",
+  fontSize: 11,
+  fontFamily: fonts.display,
+  letterSpacing: "0.04em",
+};
+const addExitButtonStyle: CSSProperties = {
+  padding: "8px 14px",
+  background: "rgba(212,175,55,0.08)",
+  border: `1px dashed ${colors.goldBorder}`,
+  borderRadius: 6,
+  color: colors.gold,
+  fontSize: 11,
+  fontFamily: fonts.display,
+  letterSpacing: "0.05em",
 };
 const createRoomFormStyle2: CSSProperties = {
   marginTop: 28,

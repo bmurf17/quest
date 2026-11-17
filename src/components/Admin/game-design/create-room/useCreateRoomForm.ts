@@ -5,12 +5,22 @@ import { getRoomById, supabase } from "@/queries/RoomQueries";
 import { getAdminEnemies } from "@/queries/AdminEnemyQueries";
 import { useGameStore } from "@/state/GameState";
 import { logger } from "@/lib/logger";
-import { directionToDbEnum, oppositeDirection } from "@/lib/directions";
+import { directionToDbEnum, DIRECTION_OPTIONS, oppositeDirection } from "@/lib/directions";
 import { Directions } from "@/types/Directions";
-import { startRoom } from "@/data/fixtures/rooms";
 import type { Json } from "@/types/database.generated";
 import type { EnemyEntry } from "./formTypes";
 import type { InteractionType } from "./interactionTypes";
+
+interface ExitDraft {
+  key: number;
+  roomId: number | null;
+  direction: Directions;
+}
+
+const firstExitFor = (rooms: { id: number }[], key: number): ExitDraft[] =>
+  rooms.length > 0
+    ? [{ key, roomId: rooms[0].id, direction: Directions.North }]
+    : [{ key, roomId: null, direction: Directions.North }];
 
 const getFormString = (formData: FormData, name: string, fallback = ""): string => {
   const value = formData.get(name);
@@ -21,7 +31,7 @@ export function useCreateRoomForm() {
   const [interaction, setInteraction] = useState<InteractionType>("NPC");
   const [enemies, setEnemies] = useState<EnemyEntry[]>([]);
   const [libraryEnemies, setLibraryEnemies] = useState<EnemyEntry[]>([]);
-  const [neighboringRoom, setNeighboringRoom] = useState(startRoom);
+  const [exits, setExits] = useState<ExitDraft[]>(() => firstExitFor([], 1));
   const [selectedSectionId, setSelectedSectionId] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<{
@@ -31,6 +41,7 @@ export function useCreateRoomForm() {
 
   // ref to synchronously guard against double-submit (rapid double-clicks)
   const submittingRef = useRef(false);
+  const nextExitKeyRef = useRef(2);
 
   const rooms = useGameStore((state) => state.rooms);
   const availableSections = useGameStore((state) => state.availableSections);
@@ -76,12 +87,48 @@ export function useCreateRoomForm() {
 
   const enemyImgs = [mushroom, blord];
 
-  const directionOptions = Object.entries(Directions)
-    .filter(([, value]) => typeof value === "string")
-    .map(([key, value]) => ({ label: value as string, value: key }));
-
+  const directionOptions = DIRECTION_OPTIONS;
   const sectionRooms =
     selectedSectionId !== null ? rooms.filter((r) => r.sectionId === selectedSectionId) : rooms;
+
+  useEffect(() => {
+    if (exits.length > 0 && exits[0].roomId !== null) return;
+    if (sectionRooms.length === 0) return;
+    setExits(firstExitFor(sectionRooms, exits[0]?.key ?? 1));
+  }, [exits, sectionRooms]);
+
+  const handleSectionChange = (sectionId: number | null) => {
+    setSelectedSectionId(sectionId);
+    const nextRooms = sectionId !== null ? rooms.filter((r) => r.sectionId === sectionId) : rooms;
+    const key = nextExitKeyRef.current++;
+    setExits(firstExitFor(nextRooms, key));
+  };
+
+  const addExit = () => {
+    const key = nextExitKeyRef.current++;
+    const unusedRoom = sectionRooms.find((room) => !exits.some((exit) => exit.roomId === room.id));
+    const usedDirections = new Set(exits.map((exit) => exit.direction));
+    const nextDirection =
+      directionOptions.find(({ value }) => !usedDirections.has(value))?.value ?? Directions.North;
+    setExits((current) => [
+      ...current,
+      {
+        key,
+        roomId: unusedRoom?.id ?? sectionRooms[0]?.id ?? null,
+        direction: nextDirection,
+      },
+    ]);
+  };
+
+  const removeExit = (key: number) => {
+    setExits((current) => (current.length <= 1 ? current : current.filter((e) => e.key !== key)));
+  };
+
+  const updateExit = (key: number, values: Partial<Pick<ExitDraft, "roomId" | "direction">>) => {
+    setExits((current) =>
+      current.map((exit) => (exit.key === key ? { ...exit, ...values } : exit)),
+    );
+  };
 
   const showToast = (type: "success" | "error", message: string) => {
     setToast({ type, message });
@@ -98,7 +145,31 @@ export function useCreateRoomForm() {
     try {
       const formData = new FormData(event.currentTarget);
       const roomName = getFormString(formData, "name");
-      const direction = formData.get("direction");
+
+      const plannedExits = exits
+        .filter((exit): exit is ExitDraft & { roomId: number } => exit.roomId !== null)
+        .map((exit) => {
+          const target = rooms.find((room) => room.id === exit.roomId);
+          if (!target) {
+            throw new Error("One of the chosen connecting rooms no longer exists.");
+          }
+          return { ...exit, target };
+        });
+
+      const usedDirections = new Set<Directions>();
+      for (const exit of plannedExits) {
+        const label =
+          DIRECTION_OPTIONS.find(({ value }) => value === exit.direction)?.label ?? "direction";
+        if (usedDirections.has(exit.direction)) {
+          throw new Error(`Two new exits both use the ${label.toLowerCase()} direction.`);
+        }
+        usedDirections.add(exit.direction);
+        if (exit.target.neighboringRooms.some(([direction]) => direction === exit.direction)) {
+          throw new Error(
+            `"${exit.target.name}" already has a doorway to the ${label.toLowerCase()}.`,
+          );
+        }
+      }
 
       const { data: newRoomData, error: roomError } = await supabase
         .from("rooms")
@@ -240,21 +311,20 @@ export function useCreateRoomForm() {
           throw new Error(`Failed to link transition: ${interactionError.message}`);
       }
 
-      if (direction && neighboringRoom.id) {
-        const directionEnum = +direction;
-        const oppositeDirectionEnum = oppositeDirection(directionEnum);
+      for (const exit of plannedExits) {
+        const oppositeDirectionEnum = oppositeDirection(exit.direction);
 
         const { error: neighborError1 } = await supabase.from("neighboring_rooms").insert({
-          room_id: neighboringRoom.id,
+          room_id: exit.target.id,
           neighbor_room_id: newRoomId,
-          direction: directionToDbEnum(directionEnum),
+          direction: directionToDbEnum(exit.direction),
         });
 
         if (neighborError1) throw new Error(`Failed to link rooms: ${neighborError1.message}`);
 
         const { error: neighborError2 } = await supabase.from("neighboring_rooms").insert({
           room_id: newRoomId,
-          neighbor_room_id: neighboringRoom.id,
+          neighbor_room_id: exit.target.id,
           direction: directionToDbEnum(oppositeDirectionEnum),
         });
 
@@ -271,14 +341,16 @@ export function useCreateRoomForm() {
         throw new Error("The room was created but could not be loaded.");
       }
 
-      if (direction) {
-        const updatedNeighbor = await getRoomById(neighboringRoom.id);
+      const refreshedNeighborIds = new Set(plannedExits.map((exit) => exit.target.id));
+      for (const neighborId of refreshedNeighborIds) {
+        const updatedNeighbor = await getRoomById(neighborId);
         if (updatedNeighbor) updateRoom(updatedNeighbor);
       }
 
       addRoom(createdRoom);
       showToast("success", `"${roomName}" has been etched into the map.`);
       (event.target as HTMLFormElement).reset();
+      setExits(firstExitFor(sectionRooms, nextExitKeyRef.current++));
     } catch (err) {
       showToast("error", err instanceof Error ? err.message : "An unknown error occurred");
       logger.error("Error creating room:", err);
@@ -294,10 +366,12 @@ export function useCreateRoomForm() {
     enemies,
     setEnemies,
     libraryEnemies,
-    neighboringRoom,
-    setNeighboringRoom,
+    exits,
+    addExit,
+    removeExit,
+    updateExit,
+    handleSectionChange,
     selectedSectionId,
-    setSelectedSectionId,
     isSubmitting,
     toast,
     setToast,

@@ -62,10 +62,12 @@ Planned order agreed with the design owner. Items are checked as they ship.
 - [x] "Edit Room" action from the Realm Map popup
 - [x] Full-height admin shell with its own scroll pane (fixes clipped backgrounds)
 - [x] Realm Map room dialog stays centered in the viewport
-- [ ] Edit enemies and interactions on an existing room
-- [ ] Create multiple exits while forging a new room
+- [x] Edit enemies and interactions on an existing room
+- [x] Create multiple exits while forging a new room
 - [ ] Explicit start-room flag (today the map uses the first room)
 - [ ] Improve create-room flow (inline dialogue picker/creator)
+
+Room editing now covers the full contents of an existing room: pick reusable enemies from the library, or change the interaction type (NPC, chest, camp, transition, cutscene) and its fields in place. `saveRoomInteraction` updates child rows when the type is unchanged so quests and chest state survive, then cleans up stale children after a type change. The World Builder can also add several exits at once; each exit is mirrored on the destination and duplicate directions are rejected before the room is created.
 
 ### Phase 2 — Dialogue graph editor
 

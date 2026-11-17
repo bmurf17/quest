@@ -106,6 +106,7 @@ interface DbTransition {
 interface DbRoomInteraction {
   room_id: number;
   interaction_type: string;
+  cutscene_id: string | null;
   discovery_message: string | null;
   npcs: DbNpc | null;
   chests: DbChest | null;
@@ -354,7 +355,7 @@ export async function getAllRooms(): Promise<Room[]> {
             interaction = {
               type: "cutscene",
               cutscene: {
-                cutsceneId: "intro",
+                cutsceneId: interactionData.cutscene_id ?? "intro",
                 discoveryMessage: interactionData.discovery_message ?? undefined,
               },
             };

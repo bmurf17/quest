@@ -7,6 +7,7 @@ import { colors, fonts } from "@/theme";
 import { DIRECTION_OPTIONS, oppositeDirection } from "@/lib/directions";
 import { Directions } from "@/types/Directions";
 import { Toast } from "./create-room/Toast";
+import { RoomContents } from "./RoomContents";
 import { FieldGroup, StyledInput, StyledSelect } from "./create-room/primitives";
 import type { Room } from "@/types/Room";
 import type { CSSProperties } from "react";
@@ -509,10 +510,12 @@ export default function Rooms() {
                       </div>
                     </div>
                     <p style={helperTextStyle}>
-                      Editing enemies and interactions is coming next. For now, create new rooms
-                      with the World Builder form.
+                      Edit the enemy roster and interaction below. Changes save to the database
+                      immediately.
                     </p>
                   </div>
+
+                  <RoomContents room={selectedRoom} onRefresh={refresh} showToast={showToast} />
 
                   <div style={{ ...panelStyle, borderColor: "rgba(220,38,38,0.25)" }}>
                     <div style={{ ...panelHeadingStyle, color: "#FCA5A5" }}>Danger zone</div>
