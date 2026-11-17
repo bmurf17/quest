@@ -1,4 +1,38 @@
 import type { EnemyMoveEffect } from "@/types/EnemyMove";
+import type { QuickDialogueChoiceInput } from "@/lib/quickDialogue";
+
+export type NpcSource = "new" | "existing";
+
+export interface QuickDialogueChoiceEntry extends QuickDialogueChoiceInput {
+  key: number;
+}
+
+export interface QuickDialogueLineEntry {
+  key: number;
+  text: string;
+  choices: QuickDialogueChoiceEntry[];
+}
+
+export interface ExistingNpcOption {
+  id: number;
+  name: string;
+  npcType: string;
+  treeName: string | null;
+  hasTree: boolean;
+}
+
+export const defaultQuickDialogueLine = (key: number): QuickDialogueLineEntry => ({
+  key,
+  text: "",
+  choices: [],
+});
+
+export const defaultQuickDialogueChoice = (key: number): QuickDialogueChoiceEntry => ({
+  key,
+  text: "",
+  outcomeType: "none",
+  outcomeValue: "",
+});
 
 export interface MoveEntry {
   name: string;

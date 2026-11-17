@@ -65,7 +65,7 @@ Planned order agreed with the design owner. Items are checked as they ship.
 - [x] Edit enemies and interactions on an existing room
 - [x] Create multiple exits while forging a new room
 - [ ] Explicit start-room flag (today the map uses the first room)
-- [ ] Improve create-room flow (inline dialogue picker/creator)
+- [x] Improve create-room flow (inline dialogue picker/creator)
 
 Room editing now covers the full contents of an existing room: pick reusable enemies from the library, or change the interaction type (NPC, chest, camp, transition, cutscene) and its fields in place. `saveRoomInteraction` updates child rows when the type is unchanged so quests and chest state survive, then cleans up stale children after a type change. The World Builder can also add several exits at once; each exit is mirrored on the destination and duplicate directions are rejected before the room is created.
 
@@ -75,9 +75,11 @@ Room editing now covers the full contents of an existing room: pick reusable ene
 - [x] Add/delete nodes and link choices to next nodes
 - [x] Edit speaker, endpoints, skill checks, and outcomes
 - [x] Debounced autosave with pending-save merge, flush on leave, and save status
-- [ ] Quick dialogue builder inside room creation
+- [x] Quick dialogue builder inside room creation
 
 Note: the runtime only applies outcomes attached to choices. Node-level outcomes are stored but not actionable, so the editor only exposes choice outcomes.
+
+The room creator now lets you link an existing NPC/dialogue tree or build a quick linear conversation inline: ordered lines, optional player choices, and choice outcomes. Quick-built trees can be refined later in the full graph editor; branching, skill checks, and flags still live there.
 
 ### Phase 3 — Items and economy (DB-first)
 

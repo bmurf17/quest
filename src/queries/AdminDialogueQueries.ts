@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { planQuickDialogue, type QuickDialogueLineInput } from "@/lib/quickDialogue";
 import { DialogueOutcomeType } from "@/types/RoomInteractions";
 
 export interface AdminNpc {
@@ -108,13 +109,13 @@ export async function getDialogueGraph(npcId: number): Promise<AdminDialogueGrap
   const nodeIds = (nodes ?? []).map((node) => node.id);
   const choices =
     nodeIds.length > 0
-      ? (
+      ? ((
           await supabase
             .from("dialogue_choices")
             .select("*")
             .in("node_id", nodeIds)
             .order("sort_order")
-        ).data ?? []
+        ).data ?? [])
       : [];
 
   const choiceIds = choices.map((choice) => choice.id);
@@ -131,10 +132,7 @@ export async function getDialogueGraph(npcId: number): Promise<AdminDialogueGrap
   if (choiceOutcomeResult.error) throw choiceOutcomeResult.error;
 
   const outcomesById = new Map<string, AdminDialogueOutcome>();
-  for (const outcome of [
-    ...(nodeOutcomeResult.data ?? []),
-    ...(choiceOutcomeResult.data ?? []),
-  ]) {
+  for (const outcome of [...(nodeOutcomeResult.data ?? []), ...(choiceOutcomeResult.data ?? [])]) {
     outcomesById.set(outcome.id, outcome);
   }
 
@@ -146,10 +144,7 @@ export async function getDialogueGraph(npcId: number): Promise<AdminDialogueGrap
   };
 }
 
-export async function createDialogueTree(
-  npcId: number,
-  name: string,
-): Promise<AdminDialogueTree> {
+export async function createDialogueTree(npcId: number, name: string): Promise<AdminDialogueTree> {
   const dialogueId = crypto.randomUUID();
   const rootNodeId = crypto.randomUUID();
 
@@ -171,6 +166,88 @@ export async function createDialogueTree(
   });
 
   if (nodeError) throw nodeError;
+
+  return tree;
+}
+
+/**
+ * Creates a complete linear dialogue tree from the compact room-creation
+ * builder. The tree row is removed again if a child insert fails so a partial
+ * conversation is never left behind.
+ */
+export async function createQuickDialogueTree(
+  npcId: number,
+  name: string,
+  lines: QuickDialogueLineInput[],
+): Promise<AdminDialogueTree> {
+  const plan = planQuickDialogue(lines);
+  if (!plan.rootNodeId) {
+    throw new Error("Add at least one dialogue line before creating the tree.");
+  }
+
+  const dialogueId = crypto.randomUUID();
+
+  const { data: tree, error: treeError } = await supabase
+    .from("npc_dialogues")
+    .insert({
+      id: dialogueId,
+      npc_id: npcId,
+      root_node_id: plan.rootNodeId,
+      name,
+    })
+    .select()
+    .single();
+
+  if (treeError) throw treeError;
+
+  try {
+    const { error: nodeError } = await supabase.from("dialogue_nodes").insert(
+      plan.nodes.map((node) => ({
+        id: node.id,
+        dialogue_id: dialogueId,
+        npc_text: node.text,
+        speaker: "NPC",
+        is_endpoint: node.isEndpoint ? 1 : 0,
+        sort_order: node.sortOrder,
+      })),
+    );
+
+    if (nodeError) throw nodeError;
+
+    if (plan.choices.length > 0) {
+      const { error: choiceError } = await supabase.from("dialogue_choices").insert(
+        plan.choices.map((choice) => ({
+          id: choice.id,
+          node_id: choice.nodeId,
+          choice_text: choice.text,
+          next_node_id: choice.nextNodeId,
+          sort_order: choice.sortOrder,
+        })),
+      );
+
+      if (choiceError) throw choiceError;
+    }
+
+    const outcomes = plan.choices
+      .filter((choice) => choice.outcome !== null)
+      .map((choice) => ({
+        id: crypto.randomUUID(),
+        choice_id: choice.id,
+        outcome_type: choice.outcome!.type,
+        outcome_value: choice.outcome!.value ?? null,
+        flag_key: choice.outcome!.flagKey ?? null,
+        flag_value: choice.outcome!.flagValue ?? null,
+      }));
+
+    if (outcomes.length > 0) {
+      const { error: outcomeError } = await supabase.from("dialogue_outcomes").insert(outcomes);
+
+      if (outcomeError) throw outcomeError;
+    }
+  } catch (err) {
+    await supabase.from("npc_dialogues").delete().eq("id", dialogueId);
+    throw err;
+  }
 
   return tree;
 }

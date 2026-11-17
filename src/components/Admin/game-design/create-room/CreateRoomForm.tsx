@@ -30,6 +30,18 @@ export function CreateRoomForm({ form }: { form: CreateRoomFormState }) {
     selectedSectionId,
     isSubmitting,
     availableSections,
+    npcSource,
+    setNpcSource,
+    existingNpcs,
+    selectedNpcId,
+    setSelectedNpcId,
+    quickLines,
+    addQuickLine,
+    removeQuickLine,
+    updateQuickLine,
+    addQuickChoice,
+    removeQuickChoice,
+    updateQuickChoice,
     enemyImgs,
     directionOptions,
     sectionRooms,
@@ -201,7 +213,20 @@ export function CreateRoomForm({ form }: { form: CreateRoomFormState }) {
               switches; disabled fieldsets are excluded from FormData. */}
           <fieldset disabled={interaction !== "NPC"} style={formFieldsetStyle}>
             <div style={{ display: interaction === "NPC" ? "block" : "none" }}>
-              <NPCForm />
+              <NPCForm
+                source={npcSource}
+                onSourceChange={setNpcSource}
+                existingNpcs={existingNpcs}
+                selectedNpcId={selectedNpcId}
+                onSelectNpc={setSelectedNpcId}
+                quickLines={quickLines}
+                onAddLine={addQuickLine}
+                onRemoveLine={removeQuickLine}
+                onUpdateLine={updateQuickLine}
+                onAddChoice={addQuickChoice}
+                onRemoveChoice={removeQuickChoice}
+                onUpdateChoice={updateQuickChoice}
+              />
             </div>
           </fieldset>
           <fieldset disabled={interaction !== "Combat"} style={formFieldsetStyle}>

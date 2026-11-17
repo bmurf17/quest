@@ -3,12 +3,21 @@ import mushroom from "/images/Mushroom.png";
 import blord from "/images/Blord.png";
 import { getRoomById, supabase } from "@/queries/RoomQueries";
 import { getAdminEnemies } from "@/queries/AdminEnemyQueries";
+import { createQuickDialogueTree, getAdminNpcSummaries } from "@/queries/AdminDialogueQueries";
 import { useGameStore } from "@/state/GameState";
 import { logger } from "@/lib/logger";
 import { directionToDbEnum, DIRECTION_OPTIONS, oppositeDirection } from "@/lib/directions";
 import { Directions } from "@/types/Directions";
 import type { Json } from "@/types/database.generated";
-import type { EnemyEntry } from "./formTypes";
+import {
+  defaultQuickDialogueChoice,
+  defaultQuickDialogueLine,
+  type EnemyEntry,
+  type ExistingNpcOption,
+  type NpcSource,
+  type QuickDialogueChoiceEntry,
+  type QuickDialogueLineEntry,
+} from "./formTypes";
 import type { InteractionType } from "./interactionTypes";
 
 interface ExitDraft {
@@ -33,6 +42,12 @@ export function useCreateRoomForm() {
   const [libraryEnemies, setLibraryEnemies] = useState<EnemyEntry[]>([]);
   const [exits, setExits] = useState<ExitDraft[]>(() => firstExitFor([], 1));
   const [selectedSectionId, setSelectedSectionId] = useState<number | null>(null);
+  const [npcSource, setNpcSource] = useState<NpcSource>("new");
+  const [existingNpcs, setExistingNpcs] = useState<ExistingNpcOption[]>([]);
+  const [selectedNpcId, setSelectedNpcId] = useState<number | null>(null);
+  const [quickLines, setQuickLines] = useState<QuickDialogueLineEntry[]>(() => [
+    defaultQuickDialogueLine(1),
+  ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<{
     type: "success" | "error";
@@ -42,6 +57,8 @@ export function useCreateRoomForm() {
   // ref to synchronously guard against double-submit (rapid double-clicks)
   const submittingRef = useRef(false);
   const nextExitKeyRef = useRef(2);
+  const nextQuickLineKeyRef = useRef(2);
+  const nextQuickChoiceKeyRef = useRef(1);
 
   const rooms = useGameStore((state) => state.rooms);
   const availableSections = useGameStore((state) => state.availableSections);
@@ -84,6 +101,97 @@ export function useCreateRoomForm() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    void getAdminNpcSummaries()
+      .then((rows) => {
+        if (cancelled) return;
+        const options: ExistingNpcOption[] = rows.map((row) => ({
+          id: row.id,
+          name: row.name,
+          npcType: row.npc_type,
+          treeName: row.dialogueTreeName,
+          hasTree: row.dialogueTreeId !== null,
+        }));
+        setExistingNpcs(options);
+        setSelectedNpcId((current) => current ?? options[0]?.id ?? null);
+      })
+      .catch(() => {
+        // The picker is optional; the new-NPC builder still works.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const updateQuickLine = (key: number, text: string) => {
+    setQuickLines((current) =>
+      current.map((line) => (line.key === key ? { ...line, text } : line)),
+    );
+  };
+
+  const addQuickLine = () => {
+    setQuickLines((current) => [
+      ...current,
+      defaultQuickDialogueLine(nextQuickLineKeyRef.current++),
+    ]);
+  };
+
+  const removeQuickLine = (key: number) => {
+    setQuickLines((current) =>
+      current.length <= 1 ? current : current.filter((line) => line.key !== key),
+    );
+  };
+
+  const addQuickChoice = (lineKey: number) => {
+    setQuickLines((current) =>
+      current.map((line) =>
+        line.key === lineKey
+          ? {
+              ...line,
+              choices: [
+                ...line.choices,
+                defaultQuickDialogueChoice(nextQuickChoiceKeyRef.current++),
+              ],
+            }
+          : line,
+      ),
+    );
+  };
+
+  const removeQuickChoice = (lineKey: number, choiceKey: number) => {
+    setQuickLines((current) =>
+      current.map((line) =>
+        line.key === lineKey
+          ? { ...line, choices: line.choices.filter((choice) => choice.key !== choiceKey) }
+          : line,
+      ),
+    );
+  };
+
+  const updateQuickChoice = (
+    lineKey: number,
+    choiceKey: number,
+    values: Partial<QuickDialogueChoiceEntry>,
+  ) => {
+    setQuickLines((current) =>
+      current.map((line) =>
+        line.key === lineKey
+          ? {
+              ...line,
+              choices: line.choices.map((choice) =>
+                choice.key === choiceKey ? { ...choice, ...values } : choice,
+              ),
+            }
+          : line,
+      ),
+    );
+  };
+
+  const resetQuickDialogue = () => {
+    setQuickLines([defaultQuickDialogueLine(nextQuickLineKeyRef.current++)]);
+  };
 
   const enemyImgs = [mushroom, blord];
 
@@ -223,29 +331,71 @@ export function useCreateRoomForm() {
             throw new Error(`Failed to link enemy to room: ${roomEnemyError.message}`);
         }
       } else if (interaction === "NPC") {
-        const npcName = getFormString(formData, "npcName");
-        const dialogue = getFormString(formData, "dialogue");
-        const discoveryMessage = getFormString(formData, "discoveryMessage");
+        if (npcSource === "existing") {
+          if (selectedNpcId === null) {
+            throw new Error("Choose an existing NPC for this room, or create a new one.");
+          }
 
-        const { data: npcData, error: npcError } = await supabase
-          .from("npcs")
-          .insert({
-            name: npcName,
-            dialogue: [dialogue],
-            discovery_message: discoveryMessage,
-          })
-          .select()
-          .single();
+          const { error: interactionError } = await supabase.from("room_interactions").insert({
+            room_id: newRoomId,
+            interaction_type: "NPC",
+            npc_id: selectedNpcId,
+          });
 
-        if (npcError) throw new Error(`Failed to create NPC: ${npcError.message}`);
+          if (interactionError) throw new Error(`Failed to link NPC: ${interactionError.message}`);
+        } else {
+          const npcName = getFormString(formData, "npcName").trim();
+          const discoveryMessage = getFormString(formData, "discoveryMessage").trim();
+          const lines = quickLines
+            .map((line) => ({
+              text: line.text.trim(),
+              choices: line.choices.map((choice) => ({
+                text: choice.text,
+                outcomeType: choice.outcomeType,
+                outcomeValue: choice.outcomeValue,
+              })),
+            }))
+            .filter((line) => line.text.length > 0);
 
-        const { error: interactionError } = await supabase.from("room_interactions").insert({
-          room_id: newRoomId,
-          interaction_type: "NPC",
-          npc_id: npcData.id,
-        });
+          if (!npcName) {
+            throw new Error("Give the new NPC a name.");
+          }
+          if (lines.length === 0) {
+            throw new Error("Add at least one dialogue line for the new NPC.");
+          }
 
-        if (interactionError) throw new Error(`Failed to link NPC: ${interactionError.message}`);
+          const { data: npcData, error: npcError } = await supabase
+            .from("npcs")
+            .insert({
+              name: npcName,
+              dialogue: lines.map((line) => line.text),
+              discovery_message: discoveryMessage || null,
+            })
+            .select()
+            .single();
+
+          if (npcError) throw new Error(`Failed to create NPC: ${npcError.message}`);
+
+          try {
+            await createQuickDialogueTree(npcData.id, `${npcName} Dialogue`, lines);
+          } catch (err) {
+            // Do not leave an NPC with no room and a half-built conversation.
+            await supabase.from("npcs").delete().eq("id", npcData.id);
+            throw new Error(
+              `Could not build the NPC dialogue: ${
+                err instanceof Error ? err.message : "unknown error"
+              }`,
+            );
+          }
+
+          const { error: interactionError } = await supabase.from("room_interactions").insert({
+            room_id: newRoomId,
+            interaction_type: "NPC",
+            npc_id: npcData.id,
+          });
+
+          if (interactionError) throw new Error(`Failed to link NPC: ${interactionError.message}`);
+        }
       } else if (interaction === "Chest") {
         const itemId = getFormString(formData, "itemId");
         const quantity = parseInt(getFormString(formData, "quantity", "1"));
@@ -351,6 +501,7 @@ export function useCreateRoomForm() {
       showToast("success", `"${roomName}" has been etched into the map.`);
       (event.target as HTMLFormElement).reset();
       setExits(firstExitFor(sectionRooms, nextExitKeyRef.current++));
+      resetQuickDialogue();
     } catch (err) {
       showToast("error", err instanceof Error ? err.message : "An unknown error occurred");
       logger.error("Error creating room:", err);
@@ -377,6 +528,18 @@ export function useCreateRoomForm() {
     setToast,
     rooms,
     availableSections,
+    npcSource,
+    setNpcSource,
+    existingNpcs,
+    selectedNpcId,
+    setSelectedNpcId,
+    quickLines,
+    addQuickLine,
+    removeQuickLine,
+    updateQuickLine,
+    addQuickChoice,
+    removeQuickChoice,
+    updateQuickChoice,
     enemyImgs,
     directionOptions,
     sectionRooms,
