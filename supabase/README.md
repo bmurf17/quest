@@ -85,12 +85,14 @@ Never ship the `service_role` key: it bypasses RLS. Current policy intent is:
 | Table                                                                                                                                                                                      | Read                                                 | Write                                                                                   |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------- | --------------------------------------------------------------------------------------- |
 | `sections`, `rooms`, `room_enemies`, `neighboring_rooms`, `room_interactions`, `items`, `enemies`, `npcs`, `chests`, `camps`, `transitions`, `quests`, `quest_objectives`, `quest_rewards` | Public (`USING (true)`) so the game can load content | Authenticated users only (`auth.uid() IS NOT NULL`), i.e. the admin/game-design screens |
-| `npc_dialogues`, `dialogue_nodes`, `dialogue_choices`, `dialogue_outcomes`                                                                                                                 | Public so dialogue can load                          | Authenticated users only                                                                |
+| `npc_dialogues`, `dialogue_nodes`, `dialogue_choices`, `dialogue_outcomes`                                                                                                                 | Public so dialogue can load                          | Admin (anon) while the tool is local/solo; see `007_dialogue_admin_access.sql`          |
 | `conversation_flags`                                                                                                                                                                       | Public in the current migration                      | Authenticated users only                                                                |
 
 `001_dialogue_system.sql` enables RLS for the dialogue tables and creates those
-policies. The baseline does not create policies for the core tables; those are
-managed in the project's SQL editor.
+policies. `007_dialogue_admin_access.sql` then widens their write policies to
+the anon key because the admin currently has no auth session; apply it
+alongside the other migrations. The baseline does not create policies for the
+core tables; those are managed in the project's SQL editor.
 
 ### Follow-up recommended
 

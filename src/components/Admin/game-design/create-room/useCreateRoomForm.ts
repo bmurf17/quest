@@ -36,6 +36,16 @@ const getFormString = (formData: FormData, name: string, fallback = ""): string 
   return typeof value === "string" ? value : fallback;
 };
 
+/** Supabase errors are plain objects, not Error instances. */
+const describeError = (err: unknown, fallback = "unknown error"): string => {
+  if (err instanceof Error) return err.message;
+  if (err && typeof err === "object" && "message" in err) {
+    const message = (err as { message?: unknown }).message;
+    if (typeof message === "string" && message.length > 0) return message;
+  }
+  return fallback;
+};
+
 export function useCreateRoomForm() {
   const [interaction, setInteraction] = useState<InteractionType>("NPC");
   const [enemies, setEnemies] = useState<EnemyEntry[]>([]);
@@ -381,11 +391,7 @@ export function useCreateRoomForm() {
           } catch (err) {
             // Do not leave an NPC with no room and a half-built conversation.
             await supabase.from("npcs").delete().eq("id", npcData.id);
-            throw new Error(
-              `Could not build the NPC dialogue: ${
-                err instanceof Error ? err.message : "unknown error"
-              }`,
-            );
+            throw new Error(`Could not build the NPC dialogue: ${describeError(err)}`);
           }
 
           const { error: interactionError } = await supabase.from("room_interactions").insert({
@@ -503,7 +509,7 @@ export function useCreateRoomForm() {
       setExits(firstExitFor(sectionRooms, nextExitKeyRef.current++));
       resetQuickDialogue();
     } catch (err) {
-      showToast("error", err instanceof Error ? err.message : "An unknown error occurred");
+      showToast("error", describeError(err, "An unknown error occurred"));
       logger.error("Error creating room:", err);
     } finally {
       setIsSubmitting(false);

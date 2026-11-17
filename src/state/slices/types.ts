@@ -51,6 +51,7 @@ export interface GameState {
   addTavernCharacterToParty: (char: CharacterData) => void;
   setTavernConfig: (config: TavernConfig) => void;
   enterTown: () => void;
+  returnToSanctuary: () => void;
   exitTown: () => void;
   restInTown: () => void;
   retryFromGameOver: () => void;

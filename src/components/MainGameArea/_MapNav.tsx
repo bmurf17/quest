@@ -212,11 +212,25 @@ export default function MapNav() {
             {transition && (
               <button
                 type="button"
-                onClick={() => state.enterTown()}
-                aria-label="Enter town"
-                className="p-3 bg-gray-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 active:scale-95 disabled:hover:bg-gray-700 disabled:bg-gray-700"
+                onClick={() =>
+                  transition.destination === "sanctuary"
+                    ? state.returnToSanctuary()
+                    : state.enterTown()
+                }
+                aria-label={
+                  transition.destination === "sanctuary"
+                    ? "Return to the sanctuary"
+                    : "Continue to the next dungeon"
+                }
+                title={
+                  transition.destination === "sanctuary"
+                    ? "Return to the sanctuary"
+                    : "Continue to the next dungeon"
+                }
+                className="px-3 py-2 bg-gray-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 active:scale-95 disabled:hover:bg-gray-700 disabled:bg-gray-700"
+                style={transitionButtonStyle}
               >
-                T
+                {transition.destination === "sanctuary" ? "Sanctuary" : "Descend"}
               </button>
             )}
           </div>
@@ -243,6 +257,12 @@ const miniMapStyle2: CSSProperties = {
   pointerEvents: "none",
 };
 const mapNavStyle: CSSProperties = { display: "flex", alignItems: "flex-end", gap: 10 };
+const transitionButtonStyle: CSSProperties = {
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: "0.05em",
+  textTransform: "uppercase",
+};
 const mapNavStyle2: CSSProperties = { display: "flex", flexDirection: "column", gap: 4 };
 const mapNavStyle3: CSSProperties = {
   fontSize: 8,

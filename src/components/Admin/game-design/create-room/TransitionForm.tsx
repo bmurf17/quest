@@ -6,9 +6,7 @@ export function TransitionForm() {
       <FieldGroup id="destination" label="Destination">
         <StyledSelect id="destination" name="destination">
           <option value="next_dungeon">Next Dungeon</option>
-          <option value="sanctuary" disabled>
-            Sanctuary (Coming Soon)
-          </option>
+          <option value="sanctuary">Sanctuary</option>
         </StyledSelect>
       </FieldGroup>
       <FieldGroup id="discoveryMessage" label="Discovery Message">

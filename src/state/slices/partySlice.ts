@@ -28,6 +28,7 @@ export type PartySlice = Pick<
   | "addTavernCharacterToParty"
   | "setTavernConfig"
   | "enterTown"
+  | "returnToSanctuary"
   | "exitTown"
   | "restInTown"
   | "retryFromGameOver"
@@ -168,6 +169,19 @@ export const createPartySlice: GameSlice<PartySlice> = (set, get) => ({
     });
   },
 
+  /**
+   * Retreats to the sanctuary through a transition without completing the
+   * current section, so the player can return to the same dungeon afterwards.
+   */
+  returnToSanctuary: () =>
+    set((state) => ({
+      gameStatus: GameStatus.InTown,
+      isTavernOpen: true,
+      hasRecruitedFromTavern: false,
+      tavernCandidates: generateTavernCandidates(state.tavernConfig),
+      activityLog: [...state.activityLog, "You return to the sanctuary."],
+    })),
+
   exitTown: () => set({ gameStatus: GameStatus.Exploring }),
 
   restInTown: () =>
@@ -211,10 +225,7 @@ export const createPartySlice: GameSlice<PartySlice> = (set, get) => ({
         activeDialogue: null,
         currentDialogueNodeId: null,
         activeCutscene: null,
-        activityLog: [
-          ...state.activityLog,
-          "You awaken back in the village, battered but alive.",
-        ],
+        activityLog: [...state.activityLog, "You awaken back in the village, battered but alive."],
       };
     }),
 });

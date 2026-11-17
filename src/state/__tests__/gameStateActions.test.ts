@@ -198,6 +198,48 @@ describe("game over retry", () => {
   });
 });
 
+describe("transition destinations", () => {
+  it("returns to the sanctuary without completing the current section", () => {
+    useGameStore.setState({
+      currentSection: 2,
+      beatenSections: [1],
+      availableSections: [
+        { id: 1, name: "Forest" },
+        { id: 2, name: "Crypt" },
+      ],
+      gameStatus: GameStatus.Exploring,
+      activityLog: [],
+    });
+
+    useGameStore.getState().returnToSanctuary();
+
+    const state = useGameStore.getState();
+    expect(state.gameStatus).toBe(GameStatus.InTown);
+    expect(state.currentSection).toBe(2);
+    expect(state.beatenSections).toEqual([1]);
+    expect(state.activityLog).toContain("You return to the sanctuary.");
+  });
+
+  it("marks the current section complete when entering town from a next-dungeon transition", () => {
+    useGameStore.setState({
+      currentSection: 2,
+      beatenSections: [1],
+      availableSections: [
+        { id: 1, name: "Forest" },
+        { id: 2, name: "Crypt" },
+      ],
+      gameStatus: GameStatus.Exploring,
+      activityLog: [],
+    });
+
+    useGameStore.getState().enterTown();
+
+    const state = useGameStore.getState();
+    expect(state.gameStatus).toBe(GameStatus.InTown);
+    expect(state.beatenSections).toEqual([1, 2]);
+  });
+});
+
 describe("tavern recruitment", () => {
   it("closes the tavern after recruiting a companion", () => {
     const warrior = hero({ name: "Warrior" });
