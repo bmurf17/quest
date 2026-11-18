@@ -9,6 +9,7 @@ import { Directions } from "@/types/Directions";
 import { Toast } from "./create-room/Toast";
 import { RoomContents } from "./RoomContents";
 import { FieldGroup, StyledInput, StyledSelect } from "./create-room/primitives";
+import { AdminPageHeader } from "@/components/Admin/ui/AdminPrimitives";
 import type { Room } from "@/types/Room";
 import type { CSSProperties } from "react";
 
@@ -262,23 +263,21 @@ export default function Rooms() {
     <>
       <main style={pageStyle}>
         <div style={pageInnerStyle}>
-          <header style={headerStyle}>
-            <div>
-              <div style={eyebrowStyle}>World Builder</div>
-              <h1 style={titleStyle}>Rooms</h1>
-              <p style={subtitleStyle}>
-                Browse every chamber, fix connections, and keep the map consistent.
-              </p>
-            </div>
-            <div style={headerActionsStyle}>
-              <Link to="/admin/game-design/roomMap" style={secondaryButtonStyle}>
-                View map
-              </Link>
-              <Link to="/admin/game-design/rooms/new" style={primaryButtonStyle}>
-                + New room
-              </Link>
-            </div>
-          </header>
+          <AdminPageHeader
+            eyebrow="World Builder"
+            title="Rooms"
+            description="Browse every chamber, fix connections, and keep the map consistent."
+            actions={
+              <>
+                <Link to="/admin/game-design/roomMap" style={secondaryButtonStyle}>
+                  View map
+                </Link>
+                <Link to="/admin/game-design/rooms/new" style={primaryButtonStyle}>
+                  + New room
+                </Link>
+              </>
+            }
+          />
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
             <section style={panelStyle}>
@@ -564,33 +563,6 @@ const pageInnerStyle: CSSProperties = {
   maxWidth: 1120,
   margin: "0 auto",
 };
-const headerStyle: CSSProperties = {
-  display: "flex",
-  alignItems: "flex-end",
-  justifyContent: "space-between",
-  gap: 16,
-  flexWrap: "wrap",
-  marginBottom: 24,
-};
-const eyebrowStyle: CSSProperties = {
-  fontSize: 11,
-  fontWeight: 700,
-  letterSpacing: "0.14em",
-  textTransform: "uppercase",
-  color: colors.goldMuted,
-  fontFamily: fonts.display,
-  marginBottom: 6,
-};
-const titleStyle: CSSProperties = {
-  margin: 0,
-  fontSize: 30,
-  fontWeight: 700,
-  color: colors.text,
-  fontFamily: fonts.display,
-  letterSpacing: "0.04em",
-};
-const subtitleStyle: CSSProperties = { margin: "6px 0 0", fontSize: 14, color: colors.muted };
-const headerActionsStyle: CSSProperties = { display: "flex", gap: 8 };
 const panelStyle: CSSProperties = {
   background: "rgba(255,255,255,0.025)",
   border: `1px solid ${colors.goldBorder}`,

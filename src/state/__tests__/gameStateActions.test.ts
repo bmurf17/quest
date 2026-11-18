@@ -199,7 +199,7 @@ describe("game over retry", () => {
 });
 
 describe("transition destinations", () => {
-  it("returns to the sanctuary without completing the current section", () => {
+  it("returns to the sanctuary and completes the current section", () => {
     useGameStore.setState({
       currentSection: 2,
       beatenSections: [1],
@@ -216,8 +216,8 @@ describe("transition destinations", () => {
     const state = useGameStore.getState();
     expect(state.gameStatus).toBe(GameStatus.InTown);
     expect(state.currentSection).toBe(2);
-    expect(state.beatenSections).toEqual([1]);
-    expect(state.activityLog).toContain("You return to the sanctuary.");
+    expect(state.beatenSections).toEqual([1, 2]);
+    expect(state.activityLog).toContain("You return to the sanctuary. Crypt has been completed!");
   });
 
   it("marks the current section complete when entering town from a next-dungeon transition", () => {

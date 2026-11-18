@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { colors, fonts } from "@/theme";
 import { estimateEnemy } from "@/lib/enemyBalance";
 import {
@@ -20,6 +21,7 @@ import { mapDbItem } from "@/queries/RoomQueries";
 import { BossEditor } from "./BossEditor";
 import { Toast } from "./create-room/Toast";
 import { FieldGroup, StyledInput, StyledSelect } from "./create-room/primitives";
+import { AdminPageHeader } from "@/components/Admin/ui/AdminPrimitives";
 import type { CSSProperties } from "react";
 
 type ToastState = { type: "success" | "error"; message: string } | null;
@@ -176,10 +178,15 @@ function BalanceCell({
 
 export default function ManageEnemies() {
   const [tab, setTab] = useState<Tab>("library");
+  const [searchParams, setSearchParams] = useSearchParams();
   const [enemies, setEnemies] = useState<AdminEnemyRow[]>([]);
   const [rooms, setRooms] = useState<AdminRoomSummary[]>([]);
   const [itemLibrary, setItemLibrary] = useState<Item[]>([]);
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(() => {
+    const raw = searchParams.get("enemy");
+    const id = Number(raw);
+    return raw && Number.isFinite(id) && id > 0 ? id : null;
+  });
   const [draft, setDraft] = useState<EnemyDraft>(emptyDraft);
   const [isNew, setIsNew] = useState(false);
   const [query, setQuery] = useState("");
@@ -210,8 +217,15 @@ export default function ManageEnemies() {
         setItemLibrary(
           itemRows.map((row) => mapDbItem(row)).filter((item): item is Item => item !== null),
         );
-        setSelectedId(enemyRows[0]?.id ?? null);
-        if (enemyRows[0]) setDraft(draftFromEnemy(enemyRows[0]));
+        const rawRequested = searchParams.get("enemy");
+        const requestedId = Number(rawRequested);
+        const requested =
+          rawRequested && Number.isFinite(requestedId)
+            ? enemyRows.find((enemy) => enemy.id === requestedId)
+            : undefined;
+        const initialEnemy = requested ?? enemyRows[0] ?? null;
+        setSelectedId(initialEnemy?.id ?? null);
+        if (initialEnemy) setDraft(draftFromEnemy(initialEnemy));
       } catch (err) {
         if (!cancelled) showToast("error", errorMessage(err));
       } finally {
@@ -222,7 +236,19 @@ export default function ManageEnemies() {
     return () => {
       cancelled = true;
     };
+    // Selection is seeded from the URL once; later changes sync through the effect below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const current = searchParams.get("enemy");
+    if ((selectedId === null && current === null) || current === String(selectedId)) return;
+
+    const next = new URLSearchParams(searchParams);
+    if (selectedId !== null) next.set("enemy", String(selectedId));
+    else next.delete("enemy");
+    setSearchParams(next, { replace: true });
+  }, [selectedId, searchParams, setSearchParams]);
 
   useEffect(() => {
     if (selectedId === null) {
@@ -354,31 +380,29 @@ export default function ManageEnemies() {
     <>
       <main style={pageStyle}>
         <div style={pageInnerStyle}>
-          <header style={headerStyle}>
-            <div>
-              <div style={eyebrowStyle}>Game Design</div>
-              <h1 style={titleStyle}>Enemies &amp; Balance</h1>
-              <p style={subtitleStyle}>
-                One reusable enemy library, boss phases, and a quick balance overview.
-              </p>
-            </div>
-            <div style={tabsStyle}>
-              <button
-                type="button"
-                onClick={() => setTab("library")}
-                style={{ ...tabStyle, ...(tab === "library" ? tabActiveStyle : {}) }}
-              >
-                Library
-              </button>
-              <button
-                type="button"
-                onClick={() => setTab("balance")}
-                style={{ ...tabStyle, ...(tab === "balance" ? tabActiveStyle : {}) }}
-              >
-                Balance
-              </button>
-            </div>
-          </header>
+          <AdminPageHeader
+            eyebrow="Game Design"
+            title="Enemies & Balance"
+            description="One reusable enemy library, boss phases, and a quick balance overview."
+            actions={
+              <div style={tabsStyle}>
+                <button
+                  type="button"
+                  onClick={() => setTab("library")}
+                  style={{ ...tabStyle, ...(tab === "library" ? tabActiveStyle : {}) }}
+                >
+                  Library
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTab("balance")}
+                  style={{ ...tabStyle, ...(tab === "balance" ? tabActiveStyle : {}) }}
+                >
+                  Balance
+                </button>
+              </div>
+            }
+          />
 
           {tab === "library" ? (
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-[290px_minmax(0,1fr)]">
@@ -399,9 +423,7 @@ export default function ManageEnemies() {
                 <div style={{ marginBottom: 10 }}>
                   <StyledSelect
                     value={typeFilter}
-                    onChange={(event) =>
-                      setTypeFilter(event.target.value as typeof typeFilter)
-                    }
+                    onChange={(event) => setTypeFilter(event.target.value as typeof typeFilter)}
                     aria-label="Filter by type"
                   >
                     <option value="all">All types</option>
@@ -576,14 +598,10 @@ export default function ManageEnemies() {
                           setDraft((current) => ({ ...current, phaseThresholds: value }))
                         }
                         moves={draft.moves}
-                        onMovesChange={(moves) =>
-                          setDraft((current) => ({ ...current, moves }))
-                        }
+                        onMovesChange={(moves) => setDraft((current) => ({ ...current, moves }))}
                         spawns={draft.spawns}
                         spawnLibrary={enemyLibrary.filter((enemy) => enemy.id !== selectedId)}
-                        onSpawnsChange={(spawns) =>
-                          setDraft((current) => ({ ...current, spawns }))
-                        }
+                        onSpawnsChange={(spawns) => setDraft((current) => ({ ...current, spawns }))}
                         goldReward={draft.goldReward}
                         onGoldRewardChange={(goldReward) =>
                           setDraft((current) => ({ ...current, goldReward }))
@@ -707,9 +725,7 @@ export default function ManageEnemies() {
                             <BalanceCell
                               value={enemy.strength}
                               ariaLabel={`${enemy.name} strength`}
-                              onSave={(strength) =>
-                                void handleInlineUpdate(enemy, { strength })
-                              }
+                              onSave={(strength) => void handleInlineUpdate(enemy, { strength })}
                             />
                           </td>
                           <td style={tdStyle}>
@@ -723,18 +739,14 @@ export default function ManageEnemies() {
                             <BalanceCell
                               value={enemy.defense}
                               ariaLabel={`${enemy.name} defense`}
-                              onSave={(defense) =>
-                                void handleInlineUpdate(enemy, { defense })
-                              }
+                              onSave={(defense) => void handleInlineUpdate(enemy, { defense })}
                             />
                           </td>
                           <td style={tdStyle}>
                             <BalanceCell
                               value={enemy.exp_gain}
                               ariaLabel={`${enemy.name} exp`}
-                              onSave={(exp_gain) =>
-                                void handleInlineUpdate(enemy, { exp_gain })
-                              }
+                              onSave={(exp_gain) => void handleInlineUpdate(enemy, { exp_gain })}
                             />
                           </td>
                           <td style={tdStyle}>{enemyEstimate.effectiveHealth}</td>
@@ -766,32 +778,6 @@ const pageStyle: CSSProperties = {
   fontFamily: fonts.body,
 };
 const pageInnerStyle: CSSProperties = { maxWidth: 1250, margin: "0 auto" };
-const headerStyle: CSSProperties = {
-  display: "flex",
-  alignItems: "flex-end",
-  justifyContent: "space-between",
-  gap: 16,
-  flexWrap: "wrap",
-  marginBottom: 24,
-};
-const eyebrowStyle: CSSProperties = {
-  fontSize: 11,
-  fontWeight: 700,
-  letterSpacing: "0.14em",
-  textTransform: "uppercase",
-  color: colors.goldMuted,
-  fontFamily: fonts.display,
-  marginBottom: 6,
-};
-const titleStyle: CSSProperties = {
-  margin: 0,
-  fontSize: 30,
-  fontWeight: 700,
-  color: colors.text,
-  fontFamily: fonts.display,
-  letterSpacing: "0.04em",
-};
-const subtitleStyle: CSSProperties = { margin: "6px 0 0", fontSize: 14, color: colors.muted };
 const tabsStyle: CSSProperties = {
   display: "flex",
   gap: 4,

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { colors, fonts } from "@/theme";
 import { resolveItemImage } from "@/lib/itemImages";
 import {
@@ -23,20 +24,14 @@ import type { DbItem } from "@/queries/RoomQueries";
 import type { EquipmentSlot } from "@/types/Item";
 import { Toast } from "./create-room/Toast";
 import { FieldGroup, StyledInput, StyledSelect } from "./create-room/primitives";
+import { AdminPageHeader } from "@/components/Admin/ui/AdminPrimitives";
 import type { CSSProperties } from "react";
 
 type ToastState = { type: "success" | "error"; message: string } | null;
 type Tab = "items" | "stock";
 type ItemType = "consumable" | "equipment";
 
-const SLOT_OPTIONS: EquipmentSlot[] = [
-  "weapon",
-  "armor",
-  "helmet",
-  "shield",
-  "accessory",
-  "boots",
-];
+const SLOT_OPTIONS: EquipmentSlot[] = ["weapon", "armor", "helmet", "shield", "accessory", "boots"];
 
 interface ItemDraft {
   id: string;
@@ -121,9 +116,7 @@ function ItemPreview({ draft }: { draft: ItemDraft }) {
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={previewNameStyle}>{draft.name.trim() || "Unnamed item"}</div>
-          {draft.effect.trim() && (
-            <div style={previewDescriptionStyle}>{draft.effect.trim()}</div>
-          )}
+          {draft.effect.trim() && <div style={previewDescriptionStyle}>{draft.effect.trim()}</div>}
           <div style={previewMetaStyle}>
             <span style={previewTypeStyle}>{draft.type}</span>
             <span style={previewPriceStyle}>{draft.value || 0} GP</span>
@@ -181,7 +174,8 @@ export default function ManageItems() {
   const [tab, setTab] = useState<Tab>("items");
   const [items, setItems] = useState<DbItem[]>([]);
   const [merchants, setMerchants] = useState<{ id: number; name: string }[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [selectedId, setSelectedId] = useState<string | null>(() => searchParams.get("item"));
   const [draft, setDraft] = useState<ItemDraft>(emptyDraft);
   const [isNew, setIsNew] = useState(false);
   const [query, setQuery] = useState("");
@@ -208,15 +202,14 @@ export default function ManageItems() {
     void (async () => {
       setIsLoading(true);
       try {
-        const [itemRows, merchantRows] = await Promise.all([
-          getAllItems(),
-          getMerchantNpcs(),
-        ]);
+        const [itemRows, merchantRows] = await Promise.all([getAllItems(), getMerchantNpcs()]);
         if (cancelled) return;
         setItems(itemRows);
         setMerchants(merchantRows);
-        setSelectedId(itemRows[0]?.id ?? null);
-        if (itemRows[0]) setDraft(draftFromItem(itemRows[0]));
+        const requestedId = searchParams.get("item");
+        const initialItem = itemRows.find((item) => item.id === requestedId) ?? itemRows[0] ?? null;
+        setSelectedId(initialItem?.id ?? null);
+        if (initialItem) setDraft(draftFromItem(initialItem));
       } catch (err) {
         if (!cancelled) showToast("error", errorMessage(err));
       } finally {
@@ -227,21 +220,30 @@ export default function ManageItems() {
     return () => {
       cancelled = true;
     };
+    // Selection is seeded from the URL once; later changes sync through the effect below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const current = searchParams.get("item");
+    if (selectedId === current) return;
+
+    const next = new URLSearchParams(searchParams);
+    if (selectedId) next.set("item", selectedId);
+    else next.delete("item");
+    setSearchParams(next, { replace: true });
+  }, [selectedId, searchParams, setSearchParams]);
 
   const filteredItems = useMemo(() => {
     const needle = query.trim().toLowerCase();
     if (!needle) return items;
     return items.filter(
       (item) =>
-        item.name.toLowerCase().includes(needle) ||
-        item.type.toLowerCase().includes(needle),
+        item.name.toLowerCase().includes(needle) || item.type.toLowerCase().includes(needle),
     );
   }, [items, query]);
 
-  const stockItemIds = useMemo(() => new Set(stock.map((entry) => entry.stock.item_id)), [
-    stock,
-  ]);
+  const stockItemIds = useMemo(() => new Set(stock.map((entry) => entry.stock.item_id)), [stock]);
   const availableStockItems = items.filter((item) => !stockItemIds.has(item.id));
 
   const shopOptions = useMemo(
@@ -366,7 +368,10 @@ export default function ManageItems() {
     try {
       const count = await seedMissingDefaultItems();
       await refreshItems();
-      showToast("success", count === 0 ? "All built-in items already exist." : `Seeded ${count} items.`);
+      showToast(
+        "success",
+        count === 0 ? "All built-in items already exist." : `Seeded ${count} items.`,
+      );
     } catch (err) {
       showToast("error", errorMessage(err));
     } finally {
@@ -407,9 +412,7 @@ export default function ManageItems() {
       await updateShopStockQuantity(entry.stock.id, quantity);
       setStock((current) =>
         current.map((row) =>
-          row.stock.id === entry.stock.id
-            ? { ...row, stock: { ...row.stock, quantity } }
-            : row,
+          row.stock.id === entry.stock.id ? { ...row, stock: { ...row.stock, quantity } } : row,
         ),
       );
     } catch (err) {
@@ -430,31 +433,29 @@ export default function ManageItems() {
     <>
       <main style={pageStyle}>
         <div style={pageInnerStyle}>
-          <header style={headerStyle}>
-            <div>
-              <div style={eyebrowStyle}>Game Design</div>
-              <h1 style={titleStyle}>Items &amp; Shops</h1>
-              <p style={subtitleStyle}>
-                Create items and control what each shop sells, including limited stock.
-              </p>
-            </div>
-            <div style={tabsStyle}>
-              <button
-                type="button"
-                onClick={() => setTab("items")}
-                style={{ ...tabStyle, ...(tab === "items" ? tabActiveStyle : {}) }}
-              >
-                Items
-              </button>
-              <button
-                type="button"
-                onClick={() => setTab("stock")}
-                style={{ ...tabStyle, ...(tab === "stock" ? tabActiveStyle : {}) }}
-              >
-                Shop stock
-              </button>
-            </div>
-          </header>
+          <AdminPageHeader
+            eyebrow="Game Design"
+            title="Items & Shops"
+            description="Create items and control what each shop sells, including limited stock."
+            actions={
+              <div style={tabsStyle}>
+                <button
+                  type="button"
+                  onClick={() => setTab("items")}
+                  style={{ ...tabStyle, ...(tab === "items" ? tabActiveStyle : {}) }}
+                >
+                  Items
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTab("stock")}
+                  style={{ ...tabStyle, ...(tab === "stock" ? tabActiveStyle : {}) }}
+                >
+                  Shop stock
+                </button>
+              </div>
+            }
+          />
 
           {tab === "items" ? (
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-[300px_minmax(0,1fr)]">
@@ -479,7 +480,11 @@ export default function ManageItems() {
                     <div style={emptyTextStyle}>
                       No items yet.
                       <br />
-                      <button type="button" onClick={() => void handleSeedItems()} style={linkButtonStyle}>
+                      <button
+                        type="button"
+                        onClick={() => void handleSeedItems()}
+                        style={linkButtonStyle}
+                      >
                         Seed built-in items
                       </button>
                     </div>
@@ -526,9 +531,7 @@ export default function ManageItems() {
               <section style={panelStyle}>
                 <div style={panelHeaderStyle}>
                   <div style={panelHeadingStyle}>{isNew ? "New item" : "Edit item"}</div>
-                  {draft.img && (
-                    <span style={imageKeyStyle}>{draft.img}</span>
-                  )}
+                  {draft.img && <span style={imageKeyStyle}>{draft.img}</span>}
                 </div>
 
                 {!isNew && !selectedId ? (
@@ -758,8 +761,8 @@ export default function ManageItems() {
                     <strong style={{ color: colors.gold }}>Shop stock table not found.</strong>
                     <p style={{ margin: "8px 0 0" }}>
                       Run <code>supabase/migrations/003_items_shop.sql</code> in the Supabase SQL
-                      editor, then reload this page. The in-game shop falls back to the item
-                      library until then.
+                      editor, then reload this page. The in-game shop falls back to the item library
+                      until then.
                     </p>
                   </div>
                 ) : isLoadingStock ? (
@@ -767,9 +770,7 @@ export default function ManageItems() {
                 ) : stockError ? (
                   <div style={infoBoxStyle}>{stockError}</div>
                 ) : stock.length === 0 ? (
-                  <div style={emptyTextStyle}>
-                    Nothing in this shop yet. Add an item below.
-                  </div>
+                  <div style={emptyTextStyle}>Nothing in this shop yet. Add an item below.</div>
                 ) : (
                   <div style={stockListStyle}>
                     {stock.map((entry) => (
@@ -879,32 +880,6 @@ const pageStyle: CSSProperties = {
   fontFamily: fonts.body,
 };
 const pageInnerStyle: CSSProperties = { maxWidth: 1200, margin: "0 auto" };
-const headerStyle: CSSProperties = {
-  display: "flex",
-  alignItems: "flex-end",
-  justifyContent: "space-between",
-  gap: 16,
-  flexWrap: "wrap",
-  marginBottom: 24,
-};
-const eyebrowStyle: CSSProperties = {
-  fontSize: 11,
-  fontWeight: 700,
-  letterSpacing: "0.14em",
-  textTransform: "uppercase",
-  color: colors.goldMuted,
-  fontFamily: fonts.display,
-  marginBottom: 6,
-};
-const titleStyle: CSSProperties = {
-  margin: 0,
-  fontSize: 30,
-  fontWeight: 700,
-  color: colors.text,
-  fontFamily: fonts.display,
-  letterSpacing: "0.04em",
-};
-const subtitleStyle: CSSProperties = { margin: "6px 0 0", fontSize: 14, color: colors.muted };
 const tabsStyle: CSSProperties = {
   display: "flex",
   gap: 4,

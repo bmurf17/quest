@@ -34,6 +34,38 @@ export type PartySlice = Pick<
   | "retryFromGameOver"
 >;
 
+/**
+ * Shared sanctuary/town arrival: opens the tavern and marks the current
+ * section complete the first time the party returns from it.
+ */
+function sanctuaryUpdates(state: GameState, arrivalMessage: string): Partial<GameState> {
+  const updates: Partial<GameState> = {
+    gameStatus: GameStatus.InTown,
+    isTavernOpen: true,
+    hasRecruitedFromTavern: false,
+    tavernCandidates: generateTavernCandidates(state.tavernConfig),
+  };
+
+  if (state.currentSection !== null && !state.beatenSections.includes(state.currentSection)) {
+    const sectionName =
+      state.availableSections.find((s) => s.id === state.currentSection)?.name ?? "the area";
+    updates.beatenSections = [...state.beatenSections, state.currentSection];
+    updates.activityLog = [
+      ...state.activityLog,
+      `${arrivalMessage} ${sectionName} has been completed!`,
+      "You spot some new faces at the tavern...",
+    ];
+  } else {
+    updates.activityLog = [
+      ...state.activityLog,
+      arrivalMessage,
+      "You spot some new faces at the tavern...",
+    ];
+  }
+
+  return updates;
+}
+
 export const createPartySlice: GameSlice<PartySlice> = (set, get) => ({
   party: [],
   isLevelingUp: false,
@@ -138,49 +170,10 @@ export const createPartySlice: GameSlice<PartySlice> = (set, get) => ({
 
   setTavernConfig: (config: TavernConfig) => set({ tavernConfig: config }),
 
-  enterTown: () => {
-    set((state) => {
-      const candidates = generateTavernCandidates(state.tavernConfig);
-      const updates: Partial<GameState> = {
-        gameStatus: GameStatus.InTown,
-        isTavernOpen: true,
-        hasRecruitedFromTavern: false,
-        tavernCandidates: candidates,
-      };
+  enterTown: () => set((state) => sanctuaryUpdates(state, "You return to town.")),
 
-      if (state.currentSection !== null && !state.beatenSections.includes(state.currentSection)) {
-        const sectionName =
-          state.availableSections.find((s) => s.id === state.currentSection)?.name ?? "the area";
-        updates.beatenSections = [...state.beatenSections, state.currentSection];
-        updates.activityLog = [
-          ...state.activityLog,
-          `You return to town. ${sectionName} has been completed!`,
-          "You spot some new faces at the tavern...",
-        ];
-      } else {
-        updates.activityLog = [
-          ...state.activityLog,
-          "You return to town.",
-          "You spot some new faces at the tavern...",
-        ];
-      }
-
-      return updates;
-    });
-  },
-
-  /**
-   * Retreats to the sanctuary through a transition without completing the
-   * current section, so the player can return to the same dungeon afterwards.
-   */
-  returnToSanctuary: () =>
-    set((state) => ({
-      gameStatus: GameStatus.InTown,
-      isTavernOpen: true,
-      hasRecruitedFromTavern: false,
-      tavernCandidates: generateTavernCandidates(state.tavernConfig),
-      activityLog: [...state.activityLog, "You return to the sanctuary."],
-    })),
+  /** Returns through a sanctuary transition and completes the current section. */
+  returnToSanctuary: () => set((state) => sanctuaryUpdates(state, "You return to the sanctuary.")),
 
   exitTown: () => set({ gameStatus: GameStatus.Exploring }),
 

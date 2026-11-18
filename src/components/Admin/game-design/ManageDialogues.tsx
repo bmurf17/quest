@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { MutableRefObject } from "react";
+import { useSearchParams } from "react-router-dom";
 import { colors, fonts } from "@/theme";
 import { Toast } from "./create-room/Toast";
 import { DialogueNodeEditor } from "./dialogue-editor/DialogueNodeEditor";
 import { buildFlow } from "./dialogue-editor/buildFlow";
 import { dialogueNodeLabel } from "./dialogue-editor/nodeLabels";
+import { AdminPageHeader } from "@/components/Admin/ui/AdminPrimitives";
 import {
   createDialogueChoice,
   createDialogueNode,
@@ -33,8 +35,13 @@ const errorMessage = (err: unknown) =>
   err instanceof Error ? err.message : "Something went wrong.";
 
 export default function ManageDialogues() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [npcs, setNpcs] = useState<AdminNpcSummary[]>([]);
-  const [selectedNpcId, setSelectedNpcId] = useState<number | null>(null);
+  const [selectedNpcId, setSelectedNpcId] = useState<number | null>(() => {
+    const raw = searchParams.get("npc");
+    const id = Number(raw);
+    return raw && Number.isFinite(id) && id > 0 ? id : null;
+  });
   const [graph, setGraph] = useState<AdminDialogueGraph | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -60,7 +67,9 @@ export default function ManageDialogues() {
         const data = await getAdminNpcSummaries();
         if (cancelled) return;
         setNpcs(data);
-        setSelectedNpcId((current) => current ?? data[0]?.id ?? null);
+        setSelectedNpcId((current) =>
+          data.some((npc) => npc.id === current) ? current : (data[0]?.id ?? null),
+        );
       } catch (err) {
         if (!cancelled) showToast("error", errorMessage(err));
       } finally {
@@ -73,6 +82,16 @@ export default function ManageDialogues() {
     };
     // Load the NPC index once; selection changes are handled by the effect below.
   }, []);
+
+  useEffect(() => {
+    const current = searchParams.get("npc");
+    if ((selectedNpcId === null && current === null) || current === String(selectedNpcId)) return;
+
+    const next = new URLSearchParams(searchParams);
+    if (selectedNpcId !== null) next.set("npc", String(selectedNpcId));
+    else next.delete("npc");
+    setSearchParams(next, { replace: true });
+  }, [selectedNpcId, searchParams, setSearchParams]);
 
   useEffect(() => {
     if (selectedNpcId === null) {
@@ -101,12 +120,12 @@ export default function ManageDialogues() {
     };
   }, [selectedNpcId]);
 
-  const filteredNpcs = useMemo(() => {    const needle = query.trim().toLowerCase();
+  const filteredNpcs = useMemo(() => {
+    const needle = query.trim().toLowerCase();
     if (!needle) return npcs;
     return npcs.filter(
       (npc) =>
-        npc.name.toLowerCase().includes(needle) ||
-        npc.npc_type.toLowerCase().includes(needle),
+        npc.name.toLowerCase().includes(needle) || npc.npc_type.toLowerCase().includes(needle),
     );
   }, [npcs, query]);
 
@@ -232,9 +251,7 @@ export default function ManageDialogues() {
     if (values.is_endpoint !== undefined) {
       const { is_endpoint, ...textValues } = values;
       if (Object.keys(textValues).length > 0) {
-        queueSave(pendingNodes, nodeId, textValues, (merged) =>
-          updateDialogueNode(nodeId, merged),
-        );
+        queueSave(pendingNodes, nodeId, textValues, (merged) => updateDialogueNode(nodeId, merged));
       }
       void updateDialogueNode(nodeId, { is_endpoint }).catch((err) => {
         showToast("error", errorMessage(err));
@@ -295,9 +312,7 @@ export default function ManageDialogues() {
       };
     });
 
-    queueSave(pendingOutcomes, choiceId, outcome, (merged) =>
-      setChoiceOutcome(choiceId, merged),
-    );
+    queueSave(pendingOutcomes, choiceId, outcome, (merged) => setChoiceOutcome(choiceId, merged));
   }
 
   async function handleCreateTree() {
@@ -408,33 +423,30 @@ export default function ManageDialogues() {
     <>
       <main style={pageStyle}>
         <div style={pageInnerStyle}>
-          <header style={headerStyle}>
-            <div>
-              <div style={eyebrowStyle}>Game Design</div>
-              <h1 style={titleStyle}>Dialogues</h1>
-              <p style={subtitleStyle}>
-                Build branching conversations, link choices to nodes, and attach outcomes.
-              </p>
-            </div>
-            {saveLabel && (
-              <div
-                role="status"
-                style={{
-                  ...saveBadgeStyle,
-                  color:
-                    saveState === "error"
-                      ? "#FCA5A5"
-                      : saveState === "saved"
-                        ? "#6EE7B7"
-                        : colors.textMuted,
-                  borderColor:
-                    saveState === "error" ? "rgba(220,38,38,0.35)" : colors.goldBorder,
-                }}
-              >
-                {saveLabel}
-              </div>
-            )}
-          </header>
+          <AdminPageHeader
+            eyebrow="Game Design"
+            title="Dialogues"
+            description="Build branching conversations, link choices to nodes, and attach outcomes."
+            actions={
+              saveLabel ? (
+                <div
+                  role="status"
+                  style={{
+                    ...saveBadgeStyle,
+                    color:
+                      saveState === "error"
+                        ? "#FCA5A5"
+                        : saveState === "saved"
+                          ? "#6EE7B7"
+                          : colors.textMuted,
+                    borderColor: saveState === "error" ? "rgba(220,38,38,0.35)" : colors.goldBorder,
+                  }}
+                >
+                  {saveLabel}
+                </div>
+              ) : undefined
+            }
+          />
 
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-[230px_290px_minmax(0,1fr)]">
             <section style={panelStyle}>
@@ -625,32 +637,6 @@ const pageStyle: CSSProperties = {
   fontFamily: fonts.body,
 };
 const pageInnerStyle: CSSProperties = { maxWidth: 1300, margin: "0 auto" };
-const headerStyle: CSSProperties = {
-  display: "flex",
-  alignItems: "flex-end",
-  justifyContent: "space-between",
-  gap: 16,
-  flexWrap: "wrap",
-  marginBottom: 24,
-};
-const eyebrowStyle: CSSProperties = {
-  fontSize: 11,
-  fontWeight: 700,
-  letterSpacing: "0.14em",
-  textTransform: "uppercase",
-  color: colors.goldMuted,
-  fontFamily: fonts.display,
-  marginBottom: 6,
-};
-const titleStyle: CSSProperties = {
-  margin: 0,
-  fontSize: 30,
-  fontWeight: 700,
-  color: colors.text,
-  fontFamily: fonts.display,
-  letterSpacing: "0.04em",
-};
-const subtitleStyle: CSSProperties = { margin: "6px 0 0", fontSize: 14, color: colors.muted };
 const saveBadgeStyle: CSSProperties = {
   padding: "4px 10px",
   border: `1px solid ${colors.goldBorder}`,

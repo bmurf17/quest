@@ -110,3 +110,75 @@ Note: `006_enemy_rewards.sql` is applied to the live project, so `gold_reward` a
 - [x] Admin remains local/solo (no auth for now, per owner)
 
 Notes: snapshots live in browser localStorage (last 8, 4 MB each). Downloads are the durable copy. Restore clears then reinserts the tables present in the backup, parents first, and requires typing `RESTORE`. Apply `supabase/migrations/004_backup_sequences.sql` so identity sequences are reset after a restore; it auto-discovers every serial `id` table, including `shop_stock`. Without it restore still works but new rows may collide with restored ids.
+
+## Admin overhaul v2 — map-first editing, search, and image libraries
+
+Agreed with the design owner. Nothing here is shipped yet. The map becomes the primary room editor, the admin nav collapses to one rail, and enemies/dialogues gain the image-first treatment items already have.
+
+### Phase 1 — Admin shell and global search
+
+- [x] Slim icon rail (with tooltips) replacing the full-width admin sidebar
+- [x] Admin top bar with breadcrumbs and a global search trigger
+- [x] `Cmd/Ctrl+K` search palette across rooms, items, enemies, and NPCs, with lazy loading and caching
+- [x] URL-driven selection (`?room=`, `?item=`, `?enemy=`, `?npc=`) so search, map links, and browser back work
+- [x] Replace the Overview card grid with a dashboard: counts, warnings, recent content, and shortcuts
+- [x] Shared `AdminPageHeader` and layout primitives to stop hand-rolled duplicated inline styles
+
+The admin shell now uses a 64px icon rail with hover tooltips, a breadcrumb/search top bar, and a dark command palette that lazy-loads content the first time it opens. Rooms, items, enemies, and NPCs all accept a URL selection parameter, and the Overview page reports counts, structural warnings, recently added rooms, and workspace shortcuts.
+
+### Phase 2 — Realm Map as room cockpit
+
+#### Data foundation
+
+- [ ] Migration `008_room_map_and_start_rooms.sql`: `rooms.map_x`, `rooms.map_y`, `sections.start_room_id`
+- [ ] Backfill each section's start room from its current lowest-id room
+- [ ] Carry the new fields through `Room`/`Section` types and `getAllRooms`/`getSections`
+- [ ] `updateRoomPosition`, `setSectionStartRoom`, and `createRoomWithExits` query helpers
+- [ ] Wire `startSection` in the runtime to `section.startRoomId` (falling back to the first room)
+
+#### Map rendering
+
+- [ ] Replace recursive render-by-name with a flat graph builder and deduped edges keyed by room id
+- [ ] Compass auto-layout per section start, with saved `map_x`/`map_y` drag overrides
+- [ ] Show disconnected/unreachable rooms in an "Unplaced" lane instead of hiding them
+- [ ] One SVG edge per connection, direction labels preserved, curves for loops
+- [ ] Pan vs drag distinction, zoom controls, and wheel zoom
+- [ ] Room/section selection in the URL; map "Edit Room" selects the node instead of navigating away
+
+#### Inspector drawer
+
+- [ ] Right-side inspector (full-screen sheet on mobile) with Basics, Contents, Exits, and Danger tabs
+- [ ] Basics: name, section, "Make section start", diagnostics warnings
+- [ ] Contents: reuse the room enemies/interaction editor
+- [ ] Exits: list/remove doorways, add existing doorway, add a new room in an empty N/S/E/W slot
+- [ ] Danger: delete room
+- [ ] Extract `RoomInspector` so the map drawer and Rooms page share one editor
+- [ ] Fold section create/rename/delete into a map dialog; keep the Sections page as secondary
+- [ ] Keep `/rooms` as an alternate list view and `/rooms/new` as a fallback create flow
+
+### Phase 3 — Image-first enemies and dialogues
+
+- [ ] Generate `src/data/imageAssets.ts` from `public/images/**` and `src/assets/**` (`predev`/`prebuild` script)
+- [ ] Shared `AdminImageField` + preview: searchable picker, category tabs, manual path/URL fallback
+- [ ] Generalize `resolveItemImage` into `resolveEntityImage(img, category)`
+- [ ] Enemy library rows show sprite thumbnails (placeholder when empty)
+- [ ] Enemy editor uses the shared image field and preview card
+- [ ] Enemy portraits in the Realm Map inspector/popup
+- [ ] NPC list rows show portraits; dialogue editor gains an NPC details block with image editing
+- [ ] Persist NPC images from the room interaction editor and quick dialogue builder
+
+### Phase 4 — Polish and verification
+
+- [ ] Consistent save/toast behavior and unsaved-change guard in the map inspector
+- [ ] Surface duplicate-name, isolated-room, one-way-exit, and missing-start-room warnings on map nodes
+- [ ] Unit tests: layout cycles/islands/overrides, per-section start rooms, image resolver, position/start-room queries
+- [ ] `pnpm typecheck`, `pnpm lint`, `pnpm test:run`
+- [ ] Update the Admin overhaul progress section as Phase 1 items ship
+
+### Decisions
+
+- Dragging a room auto-saves its position on drop, with a "Reset layout" action in the map header.
+- The section start room drives actual exploration, not just the map.
+- Rooms page remains available as an alternate view; the map is the primary editor.
+- No freeform placement for every room: auto-layout with drag overrides.
+- No Supabase Storage uploads yet: asset picker plus path/URL fallback.
