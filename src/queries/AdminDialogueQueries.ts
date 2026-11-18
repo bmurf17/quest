@@ -17,6 +17,13 @@ export interface AdminNpcSummary extends AdminNpc {
   dialogueTreeName: string | null;
 }
 
+export type AdminNpcWrite = Partial<{
+  name: string;
+  npc_type: string;
+  discovery_message: string | null;
+  img: string;
+}>;
+
 export interface AdminDialogueTree {
   id: string;
   npc_id: number | null;
@@ -85,6 +92,13 @@ export async function getAdminNpcSummaries(): Promise<AdminNpcSummary[]> {
     dialogueTreeId: treeByNpc.get(npc.id)?.id ?? null,
     dialogueTreeName: treeByNpc.get(npc.id)?.name ?? null,
   }));
+}
+
+/** Update the NPC row itself: name, type, discovery message, portrait, etc. */
+export async function updateAdminNpc(npcId: number, values: AdminNpcWrite): Promise<void> {
+  if (Object.keys(values).length === 0) return;
+  const { error } = await supabase.from("npcs").update(values).eq("id", npcId);
+  if (error) throw error;
 }
 
 export async function getDialogueGraph(npcId: number): Promise<AdminDialogueGraph | null> {

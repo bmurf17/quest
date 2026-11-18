@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { AlertTriangle, Compass, Trash2 } from "lucide-react";
+import { AlertTriangle, Compass, ImageIcon, Trash2 } from "lucide-react";
 import { colors, fonts } from "@/theme";
 import {
   createRoomWithExits,
@@ -11,6 +11,7 @@ import {
 } from "@/queries/AdminQueries";
 import { DIRECTION_OPTIONS, oppositeDirection } from "@/lib/directions";
 import { resolveStartRoom } from "@/lib/roomLayout";
+import { resolveEntityImage } from "@/lib/entityImages";
 import { Directions } from "@/types/Directions";
 import { RoomContents } from "./RoomContents";
 import { FieldGroup, StyledInput, StyledSelect } from "./create-room/primitives";
@@ -399,6 +400,39 @@ export function RoomInspector({
               <Summary label="Interaction" value={room.interaction?.type ?? "None"} />
               <Summary label="Exits" value={String(room.neighboringRooms.length)} />
             </div>
+
+            {room.enemies.length > 0 && (
+              <div style={rosterStyle}>
+                <div style={rosterHeadingStyle}>Enemy roster</div>
+                <div style={rosterGridStyle}>
+                  {room.enemies.map((enemy) => (
+                    <div
+                      key={enemy.id}
+                      style={rosterItemStyle}
+                      title={`${enemy.name} · ${enemy.health} HP`}
+                    >
+                      <div style={rosterArtStyle}>
+                        {enemy.img ? (
+                          <img
+                            src={resolveEntityImage(enemy.img, "enemies")}
+                            alt=""
+                            style={rosterImgStyle}
+                          />
+                        ) : (
+                          <ImageIcon size={18} style={{ color: "#6B7280" }} />
+                        )}
+                      </div>
+                      <div style={rosterTextStyle}>
+                        <span style={rosterNameStyle}>{enemy.name}</span>
+                        <span style={rosterMetaStyle}>
+                          {enemy.health} HP · {enemy.type ?? "enemy"}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </>
         )}
 
@@ -768,6 +802,67 @@ const summaryLabelStyle: CSSProperties = {
   fontFamily: fonts.display,
   letterSpacing: "0.08em",
   textTransform: "uppercase",
+};
+const rosterStyle: CSSProperties = {
+  marginTop: 18,
+  paddingTop: 16,
+  borderTop: `1px solid ${colors.subtleBorder}`,
+};
+const rosterHeadingStyle: CSSProperties = {
+  marginBottom: 10,
+  fontSize: 10,
+  fontWeight: 700,
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+  color: colors.goldMuted,
+  fontFamily: fonts.display,
+};
+const rosterGridStyle: CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 6,
+};
+const rosterItemStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 9,
+  padding: "6px 8px",
+  background: "rgba(0,0,0,0.2)",
+  border: `1px solid ${colors.subtleBorder}`,
+  borderRadius: 6,
+};
+const rosterArtStyle: CSSProperties = {
+  flexShrink: 0,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: 38,
+  height: 38,
+  background: "rgba(0,0,0,0.35)",
+  border: `1px solid ${colors.subtleBorder}`,
+  borderRadius: 5,
+  overflow: "hidden",
+};
+const rosterImgStyle: CSSProperties = {
+  width: 34,
+  height: 34,
+  objectFit: "contain",
+  imageRendering: "pixelated",
+};
+const rosterTextStyle: CSSProperties = { display: "flex", flexDirection: "column", minWidth: 0 };
+const rosterNameStyle: CSSProperties = {
+  fontSize: 12,
+  color: colors.text,
+  fontFamily: fonts.display,
+  letterSpacing: "0.02em",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
+};
+const rosterMetaStyle: CSSProperties = {
+  fontSize: 9,
+  color: "#6B7280",
+  textTransform: "capitalize",
 };
 const helperStyle: CSSProperties = {
   margin: "0 0 14px",

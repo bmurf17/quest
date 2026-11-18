@@ -35,6 +35,8 @@ export function CreateRoomForm({ form }: { form: CreateRoomFormState }) {
     existingNpcs,
     selectedNpcId,
     setSelectedNpcId,
+    npcImg,
+    setNpcImg,
     quickLines,
     addQuickLine,
     removeQuickLine,
@@ -219,6 +221,8 @@ export function CreateRoomForm({ form }: { form: CreateRoomFormState }) {
                 existingNpcs={existingNpcs}
                 selectedNpcId={selectedNpcId}
                 onSelectNpc={setSelectedNpcId}
+                npcImg={npcImg}
+                onNpcImgChange={setNpcImg}
                 quickLines={quickLines}
                 onAddLine={addQuickLine}
                 onRemoveLine={removeQuickLine}

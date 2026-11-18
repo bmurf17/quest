@@ -1,6 +1,7 @@
 import { colors, fonts } from "@/theme";
 import { DialogueOutcomeType } from "@/types/RoomInteractions";
 import { FieldGroup, Label, StyledInput, StyledSelect } from "./primitives";
+import { AdminImageField } from "@/components/Admin/ui/AdminImageField";
 import type {
   ExistingNpcOption,
   NpcSource,
@@ -23,6 +24,8 @@ export function NPCForm({
   existingNpcs,
   selectedNpcId,
   onSelectNpc,
+  npcImg,
+  onNpcImgChange,
   quickLines,
   onAddLine,
   onRemoveLine,
@@ -36,6 +39,8 @@ export function NPCForm({
   existingNpcs: ExistingNpcOption[];
   selectedNpcId: number | null;
   onSelectNpc: (npcId: number | null) => void;
+  npcImg: string;
+  onNpcImgChange: (img: string) => void;
   quickLines: QuickDialogueLineEntry[];
   onAddLine: () => void;
   onRemoveLine: (lineKey: number) => void;
@@ -129,6 +134,15 @@ export function NPCForm({
               placeholder="Shown when player enters room…"
             />
           </FieldGroup>
+          <AdminImageField
+            id="npcImg"
+            label="Portrait"
+            category="npc"
+            value={npcImg}
+            placeholder="/images/characters/npc/Quest-Giver-1.png"
+            hint="Optional. Pick a portrait or paste a path/URL."
+            onChange={onNpcImgChange}
+          />
 
           <div style={builderHeaderStyle}>
             <div>

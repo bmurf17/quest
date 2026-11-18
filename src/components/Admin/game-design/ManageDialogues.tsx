@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { MutableRefObject } from "react";
 import { useSearchParams } from "react-router-dom";
+import { ImageIcon } from "lucide-react";
 import { colors, fonts } from "@/theme";
+import { resolveEntityImage } from "@/lib/entityImages";
 import { Toast } from "./create-room/Toast";
 import { DialogueNodeEditor } from "./dialogue-editor/DialogueNodeEditor";
 import { buildFlow } from "./dialogue-editor/buildFlow";
 import { dialogueNodeLabel } from "./dialogue-editor/nodeLabels";
 import { AdminPageHeader } from "@/components/Admin/ui/AdminPrimitives";
+import { AdminImageField } from "@/components/Admin/ui/AdminImageField";
 import {
   createDialogueChoice,
   createDialogueNode,
@@ -19,10 +22,12 @@ import {
   updateDialogueChoice,
   updateDialogueNode,
   updateDialogueTree,
+  updateAdminNpc,
   type AdminDialogueChoice,
   type AdminDialogueGraph,
   type AdminDialogueNode,
   type AdminNpcSummary,
+  type AdminNpcWrite,
   type ChoiceOutcomeInput,
 } from "@/queries/AdminDialogueQueries";
 import { DialogueOutcomeType } from "@/types/RoomInteractions";
@@ -55,6 +60,7 @@ export default function ManageDialogues() {
   const pendingSaveCount = useRef(0);
   const idleResetTimer = useRef<number | null>(null);
   const pendingNodes = useRef(new Map<string, Partial<AdminDialogueNode>>());
+  const pendingNpcEdits = useRef(new Map<string, AdminNpcWrite>());
   const pendingChoices = useRef(new Map<string, Partial<AdminDialogueChoice>>());
   const pendingOutcomes = useRef(new Map<string, ChoiceOutcomeInput>());
 
@@ -231,6 +237,16 @@ export default function ManageDialogues() {
       if (current && next.nodes.some((node) => node.id === current)) return current;
       return next.tree.root_node_id;
     });
+  }
+
+  function handleUpdateNpc(values: AdminNpcWrite) {
+    if (!selectedNpcId) return;
+    setNpcs((current) =>
+      current.map((npc) => (npc.id === selectedNpcId ? { ...npc, ...values } : npc)),
+    );
+    queueSave(pendingNpcEdits, `npc:${selectedNpcId}`, values, (merged) =>
+      updateAdminNpc(selectedNpcId, merged),
+    );
   }
 
   function handleUpdateNode(
@@ -472,10 +488,23 @@ export default function ManageDialogues() {
                       onClick={() => setSelectedNpcId(npc.id)}
                       style={{ ...npcRowStyle, ...(isSelected ? npcRowSelectedStyle : {}) }}
                     >
-                      <span style={npcNameStyle}>{npc.name}</span>
-                      <span style={npcMetaStyle}>
-                        {npc.npc_type}
-                        {npc.dialogueTreeId ? " · tree" : " · no tree"}
+                      <span style={npcThumbStyle}>
+                        {npc.img ? (
+                          <img
+                            src={resolveEntityImage(npc.img, "npc")}
+                            alt=""
+                            style={npcThumbImgStyle}
+                          />
+                        ) : (
+                          <ImageIcon size={14} style={{ color: "#6B7280" }} />
+                        )}
+                      </span>
+                      <span style={{ flex: 1, minWidth: 0 }}>
+                        <span style={npcNameStyle}>{npc.name}</span>
+                        <span style={npcMetaStyle}>
+                          {npc.npc_type}
+                          {npc.dialogueTreeId ? " · tree" : " · no tree"}
+                        </span>
                       </span>
                     </button>
                   );
@@ -585,6 +614,75 @@ export default function ManageDialogues() {
             </section>
 
             <section style={{ minWidth: 0 }}>
+              {selectedNpc && (
+                <div style={npcDetailsStyle}>
+                  <div style={npcDetailsHeaderStyle}>
+                    <div style={npcPortraitStyle}>
+                      {selectedNpc.img ? (
+                        <img
+                          src={resolveEntityImage(selectedNpc.img, "npc")}
+                          alt=""
+                          style={npcPortraitImgStyle}
+                        />
+                      ) : (
+                        <ImageIcon size={28} style={{ color: "#6B7280" }} />
+                      )}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={npcDetailsTitleStyle}>NPC details</div>
+                      <label htmlFor="npc-details-name" style={smallLabelStyle}>
+                        Name
+                      </label>
+                      <input
+                        id="npc-details-name"
+                        value={selectedNpc.name}
+                        onChange={(event) => handleUpdateNpc({ name: event.target.value })}
+                        style={treeNameStyle}
+                      />
+                      <div style={npcDetailsFieldsStyle}>
+                        <div style={{ flex: 1, minWidth: 110 }}>
+                          <label htmlFor="npc-details-type" style={smallLabelStyle}>
+                            Type
+                          </label>
+                          <input
+                            id="npc-details-type"
+                            value={selectedNpc.npc_type}
+                            onChange={(event) => handleUpdateNpc({ npc_type: event.target.value })}
+                            style={treeNameStyle}
+                          />
+                        </div>
+                        <div style={{ flex: 1.4, minWidth: 150 }}>
+                          <label htmlFor="npc-details-discovery" style={smallLabelStyle}>
+                            Discovery message
+                          </label>
+                          <input
+                            id="npc-details-discovery"
+                            value={selectedNpc.discovery_message ?? ""}
+                            placeholder="Shown when the party enters the room"
+                            onChange={(event) =>
+                              handleUpdateNpc({
+                                discovery_message: event.target.value.trim() || null,
+                              })
+                            }
+                            style={treeNameStyle}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <AdminImageField
+                    id={`npc-img-${selectedNpc.id}`}
+                    label="Portrait"
+                    category="npc"
+                    value={selectedNpc.img}
+                    placeholder="/images/characters/npc/Merchant.png"
+                    hint="Shown in the NPC list, room inspector, and conversations."
+                    previewSize={46}
+                    onChange={(img) => handleUpdateNpc({ img })}
+                  />
+                </div>
+              )}
+
               {isLoadingGraph ? (
                 <div style={emptyPanelStyle}>Loading dialogue tree…</div>
               ) : !selectedNpc ? (
@@ -689,9 +787,9 @@ const npcListStyle: CSSProperties = {
 };
 const npcRowStyle: CSSProperties = {
   display: "flex",
-  flexDirection: "column",
-  alignItems: "flex-start",
-  gap: 2,
+  flexDirection: "row",
+  alignItems: "center",
+  gap: 8,
   width: "100%",
   padding: "8px 10px",
   background: "transparent",
@@ -701,17 +799,76 @@ const npcRowStyle: CSSProperties = {
   textAlign: "left",
   font: "inherit",
 };
+const npcThumbStyle: CSSProperties = {
+  flexShrink: 0,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: 32,
+  height: 32,
+  background: "rgba(0,0,0,0.35)",
+  border: `1px solid ${colors.subtleBorder}`,
+  borderRadius: 5,
+  overflow: "hidden",
+};
+const npcThumbImgStyle: CSSProperties = {
+  width: 28,
+  height: 28,
+  objectFit: "contain",
+  imageRendering: "pixelated",
+};
+const npcDetailsStyle: CSSProperties = {
+  padding: 14,
+  marginBottom: 14,
+  background: "rgba(255,255,255,0.025)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 9,
+};
+const npcDetailsHeaderStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "flex-start",
+  gap: 12,
+};
+const npcPortraitStyle: CSSProperties = {
+  flexShrink: 0,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: 68,
+  height: 68,
+  background: "rgba(0,0,0,0.4)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 8,
+  overflow: "hidden",
+};
+const npcPortraitImgStyle: CSSProperties = {
+  width: "100%",
+  height: "100%",
+  objectFit: "contain",
+  imageRendering: "pixelated",
+};
+const npcDetailsTitleStyle: CSSProperties = {
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+  color: colors.gold,
+  fontFamily: fonts.display,
+  marginBottom: 8,
+};
+const npcDetailsFieldsStyle: CSSProperties = { display: "flex", gap: 10, flexWrap: "wrap" };
 const npcRowSelectedStyle: CSSProperties = {
   background: "rgba(212,175,55,0.1)",
   borderColor: colors.goldBorder,
 };
 const npcNameStyle: CSSProperties = {
+  display: "block",
   fontSize: 13,
   color: colors.text,
   fontFamily: fonts.display,
   letterSpacing: "0.02em",
 };
-const npcMetaStyle: CSSProperties = { fontSize: 10, color: "#6B7280" };
+const npcMetaStyle: CSSProperties = { display: "block", fontSize: 10, color: "#6B7280" };
 const smallLabelStyle: CSSProperties = {
   display: "block",
   fontSize: 10,

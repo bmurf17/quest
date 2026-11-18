@@ -8,6 +8,7 @@ import {
   type RoomInteractionWrite,
 } from "@/queries/AdminQueries";
 import { FieldGroup, StyledInput, StyledSelect } from "./create-room/primitives";
+import { AdminImageField } from "@/components/Admin/ui/AdminImageField";
 import type { Room } from "@/types/Room";
 import type { RoomInteraction } from "@/types/RoomInteractions";
 import type { AdminEnemyRow } from "@/queries/AdminEnemyQueries";
@@ -21,6 +22,7 @@ interface InteractionDraft {
   npcName: string;
   npcDialogue: string;
   npcDiscovery: string;
+  npcImg: string;
   chestItemId: string;
   chestQuantity: number;
   chestLocked: boolean;
@@ -43,6 +45,7 @@ const blankDraft = (): InteractionDraft => ({
   npcName: "",
   npcDialogue: "",
   npcDiscovery: "",
+  npcImg: "",
   chestItemId: "",
   chestQuantity: 1,
   chestLocked: false,
@@ -78,6 +81,7 @@ function draftFromInteraction(
         npcName: interaction.npc.name,
         npcDialogue: interaction.npc.dialogue.join("\n"),
         npcDiscovery: interaction.npc.discoveryMessage ?? "",
+        npcImg: interaction.npc.img,
       };
     case "chest":
       return {
@@ -216,6 +220,7 @@ export function RoomContents({ room, onRefresh, showToast }: RoomContentsProps) 
           .map((line) => line.trim())
           .filter(Boolean),
         discoveryMessage: draft.npcDiscovery.trim() || null,
+        img: draft.npcImg.trim(),
       };
     } else if (draft.type === "chest") {
       if (!draft.chestItemId) {
@@ -400,6 +405,15 @@ export function RoomContents({ room, onRefresh, showToast }: RoomContentsProps) 
                   }
                 />
               </FieldGroup>
+              <AdminImageField
+                id="roomNpcImg"
+                label="Portrait"
+                category="npc"
+                value={draft.npcImg}
+                placeholder="/images/characters/npc/Merchant.png"
+                hint="Stored on the NPC and shown when the party meets them."
+                onChange={(npcImg) => setDraft((current) => ({ ...current, npcImg }))}
+              />
             </>
           )}
 

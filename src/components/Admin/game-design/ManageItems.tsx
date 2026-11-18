@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { colors, fonts } from "@/theme";
-import { resolveItemImage } from "@/lib/itemImages";
+import { resolveEntityImage } from "@/lib/entityImages";
 import {
   addShopStock,
   createItem,
@@ -25,6 +25,7 @@ import type { EquipmentSlot } from "@/types/Item";
 import { Toast } from "./create-room/Toast";
 import { FieldGroup, StyledInput, StyledSelect } from "./create-room/primitives";
 import { AdminPageHeader } from "@/components/Admin/ui/AdminPrimitives";
+import { AdminImageField } from "@/components/Admin/ui/AdminImageField";
 import type { CSSProperties } from "react";
 
 type ToastState = { type: "success" | "error"; message: string } | null;
@@ -102,7 +103,7 @@ const numberOrNull = (value: string): number | null => {
 };
 
 function ItemPreview({ draft }: { draft: ItemDraft }) {
-  const image = resolveItemImage(draft.img);
+  const image = resolveEntityImage(draft.img, "items");
   return (
     <div style={previewStyle}>
       <div style={previewEyebrowStyle}>Live preview</div>
@@ -500,7 +501,11 @@ export default function ManageItems() {
                       >
                         <span style={itemRowIconStyle}>
                           {item.img ? (
-                            <img src={resolveItemImage(item.img)} alt="" style={itemRowImgStyle} />
+                            <img
+                              src={resolveEntityImage(item.img, "items")}
+                              alt=""
+                              style={itemRowImgStyle}
+                            />
                           ) : (
                             "?"
                           )}
@@ -584,16 +589,16 @@ export default function ManageItems() {
                           }
                         />
                       </FieldGroup>
-                      <FieldGroup id="item-img" label="Image key or URL">
-                        <StyledInput
-                          id="item-img"
-                          value={draft.img}
-                          placeholder="health-potion.png"
-                          onChange={(event) =>
-                            setDraft((current) => ({ ...current, img: event.target.value }))
-                          }
-                        />
-                      </FieldGroup>
+                      <AdminImageField
+                        id="item-img"
+                        label="Image"
+                        category="items"
+                        value={draft.img}
+                        placeholder="health-potion.png"
+                        hint="Upload, pick from the library, or paste a path/URL. Uploads are saved under public/images/equipment or public/images/items based on type."
+                        upload={{ directory: draft.type === "equipment" ? "equipment" : "items" }}
+                        onChange={(img) => setDraft((current) => ({ ...current, img }))}
+                      />
                     </div>
 
                     <FieldGroup id="item-effect" label="Description / effect">

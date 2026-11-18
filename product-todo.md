@@ -164,14 +164,21 @@ Note: apply `supabase/migrations/008_room_map_and_start_rooms.sql` to the live p
 
 ### Phase 3 — Image-first enemies and dialogues
 
-- [ ] Generate `src/data/imageAssets.ts` from `public/images/**` and `src/assets/**` (`predev`/`prebuild` script)
-- [ ] Shared `AdminImageField` + preview: searchable picker, category tabs, manual path/URL fallback
-- [ ] Generalize `resolveItemImage` into `resolveEntityImage(img, category)`
-- [ ] Enemy library rows show sprite thumbnails (placeholder when empty)
-- [ ] Enemy editor uses the shared image field and preview card
-- [ ] Enemy portraits in the Realm Map inspector/popup
-- [ ] NPC list rows show portraits; dialogue editor gains an NPC details block with image editing
-- [ ] Persist NPC images from the room interaction editor and quick dialogue builder
+- [x] Generate `src/data/imageAssets.ts` from `public/images/**` and `src/assets/**` (`predev`/`prebuild` script)
+- [x] Shared `AdminImageField` + preview: searchable picker, category tabs, manual path/URL fallback
+- [x] Generalize `resolveItemImage` into `resolveEntityImage(img, category)`
+- [x] Enemy library rows show sprite thumbnails (placeholder when empty)
+- [x] Enemy editor uses the shared image field and preview card
+- [x] Enemy portraits in the Realm Map inspector/popup
+- [x] NPC list rows show portraits; dialogue editor gains an NPC details block with image editing
+- [x] Persist NPC images from the room interaction editor and quick dialogue builder
+- [x] Upload item images into `public/images/equipment` or `public/images/items` (with path/URL fallback)
+
+Images now come from a generated index (`pnpm generate:images`, also run by `predev`/`prebuild`). Admin editors use `AdminImageField` to browse grouped assets or paste a path/URL, and `resolveEntityImage` keeps stored paths stable while mapping bundled assets to hashed Vite URLs. Enemy sprites appear in the library, editor preview, room roster, and combat data; NPC portraits appear in the dialogue list/details, room content editor, quick dialogue builder, and the room inspector.
+
+Note: NPC `img` is stored as a path/key (for example `/images/characters/npc/Merchant.png` or `/src/assets/wizard.png`). Empty images fall back to the existing placeholder rendering.
+
+Item images can be uploaded directly from the item editor. The local Vite upload endpoint saves equipment images into `public/images/equipment` and consumable images into `public/images/items`, then stores the public path on the item. Uploads require running the admin through `pnpm dev` (or `pnpm preview`); the existing asset picker and path/URL fallback still work.
 
 ### Phase 4 — Polish and verification
 
@@ -187,4 +194,4 @@ Note: apply `supabase/migrations/008_room_map_and_start_rooms.sql` to the live p
 - The section start room drives actual exploration, not just the map.
 - Rooms page remains available as an alternate view; the map is the primary editor.
 - No freeform placement for every room: auto-layout with drag overrides.
-- No Supabase Storage uploads yet: asset picker plus path/URL fallback.
+- Image uploads write into `public/images/...` through a local Vite endpoint, not Supabase Storage. Enemies and NPCs still use the asset picker plus path/URL fallback.

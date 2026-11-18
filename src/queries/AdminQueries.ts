@@ -9,6 +9,7 @@ export type RoomInteractionWrite =
       name: string;
       dialogue: string[];
       discoveryMessage: string | null;
+      img: string;
     }
   | {
       type: "chest";
@@ -351,6 +352,7 @@ export async function saveRoomInteraction(
           name: input.name,
           dialogue: input.dialogue,
           discovery_message: input.discoveryMessage,
+          img: input.img,
         })
         .eq("id", existing.npc_id);
       if (error) throw error;
@@ -362,6 +364,7 @@ export async function saveRoomInteraction(
           name: input.name,
           dialogue: input.dialogue,
           discovery_message: input.discoveryMessage,
+          img: input.img,
         })
         .select("id")
         .single();

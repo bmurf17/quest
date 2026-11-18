@@ -4,7 +4,7 @@ import type { Room, Section } from "@/types/Room";
 import type { NPCType, Quest, QuestType, RoomInteraction } from "@/types/RoomInteractions";
 import type { EquipmentSlot, Item } from "@/types/Item";
 import { supabase } from "@/lib/supabase";
-import { resolveItemImage } from "@/lib/itemImages";
+import { resolveEntityImage } from "@/lib/entityImages";
 import { unwrapQuery } from "./queryHelpers";
 export { supabase };
 
@@ -120,7 +120,7 @@ export const mapDbItem = (it: DbItem | null | undefined): Item | null => {
   const base = {
     name: it.name,
     value: it.value,
-    img: resolveItemImage(it.img),
+    img: resolveEntityImage(it.img, "items"),
     // `value` is the only price column in the database.
     cost: it.value,
     // The items table has no dedicated description column; `effect` doubles as
@@ -160,7 +160,7 @@ export const mapDbEnemy = (e: DbEnemy): Enemy => ({
   strength: e.strength,
   dex: e.dex,
   defense: e.defense,
-  img: e.img,
+  img: resolveEntityImage(e.img, "enemies"),
   expGain: e.exp_gain ?? 10,
   type: e.type ?? "enemy",
   phase: e.type === "boss" ? 1 : undefined,
@@ -301,7 +301,7 @@ export async function getAllRooms(): Promise<Room[]> {
                 dialogue: npc.dialogue,
                 discoveryMessage: npc.discovery_message ?? undefined,
                 NPCType: npc.npc_type as NPCType,
-                img: npc.img,
+                img: resolveEntityImage(npc.img, "npc"),
                 quest: mappedQuest,
               },
             };

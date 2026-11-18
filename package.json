@@ -5,6 +5,8 @@
   "type": "module",
   "packageManager": "pnpm@10.29.2",
   "scripts": {
+    "generate:images": "node scripts/generate-image-assets.mjs",
+    "predev": "pnpm generate:images",
     "dev": "vite",
     "test": "vitest",
     "test:run": "vitest run",
@@ -14,6 +16,7 @@
     "db:baseline": "supabase db dump --remote --schema public -f supabase/schema.sql",
     "db:diff": "supabase db diff --remote",
     "db:types": "supabase gen types typescript --remote --schema public > src/types/database.generated.ts",
+    "prebuild": "pnpm generate:images",
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b",
     "lint": "eslint .",

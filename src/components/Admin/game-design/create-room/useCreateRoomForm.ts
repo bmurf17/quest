@@ -56,6 +56,7 @@ export function useCreateRoomForm() {
   const [npcSource, setNpcSource] = useState<NpcSource>("new");
   const [existingNpcs, setExistingNpcs] = useState<ExistingNpcOption[]>([]);
   const [selectedNpcId, setSelectedNpcId] = useState<number | null>(null);
+  const [npcImg, setNpcImg] = useState("");
   const [quickLines, setQuickLines] = useState<QuickDialogueLineEntry[]>(() => [
     defaultQuickDialogueLine(1),
   ]);
@@ -380,6 +381,7 @@ export function useCreateRoomForm() {
               name: npcName,
               dialogue: lines.map((line) => line.text),
               discovery_message: discoveryMessage || null,
+              img: npcImg.trim(),
             })
             .select()
             .single();
@@ -518,6 +520,8 @@ export function useCreateRoomForm() {
     existingNpcs,
     selectedNpcId,
     setSelectedNpcId,
+    npcImg,
+    setNpcImg,
     quickLines,
     addQuickLine,
     removeQuickLine,

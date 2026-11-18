@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { ImageIcon } from "lucide-react";
 import { colors, fonts } from "@/theme";
 import { estimateEnemy } from "@/lib/enemyBalance";
+import { resolveEntityImage } from "@/lib/entityImages";
 import {
   createEnemy,
   deleteEnemy,
@@ -22,6 +24,7 @@ import { BossEditor } from "./BossEditor";
 import { Toast } from "./create-room/Toast";
 import { FieldGroup, StyledInput, StyledSelect } from "./create-room/primitives";
 import { AdminPageHeader } from "@/components/Admin/ui/AdminPrimitives";
+import { AdminImageField } from "@/components/Admin/ui/AdminImageField";
 import type { CSSProperties } from "react";
 
 type ToastState = { type: "success" | "error"; message: string } | null;
@@ -173,6 +176,30 @@ function BalanceCell({
       }}
       style={balanceInputStyle}
     />
+  );
+}
+
+function EnemyPreview({ draft }: { draft: EnemyDraft }) {
+  const image = resolveEntityImage(draft.img, "enemies");
+  return (
+    <div style={enemyPreviewStyle}>
+      <div style={enemyPreviewArtStyle}>
+        {image ? (
+          <img src={image} alt="" style={enemyPreviewImgStyle} />
+        ) : (
+          <ImageIcon size={30} style={{ color: "#6B7280" }} />
+        )}
+      </div>
+      <div style={{ minWidth: 0 }}>
+        <div style={enemyPreviewNameStyle}>{draft.name.trim() || "Unnamed enemy"}</div>
+        <div style={enemyPreviewMetaStyle}>
+          {draft.type} · {Math.max(1, draft.health)} HP · {Math.max(0, draft.exp_gain)} XP
+        </div>
+        <div style={enemyPreviewStatsStyle}>
+          STR {draft.strength} · DEX {draft.dex} · DEF {draft.defense}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -447,6 +474,17 @@ export default function ManageEnemies() {
                         ...(!isNew && enemy.id === selectedId ? rowSelectedStyle : {}),
                       }}
                     >
+                      <span style={rowThumbStyle}>
+                        {enemy.img ? (
+                          <img
+                            src={resolveEntityImage(enemy.img, "enemies")}
+                            alt=""
+                            style={rowThumbImgStyle}
+                          />
+                        ) : (
+                          <ImageIcon size={14} style={{ color: "#6B7280" }} />
+                        )}
+                      </span>
                       <span style={{ flex: 1, minWidth: 0 }}>
                         <span style={rowNameStyle}>{enemy.name}</span>
                         <span style={rowMetaStyle}>
@@ -473,6 +511,8 @@ export default function ManageEnemies() {
                   <div style={emptyTextStyle}>Select an enemy to edit it.</div>
                 ) : (
                   <>
+                    <EnemyPreview draft={draft} />
+
                     <div style={formGridStyle}>
                       <FieldGroup id="enemy-name" label="Name">
                         <StyledInput
@@ -497,16 +537,6 @@ export default function ManageEnemies() {
                           <option value="enemy">Enemy</option>
                           <option value="boss">Boss</option>
                         </StyledSelect>
-                      </FieldGroup>
-                      <FieldGroup id="enemy-img" label="Sprite path or URL">
-                        <StyledInput
-                          id="enemy-img"
-                          value={draft.img}
-                          placeholder="/images/Mushroom.png"
-                          onChange={(event) =>
-                            setDraft((current) => ({ ...current, img: event.target.value }))
-                          }
-                        />
                       </FieldGroup>
                       <FieldGroup id="enemy-health" label="Health">
                         <StyledInput
@@ -590,6 +620,16 @@ export default function ManageEnemies() {
                         />
                       </FieldGroup>
                     </div>
+
+                    <AdminImageField
+                      id="enemy-img"
+                      label="Sprite"
+                      category="enemies"
+                      value={draft.img}
+                      placeholder="/images/enemies/Mushroom.png"
+                      hint="Used in the enemy library, room inspector, and combat."
+                      onChange={(img) => setDraft((current) => ({ ...current, img }))}
+                    />
 
                     {draft.type === "boss" && (
                       <BossEditor
@@ -878,6 +918,74 @@ const rowMetaStyle: CSSProperties = {
   fontSize: 10,
   color: "#6B7280",
   textTransform: "capitalize",
+};
+const rowThumbStyle: CSSProperties = {
+  flexShrink: 0,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: 30,
+  height: 30,
+  background: "rgba(0,0,0,0.35)",
+  border: `1px solid ${colors.subtleBorder}`,
+  borderRadius: 5,
+  overflow: "hidden",
+};
+const rowThumbImgStyle: CSSProperties = {
+  width: 26,
+  height: 26,
+  objectFit: "contain",
+  imageRendering: "pixelated",
+};
+const enemyPreviewStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 14,
+  padding: 12,
+  marginBottom: 16,
+  background: "rgba(255,255,255,0.025)",
+  border: `1px solid ${colors.subtleBorder}`,
+  borderRadius: 8,
+};
+const enemyPreviewArtStyle: CSSProperties = {
+  flexShrink: 0,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: 72,
+  height: 72,
+  background: "rgba(0,0,0,0.4)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 8,
+  overflow: "hidden",
+};
+const enemyPreviewImgStyle: CSSProperties = {
+  width: "100%",
+  height: "100%",
+  objectFit: "contain",
+  imageRendering: "pixelated",
+};
+const enemyPreviewNameStyle: CSSProperties = {
+  fontSize: 16,
+  fontWeight: 700,
+  color: colors.text,
+  fontFamily: fonts.display,
+  letterSpacing: "0.03em",
+  marginBottom: 4,
+};
+const enemyPreviewMetaStyle: CSSProperties = {
+  fontSize: 11,
+  color: colors.muted,
+  textTransform: "capitalize",
+  marginBottom: 6,
+};
+const enemyPreviewStatsStyle: CSSProperties = {
+  display: "flex",
+  gap: 10,
+  fontSize: 10,
+  color: colors.goldMuted,
+  fontFamily: fonts.display,
+  letterSpacing: "0.05em",
 };
 const bossBadgeStyle: CSSProperties = {
   padding: "1px 5px",
