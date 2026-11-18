@@ -426,6 +426,8 @@ export type Database = {
           name: string;
           created_at: string;
           section_id: number | null;
+          map_x: number | null;
+          map_y: number | null;
         };
         Insert: Partial<Database["public"]["Tables"]["rooms"]["Row"]>;
         Update: Partial<Database["public"]["Tables"]["rooms"]["Row"]>;
@@ -443,6 +445,7 @@ export type Database = {
         Row: {
           id: number;
           name: string;
+          start_room_id: number | null;
         };
         Insert: Partial<Database["public"]["Tables"]["sections"]["Row"]>;
         Update: Partial<Database["public"]["Tables"]["sections"]["Row"]>;

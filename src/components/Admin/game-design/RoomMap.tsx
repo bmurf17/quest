@@ -1,53 +1,67 @@
-import { useGameStore } from "@/state/GameState";
-import { Directions } from "@/types/Directions";
-import type { Room } from "@/types/Room";
-import React, { useState, useRef, useEffect } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { Compass, Layers, LocateFixed, Minus, Plus, RotateCcw, Search } from "lucide-react";
 import { colors, fonts } from "@/theme";
+import { useGameStore } from "@/state/GameState";
+import { getAllRooms, getSections } from "@/queries/RoomQueries";
+import { clearRoomPositions, updateRoomPosition } from "@/queries/AdminQueries";
+import { supabase } from "@/lib/supabase";
+import { computeRealmLayout, type LayoutEdge } from "@/lib/roomLayout";
+import { DIRECTION_OPTIONS } from "@/lib/directions";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import type { CSSProperties } from "react";
+import { RoomInspector } from "./RoomInspector";
+import { Toast } from "./create-room/Toast";
+import type { Directions } from "@/types/Directions";
+import type { Room, Section } from "@/types/Room";
+import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
 
-const MAX_DEPTH = 5;
-const ROOM_DISTANCE = 160;
-const CONTAINER_PADDING = 250;
+const CELL_W = 190;
+const CELL_H = 118;
+const NODE_W = 132;
+const NODE_H = 54;
+const ORIGIN_X = 90;
+const ORIGIN_Y = 78;
+const SECTION_HEADER = 34;
+const SECTION_GAP = 52;
+const UNPLACED_GAP = 32;
+const MIN_ZOOM = 0.35;
+const MAX_ZOOM = 2.2;
+
+type ToastState = { type: "success" | "error"; message: string } | null;
 
 const interactionConfig: Record<
   string,
-  { color: string; bg: string; border: string; label: string; icon: string }
+  { color: string; bg: string; border: string; label: string }
 > = {
   NPC: {
     color: "#818CF8",
     bg: "rgba(99,102,241,0.15)",
     border: "rgba(99,102,241,0.45)",
     label: "NPC",
-    icon: "👤",
   },
   chest: {
     color: "#F59E0B",
     bg: "rgba(217,119,6,0.15)",
     border: "rgba(217,119,6,0.45)",
     label: "Chest",
-    icon: "📦",
   },
   camp: {
     color: colors.success,
     bg: "rgba(5,150,105,0.15)",
     border: "rgba(5,150,105,0.45)",
     label: "Camp",
-    icon: "🔥",
   },
   Combat: {
     color: "#F87171",
     bg: "rgba(220,38,38,0.15)",
     border: "rgba(220,38,38,0.45)",
     label: "Combat",
-    icon: "⚔️",
   },
   none: {
     color: colors.muted,
     bg: "rgba(255,255,255,0.04)",
     border: colors.goldBorder,
     label: "Empty",
-    icon: "◇",
   },
 };
 
@@ -57,417 +71,864 @@ const getInteractionKey = (room: Room): string => {
   return "none";
 };
 
-// ─── Direction helpers ────────────────────────────────────────────────────────
+const directionShort = (direction: Directions) =>
+  DIRECTION_OPTIONS.find(({ value }) => value === direction)?.label.slice(0, 1) ?? "?";
 
-const getDirectionOffset = (direction: Directions, distance = ROOM_DISTANCE) => {
-  switch (direction) {
-    case Directions.North:
-      return { x: 0, y: -distance };
-    case Directions.South:
-      return { x: 0, y: distance };
-    case Directions.East:
-      return { x: distance, y: 0 };
-    case Directions.West:
-      return { x: -distance, y: 0 };
-    default:
-      return { x: 0, y: 0 };
-  }
-};
+const errorMessage = (err: unknown) =>
+  err instanceof Error ? err.message : "Something went wrong.";
 
-const directionLabel = (direction: Directions): string => {
-  switch (direction) {
-    case Directions.North:
-      return "N";
-    case Directions.South:
-      return "S";
-    case Directions.East:
-      return "E";
-    case Directions.West:
-      return "W";
-    default:
-      return "?";
-  }
-};
-
-// ─── SVG connector lines ──────────────────────────────────────────────────────
-
-interface ConnectorProps {
-  x1: number;
-  y1: number;
-  x2: number;
-  y2: number;
-  direction: Directions;
-}
-
-const ROOM_W = 96;
-const ROOM_H = 40;
-
-const Connector = ({ x1, y1, x2, y2, direction }: ConnectorProps) => {
-  // Offset from node centre to edge
-  const isVertical = direction === Directions.North || direction === Directions.South;
-  const sx =
-    x1 + ROOM_W / 2 + (isVertical ? 0 : direction === Directions.East ? ROOM_W / 2 : -ROOM_W / 2);
-  const sy =
-    y1 + ROOM_H / 2 + (!isVertical ? 0 : direction === Directions.South ? ROOM_H / 2 : -ROOM_H / 2);
-  const ex =
-    x2 + ROOM_W / 2 + (isVertical ? 0 : direction === Directions.East ? -ROOM_W / 2 : ROOM_W / 2);
-  const ey =
-    y2 + ROOM_H / 2 + (!isVertical ? 0 : direction === Directions.South ? -ROOM_H / 2 : ROOM_H / 2);
-
-  const mx = (sx + ex) / 2;
-  const my = (sy + ey) / 2;
-
-  return (
-    <g>
-      <line x1={sx} y1={sy} x2={ex} y2={ey} stroke={colors.goldBorder} strokeWidth={1.5} />
-      <circle cx={mx} cy={my} r={3} fill={colors.goldBorder} />
-      <text
-        x={mx + (isVertical ? 5 : 0)}
-        y={my + (!isVertical ? -4 : 0)}
-        fill={colors.goldBorder}
-        fontSize={9}
-        fontFamily={fonts.display}
-        textAnchor="middle"
-        dominantBaseline="middle"
-      >
-        {directionLabel(direction)}
-      </text>
-    </g>
-  );
-};
-
-interface ConnectorLayerProps {
+interface RenderNode {
   room: Room;
-  x: number;
-  y: number;
-  visitedRooms: Set<string>;
-  depth?: number;
+  left: number;
+  top: number;
+  isStart: boolean;
+  sectionId: number | null;
+  originX: number;
+  originY: number;
+  minX: number;
+  minY: number;
+  unplaced: boolean;
 }
 
-function ConnectorLayer({ room, x, y, visitedRooms, depth = 0 }: ConnectorLayerProps) {
-  if (depth >= MAX_DEPTH) return null;
-  const newVisited = new Set([...visitedRooms, room.name]);
+interface RenderEdge {
+  key: string;
+  path: string;
+  labels: { x: number; y: number; direction: Directions }[];
+}
+
+interface SectionRender {
+  key: string;
+  name: string;
+  headerTop: number;
+  nodes: RenderNode[];
+  edges: RenderEdge[];
+  hasUnplaced: boolean;
+  unplacedTop: number;
+}
+
+interface ViewModel {
+  sections: SectionRender[];
+  width: number;
+  height: number;
+}
+
+function buildViewModel(
+  layouts: ReturnType<typeof computeRealmLayout>,
+  dragOverrides: Map<number, { left: number; top: number }>,
+): ViewModel {
+  const sections: SectionRender[] = [];
+  let cursorY = ORIGIN_Y;
+  let maxWidth = 900;
+
+  for (const layout of layouts) {
+    if (layout.nodes.length === 0 && layout.unplaced.length === 0) continue;
+
+    const minX = layout.bounds.minX;
+    const minY = layout.bounds.minY;
+    const gridWidth = (layout.bounds.maxX - layout.bounds.minX) * CELL_W + NODE_W;
+    const gridHeight = (layout.bounds.maxY - layout.bounds.minY) * CELL_H + NODE_H;
+    const originX = ORIGIN_X;
+    const originY = cursorY + SECTION_HEADER;
+    const headerTop = cursorY - 8;
+
+    const nodes: RenderNode[] = layout.nodes.map((node) => {
+      const baseLeft = originX + (node.x - minX) * CELL_W;
+      const baseTop = originY + (node.y - minY) * CELL_H;
+      const override = dragOverrides.get(node.room.id);
+      return {
+        room: node.room,
+        left: override?.left ?? baseLeft,
+        top: override?.top ?? baseTop,
+        isStart: node.isStart,
+        sectionId: layout.sectionId,
+        originX,
+        originY,
+        minX,
+        minY,
+        unplaced: false,
+      };
+    });
+
+    const nodeById = new Map(nodes.map((node) => [node.room.id, node]));
+    const edges: RenderEdge[] = layout.edges.map((edge) => toRenderEdge(edge, nodeById));
+
+    if (layout.unplaced.length > 0) {
+      const laneTop = originY + gridHeight + UNPLACED_GAP;
+      layout.unplaced.forEach((room, index) => {
+        const left = originX + index * CELL_W;
+        nodes.push({
+          room,
+          left,
+          top: laneTop,
+          isStart: false,
+          sectionId: layout.sectionId,
+          originX,
+          originY,
+          minX,
+          minY,
+          unplaced: true,
+        });
+      });
+    }
+
+    const unplacedWidth =
+      layout.unplaced.length > 0 ? layout.unplaced.length * CELL_W - (CELL_W - NODE_W) : 0;
+    maxWidth = Math.max(maxWidth, originX + Math.max(gridWidth, unplacedWidth) + ORIGIN_X);
+    const sectionHeight = gridHeight + (layout.unplaced.length > 0 ? UNPLACED_GAP + NODE_H : 0);
+
+    sections.push({
+      key: `${layout.sectionId ?? "none"}`,
+      name: layout.sectionName,
+      headerTop,
+      nodes,
+      edges,
+      hasUnplaced: layout.unplaced.length > 0,
+      unplacedTop: originY + gridHeight + UNPLACED_GAP - 20,
+    });
+
+    cursorY += SECTION_HEADER + sectionHeight + SECTION_GAP;
+  }
+
+  return { sections, width: maxWidth, height: Math.max(cursorY, 480) };
+}
+
+function toRenderEdge(edge: LayoutEdge, nodeById: Map<number, RenderNode>): RenderEdge {
+  const a = nodeById.get(edge.aId);
+  const b = nodeById.get(edge.bId);
+  if (!a || !b) return { key: edge.key, path: "", labels: [] };
+
+  const x1 = a.left + NODE_W / 2;
+  const y1 = a.top + NODE_H / 2;
+  const x2 = b.left + NODE_W / 2;
+  const y2 = b.top + NODE_H / 2;
+  const mx = (x1 + x2) / 2;
+  const my = (y1 + y2) / 2;
+
+  let path = `M ${x1} ${y1} L ${x2} ${y2}`;
+  let curveX = 0;
+  let curveY = 0;
+  if (edge.parallelCount > 1) {
+    const offset = (edge.parallelIndex - (edge.parallelCount - 1) / 2) * 34;
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const length = Math.hypot(dx, dy) || 1;
+    curveX = (-dy / length) * offset;
+    curveY = (dx / length) * offset;
+    path = `M ${x1} ${y1} Q ${mx + curveX} ${my + curveY} ${x2} ${y2}`;
+  }
+
+  const labels = edge.labels.map((label) => {
+    const fromA = label.fromId === edge.aId;
+    const t = fromA ? 0.22 : 0.78;
+    const lx = x1 + (x2 - x1) * t + curveX * 0.6;
+    const ly = y1 + (y2 - y1) * t + curveY * 0.6;
+    return { x: lx, y: ly, direction: label.direction };
+  });
+
+  return { key: edge.key, path, labels };
+}
+
+export default function RoomMap() {
+  const rooms = useGameStore((state) => state.rooms);
+  const sections = useGameStore((state) => state.availableSections);
+  const setRooms = useGameStore((state) => state.setRooms);
+  const loadSections = useGameStore((state) => state.loadSections);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [toast, setToast] = useState<ToastState>(null);
+  const [sectionsOpen, setSectionsOpen] = useState(false);
+
+  const selectedSectionId = useMemo(() => {
+    const value = Number(searchParams.get("section"));
+    if (!Number.isFinite(value) || value <= 0) return null;
+    return sections.some((section) => section.id === value) ? value : null;
+  }, [searchParams, sections]);
+
+  const selectedRoomId = useMemo(() => {
+    const value = Number(searchParams.get("room"));
+    return Number.isFinite(value) && value > 0 ? value : null;
+  }, [searchParams]);
+
+  const selectedRoom = useMemo(
+    () => rooms.find((room) => room.id === selectedRoomId) ?? null,
+    [rooms, selectedRoomId],
+  );
+
+  const layouts = useMemo(
+    () => computeRealmLayout(rooms, sections, selectedSectionId),
+    [rooms, sections, selectedSectionId],
+  );
+
+  const [dragOverrides, setDragOverrides] = useState<Map<number, { left: number; top: number }>>(
+    new Map(),
+  );
+  const viewModel = useMemo(() => buildViewModel(layouts, dragOverrides), [layouts, dragOverrides]);
+
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const panDragRef = useRef<{ x: number; y: number; panX: number; panY: number } | null>(null);
+  const nodeDragRef = useRef<{
+    roomId: number;
+    startX: number;
+    startY: number;
+    left: number;
+    top: number;
+    currentLeft: number;
+    currentTop: number;
+    moved: boolean;
+  } | null>(null);
+  const suppressClickRef = useRef(false);
+  const viewportRef = useRef<HTMLDivElement>(null);
+
+  const showToast = useCallback((type: "success" | "error", message: string) => {
+    setToast({ type, message });
+    window.setTimeout(() => setToast(null), 4000);
+  }, []);
+
+  const refresh = useCallback(async () => {
+    const [nextRooms, nextSections] = await Promise.all([getAllRooms(), getSections()]);
+    setRooms(nextRooms);
+    loadSections(nextSections);
+    setDragOverrides(new Map());
+  }, [setRooms, loadSections]);
+
+  const selectRoom = useCallback(
+    (roomId: number | null) => {
+      setSearchParams(
+        (current) => {
+          const next = new URLSearchParams(current);
+          if (roomId === null) next.delete("room");
+          else next.set("room", String(roomId));
+          return next;
+        },
+        { replace: true },
+      );
+    },
+    [setSearchParams],
+  );
+
+  const selectSection = useCallback(
+    (sectionId: number | null) => {
+      setSearchParams(
+        (current) => {
+          const next = new URLSearchParams(current);
+          if (sectionId === null) next.delete("section");
+          else next.set("section", String(sectionId));
+          next.delete("room");
+          return next;
+        },
+        { replace: true },
+      );
+      setDragOverrides(new Map());
+    },
+    [setSearchParams],
+  );
+
+  // Remove stale selection if the room disappeared (deleted or filtered out).
+  useEffect(() => {
+    if (selectedRoomId === null) return;
+    if (rooms.some((room) => room.id === selectedRoomId)) return;
+    selectRoom(null);
+  }, [rooms, selectedRoomId, selectRoom]);
+
+  // Wheel zoom without scrolling the admin page.
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+
+    const onWheel = (event: WheelEvent) => {
+      event.preventDefault();
+      setZoom((current) => {
+        const next = clamp(current * (event.deltaY > 0 ? 0.9 : 1.1), MIN_ZOOM, MAX_ZOOM);
+        return Number(next.toFixed(3));
+      });
+    };
+
+    viewport.addEventListener("wheel", onWheel, { passive: false });
+    return () => viewport.removeEventListener("wheel", onWheel);
+  }, []);
+
+  const handleViewportPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0) return;
+    if ((event.target as HTMLElement).closest("[data-room-node]")) return;
+    panDragRef.current = {
+      x: event.clientX,
+      y: event.clientY,
+      panX: pan.x,
+      panY: pan.y,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const handleViewportPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const drag = panDragRef.current;
+    if (!drag) return;
+    setPan({
+      x: drag.panX + (event.clientX - drag.x),
+      y: drag.panY + (event.clientY - drag.y),
+    });
+  };
+
+  const endViewportDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
+    panDragRef.current = null;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  };
+
+  const handleNodePointerDown = (event: ReactPointerEvent, node: RenderNode) => {
+    if (event.button !== 0) return;
+    event.stopPropagation();
+    suppressClickRef.current = false;
+    nodeDragRef.current = {
+      roomId: node.room.id,
+      startX: event.clientX,
+      startY: event.clientY,
+      left: node.left,
+      top: node.top,
+      currentLeft: node.left,
+      currentTop: node.top,
+      moved: false,
+    };
+    (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+  };
+
+  const handleNodePointerMove = (event: ReactPointerEvent) => {
+    const drag = nodeDragRef.current;
+    if (!drag) return;
+    const dx = (event.clientX - drag.startX) / zoom;
+    const dy = (event.clientY - drag.startY) / zoom;
+    if (!drag.moved && Math.hypot(dx, dy) < 4) return;
+    drag.moved = true;
+    drag.currentLeft = drag.left + dx;
+    drag.currentTop = drag.top + dy;
+    suppressClickRef.current = true;
+
+    setDragOverrides((current) => {
+      const next = new Map(current);
+      next.set(drag.roomId, { left: drag.currentLeft, top: drag.currentTop });
+      return next;
+    });
+  };
+
+  const handleNodePointerUp = async (event: ReactPointerEvent, node: RenderNode) => {
+    const drag = nodeDragRef.current;
+    if (!drag) return;
+    nodeDragRef.current = null;
+    if ((event.currentTarget as HTMLElement).hasPointerCapture(event.pointerId)) {
+      (event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId);
+    }
+    if (!drag.moved) return;
+
+    const gridX = (drag.currentLeft - node.originX) / CELL_W + node.minX;
+    const gridY = (drag.currentTop - node.originY) / CELL_H + node.minY;
+
+    try {
+      await updateRoomPosition(node.room.id, Number(gridX.toFixed(2)), Number(gridY.toFixed(2)));
+      await refresh();
+    } catch (err) {
+      showToast("error", errorMessage(err));
+      setDragOverrides(new Map());
+    }
+  };
+
+  const handleResetLayout = async () => {
+    const ids = selectedSectionId
+      ? rooms.filter((room) => room.sectionId === selectedSectionId).map((room) => room.id)
+      : rooms.map((room) => room.id);
+
+    try {
+      await clearRoomPositions(ids);
+      await refresh();
+      setPan({ x: 0, y: 0 });
+      setZoom(1);
+      showToast("success", "Layout reset to the compass auto-layout.");
+    } catch (err) {
+      showToast("error", errorMessage(err));
+    }
+  };
+
+  const focusStart = () => {
+    const layout = layouts[0];
+    const firstNode = layout?.nodes.find((node) => node.isStart) ?? layout?.nodes[0];
+    if (!firstNode) return;
+    // Put the node near the visible centre of the viewport.
+    const viewport = viewportRef.current;
+    const width = viewport?.clientWidth ?? 800;
+    const height = viewport?.clientHeight ?? 600;
+    setPan({
+      x: width / 2 - ((firstNode.x - layout.bounds.minX) * CELL_W + ORIGIN_X + NODE_W / 2) * zoom,
+      y:
+        height / 2 -
+        ((firstNode.y - layout.bounds.minY) * CELL_H + ORIGIN_Y + SECTION_HEADER) * zoom,
+    });
+  };
 
   return (
     <>
-      {room.neighboringRooms?.map(([direction, neighbor], i: number) => {
-        if (newVisited.has(neighbor.name)) return null;
-        const offset = getDirectionOffset(direction);
-        const nx = x + offset.x;
-        const ny = y + offset.y;
-        return (
-          <React.Fragment key={`conn-${neighbor.name}-${i}`}>
-            <Connector x1={x} y1={y} x2={nx} y2={ny} direction={direction} />
-            <ConnectorLayer
-              room={neighbor}
-              x={nx}
-              y={ny}
-              visitedRooms={newVisited}
-              depth={depth + 1}
+      <main className="flex h-full min-h-0 flex-col overflow-hidden" style={mapPageStyle}>
+        <div style={headerStyle}>
+          <div style={{ minWidth: 0 }}>
+            <div style={eyebrowStyle}>World Builder</div>
+            <div style={titleRowStyle}>
+              <Compass size={20} style={{ color: colors.gold }} />
+              <h1 style={titleStyle}>Realm Map</h1>
+              <span style={countStyle}>{rooms.length} rooms</span>
+            </div>
+            <p style={hintStyle}>
+              Drag the map to pan · drag a room to save a position · scroll to zoom
+            </p>
+          </div>
+
+          <div style={toolbarStyle}>
+            <select
+              value={selectedSectionId ?? ""}
+              onChange={(event) =>
+                selectSection(event.target.value ? Number(event.target.value) : null)
+              }
+              aria-label="Filter map by section"
+              style={selectStyle}
+            >
+              <option value="">All sections</option>
+              {sections.map((section) => (
+                <option key={section.id} value={section.id}>
+                  {section.name}
+                </option>
+              ))}
+            </select>
+            <button type="button" onClick={() => setSectionsOpen(true)} style={toolButtonStyle}>
+              <Layers size={14} />
+              Sections
+            </button>
+            <button type="button" onClick={focusStart} style={toolButtonStyle}>
+              <LocateFixed size={14} />
+              Start
+            </button>
+            <button type="button" onClick={() => void handleResetLayout()} style={toolButtonStyle}>
+              <RotateCcw size={14} />
+              Reset layout
+            </button>
+            <Link to="/admin/game-design/rooms" style={toolLinkStyle}>
+              <Search size={14} />
+              Room list
+            </Link>
+          </div>
+        </div>
+
+        <div style={canvasWrapStyle}>
+          <div
+            ref={viewportRef}
+            style={viewportStyle}
+            onPointerDown={handleViewportPointerDown}
+            onPointerMove={handleViewportPointerMove}
+            onPointerUp={endViewportDrag}
+            onPointerCancel={endViewportDrag}
+          >
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                zIndex: 0,
+                backgroundImage:
+                  "radial-gradient(circle, rgba(180,140,80,0.15) 1px, transparent 1px)",
+                backgroundSize: `${32 * zoom}px ${32 * zoom}px`,
+                backgroundPosition: `${pan.x}px ${pan.y}px`,
+              }}
             />
-          </React.Fragment>
-        );
-      })}
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                zIndex: 1,
+                background:
+                  "radial-gradient(ellipse at center, transparent 42%, rgba(13,11,7,0.66) 100%)",
+                pointerEvents: "none",
+              }}
+            />
+
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: viewModel.width,
+                height: viewModel.height,
+                transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+                transformOrigin: "0 0",
+                zIndex: 2,
+              }}
+            >
+              <svg
+                width={viewModel.width}
+                height={viewModel.height}
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  overflow: "visible",
+                  pointerEvents: "none",
+                }}
+                aria-hidden
+              >
+                {viewModel.sections.flatMap((section) =>
+                  section.edges.map((edge) => (
+                    <g key={`${section.key}-${edge.key}`}>
+                      <path
+                        d={edge.path}
+                        fill="none"
+                        stroke="rgba(180,140,80,0.42)"
+                        strokeWidth={1.5}
+                      />
+                      {edge.labels.map((label, index) => (
+                        <g key={index}>
+                          <circle cx={label.x} cy={label.y} r={7} fill="#14110a" />
+                          <text
+                            x={label.x}
+                            y={label.y + 0.5}
+                            fill={colors.gold}
+                            fontSize={9}
+                            fontFamily={fonts.display}
+                            textAnchor="middle"
+                            dominantBaseline="middle"
+                          >
+                            {directionShort(label.direction)}
+                          </text>
+                        </g>
+                      ))}
+                    </g>
+                  )),
+                )}
+              </svg>
+
+              {viewModel.sections.map((section) => (
+                <div key={section.key}>
+                  <div style={{ position: "absolute", top: section.headerTop, left: ORIGIN_X }}>
+                    <span style={sectionLabelStyle}>{section.name}</span>
+                  </div>
+                  {section.hasUnplaced && (
+                    <div style={{ position: "absolute", top: section.unplacedTop, left: ORIGIN_X }}>
+                      <span style={unplacedLabelStyle}>Unplaced</span>
+                    </div>
+                  )}
+                  {section.nodes.map((node) => (
+                    <RoomNode
+                      key={`${section.key}-${node.room.id}`}
+                      node={node}
+                      selected={node.room.id === selectedRoomId}
+                      onPointerDown={handleNodePointerDown}
+                      onPointerMove={handleNodePointerMove}
+                      onPointerUp={(event, target) => void handleNodePointerUp(event, target)}
+                      onClick={() => {
+                        if (suppressClickRef.current) return;
+                        selectRoom(node.room.id);
+                      }}
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
+
+            {viewModel.sections.length === 0 && (
+              <div style={emptyCanvasStyle}>
+                <p style={{ margin: 0 }}>No rooms match this section filter.</p>
+                <Link to="/admin/game-design/rooms/new" style={toolLinkStyle}>
+                  Create a room
+                </Link>
+              </div>
+            )}
+
+            <div style={zoomControlsStyle}>
+              <button
+                type="button"
+                onClick={() => setZoom((current) => clamp(current * 1.15, MIN_ZOOM, MAX_ZOOM))}
+                style={zoomButtonStyle}
+                aria-label="Zoom in"
+              >
+                <Plus size={15} />
+              </button>
+              <span style={zoomLabelStyle}>{Math.round(zoom * 100)}%</span>
+              <button
+                type="button"
+                onClick={() => setZoom((current) => clamp(current / 1.15, MIN_ZOOM, MAX_ZOOM))}
+                style={zoomButtonStyle}
+                aria-label="Zoom out"
+              >
+                <Minus size={15} />
+              </button>
+            </div>
+          </div>
+
+          {selectedRoom && (
+            <>
+              <div
+                className="fixed inset-0 z-30 bg-black/60 md:hidden"
+                onClick={() => selectRoom(null)}
+              />
+              <aside className="fixed inset-0 z-40 md:static md:z-auto md:w-[410px] md:shrink-0">
+                <RoomInspector
+                  variant="drawer"
+                  room={selectedRoom}
+                  rooms={rooms}
+                  sections={sections}
+                  onSelectRoom={selectRoom}
+                  onRefresh={refresh}
+                  onSectionsChanged={refresh}
+                  onDeleted={() => selectRoom(null)}
+                  onClose={() => selectRoom(null)}
+                  showToast={showToast}
+                />
+              </aside>
+            </>
+          )}
+        </div>
+      </main>
+
+      {sectionsOpen && (
+        <SectionManagerDialog
+          sections={sections}
+          onClose={() => setSectionsOpen(false)}
+          onChanged={refresh}
+          showToast={showToast}
+        />
+      )}
+
+      {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
     </>
   );
 }
 
 interface RoomNodeProps {
-  room: Room;
-  x: number;
-  y: number;
-  visitedRooms: Set<string>;
-  depth?: number;
-  onRoomClick: (room: Room) => void;
-  isStart?: boolean;
+  node: RenderNode;
+  selected: boolean;
+  onPointerDown: (event: ReactPointerEvent, node: RenderNode) => void;
+  onPointerMove: (event: ReactPointerEvent) => void;
+  onPointerUp: (event: ReactPointerEvent, node: RenderNode) => void;
+  onClick: () => void;
 }
 
-const RoomNode = React.memo(
-  ({ room, x, y, visitedRooms, depth = 0, onRoomClick, isStart }: RoomNodeProps) => {
-    const [hovered, setHovered] = useState(false);
-    const key = getInteractionKey(room);
-    const cfg = interactionConfig[key] ?? interactionConfig.none;
-    const newVisited = new Set([...visitedRooms, room.name]);
-
-    return (
-      <>
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onRoomClick(room);
-          }}
-          onMouseEnter={() => setHovered(true)}
-          onMouseLeave={() => setHovered(false)}
-          aria-label={`Inspect room ${room.name}`}
-          style={{
-            font: "inherit",
-            padding: 0,
-            position: "absolute",
-            left: x,
-            top: y,
-            width: ROOM_W,
-            height: ROOM_H,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexDirection: "column",
-            gap: 1,
-            background: hovered ? cfg.bg : isStart ? "rgba(212,175,55,0.12)" : "rgba(13,11,7,0.85)",
-            border: `1px solid ${isStart ? "rgba(212,175,55,0.6)" : cfg.border}`,
-            borderRadius: 6,
-            cursor: "pointer",
-            transition: "all 0.15s",
-            transform: hovered ? "scale(1.06)" : "scale(1)",
-            boxShadow: hovered ? `0 0 12px ${cfg.color}44` : "none",
-            zIndex: hovered ? 10 : 1,
-          }}
-        >
-          <span
-            style={{
-              fontSize: 10,
-              fontFamily: fonts.display,
-              color: isStart ? colors.gold : cfg.color,
-              fontWeight: 600,
-              letterSpacing: "0.04em",
-              textAlign: "center",
-              padding: "0 6px",
-              lineHeight: 1.3,
-              overflow: "hidden",
-              maxWidth: "100%",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {room.name}
-          </span>
-          {key !== "none" && (
-            <span
-              style={{
-                fontSize: 9,
-                color: cfg.color,
-                opacity: 0.7,
-                fontFamily: fonts.display,
-                letterSpacing: "0.05em",
-              }}
-            >
-              {cfg.label}
-            </span>
-          )}
-          {isStart && <div style={roomNodeStyle}>START</div>}
-        </button>
-
-        {depth < MAX_DEPTH &&
-          room.neighboringRooms?.map(([direction, neighbor], i: number) => {
-            if (newVisited.has(neighbor.name)) return null;
-            const offset = getDirectionOffset(direction);
-            return (
-              <RoomNode
-                key={`${neighbor.name}-${i}`}
-                room={neighbor}
-                x={x + offset.x}
-                y={y + offset.y}
-                visitedRooms={newVisited}
-                depth={depth + 1}
-                onRoomClick={onRoomClick}
-              />
-            );
-          })}
-      </>
-    );
-  },
-);
-
-const calculateBounds = (
-  room: Room,
-  visited = new Set<string>(),
-  x = 0,
-  y = 0,
-  depth = 0,
-): { minX: number; maxX: number; minY: number; maxY: number } => {
-  if (depth >= MAX_DEPTH || visited.has(room.name)) return { minX: x, maxX: x, minY: y, maxY: y };
-  const newVisited = new Set([...visited, room.name]);
-  let bounds = { minX: x, maxX: x, minY: y, maxY: y };
-  room.neighboringRooms?.forEach(([direction, neighbor]) => {
-    if (!newVisited.has(neighbor.name)) {
-      const offset = getDirectionOffset(direction);
-      const child = calculateBounds(neighbor, newVisited, x + offset.x, y + offset.y, depth + 1);
-      bounds = {
-        minX: Math.min(bounds.minX, child.minX),
-        maxX: Math.max(bounds.maxX, child.maxX),
-        minY: Math.min(bounds.minY, child.minY),
-        maxY: Math.max(bounds.maxY, child.maxY),
-      };
-    }
-  });
-  return bounds;
-};
-
-function RoomPopup({ room, onClose }: { room: Room; onClose: () => void }) {
-  const key = getInteractionKey(room);
-  const cfg = interactionConfig[key] ?? interactionConfig.none;
-
-  const Row = ({ label, value }: { label: string; value: React.ReactNode }) => (
-    <div style={rowStyle}>
-      <span style={rowStyle2}>{label}</span>
-      <span style={rowStyle3}>{value}</span>
-    </div>
-  );
+function RoomNode({
+  node,
+  selected,
+  onPointerDown,
+  onPointerMove,
+  onPointerUp,
+  onClick,
+}: RoomNodeProps) {
+  const [hovered, setHovered] = useState(false);
+  const interactionKey = getInteractionKey(node.room);
+  const cfg = interactionConfig[interactionKey] ?? interactionConfig.none;
 
   return (
-    <Dialog
-      open
-      onOpenChange={(open) => {
-        if (!open) onClose();
+    <button
+      type="button"
+      data-room-node
+      onPointerDown={(event) => onPointerDown(event, node)}
+      onPointerMove={onPointerMove}
+      onPointerUp={(event) => onPointerUp(event, node)}
+      onPointerCancel={(event) => onPointerUp(event, node)}
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      aria-label={`Inspect room ${node.room.name}`}
+      aria-pressed={selected}
+      title={node.unplaced ? `${node.room.name} (unplaced)` : node.room.name}
+      style={{
+        position: "absolute",
+        left: node.left,
+        top: node.top,
+        width: NODE_W,
+        height: NODE_H,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 2,
+        padding: "0 8px",
+        font: "inherit",
+        background:
+          selected || hovered
+            ? cfg.bg
+            : node.isStart
+              ? "rgba(212,175,55,0.12)"
+              : "rgba(13,11,7,0.9)",
+        border: `1px solid ${
+          selected ? colors.gold : node.isStart ? "rgba(212,175,55,0.6)" : cfg.border
+        }`,
+        borderRadius: 7,
+        boxShadow: selected ? `0 0 0 1px ${colors.gold}55, 0 0 18px rgba(212,175,55,0.2)` : "none",
+        cursor: "grab",
+        touchAction: "none",
+        opacity: node.unplaced ? 0.72 : 1,
+        zIndex: selected || hovered ? 10 : 1,
       }}
     >
-      <DialogContent
+      <span
         style={{
-          ...roomPopupStyle,
-          borderColor: cfg.border,
+          maxWidth: "100%",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+          fontSize: 11,
+          fontFamily: fonts.display,
+          fontWeight: 600,
+          letterSpacing: "0.03em",
+          color: node.isStart ? colors.gold : colors.text,
         }}
       >
-        {["tl", "tr", "bl", "br"].map((pos) => (
-          <div
-            key={pos}
-            style={{
-              position: "absolute",
-              ...(pos.includes("t") ? { top: 10 } : { bottom: 10 }),
-              ...(pos.includes("l") ? { left: 10 } : { right: 10 }),
-              width: 14,
-              height: 14,
-              borderTop: pos.includes("t") ? `1px solid rgba(212,175,55,0.35)` : "none",
-              borderBottom: pos.includes("b") ? `1px solid rgba(212,175,55,0.35)` : "none",
-              borderLeft: pos.includes("l") ? `1px solid rgba(212,175,55,0.35)` : "none",
-              borderRight: pos.includes("r") ? `1px solid rgba(212,175,55,0.35)` : "none",
-            }}
-          />
-        ))}
+        {node.room.name}
+      </span>
+      <span
+        style={{
+          fontSize: 9,
+          fontFamily: fonts.display,
+          letterSpacing: "0.06em",
+          color: cfg.color,
+          opacity: 0.85,
+        }}
+      >
+        {cfg.label}
+      </span>
+      {node.isStart && <span style={startBadgeStyle}>START</span>}
+    </button>
+  );
+}
 
-        <div style={{ marginBottom: 20 }}>
-          <div style={roomPopupStyle2}>
-            <div style={{ width: 2, height: 18, background: cfg.color, borderRadius: 1 }} />
-            <DialogTitle asChild>
-              <h3 style={roomPopupStyle3}>{room.name}</h3>
-            </DialogTitle>
-          </div>
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 5,
-              background: cfg.bg,
-              border: `1px solid ${cfg.border}`,
-              borderRadius: 4,
-              padding: "2px 10px",
-              marginLeft: 10,
-            }}
-          >
-            <span
-              style={{
-                fontSize: 12,
-                color: cfg.color,
-                fontFamily: fonts.display,
-                letterSpacing: "0.06em",
-              }}
-            >
-              {cfg.label}
-            </span>
-          </div>
-        </div>
+function SectionManagerDialog({
+  sections,
+  onClose,
+  onChanged,
+  showToast,
+}: {
+  sections: Section[];
+  onClose: () => void;
+  onChanged: () => Promise<void>;
+  showToast: (type: "success" | "error", message: string) => void;
+}) {
+  const [drafts, setDrafts] = useState<Record<number, string>>(() =>
+    Object.fromEntries(sections.map((section) => [section.id, section.name])),
+  );
+  const [newName, setNewName] = useState("");
+  const [busy, setBusy] = useState(false);
 
-        {room.interaction?.type === "NPC" && (
-          <>
-            <Row label="NPC" value={room.interaction.npc.name} />
-            <Row label="Discovers" value={room.interaction.npc.discoveryMessage || "—"} />
-            <Row label="Says" value={room.interaction.npc.dialogue?.join(", ") || "—"} />
-          </>
-        )}
+  useEffect(() => {
+    setDrafts(Object.fromEntries(sections.map((section) => [section.id, section.name])));
+  }, [sections]);
 
-        {room.interaction?.type === "chest" && (
-          <>
-            <Row label="Item" value={room.interaction.chest.itemId} />
-            <Row label="Quantity" value={room.interaction.chest.quantity} />
-            <Row label="Locked" value={room.interaction.chest.isLocked ? "Yes" : "No"} />
-          </>
-        )}
+  const rename = async (section: Section) => {
+    const name = (drafts[section.id] ?? "").trim();
+    if (!name || name === section.name) return;
+    setBusy(true);
+    try {
+      const { error } = await supabase.from("sections").update({ name }).eq("id", section.id);
+      if (error) throw error;
+      await onChanged();
+      showToast("success", "Section renamed.");
+    } catch (err) {
+      showToast("error", errorMessage(err));
+    } finally {
+      setBusy(false);
+    }
+  };
 
-        {room.interaction?.type === "camp" && (
-          <>
-            <Row label="Heals" value={`${room.interaction.camp.healAmount} HP`} />
-            <Row label="Mana" value={room.interaction.camp.restoresMana ? "Restored" : "No"} />
-          </>
-        )}
+  const remove = async (section: Section) => {
+    if (
+      !window.confirm(
+        `Delete section "${section.name}"? Rooms stay in the database but lose their section.`,
+      )
+    ) {
+      return;
+    }
+    setBusy(true);
+    try {
+      const { error } = await supabase.from("sections").delete().eq("id", section.id);
+      if (error) throw error;
+      await onChanged();
+      showToast("success", `"${section.name}" was removed.`);
+    } catch (err) {
+      showToast("error", errorMessage(err));
+    } finally {
+      setBusy(false);
+    }
+  };
 
-        {room.enemies?.length > 0 &&
-          room.enemies.map((enemy, i) => (
-            <div key={enemy.name + i} style={{ marginTop: i > 0 ? 12 : 0 }}>
-              {i === 0 && <div style={roomPopupStyle4}>Enemies</div>}
-              <div style={roomPopupStyle5}>
-                <div style={roomPopupStyle6}>{enemy.name}</div>
-                <div style={roomPopupStyle7}>
-                  {[
-                    ["HP", enemy.health],
-                    ["STR", enemy.strength],
-                    ["DEF", enemy.defense],
-                    ["DEX", enemy.dex],
-                  ].map(([stat, val]) => (
-                    <div
-                      key={stat as string}
-                      style={{ display: "flex", justifyContent: "space-between" }}
-                    >
-                      <span style={roomPopupStyle8}>{stat}</span>
-                      <span style={{ fontSize: 13, color: colors.text }}>{val}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+  const create = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const name = newName.trim();
+    if (!name) return;
+    setBusy(true);
+    try {
+      const { error } = await supabase.from("sections").insert({ name });
+      if (error) throw error;
+      setNewName("");
+      await onChanged();
+      showToast("success", `"${name}" was created.`);
+    } catch (err) {
+      showToast("error", errorMessage(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent style={dialogStyle}>
+        <DialogTitle asChild>
+          <h2 style={dialogTitleStyle}>Sections</h2>
+        </DialogTitle>
+        <p style={dialogHintStyle}>
+          Sections group rooms and decide where exploration begins. The full Sections page remains
+          available as a secondary view.
+        </p>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          {sections.map((section) => (
+            <div key={section.id} style={sectionRowStyle}>
+              <input
+                value={drafts[section.id] ?? ""}
+                onChange={(event) =>
+                  setDrafts((current) => ({ ...current, [section.id]: event.target.value }))
+                }
+                onBlur={() => void rename(section)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    void rename(section);
+                  }
+                }}
+                aria-label={`Rename ${section.name}`}
+                style={dialogInputStyle}
+              />
+              <button
+                type="button"
+                onClick={() => void remove(section)}
+                disabled={busy}
+                style={dialogDangerStyle}
+              >
+                Delete
+              </button>
             </div>
           ))}
+          {sections.length === 0 && <div style={dialogEmptyStyle}>No sections yet.</div>}
+        </div>
 
-        {room.neighboringRooms?.length > 0 && (
-          <div style={{ marginTop: 16 }}>
-            <div style={roomPopupStyle9}>Passages</div>
-            <div style={roomPopupStyle10}>
-              {room.neighboringRooms.map(([dir, neighbor], i) => (
-                <div key={i} style={roomPopupStyle11}>
-                  <span style={roomPopupStyle12}>
-                    {Directions[dir as unknown as number]?.toUpperCase?.() ?? dir}
-                  </span>
-                  <span style={{ fontSize: 10, color: "#6B7280" }}>→</span>
-                  <span style={roomPopupStyle13}>{neighbor.name}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        <form
+          onSubmit={(event) => void create(event)}
+          style={{ display: "flex", gap: 8, marginTop: 18 }}
+        >
+          <input
+            value={newName}
+            onChange={(event) => setNewName(event.target.value)}
+            placeholder="New section name"
+            aria-label="New section name"
+            style={{ ...dialogInputStyle, flex: 1 }}
+          />
+          <button type="submit" disabled={busy || !newName.trim()} style={dialogPrimaryStyle}>
+            Create
+          </button>
+        </form>
 
-        <div style={roomPopupActionsStyle}>
-          <a
-            href={`/admin/game-design/rooms?room=${room.id}`}
-            style={{
-              ...roomPopupStyle14,
-              marginTop: 0,
-              textAlign: "center",
-              textDecoration: "none",
-              color: colors.gold,
-            }}
-          >
-            Edit Room
-          </a>
-          <button
-            onClick={onClose}
-            style={{ ...roomPopupStyle14, marginTop: 0 }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(180,140,80,0.1)";
-              e.currentTarget.style.color = colors.gold;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "transparent";
-              e.currentTarget.style.color = colors.goldMuted;
-            }}
-          >
-            Close
+        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
+          <button type="button" onClick={onClose} style={dialogButtonStyle}>
+            Done
           </button>
         </div>
       </DialogContent>
@@ -475,187 +936,124 @@ function RoomPopup({ room, onClose }: { room: Room; onClose: () => void }) {
   );
 }
 
-function Legend() {
-  const entries = Object.entries(interactionConfig);
-  return (
-    <div style={legendStyle}>
-      <div style={legendStyle2}>Legend</div>
-      {entries.map(([, cfg]) => (
-        <div key={cfg.label} style={legendStyle3}>
-          <div
-            style={{
-              width: 10,
-              height: 10,
-              borderRadius: 2,
-              background: cfg.bg,
-              border: `1px solid ${cfg.border}`,
-            }}
-          />
-          <span style={{ fontSize: 11, color: cfg.color, fontFamily: "'Cinzel', Georgia, serif" }}>
-            {cfg.label}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
 }
 
-export default function RoomMap() {
-  const allRooms = useGameStore((state) => state.rooms);
-  const availableSections = useGameStore((state) => state.availableSections);
-  const [selectedSectionId, setSelectedSectionId] = useState<number | null>(null);
-
-  const rooms =
-    selectedSectionId !== null
-      ? allRooms.filter((r) => r.sectionId === selectedSectionId)
-      : allRooms;
-
-  const startRoom = rooms.length > 0 ? rooms[0] : null;
-  const containerRef = useRef<HTMLDivElement>(null);
-  const isDraggingRef = useRef(false);
-  const dragStartRef = useRef({ x: 0, y: 0 });
-  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
-
-  const bounds = startRoom ? calculateBounds(startRoom) : null;
-  const padding = CONTAINER_PADDING;
-  const verticalPadding = 100;
-  const containerWidth = bounds ? bounds.maxX - bounds.minX + padding * 2 + ROOM_W : 0;
-  const containerHeight = bounds ? bounds.maxY - bounds.minY + verticalPadding * 2 + ROOM_H : 0;
-  const offsetX = bounds ? -bounds.minX + padding : 0;
-  const offsetY = bounds ? -bounds.minY + verticalPadding : 0;
-
-  useEffect(() => {
-    if (containerRef.current) {
-      const c = containerRef.current;
-      c.scrollTo({
-        left: (c.scrollWidth - c.clientWidth) / 2,
-        top: (c.scrollHeight - c.clientHeight) / 2,
-        behavior: "smooth",
-      });
-    }
-  }, [containerWidth, containerHeight]);
-
-  if (!startRoom) {
-    return (
-      <main style={roomMapStyle}>
-        <p style={{ color: "#6B7280", fontFamily: "'Cinzel', Georgia, serif" }}>
-          No start room found. Create one in World Builder.
-        </p>
-      </main>
-    );
-  }
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    isDraggingRef.current = true;
-    dragStartRef.current = { x: e.clientX, y: e.clientY };
-    if (containerRef.current) containerRef.current.style.cursor = "grabbing";
-  };
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDraggingRef.current || !containerRef.current) return;
-    containerRef.current.scrollLeft -= e.clientX - dragStartRef.current.x;
-    containerRef.current.scrollTop -= e.clientY - dragStartRef.current.y;
-    dragStartRef.current = { x: e.clientX, y: e.clientY };
-  };
-  const handleMouseUp = () => {
-    isDraggingRef.current = false;
-    if (containerRef.current) containerRef.current.style.cursor = "grab";
-  };
-
-  return (
-    <>
-      <main style={roomMapStyle2}>
-        <div style={{ padding: "24px 28px 16px", flexShrink: 0 }}>
-          <div style={roomMapStyle3}>
-            <div style={roomMapStyle4} />
-            <h1 style={roomMapStyle5}>Realm Map</h1>
-            <div style={roomMapStyle6}>
-              <div style={roomMapStyle7}>
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#B4965A"
-                  strokeWidth={1.5}
-                  width={14}
-                  height={14}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"
-                  />
-                </svg>
-                <span style={roomMapStyle8}>{rooms.length} rooms</span>
-              </div>
-              <select
-                value={selectedSectionId ?? ""}
-                onChange={(e) =>
-                  setSelectedSectionId(e.target.value ? Number(e.target.value) : null)
-                }
-                style={roomMapStyle9}
-              >
-                <option value="">All Sections</option>
-                {availableSections.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <p style={roomMapStyle10}>Drag to explore · Click any room to inspect</p>
-        </div>
-
-        <div style={roomMapStyle11}>
-          <div style={roomMapStyle12} />
-          <div style={roomMapStyle13} />
-
-          <div
-            ref={containerRef}
-            style={roomMapStyle14}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
-          >
-            <div style={{ position: "relative", width: containerWidth, height: containerHeight }}>
-              <svg style={roomMapStyle15}>
-                <g transform={`translate(${offsetX}, ${offsetY})`}>
-                  <ConnectorLayer room={startRoom} x={0} y={0} visitedRooms={new Set()} />
-                </g>
-              </svg>
-
-              <div
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  transform: `translate(${offsetX}px, ${offsetY}px)`,
-                }}
-              >
-                <RoomNode
-                  room={startRoom}
-                  x={0}
-                  y={0}
-                  visitedRooms={new Set()}
-                  depth={0}
-                  onRoomClick={setSelectedRoom}
-                  isStart
-                />
-              </div>
-            </div>
-          </div>
-
-          <Legend />
-        </div>
-      </main>
-
-      {selectedRoom && <RoomPopup room={selectedRoom} onClose={() => setSelectedRoom(null)} />}
-    </>
-  );
-}
-
-// Static style objects hoisted out of the render path.
-const roomNodeStyle: CSSProperties = {
+const mapPageStyle: CSSProperties = {
+  height: "100%",
+  background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 50%, #0f0e09 100%)",
+};
+const headerStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "flex-end",
+  justifyContent: "space-between",
+  gap: 16,
+  flexWrap: "wrap",
+  padding: "18px 24px 14px",
+  borderBottom: `1px solid ${colors.goldBorder}`,
+  flexShrink: 0,
+};
+const eyebrowStyle: CSSProperties = {
+  fontSize: 10,
+  fontWeight: 700,
+  letterSpacing: "0.14em",
+  textTransform: "uppercase",
+  color: colors.goldMuted,
+  fontFamily: fonts.display,
+  marginBottom: 4,
+};
+const titleRowStyle: CSSProperties = { display: "flex", alignItems: "center", gap: 9 };
+const titleStyle: CSSProperties = {
+  margin: 0,
+  fontSize: 24,
+  color: colors.text,
+  fontFamily: fonts.display,
+  letterSpacing: "0.05em",
+};
+const countStyle: CSSProperties = {
+  padding: "2px 9px",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 20,
+  fontSize: 10,
+  color: colors.goldMuted,
+  fontFamily: fonts.display,
+  letterSpacing: "0.06em",
+};
+const hintStyle: CSSProperties = {
+  margin: "5px 0 0",
+  fontSize: 11,
+  color: colors.muted,
+};
+const toolbarStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 6,
+  flexWrap: "wrap",
+};
+const selectStyle: CSSProperties = {
+  background: "rgba(0,0,0,0.35)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 6,
+  padding: "7px 10px",
+  color: colors.text,
+  fontSize: 12,
+  fontFamily: fonts.body,
+  outline: "none",
+  cursor: "pointer",
+};
+const toolButtonStyle: CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 6,
+  padding: "7px 10px",
+  background: "rgba(255,255,255,0.03)",
+  border: `1px solid ${colors.subtleBorder}`,
+  borderRadius: 6,
+  color: colors.textMuted,
+  fontSize: 11,
+  fontFamily: fonts.display,
+  letterSpacing: "0.04em",
+  cursor: "pointer",
+};
+const toolLinkStyle: CSSProperties = {
+  ...toolButtonStyle,
+  textDecoration: "none",
+};
+const canvasWrapStyle: CSSProperties = {
+  display: "flex",
+  flex: 1,
+  minHeight: 0,
+  position: "relative",
+};
+const viewportStyle: CSSProperties = {
+  position: "relative",
+  flex: 1,
+  minWidth: 0,
+  overflow: "hidden",
+  cursor: "grab",
+  touchAction: "none",
+  userSelect: "none",
+};
+const sectionLabelStyle: CSSProperties = {
+  display: "inline-block",
+  padding: "2px 10px",
+  borderRadius: 20,
+  border: `1px solid ${colors.goldBorder}`,
+  background: "rgba(13,11,7,0.9)",
+  color: colors.goldMuted,
+  fontFamily: fonts.display,
+  fontSize: 10,
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+};
+const unplacedLabelStyle: CSSProperties = {
+  ...sectionLabelStyle,
+  color: colors.warning,
+  borderColor: "rgba(242,164,68,0.3)",
+  marginTop: 6,
+};
+const startBadgeStyle: CSSProperties = {
   position: "absolute",
   top: -8,
   left: "50%",
@@ -670,258 +1068,122 @@ const roomNodeStyle: CSSProperties = {
   borderRadius: 3,
   whiteSpace: "nowrap",
 };
-const rowStyle: CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "baseline",
-  padding: "6px 0",
-  borderBottom: "1px solid rgba(180,140,80,0.1)",
-};
-const rowStyle2: CSSProperties = {
-  fontSize: 11,
-  color: colors.muted,
-  fontFamily: fonts.display,
-  letterSpacing: "0.06em",
-  textTransform: "uppercase",
-};
-const rowStyle3: CSSProperties = { fontSize: 14, color: colors.text, fontFamily: fonts.body };
-const roomPopupStyle: CSSProperties = {
-  background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 100%)",
-  borderRadius: 12,
-  padding: 28,
-  maxWidth: 340,
-  overflowY: "auto",
-  fontFamily: "'Crimson Text', Georgia, serif",
-};
-const roomPopupStyle2: CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 8,
-  marginBottom: 4,
-};
-const roomPopupStyle3: CSSProperties = {
-  margin: 0,
-  fontSize: 20,
-  fontWeight: 700,
-  color: colors.text,
-  fontFamily: fonts.display,
-  letterSpacing: "0.04em",
-};
-const roomPopupStyle4: CSSProperties = {
-  fontSize: 11,
-  color: colors.muted,
-  fontFamily: fonts.display,
-  letterSpacing: "0.06em",
-  textTransform: "uppercase",
-  marginBottom: 6,
-};
-const roomPopupStyle5: CSSProperties = {
-  background: "rgba(220,38,38,0.08)",
-  border: "1px solid rgba(220,38,38,0.2)",
-  borderRadius: 6,
-  padding: "10px 12px",
-};
-const roomPopupStyle6: CSSProperties = {
-  fontSize: 14,
-  fontWeight: 600,
-  color: colors.danger,
-  marginBottom: 8,
-  fontFamily: fonts.display,
-};
-const roomPopupStyle7: CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "1fr 1fr",
-  gap: "4px 16px",
-};
-const roomPopupStyle8: CSSProperties = {
-  fontSize: 11,
-  color: colors.muted,
-  fontFamily: fonts.display,
-};
-const roomPopupStyle9: CSSProperties = {
-  fontSize: 11,
-  color: colors.muted,
-  fontFamily: "'Cinzel', Georgia, serif",
-  letterSpacing: "0.06em",
-  textTransform: "uppercase",
-  marginBottom: 8,
-};
-const roomPopupStyle10: CSSProperties = { display: "flex", gap: 6, flexWrap: "wrap" };
-const roomPopupStyle11: CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 4,
-  background: "rgba(180,140,80,0.08)",
-  border: "1px solid rgba(180,140,80,0.2)",
-  borderRadius: 4,
-  padding: "3px 8px",
-};
-const roomPopupStyle12: CSSProperties = {
-  fontSize: 10,
-  color: colors.gold,
-  fontFamily: "'Cinzel', Georgia, serif",
-};
-const roomPopupStyle13: CSSProperties = {
-  fontSize: 11,
-  color: colors.text,
-  fontFamily: "'Crimson Text', Georgia, serif",
-};
-const roomPopupStyle14: CSSProperties = {
-  marginTop: 24,
-  width: "100%",
-  padding: "10px",
-  background: "transparent",
-  border: `1px solid ${colors.goldBorder}`,
-  borderRadius: 6,
-  color: colors.goldMuted,
-  fontSize: 13,
-  fontFamily: fonts.display,
-  letterSpacing: "0.08em",
-  cursor: "pointer",
-  transition: "all 0.15s",
-};
-const roomPopupActionsStyle: CSSProperties = {
-  display: "flex",
-  gap: 8,
-  marginTop: 24,
-};
-const legendStyle: CSSProperties = {
+const zoomControlsStyle: CSSProperties = {
   position: "absolute",
-  bottom: 16,
-  right: 16,
-  zIndex: 10,
-  background: "rgba(13,11,7,0.9)",
-  border: "1px solid rgba(180,140,80,0.2)",
-  borderRadius: 8,
-  padding: "10px 14px",
+  right: 14,
+  bottom: 14,
+  zIndex: 20,
   display: "flex",
-  flexDirection: "column",
-  gap: 5,
-  backdropFilter: "blur(4px)",
+  alignItems: "center",
+  gap: 2,
+  padding: 4,
+  background: "rgba(13,11,7,0.9)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 8,
 };
-const legendStyle2: CSSProperties = {
-  fontSize: 9,
-  color: colors.muted,
-  fontFamily: "'Cinzel', Georgia, serif",
-  letterSpacing: "0.1em",
-  textTransform: "uppercase",
-  marginBottom: 2,
-};
-const legendStyle3: CSSProperties = { display: "flex", alignItems: "center", gap: 7 };
-const roomMapStyle: CSSProperties = {
-  minHeight: "100%",
-  background: "linear-gradient(160deg, #0d0b07, #1a1209)",
+const zoomButtonStyle: CSSProperties = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
+  width: 28,
+  height: 28,
+  background: "transparent",
+  border: "none",
+  color: colors.textMuted,
+  cursor: "pointer",
 };
-const roomMapStyle2: CSSProperties = {
-  minHeight: "100%",
-  background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 50%, #0f0e09 100%)",
+const zoomLabelStyle: CSSProperties = {
+  minWidth: 42,
+  textAlign: "center",
+  fontSize: 10,
+  color: colors.goldMuted,
+  fontFamily: fonts.display,
+};
+const emptyCanvasStyle: CSSProperties = {
+  position: "absolute",
+  inset: 0,
   display: "flex",
   flexDirection: "column",
-};
-const roomMapStyle3: CSSProperties = {
-  display: "flex",
   alignItems: "center",
+  justifyContent: "center",
   gap: 12,
-  marginBottom: 4,
-};
-const roomMapStyle4: CSSProperties = {
-  width: 3,
-  height: 28,
-  background: `linear-gradient(to bottom, ${colors.gold}, transparent)`,
-  borderRadius: 2,
-};
-const roomMapStyle5: CSSProperties = {
-  margin: 0,
-  fontSize: 26,
-  fontWeight: 700,
-  color: colors.text,
-  fontFamily: "'Cinzel', Georgia, serif",
-  letterSpacing: "0.05em",
-};
-const roomMapStyle6: CSSProperties = {
-  marginLeft: "auto",
-  display: "flex",
-  gap: 6,
-  alignItems: "center",
-};
-const roomMapStyle7: CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 4,
-  background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(180,140,80,0.15)",
-  borderRadius: 20,
-  padding: "4px 12px 4px 8px",
-};
-const roomMapStyle8: CSSProperties = {
-  fontSize: 12,
-  color: "#B4965A",
-  fontFamily: "'Cinzel', Georgia, serif",
-  letterSpacing: "0.08em",
-};
-const roomMapStyle9: CSSProperties = {
-  background: "rgba(0,0,0,0.4)",
-  border: "1px solid rgba(180,140,80,0.3)",
-  borderRadius: 6,
-  padding: "5px 28px 5px 10px",
-  color: colors.text,
-  fontSize: 12,
-  fontFamily: "'Cinzel', Georgia, serif",
-  letterSpacing: "0.04em",
-  outline: "none",
-  cursor: "pointer",
-  appearance: "none",
-  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'%3E%3Cpath stroke='%239CA3AF' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E")`,
-  backgroundRepeat: "no-repeat",
-  backgroundPosition: "right 8px center",
-  backgroundSize: 14,
-};
-const roomMapStyle10: CSSProperties = {
-  margin: 0,
-  paddingLeft: 15,
-  color: "#6B7280",
+  color: colors.muted,
   fontSize: 14,
-  fontFamily: "'Crimson Text', Georgia, serif",
 };
-const roomMapStyle11: CSSProperties = {
-  flex: 1,
-  margin: "0 16px 16px",
-  position: "relative",
+const dialogStyle: CSSProperties = {
+  maxWidth: 460,
+  background: "linear-gradient(160deg, #0d0b07 0%, #1a1209 100%)",
+  border: `1px solid ${colors.goldBorder}`,
   borderRadius: 12,
-  overflow: "hidden",
-  border: "1px solid rgba(180,140,80,0.15)",
+  padding: 24,
+  color: colors.text,
+  fontFamily: fonts.body,
 };
-const roomMapStyle12: CSSProperties = {
-  position: "absolute",
-  inset: 0,
-  zIndex: 0,
-  backgroundImage: "radial-gradient(circle, rgba(180,140,80,0.15) 1px, transparent 1px)",
-  backgroundSize: "32px 32px",
+const dialogTitleStyle: CSSProperties = {
+  margin: 0,
+  color: colors.text,
+  fontFamily: fonts.display,
+  fontSize: 20,
+  letterSpacing: "0.04em",
 };
-const roomMapStyle13: CSSProperties = {
-  position: "absolute",
-  inset: 0,
-  zIndex: 1,
-  background: "radial-gradient(ellipse at center, transparent 40%, rgba(13,11,7,0.7) 100%)",
-  pointerEvents: "none",
+const dialogHintStyle: CSSProperties = {
+  margin: "8px 0 18px",
+  fontSize: 12,
+  lineHeight: 1.5,
+  color: colors.muted,
 };
-const roomMapStyle14: CSSProperties = {
-  position: "absolute",
-  inset: 0,
-  zIndex: 2,
-  overflow: "auto",
-  cursor: "grab",
-  userSelect: "none",
+const sectionRowStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 8,
 };
-const roomMapStyle15: CSSProperties = {
-  position: "absolute",
-  top: 0,
-  left: 0,
-  width: "100%",
-  height: "100%",
-  overflow: "visible",
-  pointerEvents: "none",
+const dialogInputStyle: CSSProperties = {
+  padding: "8px 10px",
+  background: "rgba(0,0,0,0.35)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 6,
+  color: colors.text,
+  fontSize: 13,
+  fontFamily: fonts.body,
+  outline: "none",
+  minWidth: 0,
+};
+const dialogDangerStyle: CSSProperties = {
+  padding: "6px 10px",
+  background: "rgba(220,38,38,0.07)",
+  border: "1px solid rgba(220,38,38,0.25)",
+  borderRadius: 5,
+  color: "#FCA5A5",
+  fontSize: 10,
+  fontFamily: fonts.display,
+  cursor: "pointer",
+};
+const dialogPrimaryStyle: CSSProperties = {
+  padding: "8px 14px",
+  background: "rgba(212,175,55,0.16)",
+  border: `1px solid ${colors.goldBorder}`,
+  borderRadius: 6,
+  color: colors.gold,
+  fontSize: 11,
+  fontWeight: 700,
+  fontFamily: fonts.display,
+  cursor: "pointer",
+};
+const dialogButtonStyle: CSSProperties = {
+  padding: "8px 16px",
+  background: "rgba(255,255,255,0.03)",
+  border: `1px solid ${colors.subtleBorder}`,
+  borderRadius: 6,
+  color: colors.textMuted,
+  fontSize: 11,
+  fontFamily: fonts.display,
+  cursor: "pointer",
+};
+const dialogEmptyStyle: CSSProperties = {
+  padding: "16px 12px",
+  textAlign: "center",
+  color: colors.muted,
+  fontSize: 12,
+  border: `1px dashed ${colors.subtleBorder}`,
+  borderRadius: 7,
 };

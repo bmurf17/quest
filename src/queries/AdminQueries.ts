@@ -66,6 +66,121 @@ export async function deleteRoom(roomId: number): Promise<void> {
   if (error) throw error;
 }
 
+/** Persist a room's dragged position on the Realm Map. */
+export async function updateRoomPosition(
+  roomId: number,
+  mapX: number,
+  mapY: number,
+): Promise<void> {
+  const { error } = await supabase
+    .from("rooms")
+    .update({ map_x: mapX, map_y: mapY })
+    .eq("id", roomId);
+
+  if (error) throw error;
+}
+
+/** Clear saved drag overrides so the auto-layout takes over again. */
+export async function clearRoomPositions(roomIds: number[]): Promise<void> {
+  if (roomIds.length === 0) return;
+
+  const { error } = await supabase
+    .from("rooms")
+    .update({ map_x: null, map_y: null })
+    .in("id", roomIds);
+
+  if (error) throw error;
+}
+
+/** Choose the room exploration starts in for a section. */
+export async function setSectionStartRoom(sectionId: number, roomId: number | null): Promise<void> {
+  const { error } = await supabase
+    .from("sections")
+    .update({ start_room_id: roomId })
+    .eq("id", sectionId);
+
+  if (error) throw error;
+}
+
+export interface CreateRoomExit {
+  /** Compass direction from the existing target room to the new room. */
+  direction: Directions;
+  targetRoomId: number;
+}
+
+export interface CreateRoomWithExitsInput {
+  name: string;
+  sectionId: number | null;
+  exits: CreateRoomExit[];
+  mapX?: number | null;
+  mapY?: number | null;
+}
+
+/**
+ * Create a room and mirror its doorways on the destination rooms in one helper.
+ * The room is removed again if a doorway fails, so the map never keeps a
+ * half-connected room.
+ */
+export async function createRoomWithExits(input: CreateRoomWithExitsInput): Promise<number> {
+  const name = input.name.trim();
+  if (!name) throw new Error("Room name is required.");
+
+  const seenDirections = new Set<Directions>();
+  for (const exit of input.exits) {
+    if (seenDirections.has(exit.direction)) {
+      throw new Error(
+        `Two doorways cannot both use the ${DIRECTION_NAMES[exit.direction]} direction.`,
+      );
+    }
+    seenDirections.add(exit.direction);
+    // The target owns the doorway in `exit.direction`; the new room mirrors it.
+    if (await directionInUse(exit.targetRoomId, exit.direction)) {
+      throw new Error(
+        `The destination already has a doorway to the ${DIRECTION_NAMES[exit.direction]}.`,
+      );
+    }
+  }
+
+  const { data, error } = await supabase
+    .from("rooms")
+    .insert({
+      name,
+      section_id: input.sectionId,
+      map_x: input.mapX ?? null,
+      map_y: input.mapY ?? null,
+    })
+    .select("id")
+    .single();
+
+  if (error) throw error;
+  const roomId = data.id;
+
+  try {
+    for (const exit of input.exits) {
+      const reverse = oppositeDirection(exit.direction);
+      const { error: linkError } = await supabase.from("neighboring_rooms").insert([
+        {
+          room_id: exit.targetRoomId,
+          neighbor_room_id: roomId,
+          direction: directionToDbEnum(exit.direction),
+        },
+        {
+          room_id: roomId,
+          neighbor_room_id: exit.targetRoomId,
+          direction: directionToDbEnum(reverse),
+        },
+      ]);
+
+      if (linkError) throw linkError;
+    }
+  } catch (err) {
+    await supabase.from("rooms").delete().eq("id", roomId);
+    throw err;
+  }
+
+  return roomId;
+}
+
 async function directionInUse(roomId: number, direction: Directions): Promise<boolean> {
   const { data, error } = await supabase
     .from("neighboring_rooms")

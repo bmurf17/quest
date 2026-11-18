@@ -14,7 +14,7 @@ import type { AdminEnemyRow } from "@/queries/AdminEnemyQueries";
 import type { DbItem } from "@/queries/RoomQueries";
 import type { CSSProperties } from "react";
 
-type InteractionKind = "none" | "NPC" | "chest" | "camp" | "transition" | "cutscene";
+type InteractionKind = "none" | "Combat" | "NPC" | "chest" | "camp" | "transition" | "cutscene";
 
 interface InteractionDraft {
   type: InteractionKind;
@@ -57,9 +57,18 @@ const blankDraft = (): InteractionDraft => ({
   cutsceneDiscovery: "",
 });
 
-function draftFromInteraction(interaction: RoomInteraction | null): InteractionDraft {
+function draftFromInteraction(
+  interaction: RoomInteraction | null,
+  hasEnemies = false,
+): InteractionDraft {
   const draft = blankDraft();
-  if (!interaction) return draft;
+  if (!interaction) {
+    return {
+      ...draft,
+      // Rooms without an interaction and with enemies are combat rooms.
+      type: hasEnemies ? "Combat" : "none",
+    };
+  }
 
   switch (interaction.type) {
     case "NPC":
@@ -121,7 +130,7 @@ export function RoomContents({ room, onRefresh, showToast }: RoomContentsProps) 
     room.enemies.map((enemy) => enemy.id),
   );
   const [draft, setDraft] = useState<InteractionDraft>(() =>
-    draftFromInteraction(room.interaction),
+    draftFromInteraction(room.interaction, room.enemies.length > 0),
   );
   const [isSavingEnemies, setIsSavingEnemies] = useState(false);
   const [isSavingInteraction, setIsSavingInteraction] = useState(false);
@@ -145,8 +154,10 @@ export function RoomContents({ room, onRefresh, showToast }: RoomContentsProps) 
 
   useEffect(() => {
     setSelectedEnemyIds(room.enemies.map((enemy) => enemy.id));
-    setDraft(draftFromInteraction(room.interaction));
+    setDraft(draftFromInteraction(room.interaction, room.enemies.length > 0));
   }, [room]);
+
+  const isCombat = draft.type === "Combat";
 
   const enemiesChanged = useMemo(
     () =>
@@ -170,8 +181,13 @@ export function RoomContents({ room, onRefresh, showToast }: RoomContentsProps) 
     setIsSavingEnemies(true);
     try {
       await setRoomEnemies(room.id, selectedEnemyIds);
+      // A combat room cannot also carry an interaction, otherwise the runtime
+      // would start combat and never show the interaction.
+      if (room.interaction) {
+        await saveRoomInteraction(room.id, { type: "none" });
+      }
       await onRefresh();
-      showToast("success", "Room enemies updated.");
+      showToast("success", "Combat room saved.");
     } catch (err) {
       showToast("error", errorMessage(err));
     } finally {
@@ -180,6 +196,11 @@ export function RoomContents({ room, onRefresh, showToast }: RoomContentsProps) 
   }
 
   async function handleSaveInteraction() {
+    if (isCombat) {
+      await handleSaveEnemies();
+      return;
+    }
+
     let write: RoomInteractionWrite;
 
     if (draft.type === "NPC") {
@@ -239,6 +260,11 @@ export function RoomContents({ room, onRefresh, showToast }: RoomContentsProps) 
     setIsSavingInteraction(true);
     try {
       await saveRoomInteraction(room.id, write);
+      // Leaving combat mode removes the encounter roster so the room does not
+      // immediately re-enter combat on entry.
+      if (room.enemies.length > 0) {
+        await setRoomEnemies(room.id, []);
+      }
       await onRefresh();
       showToast("success", draft.type === "none" ? "Interaction removed." : "Interaction saved.");
     } catch (err) {
@@ -251,57 +277,10 @@ export function RoomContents({ room, onRefresh, showToast }: RoomContentsProps) 
   return (
     <>
       <div style={panelStyle}>
-        <div style={panelHeadingStyle}>Enemies</div>
+        <div style={panelHeadingStyle}>Room type</div>
         <p style={helperTextStyle}>
-          Attach reusable enemies from the library. Combat rooms use this list for their encounter.
-        </p>
-
-        {loadError && <div style={errorStyle}>{loadError}</div>}
-
-        {enemies.length === 0 ? (
-          <div style={emptyStyle}>
-            No enemies in the library yet. Create one on the Enemies page.
-          </div>
-        ) : (
-          <div style={enemyGridStyle}>
-            {enemies.map((enemy) => (
-              <label key={enemy.id} style={checkboxStyle}>
-                <input
-                  type="checkbox"
-                  checked={selectedEnemyIds.includes(enemy.id)}
-                  onChange={() => toggleEnemy(enemy.id)}
-                />
-                <span style={checkboxTextStyle}>
-                  {enemy.name}
-                  <span style={checkboxMetaStyle}>
-                    {enemy.type} · {enemy.health} HP
-                  </span>
-                </span>
-              </label>
-            ))}
-          </div>
-        )}
-
-        <div style={formActionsStyle}>
-          <button
-            type="button"
-            onClick={() => void handleSaveEnemies()}
-            disabled={isSavingEnemies || !enemiesChanged}
-            style={{
-              ...primaryButtonStyle,
-              opacity: isSavingEnemies || !enemiesChanged ? 0.5 : 1,
-              cursor: isSavingEnemies || !enemiesChanged ? "not-allowed" : "pointer",
-            }}
-          >
-            {isSavingEnemies ? "Saving…" : "Save enemies"}
-          </button>
-        </div>
-      </div>
-
-      <div style={panelStyle}>
-        <div style={panelHeadingStyle}>Interaction</div>
-        <p style={helperTextStyle}>
-          Choose what the party finds here. Saving replaces the current interaction.
+          A room is either a combat encounter or an interaction, not both. Switching type clears the
+          other side when you save.
         </p>
 
         <FieldGroup id="roomInteractionType" label="Interaction type">
@@ -315,6 +294,7 @@ export function RoomContents({ room, onRefresh, showToast }: RoomContentsProps) 
               }))
             }
           >
+            <option value="Combat">Combat (enemies)</option>
             <option value="none">None</option>
             <option value="NPC">NPC</option>
             <option value="chest">Chest</option>
@@ -323,235 +303,301 @@ export function RoomContents({ room, onRefresh, showToast }: RoomContentsProps) 
             <option value="cutscene">Cutscene</option>
           </StyledSelect>
         </FieldGroup>
+      </div>
 
-        {draft.type === "NPC" && (
-          <>
-            <FieldGroup id="roomNpcName" label="NPC name">
-              <StyledInput
-                id="roomNpcName"
-                value={draft.npcName}
-                onChange={(event) =>
-                  setDraft((current) => ({ ...current, npcName: event.target.value }))
-                }
-              />
-            </FieldGroup>
-            <FieldGroup id="roomNpcDialogue" label="Opening dialogue (one line per entry)">
-              <textarea
-                id="roomNpcDialogue"
-                value={draft.npcDialogue}
-                rows={4}
-                onChange={(event) =>
-                  setDraft((current) => ({ ...current, npcDialogue: event.target.value }))
-                }
-                style={textareaStyle}
-              />
-            </FieldGroup>
-            <FieldGroup id="roomNpcDiscovery" label="Discovery message">
-              <StyledInput
-                id="roomNpcDiscovery"
-                value={draft.npcDiscovery}
-                onChange={(event) =>
-                  setDraft((current) => ({ ...current, npcDiscovery: event.target.value }))
-                }
-              />
-            </FieldGroup>
-          </>
-        )}
+      {isCombat ? (
+        <div style={panelStyle}>
+          <div style={panelHeadingStyle}>Enemies</div>
+          <p style={helperTextStyle}>
+            Attach reusable enemies from the library. Only combat rooms show this roster.
+          </p>
 
-        {draft.type === "chest" && (
-          <>
-            <FieldGroup id="roomChestItem" label="Item">
-              <StyledSelect
-                id="roomChestItem"
-                value={draft.chestItemId}
-                onChange={(event) =>
-                  setDraft((current) => ({ ...current, chestItemId: event.target.value }))
-                }
-              >
-                <option value="">Select an item…</option>
-                {itemOptions.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.name}
-                  </option>
-                ))}
-                {draft.chestItemId &&
-                  !itemOptions.some((item) => item.id === draft.chestItemId) && (
-                    <option value={draft.chestItemId}>{draft.chestItemId}</option>
-                  )}
-              </StyledSelect>
-            </FieldGroup>
-            <div style={twoColumnStyle}>
-              <FieldGroup id="roomChestQuantity" label="Quantity">
+          {loadError && <div style={errorStyle}>{loadError}</div>}
+
+          {enemies.length === 0 ? (
+            <div style={emptyStyle}>
+              No enemies in the library yet. Create one on the Enemies page.
+            </div>
+          ) : (
+            <div style={enemyGridStyle}>
+              {enemies.map((enemy) => (
+                <label key={enemy.id} style={checkboxStyle}>
+                  <input
+                    type="checkbox"
+                    checked={selectedEnemyIds.includes(enemy.id)}
+                    onChange={() => toggleEnemy(enemy.id)}
+                  />
+                  <span style={checkboxTextStyle}>
+                    {enemy.name}
+                    <span style={checkboxMetaStyle}>
+                      {enemy.type} · {enemy.health} HP
+                    </span>
+                  </span>
+                </label>
+              ))}
+            </div>
+          )}
+
+          {selectedEnemyIds.length === 0 && (
+            <p style={helperTextStyle}>
+              No enemies selected. Saving now leaves this as an empty room.
+            </p>
+          )}
+
+          <div style={formActionsStyle}>
+            <button
+              type="button"
+              onClick={() => void handleSaveEnemies()}
+              disabled={isSavingEnemies || (!enemiesChanged && !room.interaction)}
+              style={{
+                ...primaryButtonStyle,
+                opacity: isSavingEnemies || (!enemiesChanged && !room.interaction) ? 0.5 : 1,
+                cursor:
+                  isSavingEnemies || (!enemiesChanged && !room.interaction)
+                    ? "not-allowed"
+                    : "pointer",
+              }}
+            >
+              {isSavingEnemies ? "Saving…" : "Save combat room"}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div style={panelStyle}>
+          <div style={panelHeadingStyle}>Interaction</div>
+          <p style={helperTextStyle}>
+            Choose what the party finds here. Saving replaces the current interaction.
+          </p>
+
+          {draft.type === "NPC" && (
+            <>
+              <FieldGroup id="roomNpcName" label="NPC name">
                 <StyledInput
-                  id="roomChestQuantity"
-                  type="number"
-                  value={draft.chestQuantity}
+                  id="roomNpcName"
+                  value={draft.npcName}
                   onChange={(event) =>
-                    setDraft((current) => ({
-                      ...current,
-                      chestQuantity: Number(event.target.value) || 1,
-                    }))
+                    setDraft((current) => ({ ...current, npcName: event.target.value }))
                   }
                 />
               </FieldGroup>
-              <div>
-                <label style={labelStyle} htmlFor="roomChestLocked">
-                  Lock state
-                </label>
-                <label style={checkboxStyle} htmlFor="roomChestLocked">
-                  <input
-                    id="roomChestLocked"
-                    type="checkbox"
-                    checked={draft.chestLocked}
+              <FieldGroup id="roomNpcDialogue" label="Opening dialogue (one line per entry)">
+                <textarea
+                  id="roomNpcDialogue"
+                  value={draft.npcDialogue}
+                  rows={4}
+                  onChange={(event) =>
+                    setDraft((current) => ({ ...current, npcDialogue: event.target.value }))
+                  }
+                  style={textareaStyle}
+                />
+              </FieldGroup>
+              <FieldGroup id="roomNpcDiscovery" label="Discovery message">
+                <StyledInput
+                  id="roomNpcDiscovery"
+                  value={draft.npcDiscovery}
+                  onChange={(event) =>
+                    setDraft((current) => ({ ...current, npcDiscovery: event.target.value }))
+                  }
+                />
+              </FieldGroup>
+            </>
+          )}
+
+          {draft.type === "chest" && (
+            <>
+              <FieldGroup id="roomChestItem" label="Item">
+                <StyledSelect
+                  id="roomChestItem"
+                  value={draft.chestItemId}
+                  onChange={(event) =>
+                    setDraft((current) => ({ ...current, chestItemId: event.target.value }))
+                  }
+                >
+                  <option value="">Select an item…</option>
+                  {itemOptions.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name}
+                    </option>
+                  ))}
+                  {draft.chestItemId &&
+                    !itemOptions.some((item) => item.id === draft.chestItemId) && (
+                      <option value={draft.chestItemId}>{draft.chestItemId}</option>
+                    )}
+                </StyledSelect>
+              </FieldGroup>
+              <div style={twoColumnStyle}>
+                <FieldGroup id="roomChestQuantity" label="Quantity">
+                  <StyledInput
+                    id="roomChestQuantity"
+                    type="number"
+                    value={draft.chestQuantity}
                     onChange={(event) =>
                       setDraft((current) => ({
                         ...current,
-                        chestLocked: event.target.checked,
+                        chestQuantity: Number(event.target.value) || 1,
                       }))
                     }
                   />
-                  <span style={checkboxTextStyle}>Locked</span>
-                </label>
+                </FieldGroup>
+                <div>
+                  <label style={labelStyle} htmlFor="roomChestLocked">
+                    Lock state
+                  </label>
+                  <label style={checkboxStyle} htmlFor="roomChestLocked">
+                    <input
+                      id="roomChestLocked"
+                      type="checkbox"
+                      checked={draft.chestLocked}
+                      onChange={(event) =>
+                        setDraft((current) => ({
+                          ...current,
+                          chestLocked: event.target.checked,
+                        }))
+                      }
+                    />
+                    <span style={checkboxTextStyle}>Locked</span>
+                  </label>
+                </div>
               </div>
-            </div>
-            <FieldGroup id="roomChestDiscovery" label="Discovery message">
-              <StyledInput
-                id="roomChestDiscovery"
-                value={draft.chestDiscovery}
-                onChange={(event) =>
-                  setDraft((current) => ({ ...current, chestDiscovery: event.target.value }))
-                }
-              />
-            </FieldGroup>
-          </>
-        )}
-
-        {draft.type === "camp" && (
-          <>
-            <div style={twoColumnStyle}>
-              <FieldGroup id="roomCampHeal" label="Heal amount">
+              <FieldGroup id="roomChestDiscovery" label="Discovery message">
                 <StyledInput
-                  id="roomCampHeal"
-                  type="number"
-                  value={draft.campHeal}
+                  id="roomChestDiscovery"
+                  value={draft.chestDiscovery}
+                  onChange={(event) =>
+                    setDraft((current) => ({ ...current, chestDiscovery: event.target.value }))
+                  }
+                />
+              </FieldGroup>
+            </>
+          )}
+
+          {draft.type === "camp" && (
+            <>
+              <div style={twoColumnStyle}>
+                <FieldGroup id="roomCampHeal" label="Heal amount">
+                  <StyledInput
+                    id="roomCampHeal"
+                    type="number"
+                    value={draft.campHeal}
+                    onChange={(event) =>
+                      setDraft((current) => ({
+                        ...current,
+                        campHeal: Number(event.target.value) || 0,
+                      }))
+                    }
+                  />
+                </FieldGroup>
+                <FieldGroup id="roomCampCost" label="Cost (blank = free)">
+                  <StyledInput
+                    id="roomCampCost"
+                    type="number"
+                    value={draft.campCost}
+                    onChange={(event) =>
+                      setDraft((current) => ({ ...current, campCost: event.target.value }))
+                    }
+                  />
+                </FieldGroup>
+              </div>
+              <label style={checkboxStyle}>
+                <input
+                  type="checkbox"
+                  checked={draft.campMana}
+                  onChange={(event) =>
+                    setDraft((current) => ({ ...current, campMana: event.target.checked }))
+                  }
+                />
+                <span style={checkboxTextStyle}>Also restores mana</span>
+              </label>
+              <FieldGroup id="roomCampDiscovery" label="Discovery message">
+                <StyledInput
+                  id="roomCampDiscovery"
+                  value={draft.campDiscovery}
+                  onChange={(event) =>
+                    setDraft((current) => ({ ...current, campDiscovery: event.target.value }))
+                  }
+                />
+              </FieldGroup>
+            </>
+          )}
+
+          {draft.type === "transition" && (
+            <>
+              <FieldGroup id="roomTransitionDestination" label="Destination">
+                <StyledSelect
+                  id="roomTransitionDestination"
+                  value={draft.transitionDestination}
                   onChange={(event) =>
                     setDraft((current) => ({
                       ...current,
-                      campHeal: Number(event.target.value) || 0,
+                      transitionDestination: event.target.value as "next_dungeon" | "sanctuary",
+                    }))
+                  }
+                >
+                  <option value="next_dungeon">Next dungeon</option>
+                  <option value="sanctuary">Sanctuary</option>
+                </StyledSelect>
+              </FieldGroup>
+              <FieldGroup id="roomTransitionDiscovery" label="Discovery message">
+                <StyledInput
+                  id="roomTransitionDiscovery"
+                  value={draft.transitionDiscovery}
+                  onChange={(event) =>
+                    setDraft((current) => ({
+                      ...current,
+                      transitionDiscovery: event.target.value,
                     }))
                   }
                 />
               </FieldGroup>
-              <FieldGroup id="roomCampCost" label="Cost (blank = free)">
+            </>
+          )}
+
+          {draft.type === "cutscene" && (
+            <>
+              <FieldGroup id="roomCutsceneId" label="Cutscene id">
                 <StyledInput
-                  id="roomCampCost"
-                  type="number"
-                  value={draft.campCost}
+                  id="roomCutsceneId"
+                  value={draft.cutsceneId}
                   onChange={(event) =>
-                    setDraft((current) => ({ ...current, campCost: event.target.value }))
+                    setDraft((current) => ({ ...current, cutsceneId: event.target.value }))
                   }
                 />
               </FieldGroup>
-            </div>
-            <label style={checkboxStyle}>
-              <input
-                type="checkbox"
-                checked={draft.campMana}
-                onChange={(event) =>
-                  setDraft((current) => ({ ...current, campMana: event.target.checked }))
-                }
-              />
-              <span style={checkboxTextStyle}>Also restores mana</span>
-            </label>
-            <FieldGroup id="roomCampDiscovery" label="Discovery message">
-              <StyledInput
-                id="roomCampDiscovery"
-                value={draft.campDiscovery}
-                onChange={(event) =>
-                  setDraft((current) => ({ ...current, campDiscovery: event.target.value }))
-                }
-              />
-            </FieldGroup>
-          </>
-        )}
+              <FieldGroup id="roomCutsceneDiscovery" label="Discovery message">
+                <StyledInput
+                  id="roomCutsceneDiscovery"
+                  value={draft.cutsceneDiscovery}
+                  onChange={(event) =>
+                    setDraft((current) => ({
+                      ...current,
+                      cutsceneDiscovery: event.target.value,
+                    }))
+                  }
+                />
+              </FieldGroup>
+            </>
+          )}
 
-        {draft.type === "transition" && (
-          <>
-            <FieldGroup id="roomTransitionDestination" label="Destination">
-              <StyledSelect
-                id="roomTransitionDestination"
-                value={draft.transitionDestination}
-                onChange={(event) =>
-                  setDraft((current) => ({
-                    ...current,
-                    transitionDestination: event.target.value as "next_dungeon" | "sanctuary",
-                  }))
-                }
-              >
-                <option value="next_dungeon">Next dungeon</option>
-                <option value="sanctuary">Sanctuary</option>
-              </StyledSelect>
-            </FieldGroup>
-            <FieldGroup id="roomTransitionDiscovery" label="Discovery message">
-              <StyledInput
-                id="roomTransitionDiscovery"
-                value={draft.transitionDiscovery}
-                onChange={(event) =>
-                  setDraft((current) => ({
-                    ...current,
-                    transitionDiscovery: event.target.value,
-                  }))
-                }
-              />
-            </FieldGroup>
-          </>
-        )}
-
-        {draft.type === "cutscene" && (
-          <>
-            <FieldGroup id="roomCutsceneId" label="Cutscene id">
-              <StyledInput
-                id="roomCutsceneId"
-                value={draft.cutsceneId}
-                onChange={(event) =>
-                  setDraft((current) => ({ ...current, cutsceneId: event.target.value }))
-                }
-              />
-            </FieldGroup>
-            <FieldGroup id="roomCutsceneDiscovery" label="Discovery message">
-              <StyledInput
-                id="roomCutsceneDiscovery"
-                value={draft.cutsceneDiscovery}
-                onChange={(event) =>
-                  setDraft((current) => ({
-                    ...current,
-                    cutsceneDiscovery: event.target.value,
-                  }))
-                }
-              />
-            </FieldGroup>
-          </>
-        )}
-
-        <div style={formActionsStyle}>
-          <button
-            type="button"
-            onClick={() => void handleSaveInteraction()}
-            disabled={isSavingInteraction}
-            style={{
-              ...primaryButtonStyle,
-              opacity: isSavingInteraction ? 0.5 : 1,
-              cursor: isSavingInteraction ? "not-allowed" : "pointer",
-            }}
-          >
-            {isSavingInteraction
-              ? "Saving…"
-              : draft.type === "none"
-                ? "Clear interaction"
-                : "Save interaction"}
-          </button>
+          <div style={formActionsStyle}>
+            <button
+              type="button"
+              onClick={() => void handleSaveInteraction()}
+              disabled={isSavingInteraction}
+              style={{
+                ...primaryButtonStyle,
+                opacity: isSavingInteraction ? 0.5 : 1,
+                cursor: isSavingInteraction ? "not-allowed" : "pointer",
+              }}
+            >
+              {isSavingInteraction
+                ? "Saving…"
+                : draft.type === "none"
+                  ? "Clear interaction"
+                  : "Save interaction"}
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }

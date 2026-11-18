@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import mushroom from "/images/Mushroom.png";
 import blord from "/images/Blord.png";
 import { getRoomById, supabase } from "@/queries/RoomQueries";
+import { createRoomWithExits } from "@/queries/AdminQueries";
 import { getAdminEnemies } from "@/queries/AdminEnemyQueries";
 import { createQuickDialogueTree, getAdminNpcSummaries } from "@/queries/AdminDialogueQueries";
 import { useGameStore } from "@/state/GameState";
 import { logger } from "@/lib/logger";
-import { directionToDbEnum, DIRECTION_OPTIONS, oppositeDirection } from "@/lib/directions";
+import { DIRECTION_OPTIONS } from "@/lib/directions";
 import { Directions } from "@/types/Directions";
 import type { Json } from "@/types/database.generated";
 import {
@@ -289,15 +290,14 @@ export function useCreateRoomForm() {
         }
       }
 
-      const { data: newRoomData, error: roomError } = await supabase
-        .from("rooms")
-        .insert({ name: roomName, section_id: selectedSectionId })
-        .select()
-        .single();
-
-      if (roomError) throw new Error(`Failed to create room: ${roomError.message}`);
-
-      const newRoomId = newRoomData.id;
+      const newRoomId = await createRoomWithExits({
+        name: roomName,
+        sectionId: selectedSectionId,
+        exits: plannedExits.map((exit) => ({
+          direction: exit.direction,
+          targetRoomId: exit.target.id,
+        })),
+      });
 
       if (interaction === "Combat") {
         for (const enemy of enemies) {
@@ -465,27 +465,6 @@ export function useCreateRoomForm() {
 
         if (interactionError)
           throw new Error(`Failed to link transition: ${interactionError.message}`);
-      }
-
-      for (const exit of plannedExits) {
-        const oppositeDirectionEnum = oppositeDirection(exit.direction);
-
-        const { error: neighborError1 } = await supabase.from("neighboring_rooms").insert({
-          room_id: exit.target.id,
-          neighbor_room_id: newRoomId,
-          direction: directionToDbEnum(exit.direction),
-        });
-
-        if (neighborError1) throw new Error(`Failed to link rooms: ${neighborError1.message}`);
-
-        const { error: neighborError2 } = await supabase.from("neighboring_rooms").insert({
-          room_id: newRoomId,
-          neighbor_room_id: exit.target.id,
-          direction: directionToDbEnum(oppositeDirectionEnum),
-        });
-
-        if (neighborError2)
-          throw new Error(`Failed to create reverse link: ${neighborError2.message}`);
       }
 
       // Re-read the room from the database so the local copy includes its

@@ -16,7 +16,7 @@
 - Have equipment actually do something
 - Orbements — non-equipment items that affect stats
 - Set character skill trees
-    - make it so that you can get skills can actually be used
+  - make it so that you can get skills can actually be used
 - Crit hits
 - Can use spells outside combat
 - Heal dead party members
@@ -64,7 +64,7 @@ Planned order agreed with the design owner. Items are checked as they ship.
 - [x] Realm Map room dialog stays centered in the viewport
 - [x] Edit enemies and interactions on an existing room
 - [x] Create multiple exits while forging a new room
-- [ ] Explicit start-room flag (today the map uses the first room)
+- [x] Explicit start-room flag (today the map uses the first room)
 - [x] Improve create-room flow (inline dialogue picker/creator)
 
 Room editing now covers the full contents of an existing room: pick reusable enemies from the library, or change the interaction type (NPC, chest, camp, transition, cutscene) and its fields in place. `saveRoomInteraction` updates child rows when the type is unchanged so quests and chest state survive, then cleans up stale children after a type change. The World Builder can also add several exits at once; each exit is mirrored on the destination and duplicate directions are rejected before the room is created.
@@ -130,31 +130,37 @@ The admin shell now uses a 64px icon rail with hover tooltips, a breadcrumb/sear
 
 #### Data foundation
 
-- [ ] Migration `008_room_map_and_start_rooms.sql`: `rooms.map_x`, `rooms.map_y`, `sections.start_room_id`
-- [ ] Backfill each section's start room from its current lowest-id room
-- [ ] Carry the new fields through `Room`/`Section` types and `getAllRooms`/`getSections`
-- [ ] `updateRoomPosition`, `setSectionStartRoom`, and `createRoomWithExits` query helpers
-- [ ] Wire `startSection` in the runtime to `section.startRoomId` (falling back to the first room)
+- [x] Migration `008_room_map_and_start_rooms.sql`: `rooms.map_x`, `rooms.map_y`, `sections.start_room_id`
+- [x] Backfill each section's start room from its current lowest-id room
+- [x] Carry the new fields through `Room`/`Section` types and `getAllRooms`/`getSections`
+- [x] `updateRoomPosition`, `setSectionStartRoom`, and `createRoomWithExits` query helpers
+- [x] Wire `startSection` in the runtime to `section.startRoomId` (falling back to the first room)
 
 #### Map rendering
 
-- [ ] Replace recursive render-by-name with a flat graph builder and deduped edges keyed by room id
-- [ ] Compass auto-layout per section start, with saved `map_x`/`map_y` drag overrides
-- [ ] Show disconnected/unreachable rooms in an "Unplaced" lane instead of hiding them
-- [ ] One SVG edge per connection, direction labels preserved, curves for loops
-- [ ] Pan vs drag distinction, zoom controls, and wheel zoom
-- [ ] Room/section selection in the URL; map "Edit Room" selects the node instead of navigating away
+- [x] Replace recursive render-by-name with a flat graph builder and deduped edges keyed by room id
+- [x] Compass auto-layout per section start, with saved `map_x`/`map_y` drag overrides
+- [x] Show disconnected/unreachable rooms in an "Unplaced" lane instead of hiding them
+- [x] One SVG edge per connection, direction labels preserved, curves for loops
+- [x] Pan vs drag distinction, zoom controls, and wheel zoom
+- [x] Room/section selection in the URL; map "Edit Room" selects the node instead of navigating away
 
 #### Inspector drawer
 
-- [ ] Right-side inspector (full-screen sheet on mobile) with Basics, Contents, Exits, and Danger tabs
-- [ ] Basics: name, section, "Make section start", diagnostics warnings
-- [ ] Contents: reuse the room enemies/interaction editor
-- [ ] Exits: list/remove doorways, add existing doorway, add a new room in an empty N/S/E/W slot
-- [ ] Danger: delete room
-- [ ] Extract `RoomInspector` so the map drawer and Rooms page share one editor
-- [ ] Fold section create/rename/delete into a map dialog; keep the Sections page as secondary
-- [ ] Keep `/rooms` as an alternate list view and `/rooms/new` as a fallback create flow
+- [x] Right-side inspector (full-screen sheet on mobile) with Basics, Contents, Exits, and Danger tabs
+- [x] Basics: name, section, "Make section start", diagnostics warnings
+- [x] Contents: reuse the room enemies/interaction editor
+- [x] Exits: list/remove doorways, add existing doorway, add a new room in an empty N/S/E/W slot
+- [x] Danger: delete room
+- [x] Extract `RoomInspector` so the map drawer and Rooms page share one editor
+- [x] Fold section create/rename/delete into a map dialog; keep the Sections page as secondary
+- [x] Keep `/rooms` as an alternate list view and `/rooms/new` as a fallback create flow
+
+The map is now a flat graph: `buildRoomGraph` collapses both sides of a doorway into one edge, `computeSectionLayout` places rooms by compass steps from the section start, and saved drag coordinates override the auto-layout. Disconnected rooms appear in an "Unplaced" lane. Panning, zooming, and room dragging are separate gestures; dropping a room persists its grid position, and "Reset layout" clears overrides.
+
+`RoomInspector` is shared by the map drawer and `/rooms`, so Basics, Contents, Exits, and Danger behave identically. The inspector can promote a room to section start, add an existing doorway, or create a new room in any empty compass slot. Section create/rename/delete also moved into a map dialog; the Sections page stays as a secondary view.
+
+Note: apply `supabase/migrations/008_room_map_and_start_rooms.sql` to the live project before using drag positions or section starts. Startup still works without it because sections and rooms are read with `select *`, but drag saves and start-room writes need the new columns.
 
 ### Phase 3 — Image-first enemies and dialogues
 

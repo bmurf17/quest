@@ -376,6 +376,8 @@ export async function getAllRooms(): Promise<Room[]> {
         enemies: enemiesByRoom.get(room.id) || [],
         neighboringRooms,
         interaction,
+        mapX: room.map_x ?? null,
+        mapY: room.map_y ?? null,
       };
     }),
   );
@@ -388,6 +390,8 @@ export async function getAllRooms(): Promise<Room[]> {
     neighboringRooms: [] as [Directions, Room][],
     interaction: roomObj.interaction,
     id: roomObj.id,
+    mapX: roomObj.mapX,
+    mapY: roomObj.mapY,
   }));
 
   roomObjects.forEach((roomObj, index) => {
@@ -416,9 +420,14 @@ export async function getRoomByName(name: string): Promise<Room | null> {
 }
 
 export async function getSections(): Promise<Section[]> {
-  const data = unwrapQuery(await supabase.from("sections").select("id, name").order("id"));
+  // `select *` keeps the app loadable before migration 008 adds start_room_id.
+  const data = unwrapQuery(await supabase.from("sections").select("*").order("id"));
 
-  return data as Section[];
+  return (data ?? []).map((section) => ({
+    id: section.id,
+    name: section.name,
+    startRoomId: section.start_room_id ?? null,
+  }));
 }
 
 export async function getRoomsBySection(sectionId: number): Promise<Room[]> {

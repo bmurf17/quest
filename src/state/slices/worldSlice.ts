@@ -149,7 +149,12 @@ export const createWorldSlice: GameSlice<WorldSlice> = (set, get) => ({
       const sectionRooms = rooms.filter((r) => r.sectionId === sectionId);
       if (sectionRooms.length === 0) return state;
 
-      const firstRoom = sectionRooms[0];
+      const startRoomId = state.availableSections.find((s) => s.id === sectionId)?.startRoomId;
+      // Fall back to the first room (rooms load ordered by id) when a section
+      // has no explicit start room yet, including older saves.
+      const firstRoom =
+        (startRoomId != null ? sectionRooms.find((r) => r.id === startRoomId) : undefined) ??
+        sectionRooms[0];
       const roomInstance = {
         ...firstRoom,
         enemies: firstRoom.enemies.map((e) => ({ ...e })),

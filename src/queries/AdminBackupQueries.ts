@@ -254,10 +254,31 @@ export async function restoreBackup(backup: BackupFile): Promise<RestoreReport> 
     }
   }
 
+  // `sections.start_room_id` points at `rooms`, but sections must be inserted
+  // before rooms so rooms can satisfy their own section foreign key. Strip the
+  // start room during the insert pass and restore it once rooms exist.
+  const sectionStarts: { id: number; startRoomId: number }[] = [];
+  if (backup.tables.sections) {
+    for (const row of backup.tables.sections) {
+      const id = Number(row.id);
+      const startRoomId = Number(row.start_room_id);
+      if (Number.isFinite(id) && Number.isFinite(startRoomId)) {
+        sectionStarts.push({ id, startRoomId });
+      }
+    }
+  }
+
   // Insert parents before children.
   for (const table of presentTables) {
-    const rows = backup.tables[table] ?? [];
+    let rows = backup.tables[table] ?? [];
     if (rows.length === 0) continue;
+    if (table === "sections") {
+      rows = rows.map((row) => {
+        const copy = { ...row };
+        delete copy.start_room_id;
+        return copy;
+      });
+    }
     try {
       await insertTable(table, rows);
       report.restoredTables.push(table);
@@ -267,6 +288,21 @@ export async function restoreBackup(backup: BackupFile): Promise<RestoreReport> 
         table,
         message: pgError?.message ?? (error instanceof Error ? error.message : "Insert failed."),
       });
+    }
+  }
+
+  // Apply start-room links after rooms are back in place.
+  for (const { id, startRoomId } of sectionStarts) {
+    const { error } = await supabase
+      .from("sections")
+      .update({ start_room_id: startRoomId })
+      .eq("id", id);
+    if (error) {
+      report.failed.push({
+        table: "sections.start_room_id",
+        message: error.message,
+      });
+      break;
     }
   }
 
