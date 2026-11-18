@@ -157,10 +157,14 @@ const hasOverride = (room: Room): boolean =>
   typeof room.mapY === "number" &&
   Number.isFinite(room.mapY);
 
-function findNearestFree(
+/**
+ * Find the closest free grid cell to a desired position. Used by the map's
+ * "create room here" ghosts and by the auto-layout collision handling.
+ */
+export function findNearestFreeCell(
   desiredX: number,
   desiredY: number,
-  occupied: Map<string, number>,
+  occupied: ReadonlyMap<string, number>,
 ): [number, number] {
   if (!occupied.has(positionKey(desiredX, desiredY))) return [desiredX, desiredY];
 
@@ -235,7 +239,7 @@ export function computeSectionLayout(
     let x = desiredX;
     let y = desiredY;
     if (occupied.has(positionKey(x, y))) {
-      [x, y] = findNearestFree(x, y, occupied);
+      [x, y] = findNearestFreeCell(x, y, occupied);
     }
     occupied.set(positionKey(x, y), room.id);
 

@@ -4,14 +4,18 @@ import { Compass, Layers, LocateFixed, Minus, Plus, RotateCcw, Search } from "lu
 import { colors, fonts } from "@/theme";
 import { useGameStore } from "@/state/GameState";
 import { getAllRooms, getSections } from "@/queries/RoomQueries";
-import { clearRoomPositions, updateRoomPosition } from "@/queries/AdminQueries";
+import {
+  clearRoomPositions,
+  createRoomWithExits,
+  updateRoomPosition,
+} from "@/queries/AdminQueries";
 import { supabase } from "@/lib/supabase";
-import { computeRealmLayout, type LayoutEdge } from "@/lib/roomLayout";
+import { computeRealmLayout, findNearestFreeCell, type LayoutEdge } from "@/lib/roomLayout";
 import { DIRECTION_OPTIONS } from "@/lib/directions";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { RoomInspector } from "./RoomInspector";
 import { Toast } from "./create-room/Toast";
-import type { Directions } from "@/types/Directions";
+import { Directions } from "@/types/Directions";
 import type { Room, Section } from "@/types/Room";
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
 
@@ -23,7 +27,6 @@ const ORIGIN_X = 90;
 const ORIGIN_Y = 78;
 const SECTION_HEADER = 34;
 const SECTION_GAP = 52;
-const UNPLACED_GAP = 32;
 const MIN_ZOOM = 0.35;
 const MAX_ZOOM = 2.2;
 
@@ -74,6 +77,16 @@ const getInteractionKey = (room: Room): string => {
 const directionShort = (direction: Directions) =>
   DIRECTION_OPTIONS.find(({ value }) => value === direction)?.label.slice(0, 1) ?? "?";
 
+const directionLabel = (direction: Directions) =>
+  DIRECTION_OPTIONS.find(({ value }) => value === direction)?.label ?? "Unknown";
+
+const DIRECTION_OFFSETS: Record<Directions, [number, number]> = {
+  [Directions.North]: [0, -1],
+  [Directions.South]: [0, 1],
+  [Directions.East]: [1, 0],
+  [Directions.West]: [-1, 0],
+};
+
 const errorMessage = (err: unknown) =>
   err instanceof Error ? err.message : "Something went wrong.";
 
@@ -81,6 +94,9 @@ interface RenderNode {
   room: Room;
   left: number;
   top: number;
+  /** Grid coordinates used by the layout, or null for unplaced rooms. */
+  gridX: number | null;
+  gridY: number | null;
   isStart: boolean;
   sectionId: number | null;
   originX: number;
@@ -102,8 +118,6 @@ interface SectionRender {
   headerTop: number;
   nodes: RenderNode[];
   edges: RenderEdge[];
-  hasUnplaced: boolean;
-  unplacedTop: number;
 }
 
 interface ViewModel {
@@ -121,7 +135,8 @@ function buildViewModel(
   let maxWidth = 900;
 
   for (const layout of layouts) {
-    if (layout.nodes.length === 0 && layout.unplaced.length === 0) continue;
+    // Unplaced rooms (no path from the section start) are intentionally hidden.
+    if (layout.nodes.length === 0) continue;
 
     const minX = layout.bounds.minX;
     const minY = layout.bounds.minY;
@@ -139,6 +154,8 @@ function buildViewModel(
         room: node.room,
         left: override?.left ?? baseLeft,
         top: override?.top ?? baseTop,
+        gridX: node.x,
+        gridY: node.y,
         isStart: node.isStart,
         sectionId: layout.sectionId,
         originX,
@@ -152,29 +169,7 @@ function buildViewModel(
     const nodeById = new Map(nodes.map((node) => [node.room.id, node]));
     const edges: RenderEdge[] = layout.edges.map((edge) => toRenderEdge(edge, nodeById));
 
-    if (layout.unplaced.length > 0) {
-      const laneTop = originY + gridHeight + UNPLACED_GAP;
-      layout.unplaced.forEach((room, index) => {
-        const left = originX + index * CELL_W;
-        nodes.push({
-          room,
-          left,
-          top: laneTop,
-          isStart: false,
-          sectionId: layout.sectionId,
-          originX,
-          originY,
-          minX,
-          minY,
-          unplaced: true,
-        });
-      });
-    }
-
-    const unplacedWidth =
-      layout.unplaced.length > 0 ? layout.unplaced.length * CELL_W - (CELL_W - NODE_W) : 0;
-    maxWidth = Math.max(maxWidth, originX + Math.max(gridWidth, unplacedWidth) + ORIGIN_X);
-    const sectionHeight = gridHeight + (layout.unplaced.length > 0 ? UNPLACED_GAP + NODE_H : 0);
+    maxWidth = Math.max(maxWidth, originX + gridWidth + ORIGIN_X);
 
     sections.push({
       key: `${layout.sectionId ?? "none"}`,
@@ -182,11 +177,9 @@ function buildViewModel(
       headerTop,
       nodes,
       edges,
-      hasUnplaced: layout.unplaced.length > 0,
-      unplacedTop: originY + gridHeight + UNPLACED_GAP - 20,
     });
 
-    cursorY += SECTION_HEADER + sectionHeight + SECTION_GAP;
+    cursorY += SECTION_HEADER + gridHeight + SECTION_GAP;
   }
 
   return { sections, width: maxWidth, height: Math.max(cursorY, 480) };
@@ -228,6 +221,81 @@ function toRenderEdge(edge: LayoutEdge, nodeById: Map<number, RenderNode>): Rend
   return { key: edge.key, path, labels };
 }
 
+interface GhostSlot {
+  key: string;
+  sectionKey: string;
+  direction: Directions;
+  gridX: number;
+  gridY: number;
+  left: number;
+  top: number;
+}
+
+/**
+ * Empty compass slots around the selected room. Each ghost knows the exact
+ * grid cell a new room will occupy, so placement is predictable before the
+ * room exists. Directions that already have a doorway are skipped.
+ */
+function buildGhostSlots(
+  viewModel: ViewModel,
+  selectedRoom: Room | null,
+): GhostSlot[] {
+  if (!selectedRoom) return [];
+
+  const selectedNode = viewModel.sections
+    .flatMap((section) => section.nodes)
+    .find((node) => node.room.id === selectedRoom.id && !node.unplaced);
+
+  if (
+    !selectedNode ||
+    selectedNode.gridX === null ||
+    selectedNode.gridY === null
+  ) {
+    return [];
+  }
+
+  const section = viewModel.sections.find((candidate) =>
+    candidate.nodes.some((node) => node.room.id === selectedRoom.id),
+  );
+  if (!section) return [];
+
+  const occupied = new Map<string, number>();
+  for (const node of section.nodes) {
+    if (node.gridX === null || node.gridY === null) continue;
+    occupied.set(`${node.gridX},${node.gridY}`, node.room.id);
+  }
+
+  const usedDirections = new Set(selectedRoom.neighboringRooms.map(([direction]) => direction));
+  const seenCells = new Set<string>();
+  const slots: GhostSlot[] = [];
+
+  for (const { value: direction } of DIRECTION_OPTIONS) {
+    if (usedDirections.has(direction)) continue;
+
+    const [dx, dy] = DIRECTION_OFFSETS[direction];
+    const [gridX, gridY] = findNearestFreeCell(
+      selectedNode.gridX + dx,
+      selectedNode.gridY + dy,
+      occupied,
+    );
+    const cellKey = `${gridX},${gridY}`;
+    if (seenCells.has(cellKey)) continue;
+    seenCells.add(cellKey);
+
+    slots.push({
+      key: `${section.key}-${direction}`,
+      sectionKey: section.key,
+      direction,
+      gridX,
+      gridY,
+      left: selectedNode.originX + (gridX - selectedNode.minX) * CELL_W,
+      top: selectedNode.originY + (gridY - selectedNode.minY) * CELL_H,
+    });
+  }
+
+  return slots;
+}
+
 export default function RoomMap() {
   const rooms = useGameStore((state) => state.rooms);
   const sections = useGameStore((state) => state.availableSections);
@@ -263,6 +331,11 @@ export default function RoomMap() {
     new Map(),
   );
   const viewModel = useMemo(() => buildViewModel(layouts, dragOverrides), [layouts, dragOverrides]);
+  const ghostSlots = useMemo(
+    () => buildGhostSlots(viewModel, selectedRoom),
+    [viewModel, selectedRoom],
+  );
+  const [ghostTarget, setGhostTarget] = useState<GhostSlot | null>(null);
 
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -448,6 +521,11 @@ export default function RoomMap() {
     }
   };
 
+  const handleGhostCreated = async (roomId: number) => {
+    await refresh();
+    selectRoom(roomId);
+  };
+
   const focusStart = () => {
     const layout = layouts[0];
     const firstNode = layout?.nodes.find((node) => node.isStart) ?? layout?.nodes[0];
@@ -476,7 +554,8 @@ export default function RoomMap() {
               <span style={countStyle}>{rooms.length} rooms</span>
             </div>
             <p style={hintStyle}>
-              Drag the map to pan · drag a room to save a position · scroll to zoom
+              Drag the map to pan · drag a room to save a position · scroll to zoom · select a room
+              to add a neighbour
             </p>
           </div>
 
@@ -604,11 +683,6 @@ export default function RoomMap() {
                   <div style={{ position: "absolute", top: section.headerTop, left: ORIGIN_X }}>
                     <span style={sectionLabelStyle}>{section.name}</span>
                   </div>
-                  {section.hasUnplaced && (
-                    <div style={{ position: "absolute", top: section.unplacedTop, left: ORIGIN_X }}>
-                      <span style={unplacedLabelStyle}>Unplaced</span>
-                    </div>
-                  )}
                   {section.nodes.map((node) => (
                     <RoomNode
                       key={`${section.key}-${node.room.id}`}
@@ -623,6 +697,15 @@ export default function RoomMap() {
                       }}
                     />
                   ))}
+                  {ghostSlots
+                    .filter((slot) => slot.sectionKey === section.key)
+                    .map((slot) => (
+                      <GhostNode
+                        key={slot.key}
+                        slot={slot}
+                        onClick={() => setGhostTarget(slot)}
+                      />
+                    ))}
                 </div>
               ))}
             </div>
@@ -687,6 +770,17 @@ export default function RoomMap() {
           sections={sections}
           onClose={() => setSectionsOpen(false)}
           onChanged={refresh}
+          showToast={showToast}
+        />
+      )}
+
+      {ghostTarget && selectedRoom && (
+        <CreateRoomFromMapDialog
+          slot={ghostTarget}
+          room={selectedRoom}
+          sections={sections}
+          onClose={() => setGhostTarget(null)}
+          onCreated={handleGhostCreated}
           showToast={showToast}
         />
       )}
@@ -789,6 +883,141 @@ function RoomNode({
       </span>
       {node.isStart && <span style={startBadgeStyle}>START</span>}
     </button>
+  );
+}
+
+function GhostNode({ slot, onClick }: { slot: GhostSlot; onClick: () => void }) {
+  const [hovered, setHovered] = useState(false);
+  const label = directionLabel(slot.direction);
+
+  return (
+    <button
+      type="button"
+      data-room-node
+      data-ghost-slot
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      aria-label={`Create a room to the ${label.toLowerCase()}`}
+      title={`Add a room to the ${label.toLowerCase()}`}
+      style={{
+        position: "absolute",
+        left: slot.left,
+        top: slot.top,
+        width: NODE_W,
+        height: NODE_H,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 2,
+        padding: "0 8px",
+        background: hovered ? "rgba(212,175,55,0.14)" : "rgba(13,11,7,0.55)",
+        border: `1px dashed ${hovered ? colors.gold : "rgba(212,175,55,0.45)"}`,
+        borderRadius: 7,
+        color: colors.goldMuted,
+        cursor: "pointer",
+        touchAction: "none",
+        zIndex: 2,
+        transition: "background 120ms ease, border-color 120ms ease",
+      }}
+    >
+      <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+        <Plus size={12} />
+        <span
+          style={{
+            fontSize: 10,
+            fontFamily: fonts.display,
+            letterSpacing: "0.06em",
+            textTransform: "uppercase",
+          }}
+        >
+          {label}
+        </span>
+      </span>
+      <span style={{ fontSize: 9, color: colors.muted }}>Add room</span>
+    </button>
+  );
+}
+
+function CreateRoomFromMapDialog({
+  slot,
+  room,
+  sections,
+  onClose,
+  onCreated,
+  showToast,
+}: {
+  slot: GhostSlot;
+  room: Room;
+  sections: Section[];
+  onClose: () => void;
+  onCreated: (roomId: number) => Promise<void>;
+  showToast: (type: "success" | "error", message: string) => void;
+}) {
+  const [name, setName] = useState("");
+  const [busy, setBusy] = useState(false);
+  const label = directionLabel(slot.direction);
+  const sectionName =
+    sections.find((section) => section.id === room.sectionId)?.name ?? "Unassigned";
+
+  const submit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const trimmed = name.trim();
+    if (!trimmed) return;
+
+    setBusy(true);
+    try {
+      const newRoomId = await createRoomWithExits({
+        name: trimmed,
+        sectionId: room.sectionId || null,
+        exits: [{ direction: slot.direction, targetRoomId: room.id }],
+        mapX: slot.gridX,
+        mapY: slot.gridY,
+      });
+      await onCreated(newRoomId);
+      showToast("success", `"${trimmed}" was created to the ${label.toLowerCase()}.`);
+      onClose();
+    } catch (err) {
+      showToast("error", errorMessage(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent style={dialogStyle}>
+        <DialogTitle asChild>
+          <h2 style={dialogTitleStyle}>Add a room to the {label.toLowerCase()}</h2>
+        </DialogTitle>
+        <p style={dialogHintStyle}>
+          The new room will appear in the dashed slot beside{" "}
+          <strong style={{ color: colors.text }}>{room.name}</strong> in {sectionName}, with a
+          doorway between them.
+        </p>
+
+        <form onSubmit={(event) => void submit(event)} style={{ display: "flex", gap: 8 }}>
+          <input
+            autoFocus
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            placeholder="Room name"
+            aria-label="New room name"
+            style={{ ...dialogInputStyle, flex: 1 }}
+          />
+          <button type="submit" disabled={busy || !name.trim()} style={dialogPrimaryStyle}>
+            {busy ? "Creating…" : "Create room"}
+          </button>
+        </form>
+
+        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
+          <button type="button" onClick={onClose} style={dialogButtonStyle}>
+            Cancel
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -1046,12 +1275,6 @@ const sectionLabelStyle: CSSProperties = {
   fontSize: 10,
   letterSpacing: "0.1em",
   textTransform: "uppercase",
-};
-const unplacedLabelStyle: CSSProperties = {
-  ...sectionLabelStyle,
-  color: colors.warning,
-  borderColor: "rgba(242,164,68,0.3)",
-  marginTop: 6,
 };
 const startBadgeStyle: CSSProperties = {
   position: "absolute",
